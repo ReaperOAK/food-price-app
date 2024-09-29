@@ -1,25 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import MainPage from './components/MainPage';
+import AdminPage from './components/AdminPage';
+import LoginPage from './components/LoginPage';
+// @df8cZ5v db password
+// https://blueviolet-gerbil-672303.hostingersite.com/php
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    // Get the authentication state from local storage
+    return localStorage.getItem('isAuthenticated') === 'true';
+  });
+
+  useEffect(() => {
+    // Update local storage when authentication state changes
+    localStorage.setItem('isAuthenticated', isAuthenticated);
+  }, [isAuthenticated]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+        <Route path="/:city" element={<MainPage />} />
+        <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
+        <Route
+          path="/admin"
+          element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
+        />
+      </Routes>
+    </Router>
   );
 }
 
 export default App;
+
