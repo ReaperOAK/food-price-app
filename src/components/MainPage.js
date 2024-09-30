@@ -1,19 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, matchPath } from 'react-router-dom';
 import Navbar from './Navbar';
 import RateTable from './RateTable';
 import DefaultTable from './DefaultTable';
-import SEOText from './SEOText';
-import FAQ from './FAQ';
 import Footer from './Footer';
 import BodyOne from './BodyOne';
+import BodyTwo from './BodyTwo';
+import StatePage from './StatePage';
+import StateList from './StateList';
+import SpecialRatesTable from './SpecialRatesTable';
 
 const MainPage = () => {
-  const { city } = useParams();
+  const { city, state } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
-  const [selectedState, setSelectedState] = useState('');
+  const [selectedState, setSelectedState] = useState(state || '');
   const [selectedCity, setSelectedCity] = useState(city || '');
   const [eggRates, setEggRates] = useState([]);
 
@@ -91,6 +94,16 @@ const MainPage = () => {
     }
   }, [selectedCity, navigate]);
 
+  // Update URL when selectedState changes
+  useEffect(() => {
+    if (selectedState && !selectedCity) {
+      navigate(`/state/${selectedState}`);
+    }
+  }, [selectedState, selectedCity, navigate]);
+
+  // Check if the current URL matches /state/:state
+  const stateMatch = matchPath('/state/:state', location.pathname);
+
   return (
     <div>
       <Navbar
@@ -101,15 +114,20 @@ const MainPage = () => {
       />
       <BodyOne/>
 
-      {selectedCity && selectedState ? (
-        <RateTable key={`${selectedCity}-${selectedState}`} selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
+      {stateMatch ? (
+        <StatePage />
       ) : (
-        <DefaultTable key="default-table" eggRates={eggRates} />
+        <>
+          {selectedCity && selectedState ? (
+            <RateTable key={`${selectedCity}-${selectedState}`} selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
+          ) : (
+            <DefaultTable key="default-table" eggRates={eggRates} />
+          )}
+        </>
       )}
-      <SEOText selectedCity={selectedCity} selectedState={selectedState} />
-      
-      
-      <FAQ />
+      <StateList/>
+      <SpecialRatesTable/>
+      <BodyTwo/>
       <Footer />
     </div>
   );

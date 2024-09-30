@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './components/MainPage';
 import AdminPage from './components/AdminPage';
 import LoginPage from './components/LoginPage';
+import StateList from './components/StateList';
+import StatePage from './components/StatePage';
 // @df8cZ5v db password
 // https://blueviolet-gerbil-672303.hostingersite.com/php
 
@@ -22,6 +24,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/:city" element={<MainPage />} />
+        <Route path="/state/:state" element={<MainPage />} />
         <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
         <Route
           path="/admin"
@@ -33,4 +36,3 @@ function App() {
 }
 
 export default App;
-
