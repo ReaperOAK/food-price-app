@@ -6,7 +6,7 @@ import LoginPage from './components/LoginPage';
 import StateList from './components/StateList';
 import StatePage from './components/StatePage';
 // @df8cZ5v db password
-// https://blueviolet-gerbil-672303.hostingersite.com/php
+// https://todayeggrates.com/php
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {

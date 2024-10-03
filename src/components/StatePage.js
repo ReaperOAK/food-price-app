@@ -6,7 +6,7 @@ const StatePage = () => {
   const [averageRates, setAverageRates] = useState([]);
 
   useEffect(() => {
-    fetch(`https://blueviolet-gerbil-672303.hostingersite.com/php/get_average_rates.php?state=${state}`)
+    fetch(`https://todayeggrates.com/php/get_average_rates.php?state=${state}`)
       .then(response => response.json())
       .then(data => {
         console.log('Fetched average rates:', data); // Debugging log
@@ -16,26 +16,34 @@ const StatePage = () => {
   }, [state]);
 
   return (
-    <div className="p-6 mt-6 bg-gray-100 rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Average Rates for {state}</h2>
-      <table className="min-w-full border border-gray-300 mt-4">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 p-2">Date</th>
-            <th className="border border-gray-300 p-2">Average Rate</th>
-          </tr>
-        </thead>
-        <tbody>
-          {averageRates.map((rate, index) => (
-            <tr key={`${rate.date}-${index}`}>
-              <td className="border border-gray-300 p-2">{rate.date}</td>
-              <td className="border border-gray-300 p-2">
-                {rate.averageRate ? `₹${parseFloat(rate.averageRate).toFixed(2)}` : 'N/A'}
-              </td>
+    <div className="p-6 mt-6 bg-white rounded-lg shadow-lg max-w-4xl mx-auto">
+      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Average Rates for {state}</h2>
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-gray-300">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border border-gray-300 p-4 text-left">Date</th>
+              <th className="border border-gray-300 p-4 text-left">Average Rate</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {averageRates.length > 0 ? (
+              averageRates.map((rate, index) => (
+                <tr key={`${rate.date}-${index}`} className="hover:bg-gray-100 transition duration-150">
+                  <td className="border border-gray-300 p-4">{rate.date}</td>
+                  <td className="border border-gray-300 p-4">
+                    {rate.averageRate ? `₹${parseFloat(rate.averageRate).toFixed(2)}` : 'N/A'}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td className="border border-gray-300 p-4 text-center" colSpan="2">Loading...</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

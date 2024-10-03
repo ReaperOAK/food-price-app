@@ -22,7 +22,7 @@ const MainPage = () => {
 
   // Fetch states on mount
   useEffect(() => {
-    fetch('https://blueviolet-gerbil-672303.hostingersite.com/php/get_states.php')
+    fetch('https://todayeggrates.com/php/get_states.php')
       .then(res => res.json())
       .then(data => setStates(data))
       .catch(error => console.error('Error fetching states:', error));
@@ -31,7 +31,7 @@ const MainPage = () => {
   // Fetch cities when a state is selected
   useEffect(() => {
     if (selectedState) {
-      fetch(`https://blueviolet-gerbil-672303.hostingersite.com/php/get_cities.php?state=${selectedState}`)
+      fetch(`https://todayeggrates.com/php/get_cities.php?state=${selectedState}`)
         .then(res => res.json())
         .then(data => setCities(data))
         .catch(error => console.error('Error fetching cities:', error));
@@ -41,7 +41,7 @@ const MainPage = () => {
   // Fetch state for the city from the URL
   useEffect(() => {
     if (city) {
-      fetch(`https://blueviolet-gerbil-672303.hostingersite.com/php/get_state_for_city.php?city=${city}`)
+      fetch(`https://todayeggrates.com/php/get_state_for_city.php?city=${city}`)
         .then(res => res.json())
         .then(data => {
           if (data.state) {
@@ -57,24 +57,24 @@ const MainPage = () => {
   const handleFetchRates = () => {
     if (selectedCity && selectedState) {
       // Fetch rates for selected city and state
-      fetch(`https://blueviolet-gerbil-672303.hostingersite.com/php/get_rates.php?city=${selectedCity}&state=${selectedState}`)
+      fetch(`https://todayeggrates.com/php/get_rates.php?city=${selectedCity}&state=${selectedState}`)
         .then(res => res.json())
         .then(data => {
           const convertedData = data.map(item => ({
             ...item,
-            rate: parseFloat(item.rate) // Convert rate to a number
+            rate: parseFloat(item.rate), // Convert rate to a number
           }));
           setEggRates(convertedData);
         })
         .catch(error => console.error('Error fetching rates:', error));
     } else {
       // Fetch latest rates when no city/state is selected
-      fetch(`https://blueviolet-gerbil-672303.hostingersite.com/php/get_latest_rates.php`)
+      fetch(`https://todayeggrates.com/php/get_latest_rates.php`)
         .then(res => res.json())
         .then(data => {
           const convertedData = data.map(item => ({
             ...item,
-            rate: parseFloat(item.rate) // Convert rate to a number
+            rate: parseFloat(item.rate), // Convert rate to a number
           }));
           setEggRates(convertedData);
         })
@@ -105,29 +105,39 @@ const MainPage = () => {
   const stateMatch = matchPath('/state/:state', location.pathname);
 
   return (
-    <div>
+    <div className="bg-gray-50 min-h-screen flex flex-col">
       <Navbar
         selectedState={selectedState}
-        setSelectedState={setSelectedState} 
-        setSelectedCity={setSelectedCity} 
+        setSelectedState={setSelectedState}
+        setSelectedCity={setSelectedCity}
         selectedCity={selectedCity}
       />
-      <BodyOne/>
+      <div className="flex-grow p-4 md:p-8 lg:p-12">
+        <BodyOne />
 
-      {stateMatch ? (
-        <StatePage />
-      ) : (
-        <>
-          {selectedCity && selectedState ? (
-            <RateTable key={`${selectedCity}-${selectedState}`} selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
+        <div className="bg-white rounded-lg shadow-md p-6">
+          {stateMatch ? (
+            <StatePage />
           ) : (
-            <DefaultTable key="default-table" eggRates={eggRates} />
+            <>
+              {selectedCity && selectedState ? (
+                <RateTable
+                  key={`${selectedCity}-${selectedState}`}
+                  selectedCity={selectedCity}
+                  selectedState={selectedState}
+                  eggRates={eggRates}
+                />
+              ) : (
+                <DefaultTable key="default-table" eggRates={eggRates} />
+              )}
+            </>
           )}
-        </>
-      )}
-      <StateList/>
-      <SpecialRatesTable/>
-      <BodyTwo/>
+          <StateList />
+          <SpecialRatesTable />
+        </div>
+
+        <BodyTwo />
+      </div>
       <Footer />
     </div>
   );

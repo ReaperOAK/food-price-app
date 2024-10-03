@@ -43,36 +43,38 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
   }
 
   return (
-    <div className="dynamic-body">
-      <table className="min-w-full border border-gray-300 mt-4">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="border border-gray-300 p-2 cursor-pointer" onClick={() => requestSort('date')}>Date</th>
-            <th className="border border-gray-300 p-2 cursor-pointer" onClick={() => requestSort('rate')}>Piece</th>
-            <th className="border border-gray-300 p-2">Tray</th>
-            <th className="border border-gray-300 p-2">100 Pcs</th>
-            <th className="border border-gray-300 p-2">Peti</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems.map((rate, index) => (
-            <tr key={`${rate.date}-${rate.rate}-${index}`}>
-              <td className="border border-gray-300 p-2">{rate.date}</td>
-              <td className="border border-gray-300 p-2">₹{rate.rate.toFixed(2)}</td>
-              <td className="border border-gray-300 p-2">₹{(rate.rate * 30).toFixed(2)}</td>
-              <td className="border border-gray-300 p-2">₹{(rate.rate * 100).toFixed(2)}</td>
-              <td className="border border-gray-300 p-2">₹{(rate.rate * 210).toFixed(2)}</td>
+    <div className="dynamic-body p-4">
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-gray-300 mt-4">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border border-gray-300 p-2 cursor-pointer" onClick={() => requestSort('date')}>Date</th>
+              <th className="border border-gray-300 p-2 cursor-pointer" onClick={() => requestSort('rate')}>Piece</th>
+              <th className="border border-gray-300 p-2">Tray</th>
+              <th className="border border-gray-300 p-2">100 Pcs</th>
+              <th className="border border-gray-300 p-2">Peti</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="pagination mt-4">
+          </thead>
+          <tbody>
+            {currentItems.map((rate, index) => (
+              <tr key={`${rate.date}-${rate.rate}-${index}`} className="hover:bg-gray-100">
+                <td className="border border-gray-300 p-2">{rate.date}</td>
+                <td className="border border-gray-300 p-2">₹{rate.rate.toFixed(2)}</td>
+                <td className="border border-gray-300 p-2">₹{(rate.rate * 30).toFixed(2)}</td>
+                <td className="border border-gray-300 p-2">₹{(rate.rate * 100).toFixed(2)}</td>
+                <td className="border border-gray-300 p-2">₹{(rate.rate * 210).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="pagination mt-4 flex justify-center">
         {pages.map(number => (
           <button
             key={number}
             id={number}
             onClick={handleClick}
-            className={`px-4 py-2 mx-1 border ${currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`}
+            className={`px-4 py-2 mx-1 border rounded ${currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 hover:bg-blue-100'}`}
           >
             {number}
           </button>
