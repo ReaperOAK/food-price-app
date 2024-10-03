@@ -42,48 +42,52 @@ const DefaultTable = ({ eggRates = [] }) => {
   }
 
   return (
-    <div className="p-6 mt-6 bg-gray-100 rounded-lg shadow-lg">
+    <div className="dynamic-body p-4">
       <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-300 mt-4 bg-white rounded-lg">
+        <table className="min-w-full border border-gray-300 mt-4">
           <thead>
-            <tr className="bg-gray-200">
+            <tr style={{ backgroundColor: '#F9BE0C' }}>
               <th
-                className="border border-gray-300 p-4 cursor-pointer text-left hover:bg-gray-300 transition"
+                className="border border-gray-300 p-2 cursor-pointer"
                 onClick={() => requestSort('city')}
               >
                 Market
               </th>
               <th
-                className="border border-gray-300 p-4 cursor-pointer text-left hover:bg-gray-300 transition"
+                className="border border-gray-300 p-2 cursor-pointer"
                 onClick={() => requestSort('rate')}
               >
                 Piece
               </th>
-              <th className="border border-gray-300 p-4 text-left">Tray</th>
-              <th className="border border-gray-300 p-4 text-left">100 Pcs</th>
-              <th className="border border-gray-300 p-4 text-left">Peti</th>
+              <th className="border border-gray-300 p-2">Tray</th>
+              <th className="border border-gray-300 p-2">100 Pcs</th>
+              <th className="border border-gray-300 p-2">Peti</th>
             </tr>
           </thead>
           <tbody>
             {currentItems.map((rate, index) => (
-              <tr key={`${rate.city}-${rate.date}-${index}`} className="hover:bg-gray-100 transition">
-                <td className="border border-gray-300 p-4">{rate.city}</td>
-                <td className="border border-gray-300 p-4">₹{rate.rate.toFixed(2)}</td>
-                <td className="border border-gray-300 p-4">₹{(rate.rate * 30).toFixed(2)}</td>
-                <td className="border border-gray-300 p-4">₹{(rate.rate * 100).toFixed(2)}</td>
-                <td className="border border-gray-300 p-4">₹{(rate.rate * 210).toFixed(2)}</td>
+              <tr
+                key={`${rate.city}-${rate.date}-${index}`}
+                className="hover:bg-[#DDFAFE]"
+                style={{ backgroundColor: index % 2 === 0 ? '#FFFCDF' : '#FFF1C8' }}
+              >
+                <td className="border border-gray-300 p-2">{rate.city}</td>
+                <td className="border border-gray-300 p-2">₹{rate.rate.toFixed(2)}</td>
+                <td className="border border-gray-300 p-2">₹{(rate.rate * 30).toFixed(2)}</td>
+                <td className="border border-gray-300 p-2">₹{(rate.rate * 100).toFixed(2)}</td>
+                <td className="border border-gray-300 p-2">₹{(rate.rate * 210).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-      <div className="flex justify-center mt-4">
+      <div className="pagination mt-4 flex justify-center">
         {pages.map(number => (
           <button
             key={number}
             id={number}
             onClick={handleClick}
-            className={`px-4 py-2 mx-1 border rounded transition ${currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 hover:bg-blue-100'}`}
+            className={`px-4 py-2 mx-1 border rounded ${currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 hover:bg-blue-100'}`}
           >
             {number}
           </button>

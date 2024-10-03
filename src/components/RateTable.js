@@ -47,7 +47,7 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-300 mt-4">
           <thead>
-            <tr className="bg-gray-200">
+            <tr style={{ backgroundColor: '#F9BE0C' }}>
               <th className="border border-gray-300 p-2 cursor-pointer" onClick={() => requestSort('date')}>Date</th>
               <th className="border border-gray-300 p-2 cursor-pointer" onClick={() => requestSort('rate')}>Piece</th>
               <th className="border border-gray-300 p-2">Tray</th>
@@ -57,7 +57,11 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
           </thead>
           <tbody>
             {currentItems.map((rate, index) => (
-              <tr key={`${rate.date}-${rate.rate}-${index}`} className="hover:bg-gray-100">
+              <tr
+                key={`${rate.date}-${rate.rate}-${index}`}
+                className="hover:bg-[#DDFAFE]"
+                style={{ backgroundColor: index % 2 === 0 ? '#FFFCDF' : '#FFF1C8' }}
+              >
                 <td className="border border-gray-300 p-2">{rate.date}</td>
                 <td className="border border-gray-300 p-2">₹{rate.rate.toFixed(2)}</td>
                 <td className="border border-gray-300 p-2">₹{(rate.rate * 30).toFixed(2)}</td>
