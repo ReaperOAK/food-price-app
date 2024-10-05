@@ -68,8 +68,7 @@ const DefaultTable = ({ eggRates = [] }) => {
             {currentItems.map((rate, index) => (
               <tr
                 key={`${rate.city}-${rate.date}-${index}`}
-                className="hover:bg-[#DDFAFE]"
-                style={{ backgroundColor: index % 2 === 0 ? '#FFFCDF' : '#FFF1C8' }}
+                className={`${index % 2 === 0 ? 'bg-[#fffcdf]' : 'bg-[#fff1c8]'} hover:bg-[#ddfafe]`}
               >
                 <td className="border border-gray-300 p-2"><a href={`/${rate.city}`}>{rate.city}</a></td>
                 <td className="border border-gray-300 p-2">₹{rate.rate.toFixed(2)}</td>

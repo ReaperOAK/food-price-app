@@ -59,8 +59,7 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
             {currentItems.map((rate, index) => (
               <tr
                 key={`${rate.date}-${rate.rate}-${index}`}
-                className="hover:bg-[#DDFAFE]"
-                style={{ backgroundColor: index % 2 === 0 ? '#FFFCDF' : '#FFF1C8' }}
+                className={`${index % 2 === 0 ? 'bg-[#fffcdf]' : 'bg-[#fff1c8]'} hover:bg-[#ddfafe]`}
               >
                 <td className="border border-gray-300 p-2">{rate.date}</td>
                 <td className="border border-gray-300 p-2">₹{rate.rate.toFixed(2)}</td>

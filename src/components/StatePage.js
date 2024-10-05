@@ -21,7 +21,7 @@ const StatePage = () => {
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-300">
           <thead>
-            <tr className="bg-gray-200">
+            <tr style={{ backgroundColor: '#F9BE0C' }}>
               <th className="border border-gray-300 p-4 text-left">Date</th>
               <th className="border border-gray-300 p-4 text-left">Average Rate</th>
             </tr>
@@ -29,7 +29,7 @@ const StatePage = () => {
           <tbody>
             {averageRates.length > 0 ? (
               averageRates.map((rate, index) => (
-                <tr key={`${rate.date}-${index}`} className="hover:bg-gray-100 transition duration-150">
+                <tr key={`${rate.date}-${index}`} className={`transition duration-150 ${index % 2 === 0 ? 'bg-[#fffcdf]' : 'bg-[#fff1c8]'} hover:bg-[#ddfafe]`}>
                   <td className="border border-gray-300 p-4">{rate.date}</td>
                   <td className="border border-gray-300 p-4">
                     {rate.averageRate ? `₹${parseFloat(rate.averageRate).toFixed(2)}` : 'N/A'}
