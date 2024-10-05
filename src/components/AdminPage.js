@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import AdminNavbar from './AdminNavbar';
 
 const AdminPage = ({ setIsAuthenticated }) => {
   const [eggRate, setEggRate] = useState({ id: '', city: '', state: '', date: '', rate: '' });
@@ -60,6 +61,8 @@ const AdminPage = ({ setIsAuthenticated }) => {
   if (error) return <div>Error loading data: {error.message}</div>;
 
   return (
+    <>
+    <AdminNavbar setIsAuthenticated={setIsAuthenticated} />
     <div className="p-6 bg-gray-100 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
         <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Admin Egg Rate Management</h1>
@@ -129,6 +132,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
