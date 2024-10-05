@@ -25,7 +25,7 @@ const StateList = () => {
         <tr key={i} className="bg-white border-b hover:bg-gray-50">
           {states.slice(i, i + 3).map(state => (
             <td key={state} className="px-6 py-4 text-center">
-              <Link to={`/state/${state}`} className="text-blue-600 hover:underline transition duration-200">{state}</Link>
+              <Link to={`/state/${state}`} className="text-green-600 font-bold hover:underline transition duration-200">{state}</Link>
             </td>
           ))}
         </tr>
