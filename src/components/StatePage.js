@@ -9,7 +9,6 @@ const StatePage = () => {
     fetch(`https://todayeggrates.com/php/get_average_rates.php?state=${state}`)
       .then(response => response.json())
       .then(data => {
-        console.log('Fetched average rates:', data); // Debugging log
         setAverageRates(data.averageRates || []);
       })
       .catch(error => console.error('Error fetching average rates:', error));

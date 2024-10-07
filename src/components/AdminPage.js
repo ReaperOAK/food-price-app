@@ -36,7 +36,6 @@ const AdminPage = ({ setIsAuthenticated }) => {
     })
       .then(res => res.json())
       .then(response => {
-        console.log(response);
         fetchEggRates(); // Refresh the list of egg rates
         setEggRate({ id: '', city: '', state: '', date: '', rate: '' }); // Reset form
       })
@@ -51,7 +50,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
     })
       .then(res => res.json())
       .then(response => {
-        console.log(response);
+    
         fetchEggRates(); // Refresh the list of egg rates
       })
       .catch(error => console.error("Error deleting item:", error));

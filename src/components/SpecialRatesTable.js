@@ -7,7 +7,6 @@ const SpecialRatesTable = () => {
     fetch('https://todayeggrates.com/php/get_special_rates.php')
       .then(response => response.json())
       .then(data => {
-        console.log('Fetched special rates:', data); // Log the special rates
         setSpecialRates(data);
       })
       .catch(error => console.error('Error fetching special rates:', error));

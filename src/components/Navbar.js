@@ -10,10 +10,15 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity }) => {
     fetch('https://todayeggrates.com/php/get_states_and_cities.php')
       .then(response => response.json())
       .then(data => {
-        const combinedOptions = data.map(item => ({
-          value: item.city,
-          label: `${item.city}, ${item.state}`,
-        }));
+        const combinedOptions = [];
+        for (const state in data) {
+          data[state].forEach(city => {
+            combinedOptions.push({
+              value: city,
+              label: `${city}, ${state}`,
+            });
+          });
+        }
         setOptions(combinedOptions);
       })
       .catch(error => console.error('Error fetching states and cities:', error));

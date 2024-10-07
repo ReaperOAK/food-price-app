@@ -8,7 +8,6 @@ const StateList = () => {
     fetch('https://todayeggrates.com/php/get_states.php')
       .then(response => response.json())
       .then(data => {
-        console.log('Fetched data:', data);
         if (Array.isArray(data)) {
           setStates(data);
         } else {
