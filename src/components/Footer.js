@@ -55,6 +55,8 @@ const Footer = () => {
           </a>
           .
         </p>
+        <br/>
+        <p>Made with &#10084; by Owais Khan</p>
       </div>
     </footer>
   );

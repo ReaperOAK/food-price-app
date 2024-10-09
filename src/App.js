@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainPage from './components/MainPage';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TOS from './components/TOS';
 import AdminPage from './components/AdminPage';
 import LoginPage from './components/LoginPage';
-import StateList from './components/StateList';
-import StatePage from './components/StatePage';
 // @df8cZ5v db password
 // https://todayeggrates.com/php
 
@@ -23,6 +23,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<MainPage />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TOS />} />
         <Route path="/:city" element={<MainPage />} />
         <Route path="/state/:state" element={<MainPage />} />
         <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
