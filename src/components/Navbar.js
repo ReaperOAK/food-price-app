@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Select from 'react-select';
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 const Navbar = ({ setSelectedCity, setSelectedState, selectedCity }) => {
   const [options, setOptions] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,18 +39,62 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity }) => {
     navigate('/');
   };
 
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+
   return (
     <nav className="bg-white p-4 shadow-lg">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
-        <Link to="/" onClick={handleHomeClick} className="mb-4 md:mb-0">
-          <img src="tee.avif" alt="Today Egg Rates Logo" className="h-10" />
-        </Link>
-        <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mb-4 md:mb-0">
-          <Link to="/" className="text-gray-800 hover:text-gray-600 transition duration-300" onClick={handleHomeClick}>Home</Link>
-          <Link to="/Mumbai" className="text-gray-800 hover:text-gray-600 transition duration-300">Mumbai</Link>
-          <Link to="/Kolkata" className="text-gray-800 hover:text-gray-600 transition duration-300">Kolkata</Link>
-          <Link to="/Lucknow" className="text-gray-800 hover:text-gray-600 transition duration-300">Lucknow</Link>
-          <Link to="/Chennai" className="text-gray-800 hover:text-gray-600 transition duration-300">Chennai</Link>
+        <div className="flex justify-between items-center w-full md:w-auto">
+          <Link to="/" onClick={handleHomeClick} className="mb-4 md:mb-0">
+            <img src="tee.avif" alt="Today Egg Rates Logo" className="h-10" />
+          </Link>
+          <button
+            className="md:hidden text-gray-800 focus:outline-none"
+            onClick={toggleMenu}
+          >
+            {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+          </button>
+        </div>
+        <div
+          className={`${
+            menuOpen ? 'block' : 'hidden'
+          } md:flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-4 mb-4 md:mb-0 w-full md:w-auto`}
+        >
+          <div className="flex flex-col space-y-2 md:space-y-0 md:flex-row md:space-x-4">
+          <Link
+            to="/"
+            className="text-gray-800 hover:text-gray-600 transition duration-300"
+            onClick={handleHomeClick}
+          >
+            Home
+          </Link>
+          <Link
+            to="/Mumbai"
+            className="text-gray-800 hover:text-gray-600 transition duration-300"
+          >
+            Mumbai
+          </Link>
+          <Link
+            to="/Kolkata"
+            className="text-gray-800 hover:text-gray-600 transition duration-300"
+          >
+            Kolkata
+          </Link>
+          <Link
+            to="/Lucknow"
+            className="text-gray-800 hover:text-gray-600 transition duration-300"
+          >
+            Lucknow
+          </Link>
+          <Link
+            to="/Chennai"
+            className="text-gray-800 hover:text-gray-600 transition duration-300"
+          >
+            Chennai
+          </Link>
+          </div>
         </div>
         <div className="w-full md:w-64">
           <Select
