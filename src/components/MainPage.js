@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation, matchPath } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+
 import Navbar from './Navbar';
 import RateTable from './RateTable';
 import DefaultTable from './DefaultTable';
@@ -19,6 +21,7 @@ const MainPage = () => {
   const [selectedState, setSelectedState] = useState(state || '');
   const [selectedCity, setSelectedCity] = useState(city || '');
   const [eggRates, setEggRates] = useState([]);
+  const displayName = selectedCity ? selectedCity : selectedState ? selectedState : 'India';
 
   // Fetch states on mount
   useEffect(() => {
@@ -87,59 +90,60 @@ const MainPage = () => {
     handleFetchRates();
   }, [selectedState, selectedCity]); // Run effect whenever selectedState or selectedCity changes
 
-  // Update URL when selectedCity changes
-  useEffect(() => {
-    if (selectedCity) {
-      navigate(`/${selectedCity}`);
-    }
-  }, [selectedCity, navigate]);
-
-  // Update URL when selectedState changes
-  useEffect(() => {
-    if (selectedState && !selectedCity) {
-      navigate(`/state/${selectedState}`);
-    }
-  }, [selectedState, selectedCity, navigate]);
-
   // Check if the current URL matches /state/:state
   const stateMatch = matchPath('/state/:state', location.pathname);
 
+  // Update URL when selectedCity or selectedState changes
+  useEffect(() => {
+    if (selectedCity) {
+      // Update the URL format to /city-egg-rate (for frontend)
+      navigate(`/${selectedCity.toLowerCase()}-egg-rate/`);
+    } else if (selectedState && !selectedCity) {
+      // Update the URL format to /state/state-egg-rate (for frontend)
+      navigate(`/state/${selectedState.toLowerCase()}-egg-rate`);
+    }
+  }, [selectedCity, selectedState, navigate]);
+
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Navbar
-        selectedState={selectedState}
-        setSelectedState={setSelectedState}
-        setSelectedCity={setSelectedCity}
-        selectedCity={selectedCity}
-      />
-      <div className="flex-grow p-4 md:p-8 lg:p-12">
-        <BodyOne />
-
-        <div className="bg-white rounded-lg shadow-md p-6">
-          {stateMatch ? (
-            <StatePage />
-          ) : (
-            <>
-              {selectedCity && selectedState ? (
-                <RateTable
-                  key={`${selectedCity}-${selectedState}`}
-                  selectedCity={selectedCity}
-                  selectedState={selectedState}
-                  eggRates={eggRates}
-                />
-              ) : (
-                <DefaultTable key="default-table" eggRates={eggRates} />
-              )}
-            </>
-          )}
-          <StateList />
-          <SpecialRatesTable />
+    <>
+      <Helmet>
+        <title>{`Egg Rates in ${displayName}`}</title>
+        <meta name="description" content={`Get the latest egg rates in ${displayName}.`} />
+      </Helmet>
+      <div className="bg-gray-50 min-h-screen flex flex-col">
+        <Navbar
+          selectedState={selectedState}
+          setSelectedState={setSelectedState}
+          setSelectedCity={setSelectedCity}
+          selectedCity={selectedCity}
+        />
+        <div className="flex-grow p-4 md:p-8 lg:p-12">
+          <BodyOne selectedCity={selectedCity} selectedState={selectedState} />
+          <div className="bg-white rounded-lg shadow-md p-6">
+            {stateMatch ? (
+              <StatePage />
+            ) : (
+              <>
+                {selectedCity && selectedState ? (
+                  <RateTable
+                    key={`${selectedCity}-${selectedState}`}
+                    selectedCity={selectedCity}
+                    selectedState={selectedState}
+                    eggRates={eggRates}
+                  />
+                ) : (
+                  <DefaultTable key="default-table" eggRates={eggRates} />
+                )}
+              </>
+            )}
+            <StateList />
+            <SpecialRatesTable />
+          </div>
+          <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
         </div>
-
-        <BodyTwo />
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </>
   );
 };
 
