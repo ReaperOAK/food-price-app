@@ -47,7 +47,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
           });
           data[state].forEach(city => {
             combinedOptions.push({
-              value: city,
+              value: `${city}-${state}`, // Ensure unique value
               label: `${city}, ${state}`,
               type: 'city',
             });
@@ -127,6 +127,47 @@ const AdminPage = ({ setIsAuthenticated }) => {
     setSelectedOptions(stateOptions);
   };
 
+  const handleSelectAll = () => {
+    const allCities = options.filter(option => option.type === 'city');
+    setSelectedOptions(allCities);
+  };
+
+  const handleCopyPreviousRates = () => {
+    if (selectedOptions.length === 0) {
+      alert('Please select at least one city.');
+      return;
+    }
+
+    const previousDate = new Date(eggRate.date);
+    previousDate.setDate(previousDate.getDate() - 1);
+    const formattedPreviousDate = previousDate.toISOString().split('T')[0];
+
+    const payload = selectedOptions.map(option => {
+      const [cityName, state] = option.label.split(', ');
+      const previousRate = eggRates.find(rate => rate.city === cityName && rate.state === state && rate.date === formattedPreviousDate);
+      return {
+        city: cityName,
+        state: state || '',
+        date: eggRate.date,
+        rate: previousRate ? previousRate.rate : eggRate.rate,
+        type: option.type,
+      };
+    });
+
+    fetch('https://todayeggrates.com/php/update_multiple_rates.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+      .then(res => res.json())
+      .then(response => {
+        fetchEggRates(); // Refresh the list of egg rates
+        setEggRate({ date: '', rate: '' }); // Reset form
+        setSelectedOptions([]); // Reset selected options
+      })
+      .catch(error => console.error("Error submitting data:", error));
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading data: {error.message}</div>;
 
@@ -173,6 +214,9 @@ const AdminPage = ({ setIsAuthenticated }) => {
               }}
               placeholder="Select Cities, States"
             />
+            <button type="button" onClick={handleSelectAll} className="bg-green-600 text-white p-3 rounded w-full hover:bg-green-700 transition">
+              Select All Cities
+            </button>
             <input
               type="date"
               value={eggRate.date}
@@ -191,6 +235,9 @@ const AdminPage = ({ setIsAuthenticated }) => {
             <button type="submit" className="bg-blue-600 text-white p-3 rounded w-full hover:bg-blue-700 transition">
               Update Rates
             </button>
+            <button type="button" onClick={handleCopyPreviousRates} className="bg-yellow-600 text-white p-3 rounded w-full hover:bg-yellow-700 transition">
+              Copy Previous Rates
+            </button>
           </form>
           <h2 className="text-2xl font-semibold mb-4 text-blue-600">Current Egg Rates</h2>
           <div className="overflow-x-auto">
@@ -206,7 +253,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
               </thead>
               <tbody>
                 {sortedEggRates.map((rate) => (
-                  <tr key={rate.id} className="hover:bg-gray-100">
+                  <tr key={`${rate.city}-${rate.state}-${rate.date}`} className="hover:bg-gray-100">
                     <td className="border border-gray-300 p-3">{rate.city}</td>
                     <td className="border border-gray-300 p-3">{rate.state}</td>
                     <td className="border border-gray-300 p-3">{rate.date}</td>

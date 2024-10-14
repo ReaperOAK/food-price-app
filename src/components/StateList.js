@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const StateList = () => {
   const [states, setStates] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch('https://todayeggrates.com/php/get_states.php')
@@ -17,6 +18,10 @@ const StateList = () => {
       .catch(error => console.error('Error fetching states:', error));
   }, []);
 
+  const handleStateClick = (state) => {
+    navigate(`/state/${state.toLowerCase()}-egg-rate`);
+  };
+
   const renderTableRows = () => {
     const rows = [];
     for (let i = 0; i < states.length; i += 3) {
@@ -24,7 +29,12 @@ const StateList = () => {
         <tr key={i} className="bg-white border-b hover:bg-gray-50">
           {states.slice(i, i + 3).map(state => (
             <td key={state} className="px-6 py-4 text-center">
-              <Link to={`/state/${state}`} className="text-green-600 font-bold hover:underline transition duration-200">{state}</Link>
+              <button
+                onClick={() => handleStateClick(state)}
+                className="text-green-600 font-bold hover:underline transition duration-200"
+              >
+                {state}
+              </button>
             </td>
           ))}
         </tr>

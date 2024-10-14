@@ -91,18 +91,18 @@ const MainPage = () => {
   }, [selectedState, selectedCity]); // Run effect whenever selectedState or selectedCity changes
 
   // Check if the current URL matches /state/:state
-  const stateMatch = matchPath('/state/:state', location.pathname);
+  const stateMatch = matchPath('/state/:state-egg-rate', location.pathname);
 
   // Update URL when selectedCity or selectedState changes
   useEffect(() => {
-    if (selectedCity) {
+    if (selectedCity && !location.pathname.includes(`-egg-rate`)) {
       // Update the URL format to /city-egg-rate (for frontend)
       navigate(`/${selectedCity.toLowerCase()}-egg-rate/`);
-    } else if (selectedState && !selectedCity) {
+    } else if (selectedState && !selectedCity && !location.pathname.includes(`-egg-rate`)) {
       // Update the URL format to /state/state-egg-rate (for frontend)
       navigate(`/state/${selectedState.toLowerCase()}-egg-rate`);
     }
-  }, [selectedCity, selectedState, navigate]);
+  }, [selectedCity, selectedState, navigate, location.pathname]);
 
   return (
     <>
