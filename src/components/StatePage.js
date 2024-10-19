@@ -14,7 +14,8 @@ const StatePage = () => {
     fetch(`https://todayeggrates.com/php/get_average_rates.php?state=${state}`)
       .then(response => response.json())
       .then(data => {
-        setAverageRates(data.averageRates || []);
+        const sortedRates = (data.averageRates || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+        setAverageRates(sortedRates);
         setLoading(false);
       })
       .catch(error => {
