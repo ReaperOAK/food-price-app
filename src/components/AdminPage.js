@@ -25,17 +25,24 @@ const AdminPage = ({ setIsAuthenticated }) => {
   const [removeState, setRemoveState] = useState('');
   const [removeCity, setRemoveCity] = useState(null);
   const [removeCityState, setRemoveCityState] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(today);
 
   useEffect(() => {
     fetchEggRates();
     fetchCitiesAndStates();
-  }, []);
+  }, [selectedDate]);
 
   const fetchEggRates = () => {
-    fetch('https://todayeggrates.com/php/get_all_rates.php')
+    fetch(`https://todayeggrates.com/php/get_all_rates.php?date=${selectedDate}`)
       .then((response) => response.json())
       .then((data) => {
-        setEggRates(data);
+        const latestRates = data.reduce((acc, rate) => {
+          if (!acc[rate.city] || new Date(rate.date) > new Date(acc[rate.city].date)) {
+            acc[rate.city] = rate;
+          }
+          return acc;
+        }, {});
+        setEggRates(Object.values(latestRates));
         setLoading(false);
       })
       .catch((error) => {
@@ -272,6 +279,11 @@ const AdminPage = ({ setIsAuthenticated }) => {
       .catch(error => console.error("Error removing city:", error));
   };
 
+  const handleEditRate = (rate) => {
+    const updatedRates = eggRates.map(r => r.id === rate.id ? rate : r);
+    setEggRates(updatedRates);
+  };
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error loading data: {error.message}</div>;
 
@@ -281,77 +293,90 @@ const AdminPage = ({ setIsAuthenticated }) => {
       <div className="p-6 bg-gray-100 min-h-screen">
         <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
           <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Admin Egg Rate Management</h1>
-          <StateSelect
-            states={states}
-            selectedState={selectedState}
-            handleStateChange={handleStateChange}
-          />
-          <CitySelect
-            options={options}
-            selectedOptions={selectedOptions}
-            setSelectedOptions={setSelectedOptions}
-          />
-          <RateForm
-            eggRate={eggRate}
-            setEggRate={setEggRate}
-            handleSubmit={handleSubmit}
-            handleSelectAll={handleSelectAll}
-            handleCopyPreviousRates={handleCopyPreviousRates}
-          />
-          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Add New State</h2>
-          <AddStateForm
-            newState={newState}
-            setNewState={setNewState}
-            handleAddState={handleAddState}
-          />
-          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Add New City</h2>
-          <AddCityForm
-            states={states}
-            newCity={newCity}
-            setNewCity={setNewCity}
-            newCityState={newCityState}
-            setNewCityState={setNewCityState}
-            handleAddCity={handleAddCity}
-          />
-          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Remove State</h2>
-          <form onSubmit={handleRemoveState} className="mb-6 grid grid-cols-1 gap-4">
-            <Select
-              options={states}
-              value={states.find(state => state.value === removeState)}
-              onChange={(selectedOption) => setRemoveState(selectedOption.value)}
-              className="w-full mb-4"
-              placeholder="Select State to Remove"
+          <div className="mb-6">
+            <StateSelect
+              states={states}
+              selectedState={selectedState}
+              handleStateChange={handleStateChange}
             />
-            <button type="submit" className="bg-red-600 text-white p-3 rounded w-full hover:bg-red-700 transition">
-              Remove State
-            </button>
-          </form>
-          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Remove City</h2>
-          <form onSubmit={handleRemoveCity} className="mb-6 grid grid-cols-1 gap-4">
-            <Select
-              options={states}
-              value={states.find(state => state.value === removeCityState?.value)}
-              onChange={setRemoveCityState}
-              className="w-full mb-4"
-              placeholder="Select State for City to Remove"
+            <CitySelect
+              options={options}
+              selectedOptions={selectedOptions}
+              setSelectedOptions={setSelectedOptions}
             />
-            <Select
-              options={options.filter(option => option.type === 'city' && option.label.includes(removeCityState?.value))}
-              value={removeCity}
-              onChange={setRemoveCity}
-              className="w-full mb-4"
-              placeholder="Select City to Remove"
+            <RateForm
+              eggRate={eggRate}
+              setEggRate={setEggRate}
+              handleSubmit={handleSubmit}
+              handleSelectAll={handleSelectAll}
+              handleCopyPreviousRates={handleCopyPreviousRates}
             />
-            <button type="submit" className="bg-red-600 text-white p-3 rounded w-full hover:bg-red-700 transition">
-              Remove City
-            </button>
-          </form>
-          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Current Egg Rates</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-blue-600">Add New State</h2>
+            <AddStateForm
+              newState={newState}
+              setNewState={setNewState}
+              handleAddState={handleAddState}
+            />
+            <h2 className="text-2xl font-semibold mb-4 text-blue-600">Add New City</h2>
+            <AddCityForm
+              states={states}
+              newCity={newCity}
+              setNewCity={setNewCity}
+              newCityState={newCityState}
+              setNewCityState={setNewCityState}
+              handleAddCity={handleAddCity}
+            />
+            <h2 className="text-2xl font-semibold mb-4 text-blue-600">Remove State</h2>
+            <form onSubmit={handleRemoveState} className="mb-6 grid grid-cols-1 gap-4">
+              <Select
+                options={states}
+                value={states.find(state => state.value === removeState)}
+                onChange={(selectedOption) => setRemoveState(selectedOption.value)}
+                className="w-full mb-4"
+                placeholder="Select State to Remove"
+              />
+              <button type="submit" className="bg-red-600 text-white p-3 rounded w-full hover:bg-red-700 transition">
+                Remove State
+              </button>
+            </form>
+            <h2 className="text-2xl font-semibold mb-4 text-blue-600">Remove City</h2>
+            <form onSubmit={handleRemoveCity} className="mb-6 grid grid-cols-1 gap-4">
+              <Select
+                options={states}
+                value={states.find(state => state.value === removeCityState?.value)}
+                onChange={setRemoveCityState}
+                className="w-full mb-4"
+                placeholder="Select State for City to Remove"
+              />
+              <Select
+                options={options.filter(option => option.type === 'city' && option.label.includes(removeCityState?.value))}
+                value={removeCity}
+                onChange={setRemoveCity}
+                className="w-full mb-4"
+                placeholder="Select City to Remove"
+              />
+              <button type="submit" className="bg-red-600 text-white p-3 rounded w-full hover:bg-red-700 transition">
+                Remove City
+              </button>
+            </form>
+            <h2 className="text-2xl font-semibold mb-4 text-blue-600">Current Egg Rates</h2>
+            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
+              Select Date
+            </label>
+            <input
+              type="date"
+              id="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              className="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+            />
+          </div>
           <EggRatesTable
             sortedEggRates={sortedEggRates}
             handleSort={handleSort}
             setEggRate={setEggRate}
             handleDelete={handleDelete}
+            handleEditRate={handleEditRate}
           />
         </div>
       </div>
