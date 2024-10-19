@@ -1,9 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import AdminNavbar from './AdminNavbar';
 import Select from 'react-select';
+import AdminNavbar from './AdminNavbar';
+import StateSelect from './StateSelect';
+import CitySelect from './CitySelect';
+import RateForm from './RateForm';
+import AddStateForm from './AddStateForm';
+import AddCityForm from './AddCityForm';
+import EggRatesTable from './EggRatesTable';
 
 const AdminPage = ({ setIsAuthenticated }) => {
-  const [eggRate, setEggRate] = useState({ date: '', rate: '' });
+  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+  const [eggRate, setEggRate] = useState({ date: today, rate: '' });
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [options, setOptions] = useState([]);
   const [eggRates, setEggRates] = useState([]);
@@ -12,6 +19,12 @@ const AdminPage = ({ setIsAuthenticated }) => {
   const [sortConfig, setSortConfig] = useState({ key: 'city', direction: 'ascending' });
   const [states, setStates] = useState([]);
   const [selectedState, setSelectedState] = useState(null);
+  const [newState, setNewState] = useState('');
+  const [newCity, setNewCity] = useState('');
+  const [newCityState, setNewCityState] = useState(null);
+  const [removeState, setRemoveState] = useState('');
+  const [removeCity, setRemoveCity] = useState(null);
+  const [removeCityState, setRemoveCityState] = useState(null);
 
   useEffect(() => {
     fetchEggRates();
@@ -80,7 +93,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
       .then(res => res.json())
       .then(response => {
         fetchEggRates(); // Refresh the list of egg rates
-        setEggRate({ date: '', rate: '' }); // Reset form
+        setEggRate({ date: today, rate: '' }); // Reset form with today's date
         setSelectedOptions([]); // Reset selected options
       })
       .catch(error => console.error("Error submitting data:", error));
@@ -138,34 +151,125 @@ const AdminPage = ({ setIsAuthenticated }) => {
       return;
     }
 
-    const previousDate = new Date(eggRate.date);
-    previousDate.setDate(previousDate.getDate() - 1);
-    const formattedPreviousDate = previousDate.toISOString().split('T')[0];
+    const fetchLatestRates = async (cities) => {
+      const response = await fetch('https://todayeggrates.com/php/get_latest_rates.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cities),
+      });
+      const data = await response.json();
+      return data;
+    };
 
-    const payload = selectedOptions.map(option => {
-      const [cityName, state] = option.label.split(', ');
-      const previousRate = eggRates.find(rate => rate.city === cityName && rate.state === state && rate.date === formattedPreviousDate);
-      return {
-        city: cityName,
-        state: state || '',
+    const updateRates = async () => {
+      const cities = selectedOptions.map(option => {
+        const [cityName, state] = option.label.split(', ');
+        return { city: cityName, state: state };
+      });
+
+      const latestRates = await fetchLatestRates(cities);
+
+      const payload = latestRates.map(rate => ({
+        city: rate.city,
+        state: rate.state,
         date: eggRate.date,
-        rate: previousRate ? previousRate.rate : eggRate.rate,
-        type: option.type,
-      };
-    });
+        rate: rate.rate || eggRate.rate,
+        type: 'city',
+      }));
 
-    fetch('https://todayeggrates.com/php/update_multiple_rates.php', {
+      fetch('https://todayeggrates.com/php/update_multiple_rates.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+        .then(res => res.json())
+        .then(response => {
+          fetchEggRates(); // Refresh the list of egg rates
+          setEggRate({ date: today, rate: '' }); // Reset form with today's date
+          setSelectedOptions([]); // Reset selected options
+        })
+        .catch(error => console.error("Error submitting data:", error));
+    };
+
+    updateRates();
+  };
+
+  const handleAddState = (e) => {
+    e.preventDefault();
+    fetch('https://todayeggrates.com/php/add_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ type: 'state', name: newState }),
     })
       .then(res => res.json())
       .then(response => {
-        fetchEggRates(); // Refresh the list of egg rates
-        setEggRate({ date: '', rate: '' }); // Reset form
-        setSelectedOptions([]); // Reset selected options
+        if (response.success) {
+          fetchCitiesAndStates(); // Refresh the list of states and cities
+          setNewState(''); // Reset form
+        } else {
+          alert(response.error);
+        }
       })
-      .catch(error => console.error("Error submitting data:", error));
+      .catch(error => console.error("Error adding state:", error));
+  };
+
+  const handleAddCity = (e) => {
+    e.preventDefault();
+    fetch('https://todayeggrates.com/php/add_state_city.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'city', name: newCity, state: newCityState.value }),
+    })
+      .then(res => res.json())
+      .then(response => {
+        if (response.success) {
+          fetchCitiesAndStates(); // Refresh the list of states and cities
+          setNewCity(''); // Reset form
+          setNewCityState(null); // Reset form
+        } else {
+          alert(response.error);
+        }
+      })
+      .catch(error => console.error("Error adding city:", error));
+  };
+
+  const handleRemoveState = (e) => {
+    e.preventDefault();
+    fetch('https://todayeggrates.com/php/remove_state_city.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'state', name: removeState }),
+    })
+      .then(res => res.json())
+      .then(response => {
+        if (response.success) {
+          fetchCitiesAndStates(); // Refresh the list of states and cities
+          setRemoveState(''); // Reset form
+        } else {
+          alert(response.error);
+        }
+      })
+      .catch(error => console.error("Error removing state:", error));
+  };
+
+  const handleRemoveCity = (e) => {
+    e.preventDefault();
+    fetch('https://todayeggrates.com/php/remove_state_city.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'city', name: removeCity.label.split(', ')[0], state: removeCityState.value }),
+    })
+      .then(res => res.json())
+      .then(response => {
+        if (response.success) {
+          fetchCitiesAndStates(); // Refresh the list of states and cities
+          setRemoveCity(null); // Reset form
+          setRemoveCityState(null); // Reset form
+        } else {
+          alert(response.error);
+        }
+      })
+      .catch(error => console.error("Error removing city:", error));
   };
 
   if (loading) return <div>Loading...</div>;
@@ -177,96 +281,78 @@ const AdminPage = ({ setIsAuthenticated }) => {
       <div className="p-6 bg-gray-100 min-h-screen">
         <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
           <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Admin Egg Rate Management</h1>
-          <form onSubmit={handleSubmit} className="mb-6 grid grid-cols-1 gap-4">
+          <StateSelect
+            states={states}
+            selectedState={selectedState}
+            handleStateChange={handleStateChange}
+          />
+          <CitySelect
+            options={options}
+            selectedOptions={selectedOptions}
+            setSelectedOptions={setSelectedOptions}
+          />
+          <RateForm
+            eggRate={eggRate}
+            setEggRate={setEggRate}
+            handleSubmit={handleSubmit}
+            handleSelectAll={handleSelectAll}
+            handleCopyPreviousRates={handleCopyPreviousRates}
+          />
+          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Add New State</h2>
+          <AddStateForm
+            newState={newState}
+            setNewState={setNewState}
+            handleAddState={handleAddState}
+          />
+          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Add New City</h2>
+          <AddCityForm
+            states={states}
+            newCity={newCity}
+            setNewCity={setNewCity}
+            newCityState={newCityState}
+            setNewCityState={setNewCityState}
+            handleAddCity={handleAddCity}
+          />
+          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Remove State</h2>
+          <form onSubmit={handleRemoveState} className="mb-6 grid grid-cols-1 gap-4">
             <Select
               options={states}
-              value={selectedState}
-              onChange={handleStateChange}
+              value={states.find(state => state.value === removeState)}
+              onChange={(selectedOption) => setRemoveState(selectedOption.value)}
               className="w-full mb-4"
-              placeholder="Select State"
+              placeholder="Select State to Remove"
+            />
+            <button type="submit" className="bg-red-600 text-white p-3 rounded w-full hover:bg-red-700 transition">
+              Remove State
+            </button>
+          </form>
+          <h2 className="text-2xl font-semibold mb-4 text-blue-600">Remove City</h2>
+          <form onSubmit={handleRemoveCity} className="mb-6 grid grid-cols-1 gap-4">
+            <Select
+              options={states}
+              value={states.find(state => state.value === removeCityState?.value)}
+              onChange={setRemoveCityState}
+              className="w-full mb-4"
+              placeholder="Select State for City to Remove"
             />
             <Select
-              isMulti
-              options={options}
-              value={selectedOptions}
-              onChange={setSelectedOptions}
-              className="w-full"
-              styles={{
-                control: (base) => ({
-                  ...base,
-                  backgroundColor: 'white',
-                  borderColor: 'transparent',
-                  boxShadow: 'none',
-                  '&:hover': {
-                    borderColor: 'transparent',
-                  },
-                  padding: '0.5rem', // Add padding for better touch target
-                  borderRadius: '0.375rem', // Tailwind rounded
-                }),
-                menu: (base) => ({
-                  ...base,
-                  zIndex: 9999,
-                }),
-                placeholder: (base) => ({
-                  ...base,
-                  color: '#A0AEC0', // Placeholder color for better contrast
-                }),
-              }}
-              placeholder="Select Cities, States"
+              options={options.filter(option => option.type === 'city' && option.label.includes(removeCityState?.value))}
+              value={removeCity}
+              onChange={setRemoveCity}
+              className="w-full mb-4"
+              placeholder="Select City to Remove"
             />
-            <button type="button" onClick={handleSelectAll} className="bg-green-600 text-white p-3 rounded w-full hover:bg-green-700 transition">
-              Select All Cities
-            </button>
-            <input
-              type="date"
-              value={eggRate.date}
-              onChange={(e) => setEggRate({ ...eggRate, date: e.target.value })}
-              className="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              required
-            />
-            <input
-              type="number"
-              placeholder="Rate"
-              value={eggRate.rate}
-              onChange={(e) => setEggRate({ ...eggRate, rate: e.target.value })}
-              className="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-              required
-            />
-            <button type="submit" className="bg-blue-600 text-white p-3 rounded w-full hover:bg-blue-700 transition">
-              Update Rates
-            </button>
-            <button type="button" onClick={handleCopyPreviousRates} className="bg-yellow-600 text-white p-3 rounded w-full hover:bg-yellow-700 transition">
-              Copy Previous Rates
+            <button type="submit" className="bg-red-600 text-white p-3 rounded w-full hover:bg-red-700 transition">
+              Remove City
             </button>
           </form>
           <h2 className="text-2xl font-semibold mb-4 text-blue-600">Current Egg Rates</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-300">
-              <thead>
-                <tr className="bg-gray-200">
-                  <th className="border border-gray-300 p-3 text-left cursor-pointer" onClick={() => handleSort('city')}>City</th>
-                  <th className="border border-gray-300 p-3 text-left cursor-pointer" onClick={() => handleSort('state')}>State</th>
-                  <th className="border border-gray-300 p-3 text-left cursor-pointer" onClick={() => handleSort('date')}>Date</th>
-                  <th className="border border-gray-300 p-3 text-left cursor-pointer" onClick={() => handleSort('rate')}>Rate</th>
-                  <th className="border border-gray-300 p-3 text-left">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedEggRates.map((rate) => (
-                  <tr key={`${rate.city}-${rate.state}-${rate.date}`} className="hover:bg-gray-100">
-                    <td className="border border-gray-300 p-3">{rate.city}</td>
-                    <td className="border border-gray-300 p-3">{rate.state}</td>
-                    <td className="border border-gray-300 p-3">{rate.date}</td>
-                    <td className="border border-gray-300 p-3">${rate.rate}</td>
-                    <td className="border border-gray-300 p-3 flex space-x-2">
-                      <button onClick={() => setEggRate(rate)} className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition">Edit</button>
-                      <button onClick={() => handleDelete(rate)} className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition">Delete</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <EggRatesTable
+            sortedEggRates={sortedEggRates}
+            handleSort={handleSort}
+            setEggRate={setEggRate}
+            handleDelete={handleDelete}
+          />
         </div>
       </div>
     </>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const RateTable = ({ eggRates, selectedCity, selectedState }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'ascending' });
+  const [sortConfig, setSortConfig] = useState({ key: 'date', direction: 'descending' }); // Default to descending order
   const itemsPerPage = 10;
 
   const handleClick = (event) => {
