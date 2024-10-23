@@ -13,18 +13,29 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
       .then(response => response.json())
       .then(data => {
         const combinedOptions = [];
+        const stateSet = new Set();
+        const citySet = new Set();
+        
         for (const state in data) {
-          combinedOptions.push({
-            value: state,
-            label: state,
-            type: 'state',
-          });
-          data[state].forEach(city => {
+          if (!stateSet.has(state)) {
             combinedOptions.push({
-              value: city,
-              label: `${city}, ${state}`,
-              type: 'city',
+              value: state,
+              label: state,
+              type: 'state',
             });
+            stateSet.add(state);
+          }
+          
+          data[state].forEach(city => {
+            const cityLabel = `${city}, ${state}`;
+            if (!citySet.has(cityLabel)) {
+              combinedOptions.push({
+                value: city,
+                label: cityLabel,
+                type: 'city',
+              });
+              citySet.add(cityLabel);
+            }
           });
         }
         setOptions(combinedOptions);
@@ -50,6 +61,12 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
     setSelectedCity('');
     setSelectedState('');
     navigate('/');
+  };
+
+  const handleCityClick = (city) => {
+    setSelectedCity(city);
+    setSelectedState('');
+    navigate(`/${city.toLowerCase()}-egg-rate`);
   };
 
   const toggleMenu = () => {
@@ -90,26 +107,30 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
               Home
             </Link>
             <Link
-              to="/mumbai"
+              to="/mumbai-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
+              onClick={() => handleCityClick('Mumbai')}
             >
               Mumbai
             </Link>
             <Link
-              to="/kolkata"
+              to="/kolkata-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
+              onClick={() => handleCityClick('Kolkata')}
             >
               Kolkata
             </Link>
             <Link
-              to="/lucknow"
+              to="/lucknow-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
+              onClick={() => handleCityClick('Lucknow')}
             >
               Lucknow
             </Link>
             <Link
-              to="/chennai"
+              to="/chennai-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
+              onClick={() => handleCityClick('Chennai')}
             >
               Chennai
             </Link>

@@ -13,13 +13,13 @@ import StateList from './StateList';
 import SpecialRatesTable from './SpecialRatesTable';
 
 const MainPage = () => {
-  const { city, state } = useParams();
+  const { city: cityParam, state: stateParam } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
-  const [selectedState, setSelectedState] = useState(state || '');
-  const [selectedCity, setSelectedCity] = useState(city || '');
+  const [selectedState, setSelectedState] = useState(stateParam ? stateParam.replace('-egg-rate', '') : '');
+  const [selectedCity, setSelectedCity] = useState(cityParam ? cityParam.replace('-egg-rate', '') : '');
   const [eggRates, setEggRates] = useState([]);
   const displayName = selectedCity ? selectedCity : selectedState ? selectedState : 'India';
 
@@ -43,18 +43,18 @@ const MainPage = () => {
 
   // Fetch state for the city from the URL
   useEffect(() => {
-    if (city) {
-      fetch(`https://todayeggrates.com/php/get_state_for_city.php?city=${city}`)
+    if (cityParam) {
+      fetch(`https://todayeggrates.com/php/get_state_for_city.php?city=${selectedCity}`)
         .then(res => res.json())
         .then(data => {
           if (data.state) {
             setSelectedState(data.state);
-            setSelectedCity(city);
+            setSelectedCity(selectedCity);
           }
         })
         .catch(error => console.error('Error fetching state for city:', error));
     }
-  }, [city]);
+  }, [cityParam, selectedCity]);
 
   // Define handleFetchRates function
   const handleFetchRates = () => {

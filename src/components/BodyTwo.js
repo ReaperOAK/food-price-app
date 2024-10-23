@@ -5,10 +5,7 @@ const BodyTwo = ({ selectedCity, selectedState }) => {
   const displayName = selectedCity ? selectedCity : selectedState ? selectedState : 'India';
   
   return (
-    <div
-      className="p-6 mt-6 bg-cover bg-center rounded-lg shadow-lg"
-      style={{ backgroundImage: "url('/eggpic.png')" }}
-    >
+    <div className="p-6 mt-6 bg-cover bg-center rounded-lg shadow-lg">
       <h1 className="text-center bg-gray-200 bg-opacity-75 rounded-lg w-full p-4 mt-4 text-2xl font-bold text-gray-800">
         Egg Daily and Monthly Prices
       </h1>
@@ -34,6 +31,10 @@ const BodyTwo = ({ selectedCity, selectedState }) => {
       <p className="text-left text-gray-700 mt-4 leading-relaxed bg-white bg-opacity-75 p-2 rounded">
         At TodayEggRates.com, we offer a comprehensive overview of daily and monthly NECC egg rates throughout the different areas/cities and states of India, allowing you to effortlessly compare rates and make informed decisions. Whether you’re a farmer eager to sell your eggs or a consumer searching for the best prices, our platform serves as your trusted resource for the latest egg rate information. Discover today’s price for a tray of eggs or explore the current cost of a peti of eggs. Stay updated with live NECC rates through our detailed pricing data, ensuring you always have access to the most accurate market insights.
       </p>
+
+      <div className="flex justify-center mt-6">
+        <img src="/eggpic.png" alt="Egg" className="h-100 w-auto" />
+      </div>
 
       <div className="mt-6">
         <FAQ />

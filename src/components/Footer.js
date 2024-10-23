@@ -10,6 +10,12 @@ const Footer = () => {
           </p>
         </div>
         <div className="flex flex-col md:flex-row md:space-x-6">
+        <a
+            href="/disclaimer"
+            className="text-[#C4A484] hover:text-white transition duration-300"
+          >
+            Disclaimer
+          </a>
           <a
             href="/privacy"
             className="text-[#C4A484] hover:text-white transition duration-300 mb-2 md:mb-0"

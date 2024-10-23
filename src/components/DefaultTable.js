@@ -70,7 +70,13 @@ const DefaultTable = ({ eggRates = [] }) => {
                 key={`${rate.city}-${rate.date}-${index}`}
                 className={`${index % 2 === 0 ? 'bg-[#fffcdf]' : 'bg-[#fff1c8]'} hover:bg-[#ddfafe]`}
               >
-                <td className="border border-gray-300 p-2"><a href={`/${rate.city}`}>{rate.city}</a></td>
+                <td className="border border-gray-300 p-2">
+                  {rate.city ? (
+                    <a href={`/${rate.city.toLowerCase()}-egg-rate`}>{rate.city}</a>
+                  ) : (
+                    'N/A'
+                  )}
+                </td>
                 <td className="border border-gray-300 p-2">₹{rate.rate.toFixed(2)}</td>
                 <td className="border border-gray-300 p-2">₹{(rate.rate * 30).toFixed(2)}</td>
                 <td className="border border-gray-300 p-2">₹{(rate.rate * 100).toFixed(2)}</td>
