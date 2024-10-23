@@ -100,8 +100,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
       .then(res => res.json())
       .then(response => {
         fetchEggRates(); // Refresh the list of egg rates
-        setEggRate({ date: today, rate: '' }); // Reset form with today's date
-        setSelectedOptions([]); // Reset selected options
+        resetForm(); // Reset form
       })
       .catch(error => console.error("Error submitting data:", error));
   };
@@ -143,6 +142,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleStateChange = (selectedState) => {
     setSelectedState(selectedState);
+    setSelectedOptions([]); // Reset selected options
     const stateOptions = options.filter(option => option.type === 'city' && option.label.includes(selectedState.value));
     setSelectedOptions(stateOptions);
   };
@@ -157,25 +157,31 @@ const AdminPage = ({ setIsAuthenticated }) => {
       alert('Please select at least one city.');
       return;
     }
-
+  
     const fetchLatestRates = async (cities) => {
+      console.log('Fetching latest rates for cities:', cities);
       const response = await fetch('https://todayeggrates.com/php/get_latest_rates.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cities),
       });
       const data = await response.json();
+      console.log('Fetched latest rates:', data);
       return data;
     };
-
+  
     const updateRates = async () => {
-      const cities = selectedOptions.map(option => {
-        const [cityName, state] = option.label.split(', ');
-        return { city: cityName, state: state };
-      });
-
+      const cities = selectedOptions
+        .filter(option => option.type === 'city') // Ensure only cities are selected
+        .map(option => {
+          const [cityName, state] = option.label.split(', ');
+          return { city: cityName, state: state };
+        });
+  
+      console.log('Selected cities for updating rates:', cities);
+  
       const latestRates = await fetchLatestRates(cities);
-
+  
       const payload = latestRates.map(rate => ({
         city: rate.city,
         state: rate.state,
@@ -183,7 +189,9 @@ const AdminPage = ({ setIsAuthenticated }) => {
         rate: rate.rate || eggRate.rate,
         type: 'city',
       }));
-
+  
+      console.log('Payload for updating rates:', payload);
+  
       fetch('https://todayeggrates.com/php/update_multiple_rates.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -191,13 +199,13 @@ const AdminPage = ({ setIsAuthenticated }) => {
       })
         .then(res => res.json())
         .then(response => {
+          console.log('Response from updating rates:', response);
           fetchEggRates(); // Refresh the list of egg rates
-          setEggRate({ date: today, rate: '' }); // Reset form with today's date
-          setSelectedOptions([]); // Reset selected options
+          resetForm(); // Reset form
         })
         .catch(error => console.error("Error submitting data:", error));
     };
-
+  
     updateRates();
   };
 
@@ -282,6 +290,18 @@ const AdminPage = ({ setIsAuthenticated }) => {
   const handleEditRate = (rate) => {
     const updatedRates = eggRates.map(r => r.id === rate.id ? rate : r);
     setEggRates(updatedRates);
+  };
+
+  const resetForm = () => {
+    setEggRate({ date: today, rate: '' });
+    setSelectedOptions([]);
+    setSelectedState(null);
+    setRemoveState('');
+    setRemoveCity(null);
+    setRemoveCityState(null);
+    setNewState('');
+    setNewCity('');
+    setNewCityState(null);
   };
 
   if (loading) return <div>Loading...</div>;
