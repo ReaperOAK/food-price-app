@@ -9,7 +9,7 @@ const LoginPage = ({ setIsAuthenticated }) => {
   const handleLogin = (e) => {
     e.preventDefault();
     // Example credentials check (replace with actual logic)
-    if (username === "admin" && password === "password") {
+    if (username === "lokeshsinghsodha28" && password === "Sodha@111") {
       setIsAuthenticated(true);
       navigate("/admin");
     } else {
