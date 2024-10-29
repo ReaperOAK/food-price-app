@@ -20,10 +20,8 @@ jobs:
         run: npm run build # The build command of your project
 
       - name: Push build folder to build branch
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@releases/v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
-          publish_branch: build
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: build # The branch name where you want to push the assets
+          FOLDER: build # The directory where your assets are generated
