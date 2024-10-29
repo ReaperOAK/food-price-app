@@ -25,6 +25,7 @@ const FAQ = () => {
     { question: "What is broiler rate today in India?", answer: "White broiler chicken cost around ₹195/kg." },
   ];
 
+  
   return (
     <div className="p-6 mt-6 mx-auto bg-white shadow-lg rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Frequently Asked Questions</h2>
