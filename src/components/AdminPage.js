@@ -33,7 +33,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   }, [selectedDate]);
 
   const fetchEggRates = () => {
-    fetch(`https://todayeggrates.com/php/get_all_rates.php?date=${selectedDate}`)
+    fetch(`/php/get_all_rates.php?date=${selectedDate}`)
       .then((response) => response.json())
       .then((data) => {
         const latestRates = data.reduce((acc, rate) => {
@@ -53,7 +53,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   };
 
   const fetchCitiesAndStates = () => {
-    fetch('https://todayeggrates.com/php/get_states_and_cities.php')
+    fetch('/php/get_states_and_cities.php')
       .then(response => response.json())
       .then(data => {
         const combinedOptions = [];
@@ -92,7 +92,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
       };
     });
 
-    fetch('https://todayeggrates.com/php/update_multiple_rates.php', {
+    fetch('/php/update_multiple_rates.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -106,7 +106,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   };
 
   const handleDelete = (rate) => {
-    fetch('https://todayeggrates.com/php/delete_rate.php', {
+    fetch('/php/delete_rate.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: rate.id }), // Send ID for deletion
@@ -160,7 +160,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   
     const fetchLatestRates = async (cities) => {
       console.log('Fetching latest rates for cities:', cities);
-      const response = await fetch('https://todayeggrates.com/php/get_latest_rates.php', {
+      const response = await fetch('/php/get_latest_rates.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cities),
@@ -192,7 +192,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   
       console.log('Payload for updating rates:', payload);
   
-      fetch('https://todayeggrates.com/php/update_multiple_rates.php', {
+      fetch('/php/update_multiple_rates.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -211,7 +211,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleAddState = (e) => {
     e.preventDefault();
-    fetch('https://todayeggrates.com/php/add_state_city.php', {
+    fetch('/php/add_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'state', name: newState }),
@@ -230,7 +230,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleAddCity = (e) => {
     e.preventDefault();
-    fetch('https://todayeggrates.com/php/add_state_city.php', {
+    fetch('/php/add_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'city', name: newCity, state: newCityState.value }),
@@ -250,7 +250,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleRemoveState = (e) => {
     e.preventDefault();
-    fetch('https://todayeggrates.com/php/remove_state_city.php', {
+    fetch('/php/remove_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'state', name: removeState }),
@@ -269,7 +269,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleRemoveCity = (e) => {
     e.preventDefault();
-    fetch('https://todayeggrates.com/php/remove_state_city.php', {
+    fetch('/php/remove_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'city', name: removeCity.label.split(', ')[0], state: removeCityState.value }),

@@ -25,7 +25,7 @@ const MainPage = () => {
 
   // Fetch states on mount
   useEffect(() => {
-    fetch('https://todayeggrates.com/php/get_states.php')
+    fetch('/php/get_states.php')
       .then(res => res.json())
       .then(data => setStates(data))
       .catch(error => console.error('Error fetching states:', error));
@@ -34,7 +34,7 @@ const MainPage = () => {
   // Fetch cities when a state is selected
   useEffect(() => {
     if (selectedState) {
-      fetch(`https://todayeggrates.com/php/get_cities.php?state=${selectedState}`)
+      fetch(`/php/get_cities.php?state=${selectedState}`)
         .then(res => res.json())
         .then(data => setCities(data))
         .catch(error => console.error('Error fetching cities:', error));
@@ -44,7 +44,7 @@ const MainPage = () => {
   // Fetch state for the city from the URL
   useEffect(() => {
     if (cityParam) {
-      fetch(`https://todayeggrates.com/php/get_state_for_city.php?city=${selectedCity}`)
+      fetch(`/php/get_state_for_city.php?city=${selectedCity}`)
         .then(res => res.json())
         .then(data => {
           if (data.state) {
@@ -60,7 +60,7 @@ const MainPage = () => {
   const handleFetchRates = () => {
     if (selectedCity && selectedState) {
       // Fetch rates for selected city and state
-      fetch(`https://todayeggrates.com/php/get_rates.php?city=${selectedCity}&state=${selectedState}`)
+      fetch(`/php/get_rates.php?city=${selectedCity}&state=${selectedState}`)
         .then(res => res.json())
         .then(data => {
           const convertedData = data.map(item => ({
@@ -72,7 +72,7 @@ const MainPage = () => {
         .catch(error => console.error('Error fetching rates:', error));
     } else {
       // Fetch latest rates when no city/state is selected
-      fetch(`https://todayeggrates.com/php/get_latest_rates.php`)
+      fetch(`/php/get_latest_rates.php`)
         .then(res => res.json())
         .then(data => {
           const convertedData = data.map(item => ({

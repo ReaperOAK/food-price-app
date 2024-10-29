@@ -9,7 +9,7 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('https://todayeggrates.com/php/get_states_and_cities.php')
+    fetch('/php/get_states_and_cities.php')
       .then(response => response.json())
       .then(data => {
         const combinedOptions = [];

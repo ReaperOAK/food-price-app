@@ -11,7 +11,7 @@ const StatePage = () => {
   const state = stateParam.replace('-egg-rate', '');
 
   useEffect(() => {
-    fetch(`https://todayeggrates.com/php/get_average_rates.php?state=${state}`)
+    fetch(`/php/get_average_rates.php?state=${state}`)
       .then(response => response.json())
       .then(data => {
         const sortedRates = (data.averageRates || []).sort((a, b) => new Date(b.date) - new Date(a.date));

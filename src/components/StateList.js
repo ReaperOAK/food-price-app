@@ -6,7 +6,7 @@ const StateList = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('https://todayeggrates.com/php/get_states.php')
+    fetch('/php/get_states.php')
       .then(response => response.json())
       .then(data => {
         if (Array.isArray(data)) {
