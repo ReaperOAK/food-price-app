@@ -128,6 +128,20 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
               Lucknow
             </Link>
             <Link
+              to="/barwala-egg-rate"
+              className="text-gray-800 hover:text-gray-600 transition duration-300"
+              onClick={() => handleCityClick('Lucknow')}
+            >
+              Barwala
+            </Link>
+            <Link
+              to="/hyderabad-egg-rate"
+              className="text-gray-800 hover:text-gray-600 transition duration-300"
+              onClick={() => handleCityClick('Lucknow')}
+            >
+              Hyderabad
+            </Link>
+            <Link
               to="/chennai-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
               onClick={() => handleCityClick('Chennai')}
