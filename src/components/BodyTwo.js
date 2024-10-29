@@ -2,7 +2,6 @@ import React from "react";
 import FAQ from "./FAQ";
 
 const BodyTwo = ({ selectedCity, selectedState }) => {
-  const displayName = selectedCity ? selectedCity : selectedState ? selectedState : 'India';
   
   return (
     <div className="p-6 mt-6 bg-cover bg-center rounded-lg shadow-lg">

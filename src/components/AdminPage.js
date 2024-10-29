@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Select from 'react-select';
 import AdminNavbar from './AdminNavbar';
 import StateSelect from './StateSelect';
@@ -27,12 +27,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   const [removeCityState, setRemoveCityState] = useState(null);
   const [selectedDate, setSelectedDate] = useState(today);
 
-  useEffect(() => {
-    fetchEggRates();
-    fetchCitiesAndStates();
-  }, [selectedDate]);
-
-  const fetchEggRates = () => {
+  const fetchEggRates = useCallback(() => {
     fetch(`/php/get_all_rates.php?date=${selectedDate}`)
       .then((response) => response.json())
       .then((data) => {
@@ -50,7 +45,12 @@ const AdminPage = ({ setIsAuthenticated }) => {
         setError(error);
         setLoading(false);
       });
-  };
+  }, [selectedDate]);
+
+  useEffect(() => {
+    fetchEggRates();
+    fetchCitiesAndStates();
+  }, [selectedDate, fetchEggRates]);
 
   const fetchCitiesAndStates = () => {
     fetch('/php/get_states_and_cities.php')

@@ -7,8 +7,6 @@ const RateForm = ({
   handleSelectAll,
   handleCopyPreviousRates,
 }) => {
-  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-
   return (
     <form onSubmit={handleSubmit} className="mb-6 grid grid-cols-1 gap-4">
       <button

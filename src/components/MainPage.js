@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
@@ -57,7 +57,7 @@ const MainPage = () => {
   }, [cityParam, selectedCity]);
 
   // Define handleFetchRates function
-  const handleFetchRates = () => {
+  const handleFetchRates = useCallback(() => {
     if (selectedCity && selectedState) {
       // Fetch rates for selected city and state
       fetch(`/php/get_rates.php?city=${selectedCity}&state=${selectedState}`)
@@ -83,12 +83,12 @@ const MainPage = () => {
         })
         .catch(error => console.error('Error fetching latest rates:', error));
     }
-  };
+  }, [selectedCity, selectedState]);
 
   // Fetch rates automatically when state or city changes
   useEffect(() => {
     handleFetchRates();
-  }, [selectedState, selectedCity]); // Run effect whenever selectedState or selectedCity changes
+  }, [selectedState, selectedCity, handleFetchRates]); // Run effect whenever selectedState or selectedCity changes
 
   // Check if the current URL matches /state/:state
   const stateMatch = matchPath('/state/:state-egg-rate', location.pathname);
@@ -116,6 +116,8 @@ const MainPage = () => {
           setSelectedState={setSelectedState}
           setSelectedCity={setSelectedCity}
           selectedCity={selectedCity}
+          states={states} // Pass states to Navbar
+          cities={cities} // Pass cities to Navbar
         />
         <div className="flex-grow p-4 md:p-8 lg:p-12">
           <BodyOne selectedCity={selectedCity} selectedState={selectedState} />
@@ -136,7 +138,7 @@ const MainPage = () => {
                 )}
               </>
             )}
-            <StateList />
+            <StateList states={states} /> {/* Pass states to StateList */}
             <SpecialRatesTable />
           </div>
           <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
