@@ -28,5 +28,6 @@ def get_egg_prices():
     else:
         return jsonify({'error': 'Failed to retrieve the page'}), response.status_code
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# Vercel requires the app to be exported as a module-level variable named "app"
+if __name__ != '__main__':
+    app = app
