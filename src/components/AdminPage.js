@@ -290,6 +290,22 @@ const AdminPage = ({ setIsAuthenticated }) => {
   const handleEditRate = (rate) => {
     const updatedRates = eggRates.map(r => r.id === rate.id ? rate : r);
     setEggRates(updatedRates);
+  
+    // Send the updated rate to the backend
+    fetch('/php/update_rate.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(rate),
+    })
+      .then(res => res.json())
+      .then(response => {
+        if (response.success) {
+          fetchEggRates(); // Refresh the list of egg rates
+        } else {
+          console.error("Error updating rate:", response.error);
+        }
+      })
+      .catch(error => console.error("Error updating rate:", error));
   };
 
   const resetForm = () => {

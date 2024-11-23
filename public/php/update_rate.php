@@ -1,31 +1,48 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST');
-header('Access-Control-Allow-Headers: X-Requested-With, Content-Type');
 
-include 'db.php'; // Include the database connection
+$servername = "localhost";
+$username = "u901337298_test";
+$password = "A12345678b*";
+$dbname = "u901337298_test";
 
-$data = json_decode(file_get_contents('php://input'), true);
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-if (isset($data['city']) && isset($data['state']) && isset($data['date']) && isset($data['rate'])) {
+if ($conn->connect_error) {
+    die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
+}
+
+// Get the input data
+$input = file_get_contents('php://input');
+$data = json_decode($input, true);
+
+if (isset($data['id']) && isset($data['city']) && isset($data['state']) && isset($data['date']) && isset($data['rate'])) {
+    $id = $data['id'];
     $city = $data['city'];
     $state = $data['state'];
     $date = $data['date'];
     $rate = $data['rate'];
 
-    $stmt = $conn->prepare("UPDATE egg_rates SET rate = ? WHERE city = ? AND state = ? AND date = ?");
-    $stmt->bind_param("dsss", $rate, $city, $state, $date);
+    // Update the rate in the database
+    $stmt = $conn->prepare("UPDATE egg_rates SET city = ?, state = ?, date = ?, rate = ? WHERE id = ?");
+    $stmt->bind_param("ssssi", $city, $state, $date, $rate, $id);
 
     if ($stmt->execute()) {
-        echo json_encode(["message" => "Rate updated successfully."]);
+        echo json_encode(['success' => true]);
     } else {
-        echo json_encode(["error" => "Error updating rate: " . $stmt->error]);
+        echo json_encode(['success' => false, 'error' => $stmt->error]);
     }
 
     $stmt->close();
 } else {
-    echo json_encode(["error" => "Invalid input."]);
+    echo json_encode(['success' => false, 'error' => 'Invalid input']);
 }
 
 $conn->close();
