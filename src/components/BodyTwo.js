@@ -2,7 +2,6 @@ import React from "react";
 import FAQ from "./FAQ";
 
 const BodyTwo = ({ selectedCity, selectedState }) => {
-  
   return (
     <div className="p-6 mt-6 bg-cover bg-center rounded-lg shadow-lg">
       <h1 className="text-center bg-gray-200 bg-opacity-75 rounded-lg w-full p-4 mt-4 text-2xl font-bold text-gray-800">
@@ -104,6 +103,7 @@ Disease outbreaks, especially recurring incidents of bird flu, can have a profou
       <div className="mt-6">
         <FAQ />
       </div>
+      <FAQ />
     </div>
   );
 };
