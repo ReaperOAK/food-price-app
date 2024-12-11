@@ -34,7 +34,7 @@ const BodyTwo = ({ selectedCity, selectedState }) => {
         NECC-National Egg Coordination Committee
       </h1>
       <div class="grid lg:grid-cols-2 gap-5"> 
-          <img src="/eggrate2.jpg" class="col-span-1 object-contain shadow rounded border-none" />
+          <img src="/eggrate2.jpg" class="col-span-1 object-contain shadow rounded border-none" alt="egg rate" />
           <div>
             <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
               Eggs are a fantastic addition to any meal, whether it's breakfast, lunch, or dinner! You can enjoy them scrambled or boiled, and they work wonderfully in dishes like Anda Bhurji or even Anda Ka Halwa. Just like us Indians, eggs can fit into a variety of recipes while keeping their special charm. If you're curious about egg prices in India, they change daily, as shared by the NECC (National Egg Coordination Committee). We make it easy for you to stay updated with the latest egg rates so you can continue enjoying your favorite egg dishes!
@@ -50,13 +50,13 @@ const BodyTwo = ({ selectedCity, selectedState }) => {
           The National Egg Coordination Committee (NECC) considers purchasing trends and the efforts of egg farmers when recommending current egg prices. This organization provides price suggestions for over 50 cities and states across the country. By disseminating today’s egg prices, we ensure that users remain informed about NECC’s recommendations, thereby enabling them to make more informed purchasing decisions.
           </p> 
         </div>
-        <img src="/desiegg.jpg" class="col-span-1 object-contain shadow rounded border-none" />
+        <img src="/desiegg.jpg" class="col-span-1 object-contain shadow rounded border-none" alt="egg rate in india" />
       </div>
       <h1 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
         Egg Consumption in India
       </h1>
       <div class="grid lg:grid-cols-2 gap-5"> 
-          <img src="/eggrate3.jpg" class="col-span-1 object-contain shadow rounded border-none" />
+          <img src="/eggrate3.jpg" class="col-span-1 object-contain shadow rounded border-none" alt="egg rate in mumbai" />
           <div>
             <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
             India is a major player in the global egg production industry, generating approximately 129.6 billion eggs each year. This production figure is experiencing a steady growth rate of 7% annually, reflecting the increasing demand for eggs among the population. According to data published by Agrospectrum, the average egg consumption per person in India is estimated to be 95 eggs per year. This indicates not only a high level of consumption but also a cultural acceptance of eggs as a staple food source. Furthermore, India holds the position of third largest egg producer globally, trailing only behind China and the United States. This prominent ranking underscores the significant role eggs play in the Indian diet, as well as the growing awareness among consumers regarding the nutritional benefits of eggs, including their high protein content and essential vitamins.
@@ -73,13 +73,13 @@ const BodyTwo = ({ selectedCity, selectedState }) => {
 Disease outbreaks, especially recurring incidents of bird flu, can have a profound effect on the egg market. Such outbreaks often lead to a decrease in egg production and concerns about food safety, causing prices to spike. Furthermore, the impact of seasonal changes should not be overlooked; egg production typically sees a slight increase during the warmer months of summer due to improved laying conditions, while it often diminishes in the colder winter months when laying can be less consistent. These dynamics create a complex landscape that shapes the pricing of eggs across the country.
           </p> 
         </div>
-        <img src="/eggchicken.jpg" class="col-span-1 object-contain shadow rounded border-none" />
+        <img src="/eggchicken.jpg" class="col-span-1 object-contain shadow rounded border-none" alt="egg rate barwala" />
       </div>
       <h1 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
       How NECC Sets Egg Prices
       </h1>
       <div class="grid lg:grid-cols-2 gap-5"> 
-          <img src="/eggrate3.jpg" class="col-span-1 object-contain shadow rounded border-none" />
+          <img src="/eggrate3.jpg" class="col-span-1 object-contain shadow rounded border-none" alt="egg rate namakkal" />
           <div>
             <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
             NECC (National Egg Coordination Committee) does not set egg prices directly. Instead, it provides a platform for stakeholders to work together and share information. Prices are determined daily by NECC after careful consideration and are updated every day at midnight. Key players in setting these prices include market forces, traders, distributors, and sometimes retailers.
