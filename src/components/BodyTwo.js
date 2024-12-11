@@ -103,7 +103,6 @@ Disease outbreaks, especially recurring incidents of bird flu, can have a profou
       <div className="mt-6">
         <FAQ />
       </div>
-      <FAQ />
     </div>
   );
 };
