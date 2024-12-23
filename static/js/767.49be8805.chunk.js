@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[767],{3767:(e,s,c)=>{c.r(s),c.d(s,{default:()=>t});c(5043);var n=c(579);const t=()=>(0,n.jsxs)("div",{children:[(0,n.jsx)("h2",{children:"Introduction"}),(0,n.jsx)("p",{children:"This is the full content of blog 1. It includes all the necessary styling and structure."})]})}}]);
+//# sourceMappingURL=767.49be8805.chunk.js.map
