@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const DefaultTable = ({ eggRates = [] }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,6 +44,32 @@ const DefaultTable = ({ eggRates = [] }) => {
   if (eggRates.length === 0) {
     return <div className="p-6 mt-6 bg-gray-100 rounded-lg shadow-lg text-center">No rates available at the moment.</div>;
   }
+
+  const data = {
+    labels: currentItems.map(rate => rate.city),
+    datasets: [
+      {
+        label: 'Egg Rates',
+        data: currentItems.map(rate => rate.rate),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Egg Rates',
+      },
+    },
+  };
 
   return (
     <div className="dynamic-body p-4">
@@ -97,6 +127,9 @@ const DefaultTable = ({ eggRates = [] }) => {
             {number}
           </button>
         ))}
+      </div>
+      <div className="mt-8">
+        <Bar data={data} options={options} />
       </div>
     </div>
   );

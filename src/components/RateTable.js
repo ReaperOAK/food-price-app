@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+import { Bar } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const RateTable = ({ eggRates, selectedCity, selectedState }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,6 +46,32 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
     return <div>No rates available for {selectedCity}, {selectedState}.</div>;
   }
 
+  const data = {
+    labels: currentItems.map(rate => rate.date),
+    datasets: [
+      {
+        label: 'Egg Rates',
+        data: currentItems.map(rate => rate.rate),
+        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+        borderColor: 'rgba(75, 192, 192, 1)',
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const options = {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: `Egg Rates in ${selectedCity}, ${selectedState}`,
+      },
+    },
+  };
+
   return (
     <div className="dynamic-body p-4">
       <div className="overflow-x-auto">
@@ -82,6 +112,9 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
             {number}
           </button>
         ))}
+      </div>
+      <div className="mt-8">
+        <Bar data={data} options={options} />
       </div>
     </div>
   );

@@ -11,6 +11,9 @@ import BodyTwo from './BodyTwo';
 import StatePage from './StatePage';
 import StateList from './StateList';
 import SpecialRatesTable from './SpecialRatesTable';
+import BlogList from './BlogList';
+import FAQ from './FAQ'; // Import the FAQ component
+import blogs from '../data/blogs'; // Import the blogs list
 
 const MainPage = () => {
   const { city: cityParam, state: stateParam } = useParams();
@@ -142,6 +145,8 @@ const MainPage = () => {
             <SpecialRatesTable />
           </div>
           <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
+          <BlogList blogs={blogs} />
+          <FAQ /> {/* Add FAQ component here */}
         </div>
         <Footer />
       </div>

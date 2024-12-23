@@ -6,8 +6,8 @@ import TOS from './components/TOS';
 import Disclaimer from './components/Disclaimer';
 import AdminPage from './components/AdminPage';
 import LoginPage from './components/LoginPage';
-// @df8cZ5v db password
-// https://todayeggrates.com/php
+import BlogPage from './components/BlogPage';
+import blogs from './data/blogs'; // Import the blogs list
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -34,6 +34,7 @@ function App() {
           path="/admin"
           element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
         />
+        <Route path="/blog/:link" element={<BlogPage blogs={blogs} />} />
       </Routes>
     </Router>
   );
