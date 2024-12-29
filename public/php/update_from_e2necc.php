@@ -1,17 +1,7 @@
 <?php
 header('Content-Type: application/json');
 
-// Database connection
-$servername = "localhost";
-$username = "u901337298_test";
-$password = "A12345678b*";
-$dbname = "u901337298_test";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Set a timeout for the HTTP request
 $context = stream_context_create([
@@ -23,6 +13,18 @@ $context = stream_context_create([
 // Fetch the latest egg prices
 $url = 'https://e2necc.com/home/eggprice';
 $html = @file_get_contents($url, false, $context);
+
+// Database connection
+$servername = "localhost";
+$username = "u901337298_test";
+$password = "A12345678b*";
+$dbname = "u901337298_test";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 if ($html !== false) {
     $dom = new DOMDocument();
