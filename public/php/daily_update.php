@@ -22,10 +22,22 @@ if ($conn->connect_error) {
 // Get today's date
 $today = date('Y-m-d');
 
-// Fetch the latest available rates for each city and state
+// Fetch the cities updated by update_from_e2necc.php
+$updatedCitiesQuery = "SELECT city, state FROM updated_cities WHERE date = '$today'";
+$updatedCitiesResult = $conn->query($updatedCitiesQuery);
+
+$updatedCities = [];
+if ($updatedCitiesResult->num_rows > 0) {
+    while ($row = $updatedCitiesResult->fetch_assoc()) {
+        $updatedCities[] = $row['city'];
+    }
+}
+
+// Fetch the latest available rates for each city and state that were not updated by update_from_e2necc.php
 $sql = "
     SELECT city, state, rate, MAX(date) as latest_date
     FROM egg_rates
+    WHERE city NOT IN ('" . implode("','", $updatedCities) . "')
     GROUP BY city, state
 ";
 
