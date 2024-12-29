@@ -12,6 +12,7 @@ DESCRIBE egg_rates;
 -- | rate  | decimal(10,2)| NO   |     | NULL    |                |
 -- +-------+--------------+------+-----+---------+----------------+
 
+
 -- Table structure for 'updated_cities'
 DESCRIBE updated_cities;
 
@@ -23,4 +24,5 @@ DESCRIBE updated_cities;
 -- | city  | varchar(255) | NO   |     | NULL    |                |
 -- | state | varchar(255) | NO   |     | NULL    |                |
 -- | date  | date         | NO   |     | NULL    |                |
+-- | rate  | decimal(10,2)| NO   |     | NULL    |                |
 -- +-------+--------------+------+-----+---------+----------------+
