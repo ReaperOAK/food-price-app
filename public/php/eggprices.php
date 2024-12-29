@@ -41,6 +41,44 @@ if ($html !== false) {
             }
         }
 
+        // City to state mapping
+        $cityToState = [
+            "Ahmedabad" => "Gujarat",
+            "Ajmer" => "Rajasthan",
+            "Barwala" => "Haryana",
+            "Bengaluru (CC)" => "Karnataka",
+            "Brahmapur (OD)" => "Odisha",
+            "Chennai (CC)" => "Tamil Nadu",
+            "Chittoor" => "Andhra Pradesh",
+            "Delhi (CC)" => "Delhi",
+            "E.Godavari" => "Andhra Pradesh",
+            "Hospet" => "Karnataka",
+            "Hyderabad" => "Telangana",
+            "Jabalpur" => "Madhya Pradesh",
+            "Kolkata (WB)" => "West Bengal",
+            "Ludhiana" => "Punjab",
+            "Mumbai (CC)" => "Maharashtra",
+            "Mysuru" => "Karnataka",
+            "Namakkal" => "Tamil Nadu",
+            "Pune" => "Maharashtra",
+            "Raipur" => "Chhattisgarh",
+            "Surat" => "Gujarat",
+            "Vijayawada" => "Andhra Pradesh",
+            "Vizag" => "Andhra Pradesh",
+            "W.Godavari" => "Andhra Pradesh",
+            "Warangal" => "Telangana",
+            "Allahabad (CC)" => "Uttar Pradesh",
+            "Bhopal" => "Madhya Pradesh",
+            "Indore (CC)" => "Madhya Pradesh",
+            "Kanpur (CC)" => "Uttar Pradesh",
+            "Luknow (CC)" => "Uttar Pradesh",
+            "Muzaffurpur (CC)" => "Bihar",
+            "Nagpur" => "Maharashtra",
+            "Patna" => "Bihar",
+            "Ranchi  (CC)" => "Jharkhand",
+            "Varanasi (CC)" => "Uttar Pradesh"
+        ];
+
         // Get today's date and day of the month
         $today = date('Y-m-d');
         $dayOfMonth = date('j'); // Get the current day of the month (1-31)
@@ -66,15 +104,19 @@ if ($html !== false) {
             // Convert rate from paisa to rupees
             $rateInRupees = number_format($rate / 100, 2);
 
+            // Get the state for the city
+            $state = isset($cityToState[$city]) ? $cityToState[$city] : 'Unknown';
+
             $todayRows[] = [
                 'city' => $city,
+                'state' => $state,
                 'date' => $today,
                 'rate' => $rateInRupees
             ];
         }
 
         $data = [
-            'headers' => ['City', 'Date', 'Rate'],
+            'headers' => ['City', 'State', 'Date', 'Rate'],
             'rows' => $todayRows
         ];
         echo json_encode($data);
