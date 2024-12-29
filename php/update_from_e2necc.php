@@ -47,6 +47,12 @@ if ($response !== false) {
                 $stmt->bind_param("sss", $rate, $city, $date);
                 $stmt->execute();
             }
+
+            // Track updated cities
+            $trackQuery = "INSERT INTO updated_cities (city, state, date) VALUES (?, ?, ?)";
+            $stmt = $conn->prepare($trackQuery);
+            $stmt->bind_param("sss", $city, $state, $date);
+            $stmt->execute();
         }
 
         echo json_encode(['status' => 'success', 'message' => 'Data updated successfully']);
