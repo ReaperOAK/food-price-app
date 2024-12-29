@@ -38,6 +38,7 @@ const BlogList = ({ blogs }) => {
 
   return (
     <div className="my-8">
+      <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">Our Latest Blogs</h2>
       <Slider {...sliderSettings}>
         {sortedBlogs.map((blog) => (
           <BlogCard key={blog.link} blog={blog} />
