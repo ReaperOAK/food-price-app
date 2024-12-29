@@ -76,13 +76,13 @@ if ($response !== false) {
             }
 
             // Track updated cities
-            $trackQuery = "INSERT INTO updated_cities (city, state, date) VALUES (?, ?, ?)";
+            $trackQuery = "INSERT INTO updated_cities (city, state, date, rate) VALUES (?, ?, ?, ?)";
             $stmt = $conn->prepare($trackQuery);
             if (!$stmt) {
                 error_log("Prepare failed: " . $conn->error);
                 die(json_encode(['error' => "Prepare failed: " . $conn->error]));
             }
-            $stmt->bind_param("sss", $city, $state, $date);
+            $stmt->bind_param("ssss", $city, $state, $date, $rate);
             $stmt->execute();
         }
 
