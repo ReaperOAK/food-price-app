@@ -49,6 +49,8 @@ if ($html !== false) {
         $todayRows = [];
         foreach ($rows as $row) {
             $city = $row[0];
+            if (strtolower($city) === 'prevailing prices') continue; // Exclude "Prevailing Prices"
+
             $rate = $row[$dayOfMonth]; // Get today's rate
 
             // If today's rate is not available, find the last available rate
@@ -61,10 +63,13 @@ if ($html !== false) {
                 }
             }
 
+            // Convert rate from paisa to rupees
+            $rateInRupees = number_format($rate / 100, 2);
+
             $todayRows[] = [
                 'city' => $city,
                 'date' => $today,
-                'rate' => $rate
+                'rate' => $rateInRupees
             ];
         }
 
