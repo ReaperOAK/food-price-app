@@ -5,7 +5,7 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
-ini_set('error_log', '/error.log'); // Update with the correct path to your error log file
+ini_set('error_log', '/path/to/error.log'); // Update with the correct path to your error log file
 
 // Database connection
 $servername = "localhost";
