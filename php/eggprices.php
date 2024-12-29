@@ -1,8 +1,15 @@
 <?php
 header('Content-Type: application/json');
 
+// Set a timeout for the HTTP request
+$context = stream_context_create([
+    'http' => [
+        'timeout' => 60 // Timeout in seconds
+    ]
+]);
+
 $url = 'https://e2necc.com/home/eggprice';
-$html = file_get_contents($url);
+$html = @file_get_contents($url, false, $context);
 
 if ($html !== false) {
     $dom = new DOMDocument();
@@ -34,9 +41,36 @@ if ($html !== false) {
             }
         }
 
+        // Get today's date and day of the month
+        $today = date('Y-m-d');
+        $dayOfMonth = date('j'); // Get the current day of the month (1-31)
+
+        // Filter rows to include only today's data
+        $todayRows = [];
+        foreach ($rows as $row) {
+            $city = $row[0];
+            $rate = $row[$dayOfMonth]; // Get today's rate
+
+            // If today's rate is not available, find the last available rate
+            if ($rate === '-' || $rate === '') {
+                for ($i = $dayOfMonth - 1; $i > 0; $i--) {
+                    if ($row[$i] !== '-' && $row[$i] !== '') {
+                        $rate = $row[$i];
+                        break;
+                    }
+                }
+            }
+
+            $todayRows[] = [
+                'city' => $city,
+                'date' => $today,
+                'rate' => $rate
+            ];
+        }
+
         $data = [
-            'headers' => $headers,
-            'rows' => $rows
+            'headers' => ['City', 'Date', 'Rate'],
+            'rows' => $todayRows
         ];
         echo json_encode($data);
     } else {
