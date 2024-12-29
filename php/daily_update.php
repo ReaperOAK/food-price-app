@@ -23,19 +23,32 @@ if ($conn->connect_error) {
 $today = date('Y-m-d');
 
 // Fetch the cities updated by update_from_e2necc.php
-$updatedCitiesQuery = "SELECT city, state FROM updated_cities WHERE date = '$today'";
+$updatedCitiesQuery = "SELECT city, state, rate FROM updated_cities WHERE date = '$today'";
 $updatedCitiesResult = $conn->query($updatedCitiesQuery);
 
 $updatedCities = [];
+$stateRates = [];
 if ($updatedCitiesResult->num_rows > 0) {
     while ($row = $updatedCitiesResult->fetch_assoc()) {
         $updatedCities[] = $row['city'];
+        $state = $row['state'];
+        $rate = $row['rate'];
+        if (!isset($stateRates[$state])) {
+            $stateRates[$state] = [];
+        }
+        $stateRates[$state][] = $rate;
     }
 }
 
-// Fetch the latest available rates for each city and state that were not updated by update_from_e2necc.php
+// Calculate the average rate for each state
+$stateAverageRates = [];
+foreach ($stateRates as $state => $rates) {
+    $stateAverageRates[$state] = array_sum($rates) / count($rates);
+}
+
+// Fetch the cities that were not updated by update_from_e2necc.php
 $sql = "
-    SELECT city, state, rate, MAX(date) as latest_date
+    SELECT city, state
     FROM egg_rates
     WHERE city NOT IN ('" . implode("','", $updatedCities) . "')
     GROUP BY city, state
@@ -48,8 +61,7 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $city = $conn->real_escape_string($row['city']);
         $state = $conn->real_escape_string($row['state']);
-        $rate = $conn->real_escape_string($row['rate']);
-        $latest_date = $conn->real_escape_string($row['latest_date']);
+        $rate = $stateAverageRates[$state];
 
         // Check if the rate already exists for today's date
         $checkSql = "SELECT * FROM egg_rates WHERE city='$city' AND state='$state' AND date='$today'";
