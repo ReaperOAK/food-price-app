@@ -61,7 +61,7 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $city = $conn->real_escape_string($row['city']);
         $state = $conn->real_escape_string($row['state']);
-        $rate = $stateAverageRates[$state];
+        $rate = $stateAverageRates[$state]; // Use the state average rate
 
         // Check if the rate already exists for today's date
         $checkSql = "SELECT * FROM egg_rates WHERE city='$city' AND state='$state' AND date='$today'";
