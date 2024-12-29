@@ -13,9 +13,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Set a timeout for the HTTP request
+$context = stream_context_create([
+    'http' => [
+        'timeout' => 60 // Timeout in seconds
+    ]
+]);
+
 // Fetch the latest egg prices from eggprices.php
 $url = 'https://todayeggrates.com/php/eggprices.php'; // Update with the correct URL
-$response = @file_get_contents($url);
+$response = @file_get_contents($url, false, $context);
 
 if ($response !== false) {
     $data = json_decode($response, true);
