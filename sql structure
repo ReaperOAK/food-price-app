@@ -11,3 +11,16 @@ DESCRIBE egg_rates;
 -- | date  | date         | NO   |     | NULL    |                |
 -- | rate  | decimal(10,2)| NO   |     | NULL    |                |
 -- +-------+--------------+------+-----+---------+----------------+
+
+-- Table structure for 'updated_cities'
+DESCRIBE updated_cities;
+
+-- Fields
+-- +-------+--------------+------+-----+---------+----------------+
+-- | Field | Type         | Null | Key | Default | Extra          |
+-- +-------+--------------+------+-----+---------+----------------+
+-- | id    | int(11)      | NO   | PRI | NULL    | auto_increment |
+-- | city  | varchar(255) | NO   |     | NULL    |                |
+-- | state | varchar(255) | NO   |     | NULL    |                |
+-- | date  | date         | NO   |     | NULL    |                |
+-- +-------+--------------+------+-----+---------+----------------+

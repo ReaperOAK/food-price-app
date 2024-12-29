@@ -41,6 +41,19 @@ if ($response !== false) {
             $date = $row['date'];
             $rate = $row['rate'];
 
+            // Fetch the state for the city
+            $stateQuery = "SELECT state FROM egg_rates WHERE city = ? LIMIT 1";
+            $stmt = $conn->prepare($stateQuery);
+            if (!$stmt) {
+                error_log("Prepare failed: " . $conn->error);
+                die(json_encode(['error' => "Prepare failed: " . $conn->error]));
+            }
+            $stmt->bind_param("s", $city);
+            $stmt->execute();
+            $stateResult = $stmt->get_result();
+            $stateRow = $stateResult->fetch_assoc();
+            $state = $stateRow['state'];
+
             // Check if data for today already exists
             $checkQuery = "SELECT * FROM egg_rates WHERE city = ? AND date = ?";
             $stmt = $conn->prepare($checkQuery);
