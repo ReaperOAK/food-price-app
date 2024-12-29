@@ -1,19 +1,6 @@
 <?php
 header('Content-Type: application/json');
 
-
-
-// Set a timeout for the HTTP request
-$context = stream_context_create([
-    'http' => [
-        'timeout' => 60 // Timeout in seconds
-    ]
-]);
-
-// Fetch the latest egg prices
-$url = 'https://e2necc.com/home/eggprice';
-$html = @file_get_contents($url, false, $context);
-
 // Database connection
 $servername = "localhost";
 $username = "u901337298_test";
@@ -26,58 +13,24 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if ($html !== false) {
-    $dom = new DOMDocument();
-    @$dom->loadHTML($html);
-    $xpath = new DOMXPath($dom);
+// Fetch the latest egg prices from eggprices.php
+$url = 'https://todayeggrates.com/php/eggprices.php'; // Update with the correct URL
+$response = @file_get_contents($url);
 
-    $table = $xpath->query('//table[@border="1px"]')->item(0);
-    if ($table) {
-        $headers = [];
-        $rows = [];
+if ($response !== false) {
+    $data = json_decode($response, true);
 
-        // Get table headers
-        $headerNodes = $xpath->query('.//th', $table);
-        foreach ($headerNodes as $headerNode) {
-            $headers[] = trim($headerNode->textContent);
-        }
-
-        // Get table rows
-        $rowNodes = $xpath->query('.//tr', $table);
-        foreach ($rowNodes as $rowIndex => $rowNode) {
-            if ($rowIndex < 2) continue; // Skip the first two rows
-            $cells = [];
-            $cellNodes = $xpath->query('.//td', $rowNode);
-            foreach ($cellNodes as $cellNode) {
-                $cells[] = trim($cellNode->textContent);
-            }
-            if (!empty($cells)) {
-                $rows[] = $cells;
-            }
-        }
-
+    if (isset($data['rows']) && is_array($data['rows'])) {
         // Insert or update data in the database
-        $today = date('Y-m-d');
-        $dayOfMonth = date('j'); // Get the current day of the month (1-31)
-
-        foreach ($rows as $row) {
-            $city = $row[0];
-            $rate = $row[$dayOfMonth]; // Get today's rate
-
-            // If today's rate is not available, find the last available rate
-            if ($rate === '-' || $rate === '') {
-                for ($i = $dayOfMonth - 1; $i > 0; $i--) {
-                    if ($row[$i] !== '-' && $row[$i] !== '') {
-                        $rate = $row[$i];
-                        break;
-                    }
-                }
-            }
+        foreach ($data['rows'] as $row) {
+            $city = $row['city'];
+            $date = $row['date'];
+            $rate = $row['rate'];
 
             // Check if data for today already exists
             $checkQuery = "SELECT * FROM egg_rates WHERE city = ? AND date = ?";
             $stmt = $conn->prepare($checkQuery);
-            $stmt->bind_param("ss", $city, $today);
+            $stmt->bind_param("ss", $city, $date);
             $stmt->execute();
             $result = $stmt->get_result();
 
@@ -85,23 +38,23 @@ if ($html !== false) {
                 // Insert new data
                 $insertQuery = "INSERT INTO egg_rates (city, date, rate) VALUES (?, ?, ?)";
                 $stmt = $conn->prepare($insertQuery);
-                $stmt->bind_param("sss", $city, $today, $rate);
+                $stmt->bind_param("sss", $city, $date, $rate);
                 $stmt->execute();
             } else {
                 // Update existing data
                 $updateQuery = "UPDATE egg_rates SET rate = ? WHERE city = ? AND date = ?";
                 $stmt = $conn->prepare($updateQuery);
-                $stmt->bind_param("sss", $rate, $city, $today);
+                $stmt->bind_param("sss", $rate, $city, $date);
                 $stmt->execute();
             }
         }
 
         echo json_encode(['status' => 'success', 'message' => 'Data updated successfully']);
     } else {
-        echo json_encode(['error' => 'Failed to find the table']);
+        echo json_encode(['error' => 'Invalid data format']);
     }
 } else {
-    echo json_encode(['error' => 'Failed to retrieve the page']);
+    echo json_encode(['error' => 'Failed to retrieve the data']);
 }
 
 $conn->close();
