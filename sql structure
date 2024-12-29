@@ -1,0 +1,13 @@
+-- Table structure for 'egg_rates'
+DESCRIBE egg_rates;
+
+-- Fields
+-- +-------+--------------+------+-----+---------+----------------+
+-- | Field | Type         | Null | Key | Default | Extra          |
+-- +-------+--------------+------+-----+---------+----------------+
+-- | id    | int(11)      | NO   | PRI | NULL    | auto_increment |
+-- | city  | varchar(100) | NO   | MUL | NULL    |                |
+-- | state | varchar(100) | NO   |     | NULL    |                |
+-- | date  | date         | NO   |     | NULL    |                |
+-- | rate  | decimal(10,2)| NO   |     | NULL    |                |
+-- +-------+--------------+------+-----+---------+----------------+
