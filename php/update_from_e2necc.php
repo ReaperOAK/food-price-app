@@ -13,9 +13,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Set a timeout for the HTTP request
+$context = stream_context_create([
+    'http' => [
+        'timeout' => 60 // Timeout in seconds
+    ]
+]);
+
 // Fetch the latest egg prices
 $url = 'https://e2necc.com/home/eggprice';
-$html = file_get_contents($url);
+$html = @file_get_contents($url, false, $context);
 
 if ($html !== false) {
     $dom = new DOMDocument();
