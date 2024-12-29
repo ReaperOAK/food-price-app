@@ -1,6 +1,7 @@
 /* src/index.css or src/App.css */
 @tailwind base;
 @tailwind components;
+@import 'tailwindcss/tailwind.css';
 @tailwind utilities;
 
 
