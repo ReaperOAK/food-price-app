@@ -62,7 +62,7 @@ const Footer = () => {
           .
         </p>
         <br/>
-        <p>Made with &#10084; by Owais Khan</p>
+        <p>Made with &#10084; by <a href="https://www.instagram.com/being._owais/profilecard/?igsh=MWo5Nm45cjFuNzVobA==" target="_blank" rel="noopener noreferrer" className="hover:underline">Owais Khan</a></p>
       </div>
     </footer>
   );
