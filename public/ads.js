@@ -6,17 +6,17 @@ function loadAdScript() {
     document.body.appendChild(script);
   }
   
-  // Function to check and control ad display frequency
-  function controlAdDisplay() {
-    const lastAdDisplay = localStorage.getItem('lastAdDisplay');
-    const now = new Date().getTime();
-    const adDisplayInterval = 1 * 1 * 1 * 1000; // 1s in milliseconds
+  // // Function to check and control ad display frequency
+  // function controlAdDisplay() {
+  //   const lastAdDisplay = localStorage.getItem('lastAdDisplay');
+  //   const now = new Date().getTime();
+  //   const adDisplayInterval = 1 * 1 * 1 * 1000; // 1s in milliseconds
   
-    if (!lastAdDisplay || now - lastAdDisplay > adDisplayInterval) {
-      loadAdScript();
-      localStorage.setItem('lastAdDisplay', now);
-    }
-  }
-  
+  //   if (!lastAdDisplay || now - lastAdDisplay > adDisplayInterval) {
+  //     loadAdScript();
+  //     localStorage.setItem('lastAdDisplay', now);
+  //   }
+  // }
+  loadAdScript();
   // Call the function to control ad display
-  controlAdDisplay();
+  // controlAdDisplay();
