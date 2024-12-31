@@ -77,7 +77,23 @@ if ($result->num_rows > 0) {
             // Insert new rate for today's date
             $insertSql = "INSERT INTO egg_rates (city, state, date, rate) VALUES ('$city', '$state', '$today', '$rate')";
             if (!$conn->query($insertSql)) {
-                $errors[] = "Error inserting rate for $city, $state: " . $conn->error;
+                // If insertion fails, try to use the previous day's rate
+                $previousDay = date('Y-m-d', strtotime('-1 day', strtotime($today)));
+                $previousRateSql = "SELECT rate FROM egg_rates WHERE city='$city' AND state='$state' AND date='$previousDay'";
+                $previousRateResult = $conn->query($previousRateSql);
+
+                if ($previousRateResult->num_rows > 0) {
+                    $previousRateRow = $previousRateResult->fetch_assoc();
+                    $previousRate = $previousRateRow['rate'];
+
+                    // Insert new rate for today's date using the previous day's rate
+                    $insertPreviousRateSql = "INSERT INTO egg_rates (city, state, date, rate) VALUES ('$city', '$state', '$today', '$previousRate')";
+                    if (!$conn->query($insertPreviousRateSql)) {
+                        $errors[] = "Error inserting previous day's rate for $city, $state: " . $conn->error;
+                    }
+                } else {
+                    $errors[] = "No previous rate found for $city, $state";
+                }
             }
         }
     }
