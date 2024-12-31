@@ -61,7 +61,39 @@ if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $city = $conn->real_escape_string($row['city']);
         $state = $conn->real_escape_string($row['state']);
-        $rate = $stateAverageRates[$state]; // Use the state average rate
+        
+        // Check if the state has an average rate calculated
+        if (isset($stateAverageRates[$state])) {
+            $rate = $stateAverageRates[$state]; // Use the state average rate
+        } else {
+            // If no average rate is available, use the last available rate
+            $lastAvailableRate = null;
+            $dateToCheck = strtotime('-1 day', strtotime($today));
+
+            while (!$lastAvailableRate) {
+                $previousDay = date('Y-m-d', $dateToCheck);
+                $previousRateSql = "SELECT rate FROM egg_rates WHERE city='$city' AND state='$state' AND date='$previousDay'";
+                $previousRateResult = $conn->query($previousRateSql);
+
+                if ($previousRateResult->num_rows > 0) {
+                    $previousRateRow = $previousRateResult->fetch_assoc();
+                    $lastAvailableRate = $previousRateRow['rate'];
+                } else {
+                    $dateToCheck = strtotime('-1 day', $dateToCheck);
+                    if ($dateToCheck < strtotime('-30 days', strtotime($today))) {
+                        // Break the loop if no rate is found within the last 30 days
+                        break;
+                    }
+                }
+            }
+
+            if ($lastAvailableRate) {
+                $rate = $lastAvailableRate;
+            } else {
+                $errors[] = "No available rate found for $city, $state within the last 30 days";
+                continue;
+            }
+        }
 
         // Check if the rate already exists for today's date
         $checkSql = "SELECT * FROM egg_rates WHERE city='$city' AND state='$state' AND date='$today'";
@@ -77,36 +109,7 @@ if ($result->num_rows > 0) {
             // Insert new rate for today's date
             $insertSql = "INSERT INTO egg_rates (city, state, date, rate) VALUES ('$city', '$state', '$today', '$rate')";
             if (!$conn->query($insertSql)) {
-                // If insertion fails, try to use the last available rate
-                $lastAvailableRate = null;
-                $dateToCheck = strtotime('-1 day', strtotime($today));
-
-                while (!$lastAvailableRate) {
-                    $previousDay = date('Y-m-d', $dateToCheck);
-                    $previousRateSql = "SELECT rate FROM egg_rates WHERE city='$city' AND state='$state' AND date='$previousDay'";
-                    $previousRateResult = $conn->query($previousRateSql);
-
-                    if ($previousRateResult->num_rows > 0) {
-                        $previousRateRow = $previousRateResult->fetch_assoc();
-                        $lastAvailableRate = $previousRateRow['rate'];
-                    } else {
-                        $dateToCheck = strtotime('-1 day', $dateToCheck);
-                        if ($dateToCheck < strtotime('-30 days', strtotime($today))) {
-                            // Break the loop if no rate is found within the last 30 days
-                            break;
-                        }
-                    }
-                }
-
-                if ($lastAvailableRate) {
-                    // Insert new rate for today's date using the last available rate
-                    $insertPreviousRateSql = "INSERT INTO egg_rates (city, state, date, rate) VALUES ('$city', '$state', '$today', '$lastAvailableRate')";
-                    if (!$conn->query($insertPreviousRateSql)) {
-                        $errors[] = "Error inserting last available rate for $city, $state: " . $conn->error;
-                    }
-                } else {
-                    $errors[] = "No available rate found for $city, $state within the last 30 days";
-                }
+                $errors[] = "Error inserting rate for $city, $state: " . $conn->error;
             }
         }
     }
