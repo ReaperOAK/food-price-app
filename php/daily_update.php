@@ -77,22 +77,35 @@ if ($result->num_rows > 0) {
             // Insert new rate for today's date
             $insertSql = "INSERT INTO egg_rates (city, state, date, rate) VALUES ('$city', '$state', '$today', '$rate')";
             if (!$conn->query($insertSql)) {
-                // If insertion fails, try to use the previous day's rate
-                $previousDay = date('Y-m-d', strtotime('-1 day', strtotime($today)));
-                $previousRateSql = "SELECT rate FROM egg_rates WHERE city='$city' AND state='$state' AND date='$previousDay'";
-                $previousRateResult = $conn->query($previousRateSql);
+                // If insertion fails, try to use the last available rate
+                $lastAvailableRate = null;
+                $dateToCheck = strtotime('-1 day', strtotime($today));
 
-                if ($previousRateResult->num_rows > 0) {
-                    $previousRateRow = $previousRateResult->fetch_assoc();
-                    $previousRate = $previousRateRow['rate'];
+                while (!$lastAvailableRate) {
+                    $previousDay = date('Y-m-d', $dateToCheck);
+                    $previousRateSql = "SELECT rate FROM egg_rates WHERE city='$city' AND state='$state' AND date='$previousDay'";
+                    $previousRateResult = $conn->query($previousRateSql);
 
-                    // Insert new rate for today's date using the previous day's rate
-                    $insertPreviousRateSql = "INSERT INTO egg_rates (city, state, date, rate) VALUES ('$city', '$state', '$today', '$previousRate')";
+                    if ($previousRateResult->num_rows > 0) {
+                        $previousRateRow = $previousRateResult->fetch_assoc();
+                        $lastAvailableRate = $previousRateRow['rate'];
+                    } else {
+                        $dateToCheck = strtotime('-1 day', $dateToCheck);
+                        if ($dateToCheck < strtotime('-30 days', strtotime($today))) {
+                            // Break the loop if no rate is found within the last 30 days
+                            break;
+                        }
+                    }
+                }
+
+                if ($lastAvailableRate) {
+                    // Insert new rate for today's date using the last available rate
+                    $insertPreviousRateSql = "INSERT INTO egg_rates (city, state, date, rate) VALUES ('$city', '$state', '$today', '$lastAvailableRate')";
                     if (!$conn->query($insertPreviousRateSql)) {
-                        $errors[] = "Error inserting previous day's rate for $city, $state: " . $conn->error;
+                        $errors[] = "Error inserting last available rate for $city, $state: " . $conn->error;
                     }
                 } else {
-                    $errors[] = "No previous rate found for $city, $state";
+                    $errors[] = "No available rate found for $city, $state within the last 30 days";
                 }
             }
         }
