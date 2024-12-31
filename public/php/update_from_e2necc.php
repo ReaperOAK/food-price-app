@@ -42,6 +42,10 @@ if ($response !== false) {
             $date = $row['date'];
             $rate = $row['rate'];
 
+            // Clean city name
+            $city = preg_replace('/\s*\(.*?\)\s*/', '', $city);
+            $city = trim($city);
+
             // Check if data for today already exists
             $checkQuery = "SELECT * FROM egg_rates WHERE city = ? AND date = ?";
             $stmt = $conn->prepare($checkQuery);

@@ -130,14 +130,14 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
             <Link
               to="/barwala-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('Lucknow')}
+              onClick={() => handleCityClick('Barwala')}
             >
               Barwala
             </Link>
             <Link
               to="/hyderabad-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('Lucknow')}
+              onClick={() => handleCityClick('Hyderabad')}
             >
               Hyderabad
             </Link>
