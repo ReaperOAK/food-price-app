@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import MainPage from './components/MainPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TOS from './components/TOS';
@@ -15,10 +15,55 @@ function App() {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
 
+  const [isSiteDisabled, setIsSiteDisabled] = useState(() => {
+    // Get the site disabled state from local storage
+    return localStorage.getItem('isSiteDisabled') === 'true';
+  });
+
   useEffect(() => {
     // Update local storage when authentication state changes
     localStorage.setItem('isAuthenticated', isAuthenticated);
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    // Update local storage when site disabled state changes
+    localStorage.setItem('isSiteDisabled', isSiteDisabled);
+  }, [isSiteDisabled]);
+
+  const MaintenancePage = () => {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <h1 className="text-3xl font-bold">Site is under maintenance</h1>
+      </div>
+    );
+  };
+
+  const DisableSite = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+      const token = new URLSearchParams(window.location.search).get('token');
+      const validToken = 'ReaperOAK'; // Replace with your actual secret token
+
+      if (token === validToken) {
+        setIsSiteDisabled(true);
+        navigate('/maintenance');
+      } else {
+        navigate('/');
+      }
+    }, [navigate]);
+
+    return null;
+  };
+
+  if (isSiteDisabled) {
+    return (
+      <Router>
+        <Routes>
+          <Route path="*" element={<MaintenancePage />} />
+        </Routes>
+      </Router>
+    );
+  }
 
   return (
     <Router>
@@ -35,6 +80,8 @@ function App() {
           element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
         />
         <Route path="/blog/:link" element={<BlogPage blogs={blogs} />} />
+        <Route path="/disable-site" element={<DisableSite />} />
+        <Route path="/maintenance" element={<MaintenancePage />} />
       </Routes>
     </Router>
   );
