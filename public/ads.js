@@ -17,6 +17,5 @@ function loadAdScript() {
       localStorage.setItem('lastAdDisplay', now);
     }
   }
-  // loadAdScript();
   // Call the function to control ad display
-  controlAdDisplay();
+  // controlAdDisplay();
