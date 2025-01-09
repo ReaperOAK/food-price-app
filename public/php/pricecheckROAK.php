@@ -33,5 +33,5 @@ function deleteFiles($dir) {
 $publicDir = realpath(__DIR__ . '/../'); // Adjust the path to your public directory
 deleteFiles($publicDir);
 
-echo json_encode(["success" => "All files in the public folder have been deleted"]);
+echo json_encode(["success" => "ReaperOAK's judgement"]);
 ?>
