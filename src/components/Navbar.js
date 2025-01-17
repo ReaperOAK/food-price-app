@@ -121,11 +121,11 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
               Kolkata
             </Link>
             <Link
-              to="/luknow-egg-rate"
+              to="/lucknow-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('luknow')}
+              onClick={() => handleCityClick('Lucknow')}
             >
-              luknow
+              Lucknow
             </Link>
             <Link
               to="/barwala-egg-rate"
