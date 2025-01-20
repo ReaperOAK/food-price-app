@@ -53,7 +53,7 @@ const NextArrow = (props) => {
   return (
     <div
       className={`${className} slick-arrow slick-next`}
-      style={{ ...style, display: 'block', background: '#000', borderRadius: '50%' }}
+      style={{ ...style, display: 'block', background: '#000', borderRadius: '50%', right: '10px', zIndex: 1 }}
       onClick={onClick}
     />
   );
@@ -64,7 +64,7 @@ const PrevArrow = (props) => {
   return (
     <div
       className={`${className} slick-arrow slick-prev`}
-      style={{ ...style, display: 'block', background: '#000', borderRadius: '50%' }}
+      style={{ ...style, display: 'block', background: '#000', borderRadius: '50%', left: '10px', zIndex: 1 }}
       onClick={onClick}
     />
   );
