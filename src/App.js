@@ -8,6 +8,7 @@ import AdminPage from './components/AdminPage';
 import LoginPage from './components/LoginPage';
 import BlogPage from './components/BlogPage';
 import blogs from './data/blogs'; // Import the blogs list
+import ScrollToTop from './ScrollToTop'; // Import ScrollToTop
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -58,6 +59,7 @@ function App() {
   if (isSiteDisabled) {
     return (
       <Router>
+        <ScrollToTop /> {/* Include ScrollToTop */}
         <Routes>
           <Route path="*" element={<MaintenancePage />} />
         </Routes>
@@ -67,6 +69,7 @@ function App() {
 
   return (
     <Router>
+      <ScrollToTop /> {/* Include ScrollToTop */}
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
