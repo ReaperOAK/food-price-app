@@ -8,6 +8,7 @@ import DefaultTable from './DefaultTable';
 import Footer from './Footer';
 import BodyOne from './BodyOne';
 import BodyTwo from './BodyTwo';
+import BodyThree from './BodyThree';
 import StatePage from './StatePage';
 import StateList from './StateList';
 import SpecialRatesTable from './SpecialRatesTable';
@@ -158,6 +159,7 @@ const MainPage = () => {
           </div>
           <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
           <BlogList blogs={blogs} />
+          <BodyThree selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} /> {/* Pass props to BodyThree */}
           <FAQ selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} /> {/* Pass props to FAQ */}
         </div>
         <Footer />
