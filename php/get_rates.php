@@ -5,7 +5,6 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 
-
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
@@ -23,10 +22,18 @@ if ($conn->connect_error) {
 
 $city = $_GET['city'] ?? '';
 $state = $_GET['state'] ?? '';
+$days = $_GET['days'] ?? '';
 
-$sql = "SELECT date, rate FROM egg_rates WHERE city = ? AND state = ? ORDER BY date DESC";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $city, $state);
+if ($days) {
+    $sql = "SELECT date, rate FROM egg_rates WHERE city = ? AND state = ? ORDER BY date DESC LIMIT ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssi", $city, $state, $days);
+} else {
+    $sql = "SELECT date, rate FROM egg_rates WHERE city = ? AND state = ? ORDER BY date DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $city, $state);
+}
+
 $stmt->execute();
 $result = $stmt->get_result();
 
