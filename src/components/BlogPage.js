@@ -24,6 +24,9 @@ const BlogPage = () => {
     return <div>Blog not found</div>;
   }
 
+  // Filter out the current blog from the list of blogs
+  const otherBlogs = blogs.filter((b) => b.link !== link);
+
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
       <Navbar />
@@ -32,7 +35,7 @@ const BlogPage = () => {
           {ContentComponent ? <ContentComponent /> : <p>Loading content...</p>}
         </div>
       </div>
-      <BlogList blogs={blogs} />
+      <BlogList blogs={otherBlogs} /> {/* Pass the filtered list of blogs */}
       <Footer />
     </div>
   );

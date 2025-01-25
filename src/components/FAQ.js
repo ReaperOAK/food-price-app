@@ -1,31 +1,31 @@
 import React, { useState } from "react";
 
-const FAQ = () => {
+const FAQ = ({ selectedCity, selectedState, eggRates }) => {
   const [openFAQ, setOpenFAQ] = useState(null);
 
   const toggleFAQ = (index) => {
     setOpenFAQ(openFAQ === index ? null : index);
   };
 
+  const location = selectedCity || selectedState || 'your area';
+  const rate = eggRates[0]?.rate || 'N/A';
+  const rate30 = (eggRates[0]?.rate * 30).toFixed(2) || 'N/A';
+  const rate100 = (eggRates[0]?.rate * 100).toFixed(2) || 'N/A';
+
   const faqList = [
-    { question: "What is mean by NECC rate?", answer: "NECC rates refers to the National Egg Coordination Committee, NECC is the world's largest and leading association of poultry farmers with over 25000+ active members. It provides the egg price data in India." },
-    { question: "What is the 1 egg market rate today?", answer: "The market rate of 1 egg is around ₹5.30." },
-    { question: "What is the rate of 30 eggs?", answer: "₹158.94 is the current price of 30-eggs in India." },
-    { question: "Egg price in Namakkal today( or Namakkal egg rate today)?", answer: "The Namakkal egg price is ₹5.04 for a single egg, ₹151.2 for 1 egg tray and ₹504 per 100 Eggs." },
-    { question: "Barwala egg rate today?", answer: "The egg rate in Barwala is ₹5.19 for 1 egg and ₹519 per 100 Eggs." },
-    { question: "What is the egg rate(anda rate) today in India?", answer: "₹530 per 100 Eggs(Approx)." },
-    { question: "What is the 1 tray of egg price today in India?", answer: "₹159.36 per tray of eggs." },
-    { question: "What is the egg rate in Gujarat market?", answer: "1 egg rate is ₹5.5, For dozen eggs price will be ₹66. And, for 100 eggs the rate is around ₹550." },
-    { question: "Egg rate in Govandi west Mumbai?", answer: "₹5.5 per egg piece in Govandi west Mumbai. Click here to see the top egg wholesalers in Govandi West, Mumbai." },
-    { question: "How often rates are updates?", answer: "Daily egg rate updates are given. All the rates may not be accurate and exact same." },
-    { question: "What is the egg price in Delhi?", answer: "The market rate of 100 eggs in Delhi is around ₹530. Single Delhi egg rate is around ₹5.3." },
-    { question: "Egg price in Hyderabad (or egg rate today in Hyderabad)?", answer: "Hyderabad egg rate today is ₹4.8 per egg, ₹480 per 100 eggs." },
-    { question: "Egg rate today Mumbai?", answer: "₹5.5 for a single egg in Mumbai, Maharashtra." },
-    { question: "Today egg rate in Bangalore?", answer: "₹5.5 per 1 egg and egg tray price is ₹165 in Bengaluru, Karnataka." },
-    { question: "What is broiler rate today in India?", answer: "White broiler chicken cost around ₹195/kg." },
+    { question: `What is the egg rate today in ${location}?`, answer: `The egg rate in ${location} is ₹${rate} per egg.` },
+    { question: `What is the rate of 30 eggs in ${location}?`, answer: `The rate of 30 eggs in ${location} is ₹${rate30}.` },
+    { question: `What is the rate of 100 eggs in ${location}?`, answer: `The rate of 100 eggs in ${location} is ₹${rate100}.` },
+    { question: `How often are the rates updated?`, answer: `The rates are updated daily. All the rates may not be accurate and exact same.` },
+    { question: `What are the current egg prices?`, answer: `The current egg prices in ${location} vary depending on the region and the time of year. However, on average, a tray of eggs costs around ₹110-150.` },
+    { question: `What is the average price of eggs in ${location}?`, answer: `The average price of eggs in ${location} is around ₹${rate} per egg.` },
+    { question: `What is the most expensive egg in ${location}?`, answer: `The most expensive egg in ${location} can vary, but specialty eggs like organic or free-range eggs tend to be more expensive.` },
+    { question: `What is the cheapest egg in ${location}?`, answer: `The cheapest egg in ${location} is usually the standard white egg, which costs around ₹${rate} per egg.` },
+    { question: `What is the difference between brown and white eggs?`, answer: `The difference between brown and white eggs is primarily the color of the shell, which is determined by the breed of the hen. Nutritionally, they are the same.` },
+    { question: `What is the difference between free-range and cage-free eggs?`, answer: `Free-range eggs come from hens that have access to the outdoors, while cage-free eggs come from hens that are not kept in cages but may not have outdoor access.` },
+    { question: `What is the nutritional value of eggs?`, answer: `Eggs are a great source of protein, vitamins, and minerals. They contain all nine essential amino acids and are rich in vitamins A, D, E, and B12, as well as iron, selenium, and choline.` },
   ];
 
-  
   return (
     <div className="p-6 mt-6 mx-auto bg-white shadow-lg rounded-lg">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Frequently Asked Questions</h2>

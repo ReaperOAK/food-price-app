@@ -146,7 +146,7 @@ const MainPage = () => {
           </div>
           <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
           <BlogList blogs={blogs} />
-          <FAQ /> {/* Add FAQ component here */}
+          <FAQ selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} /> {/* Pass props to FAQ */}
         </div>
         <Footer />
       </div>
