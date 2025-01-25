@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css'; // Ensure Tailwind CSS is imported
 import RateTable from '../RateTable';
-import { Bar } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -26,32 +25,7 @@ const EggRates = () => {
   const todayRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
   const last7DaysRates = eggRates.slice(0, 7);
 
-  const data = {
-    labels: last7DaysRates.map(rate => rate.date),
-    datasets: [
-      {
-        label: 'Egg Rates',
-        data: last7DaysRates.map(rate => rate.rate),
-        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-        borderColor: 'rgba(75, 192, 192, 1)',
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top',
-      },
-      title: {
-        display: true,
-        text: 'Egg Rates in Barwala (Last 7 Days)',
-      },
-    },
-  };
-
+  
   return (
     <div>
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Eggs and Egg Prices in Barwala, Hisar: A Comprehensive Overview</h1>
@@ -72,13 +46,6 @@ const EggRates = () => {
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Egg Rates in the Last 7 Days</h2>
         <RateTable eggRates={last7DaysRates} selectedCity="Barwala" selectedState="Haryana" />
-      </section>
-
-      <section className="mb-8">
-        <h2 className="text-3xl font-semibold text-gray-700 mb-4">Egg Rate Chart (Last 7 Days)</h2>
-        <div className="mt-8">
-          <Bar data={data} options={options} />
-        </div>
       </section>
       
       <section className="mb-8">
