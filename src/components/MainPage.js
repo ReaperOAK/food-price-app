@@ -141,7 +141,7 @@ const MainPage = () => {
                 )}
               </>
             )}
-            <StateList states={states} /> {/* Pass states to StateList */}
+            <StateList states={states} cities={cities} /> {/* Pass states and cities to StateList */}
             <SpecialRatesTable />
           </div>
           <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
