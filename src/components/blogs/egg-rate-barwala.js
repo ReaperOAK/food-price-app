@@ -11,7 +11,7 @@ const EggRates = () => {
 
   useEffect(() => {
     // Fetch the rates for the last 7 days
-    fetch('/php/get_rates.php?city=Barwala&days=7')
+    fetch('../php/get_rates.php?city=Barwala&state=Haryana&days=7')
       .then(res => res.json())
       .then(data => {
         const convertedData = data.map(item => ({
