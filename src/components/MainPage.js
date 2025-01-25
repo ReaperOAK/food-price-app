@@ -34,7 +34,7 @@ const MainPage = () => {
       .catch(error => console.error('Error fetching states:', error));
   }, []);
 
-  // Fetch cities when a state is selected
+  // Fetch cities when a state is selected or when the URL changes
   useEffect(() => {
     if (selectedState) {
       fetch(`/php/get_cities.php?state=${selectedState}`)
@@ -106,6 +106,18 @@ const MainPage = () => {
       navigate(`/state/${selectedState.toLowerCase()}-egg-rate`);
     }
   }, [selectedCity, selectedState, navigate, location.pathname]);
+
+  // Update selectedState and selectedCity when URL parameters change
+  useEffect(() => {
+    if (stateParam) {
+      setSelectedState(stateParam.replace('-egg-rate', ''));
+      setSelectedCity('');
+    }
+    if (cityParam) {
+      setSelectedCity(cityParam.replace('-egg-rate', ''));
+      setSelectedState('');
+    }
+  }, [stateParam, cityParam]);
 
   return (
     <>
