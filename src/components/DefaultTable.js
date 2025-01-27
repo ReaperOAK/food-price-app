@@ -60,6 +60,7 @@ const DefaultTable = ({ eggRates = [] }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
@@ -116,19 +117,19 @@ const DefaultTable = ({ eggRates = [] }) => {
           </tbody>
         </table>
       </div>
-      <div className="pagination mt-4 flex justify-center">
+      <div className="pagination mt-4 flex flex-wrap justify-center">
         {pages.map(number => (
           <button
             key={number}
             id={number}
             onClick={handleClick}
-            className={`px-4 py-2 mx-1 border rounded ${currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 hover:bg-blue-100'}`}
+            className={`px-4 py-2 mx-1 mb-2 border rounded ${currentPage === number ? 'bg-blue-500 text-white' : 'bg-white text-blue-500 hover:bg-blue-100'}`}
           >
             {number}
           </button>
         ))}
       </div>
-      <div className="mt-8">
+      <div className="mt-8" style={{ position: 'relative', height: '400px', width: '100%' }}>
         <Bar data={data} options={options} />
       </div>
     </div>
