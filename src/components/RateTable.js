@@ -61,6 +61,7 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         position: 'top',
@@ -68,6 +69,14 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
       title: {
         display: true,
         text: `Egg Rates in ${selectedCity}, ${selectedState}`,
+      },
+    },
+    scales: {
+      x: {
+        ticks: {
+          maxRotation: 90,
+          minRotation: 45,
+        },
       },
     },
   };
@@ -113,7 +122,7 @@ const RateTable = ({ eggRates, selectedCity, selectedState }) => {
           </button>
         ))}
       </div>
-      <div className="mt-8">
+      <div className="mt-8" style={{ position: 'relative', height: '400px', width: '100%' }}>
         <Bar data={data} options={options} />
       </div>
     </div>
