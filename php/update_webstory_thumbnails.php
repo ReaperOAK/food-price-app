@@ -17,10 +17,21 @@ if (!file_exists($imageDir)) {
     mkdir($imageDir, 0755, true);
 }
 
-// Default background images for various cities
-$backgroundImages = [
-    'default' => 'eggpic.png',
-];
+// Get all available background images
+$backgroundImages = [];
+if (is_dir($imageDir)) {
+    $files = scandir($imageDir);
+    foreach ($files as $file) {
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif']) && $file !== '.' && $file !== '..') {
+            // Skip thumbnail files
+            if (strpos($file, 'thumbnail-') === 0) {
+                continue;
+            }
+            $backgroundImages[] = $file;
+        }
+    }
+}
 
 // Database connection
 include 'db.php';
@@ -34,11 +45,12 @@ if ($result->num_rows > 0) {
         $city = $row['city'];
         $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
         
-        // Determine which background image to use
-        $backgroundFile = $backgroundImages['default'];
-        $cityLower = strtolower($city);
-        if (isset($backgroundImages[$cityLower])) {
-            $backgroundFile = $backgroundImages[$cityLower];
+        // Pick a random background image for this city
+        if (!empty($backgroundImages)) {
+            $randomIndex = array_rand($backgroundImages);
+            $backgroundFile = $backgroundImages[$randomIndex];
+        } else {
+            $backgroundFile = 'eggpic.png';
         }
         
         // Load the source image
