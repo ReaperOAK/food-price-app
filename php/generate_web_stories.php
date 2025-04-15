@@ -200,8 +200,8 @@ function generateThumbnail($imageDir, $city, $citySlug, $sourceImage) {
     $textHeight = imagefontheight($font);
     
     // Calculate position for centered text
-    $textX = ($thumbnailWidth - $textWidth) / 2;
-    $textY = $thumbnailHeight - $textHeight - 10;
+    $textX = (int)(($thumbnailWidth - $textWidth) / 2); // Explicitly cast to int
+    $textY = (int)($thumbnailHeight - $textHeight - 10); // Explicitly cast to int
     
     // Draw text shadow
     imagestring($thumbnailImage, $font, $textX + 1, $textY + 1, $city, $shadowColor);
@@ -341,6 +341,5 @@ function generateWebStoryIndex($storiesDir, $conn) {
 // Generate a web stories sitemap after creating all stories
 include_once 'generate_webstories_sitemap.php';
 
-// Close connection at the end of this script
-$conn->close();
+// Connection is already closed in generate_webstories_sitemap.php, so don't close it again
 ?>
