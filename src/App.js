@@ -21,6 +21,14 @@ const SitemapHandler = () => {
   return null;
 };
 
+const WebstoriesSitemapHandler = () => {
+  useEffect(() => {
+    // Redirect to the actual webstories-sitemap.xml file
+    window.location.href = '/webstories-sitemap.xml';
+  }, []);
+  return null;
+};
+
 const RobotsHandler = () => {
   useEffect(() => {
     // Redirect to the actual robots.txt file
@@ -92,6 +100,7 @@ function App() {
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/sitemap.txt" element={<SitemapHandler />} />
+        <Route path="/webstories-sitemap.xml" element={<WebstoriesSitemapHandler />} />
         <Route path="/robots.txt" element={<RobotsHandler />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TOS />} />
