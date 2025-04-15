@@ -10,14 +10,33 @@ include_once 'delete_old_webstories.php';
 
 // Configuration
 $storiesDir = '../webstories';
+$imageDir = '../images/webstories';
 $templateFile = '../templates/webstory_template.html';
-$backgroundImages = [
-    'default' => '/images/webstories/eggpic.png',
-];
 
 // Create the stories directory if it doesn't exist
 if (!file_exists($storiesDir)) {
     mkdir($storiesDir, 0755, true);
+}
+
+// Get all available background images
+$backgroundImages = [];
+if (is_dir($imageDir)) {
+    $files = scandir($imageDir);
+    foreach ($files as $file) {
+        $extension = pathinfo($file, PATHINFO_EXTENSION);
+        if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif']) && $file !== '.' && $file !== '..') {
+            // Skip thumbnail files
+            if (strpos($file, 'thumbnail-') === 0) {
+                continue;
+            }
+            $backgroundImages[] = '/images/webstories/' . $file;
+        }
+    }
+}
+
+// If no images found, use a default image
+if (empty($backgroundImages)) {
+    $backgroundImages[] = '/images/webstories/eggpic.png';
 }
 
 // Get the web story template
@@ -30,7 +49,6 @@ if (!$template) {
 $today = date('Y-m-d');
 
 // Clean up old web stories first - but don't close the connection
-$imageDir = '../images/webstories';
 $daysToKeep = 3;
 deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
 
@@ -65,12 +83,14 @@ if ($result->num_rows > 0) {
         // Create a URL-friendly city name
         $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
         
-        // Select background image
-        $backgroundImage = $backgroundImages['default'];
-        $cityLower = strtolower($city);
-        if (isset($backgroundImages[$cityLower])) {
-            $backgroundImage = $backgroundImages[$cityLower];
-        }
+        // Randomly select different images for different pages
+        shuffle($backgroundImages);
+        $coverImage = $backgroundImages[0];
+        $trayPriceImage = isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0];
+        $ctaImage = isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0];
+        
+        // Store the first image for thumbnail use
+        $thumbnailSourceImage = $coverImage;
         
         // Format date for display
         $displayDate = date('F j, Y', strtotime($date));
@@ -82,13 +102,21 @@ if ($result->num_rows > 0) {
         $story = str_replace('{{EGG_RATE}}', $rate, $story);
         $story = str_replace('{{EGG_RATE * 30}}', ($rate * 30), $story);
         $story = str_replace('{{DATE}}', $displayDate, $story);
-        $story = str_replace('{{BACKGROUND_IMAGE}}', $backgroundImage, $story);
+        
+        // Replace different background images for different pages
+        $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
+        $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayPriceImage, $story);
+        $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
+        
         $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
         
         // Save the web story
         $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
         if (file_put_contents($filename, $story)) {
             $storiesGenerated++;
+            
+            // Generate thumbnail using the first selected background image
+            generateThumbnail($imageDir, $city, $citySlug, $thumbnailSourceImage);
         } else {
             echo "Error: Could not write to file $filename<br>";
         }
@@ -100,6 +128,96 @@ if ($result->num_rows > 0) {
     echo "Generated $storiesGenerated web stories successfully.";
 } else {
     echo "No egg rates found.";
+}
+
+// Function to generate thumbnail for a web story
+function generateThumbnail($imageDir, $city, $citySlug, $sourceImage) {
+    // Extract filename from source image path
+    $sourceFilename = basename($sourceImage);
+    $sourceImagePath = $imageDir . '/' . $sourceFilename;
+    
+    // Ensure source file exists
+    if (!file_exists($sourceImagePath)) {
+        // Try with the path as is (it might be a full path)
+        $sourceImagePath = $_SERVER['DOCUMENT_ROOT'] . $sourceImage;
+        if (!file_exists($sourceImagePath)) {
+            return false;
+        }
+    }
+    
+    // Configuration
+    $thumbnailWidth = 400;
+    $thumbnailHeight = 300;
+    
+    // Get image type
+    $imageInfo = getimagesize($sourceImagePath);
+    if ($imageInfo === false) {
+        return false;
+    }
+    
+    $sourceType = $imageInfo[2];
+    
+    // Create source image based on type
+    switch ($sourceType) {
+        case IMAGETYPE_JPEG:
+            $sourceImage = imagecreatefromjpeg($sourceImagePath);
+            break;
+        case IMAGETYPE_PNG:
+            $sourceImage = imagecreatefrompng($sourceImagePath);
+            break;
+        case IMAGETYPE_GIF:
+            $sourceImage = imagecreatefromgif($sourceImagePath);
+            break;
+        default:
+            return false;
+    }
+    
+    // Create a new thumbnail image
+    $thumbnailImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
+    
+    // Preserve transparency for PNG images
+    if ($sourceType == IMAGETYPE_PNG) {
+        imagecolortransparent($thumbnailImage, imagecolorallocate($thumbnailImage, 0, 0, 0));
+        imagealphablending($thumbnailImage, false);
+        imagesavealpha($thumbnailImage, true);
+    }
+    
+    // Resize the image
+    imagecopyresampled(
+        $thumbnailImage, $sourceImage,
+        0, 0, 0, 0,
+        $thumbnailWidth, $thumbnailHeight,
+        imagesx($sourceImage), imagesy($sourceImage)
+    );
+    
+    // Add city name text overlay
+    $textColor = imagecolorallocate($thumbnailImage, 255, 255, 255);
+    $shadowColor = imagecolorallocate($thumbnailImage, 0, 0, 0);
+    $font = 5; // Built-in font
+    
+    // Get text dimensions
+    $textWidth = imagefontwidth($font) * strlen($city);
+    $textHeight = imagefontheight($font);
+    
+    // Calculate position for centered text
+    $textX = ($thumbnailWidth - $textWidth) / 2;
+    $textY = $thumbnailHeight - $textHeight - 10;
+    
+    // Draw text shadow
+    imagestring($thumbnailImage, $font, $textX + 1, $textY + 1, $city, $shadowColor);
+    
+    // Draw text
+    imagestring($thumbnailImage, $font, $textX, $textY, $city, $textColor);
+    
+    // Save the thumbnail
+    $thumbnailPath = $imageDir . '/thumbnail-' . $citySlug . '.jpg';
+    imagejpeg($thumbnailImage, $thumbnailPath, 90);
+    
+    // Clean up
+    imagedestroy($sourceImage);
+    imagedestroy($thumbnailImage);
+    
+    return true;
 }
 
 // Function to generate an index file for all web stories
