@@ -13,6 +13,9 @@ include 'db.php';
 // Directory where web stories are stored
 $storiesDir = '../webstories';
 
+// Get limit parameter if provided
+$limit = isset($_GET['limit']) ? intval($_GET['limit']) : null;
+
 // Get the latest egg rates for all cities
 $sql = "
     SELECT city, state, rate, date 
@@ -22,8 +25,13 @@ $sql = "
         FROM egg_rates 
         GROUP BY city
     )
-    ORDER BY city
+    ORDER BY date DESC, city ASC
 ";
+
+// Add limit if specified
+if ($limit) {
+    $sql .= " LIMIT " . $limit;
+}
 
 $result = $conn->query($sql);
 $stories = [];

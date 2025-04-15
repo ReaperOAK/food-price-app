@@ -338,6 +338,9 @@ function generateWebStoryIndex($storiesDir, $conn) {
     file_put_contents($indexFile, $html);
 }
 
+// Generate a web stories sitemap after creating all stories
+include_once 'generate_webstories_sitemap.php';
+
 // Close connection at the end of this script
 $conn->close();
 ?>
