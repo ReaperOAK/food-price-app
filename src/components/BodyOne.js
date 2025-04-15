@@ -10,6 +10,7 @@ const BodyOne = ({ selectedCity, selectedState }) => {
   });
   
   const [featuredWebStories, setFeaturedWebStories] = useState([]);
+  const [isWebStoriesExpanded, setIsWebStoriesExpanded] = useState(false);
   
   useEffect(() => {
     // Fetch top 3 web stories to feature
@@ -30,33 +31,46 @@ const BodyOne = ({ selectedCity, selectedState }) => {
 
       {featuredWebStories.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-xl font-semibold text-center mb-4">Web Stories</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {featuredWebStories.map((story, index) => (
-              <a 
-                key={index}
-                href={`/webstories/${story.slug}.html`}
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="block bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="aspect-w-9 aspect-h-16 mb-2">
-                  <img 
-                    src={story.thumbnail} 
-                    alt={story.title} 
-                    className="object-cover w-full h-48 rounded-lg"
-                  />
-                </div>
-                <h3 className="font-bold">{story.title}</h3>
-                <p className="text-sm text-gray-600">{story.date}</p>
-              </a>
-            ))}
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Web Stories</h2>
+            <button 
+              onClick={() => setIsWebStoriesExpanded(!isWebStoriesExpanded)}
+              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
+            >
+              {isWebStoriesExpanded ? 'Collapse' : 'Expand'}
+            </button>
           </div>
-          <div className="text-center mt-4">
-            <Link to="/webstories" className="text-blue-600 hover:text-blue-800 font-semibold">
-              View All Web Stories
-            </Link>
-          </div>
+          
+          {isWebStoriesExpanded && (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                {featuredWebStories.map((story, index) => (
+                  <a 
+                    key={index}
+                    href={`/webstories/${story.slug}.html`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="block bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <div className="aspect-w-9 aspect-h-16 mb-2">
+                      <img 
+                        src={story.thumbnail} 
+                        alt={story.title} 
+                        className="object-cover w-full h-48 rounded-lg"
+                      />
+                    </div>
+                    <h3 className="font-bold">{story.title}</h3>
+                    <p className="text-sm text-gray-600">{story.date}</p>
+                  </a>
+                ))}
+              </div>
+              <div className="text-center mt-4">
+                <Link to="/webstories" className="text-blue-600 hover:text-blue-800 font-semibold">
+                  View All Web Stories
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       )}
 
