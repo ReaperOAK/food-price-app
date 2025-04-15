@@ -5,6 +5,9 @@ ini_set('display_errors', 1);
 // Database connection
 include 'db.php';
 
+// Include the function to delete old web stories
+include_once 'delete_old_webstories.php';
+
 // Configuration
 $storiesDir = '../webstories';
 $templateFile = '../templates/webstory_template.html';
@@ -26,8 +29,10 @@ if (!$template) {
 // Get today's date
 $today = date('Y-m-d');
 
-// Clean up old web stories first
-include_once 'delete_old_webstories.php';
+// Clean up old web stories first - but don't close the connection
+$imageDir = '../images/webstories';
+$daysToKeep = 3;
+deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
 
 // Get the latest egg rates
 $sql = "
@@ -215,5 +220,6 @@ function generateWebStoryIndex($storiesDir, $conn) {
     file_put_contents($indexFile, $html);
 }
 
+// Close connection at the end of this script
 $conn->close();
 ?>
