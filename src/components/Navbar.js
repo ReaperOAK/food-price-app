@@ -172,6 +172,12 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
             >
               Chennai
             </Link>
+            <Link
+              to="/webstories"
+              className="text-gray-800 hover:text-gray-600 transition duration-300"
+            >
+              Web Stories
+            </Link>
           </div>
         </div>
         <div className="w-full md:w-64">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import MainPage from './components/MainPage';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TOS from './components/TOS';
@@ -9,6 +9,8 @@ import LoginPage from './components/LoginPage';
 import BlogPage from './components/BlogPage';
 import blogs from './data/blogs'; // Import the blogs list
 import ScrollToTop from './ScrollToTop'; // Import ScrollToTop
+import WebStoriesList from './components/WebStoriesList'; // Import WebStoriesList
+import WebStoryViewer from './components/WebStoryViewer'; // Import WebStoryViewer
 
 // Special file handler components
 const SitemapHandler = () => {
@@ -99,11 +101,13 @@ function App() {
         <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
         <Route
           path="/admin"
-          element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <LoginPage setIsAuthenticated={setIsAuthenticated} />}
+          element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" />}
         />
         <Route path="/blog/:link" element={<BlogPage blogs={blogs} />} />
         <Route path="/disable-site" element={<DisableSite />} />
         <Route path="/maintenance" element={<MaintenancePage />} />
+        <Route path="/webstories" element={<WebStoriesList />} />
+        <Route path="/webstory/:slug" element={<WebStoryViewer />} />
       </Routes>
     </Router>
   );
