@@ -29,8 +29,12 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
           data[state].forEach(city => {
             // Standardize city names
             let cityName = city;
-            if (cityName === 'Bangalore' || cityName === 'Bangalore (CC)' || cityName === 'Bengaluru (CC)') {
-              cityName = 'Bengaluru';
+            // Case-insensitive check for bengaluru/bangalore variants
+            if (cityName.toLowerCase() === 'bangalore' || 
+                cityName.toLowerCase() === 'bangalore (cc)' || 
+                cityName.toLowerCase() === 'bengaluru (cc)' ||
+                cityName.toLowerCase() === 'bengaluru') {
+              cityName = 'Bengaluru'; // Always use this capitalization
             }
             
             const cityLabel = `${cityName}, ${state}`;
@@ -55,8 +59,12 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
       const [city, state] = label.split(', ');
       let selectedCityName = city;
       
-      if (selectedCityName === 'Bangalore' || selectedCityName === 'Bangalore (CC)') {
-        selectedCityName = 'Bengaluru';
+      // Case-insensitive check for bengaluru/bangalore variants
+      if (selectedCityName.toLowerCase() === 'bangalore' || 
+          selectedCityName.toLowerCase() === 'bangalore (cc)' || 
+          selectedCityName.toLowerCase() === 'bengaluru (cc)' ||
+          selectedCityName.toLowerCase() === 'bengaluru') {
+        selectedCityName = 'Bengaluru'; // Always use this capitalization
       }
       
       setSelectedCity(selectedCityName);

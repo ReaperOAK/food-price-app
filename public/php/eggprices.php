@@ -91,11 +91,12 @@ if ($html !== false) {
             $city = $row[0];
             if (strtolower($city) === 'prevailing prices') continue; // Exclude "Prevailing Prices"
 
-            // Standardize city names
-            if ($city === 'Bangalore' || $city === 'Bangalore (CC)') {
-                $city = 'Bengaluru';
-            } else if ($city === 'Bengaluru (CC)') {
-                $city = 'Bengaluru';
+            // Standardize city names with consistent capitalization
+            if (strtolower($city) === 'bangalore' || 
+                strtolower($city) === 'bangalore (cc)' || 
+                strtolower($city) === 'bengaluru (cc)' ||
+                strtolower($city) === 'bengaluru') {
+                $city = 'Bengaluru'; // Always use this capitalization
             }
 
             $rate = $row[$dayOfMonth]; // Get today's rate

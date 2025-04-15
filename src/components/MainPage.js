@@ -48,17 +48,27 @@ const MainPage = () => {
   // Fetch state for the city from the URL
   useEffect(() => {
     if (cityParam) {
-      fetch(`/php/get_state_for_city.php?city=${selectedCity}`)
+      // Normalize city name for display (e.g., convert 'bengaluru' to 'Bengaluru')
+      const normalizedCity = cityParam.replace('-egg-rate', '');
+      let displayCity = normalizedCity.charAt(0).toUpperCase() + normalizedCity.slice(1);
+      
+      // Special handling for Bengaluru
+      if (displayCity.toLowerCase() === 'bengaluru') {
+        displayCity = 'Bengaluru';
+      }
+      
+      setSelectedCity(displayCity);
+      
+      fetch(`/php/get_state_for_city.php?city=${displayCity}`)
         .then(res => res.json())
         .then(data => {
           if (data.state) {
             setSelectedState(data.state);
-            setSelectedCity(selectedCity);
           }
         })
         .catch(error => console.error('Error fetching state for city:', error));
     }
-  }, [cityParam, selectedCity]);
+  }, [cityParam]);
 
   // Define handleFetchRates function
   const handleFetchRates = useCallback(() => {

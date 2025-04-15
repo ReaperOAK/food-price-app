@@ -45,6 +45,11 @@ if ($response !== false) {
             // Clean city name
             $city = preg_replace('/\s*\(.*?\)\s*/', '', $city);
             $city = trim($city);
+            
+            // Standardize city names with consistent capitalization
+            if (strtolower($city) === 'bangalore' || strtolower($city) === 'bengaluru') {
+                $city = 'Bengaluru'; // Always use this capitalization
+            }
 
             // Check if data for today already exists
             $checkQuery = "SELECT * FROM egg_rates WHERE city = ? AND date = ?";
