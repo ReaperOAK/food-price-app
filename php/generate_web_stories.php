@@ -72,6 +72,7 @@ if ($result->num_rows > 0) {
         $story = str_replace('{{CITY_NAME}}', $city, $story);
         $story = str_replace('{{STATE_NAME}}', $state, $story);
         $story = str_replace('{{EGG_RATE}}', $rate, $story);
+        $story = str_replace('{{EGG_RATE * 30}}', ($rate * 30), $story);
         $story = str_replace('{{DATE}}', $displayDate, $story);
         $story = str_replace('{{BACKGROUND_IMAGE}}', $backgroundImage, $story);
         $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
