@@ -27,10 +27,16 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
           }
           
           data[state].forEach(city => {
-            const cityLabel = `${city}, ${state}`;
+            // Standardize city names
+            let cityName = city;
+            if (cityName === 'Bangalore' || cityName === 'Bangalore (CC)' || cityName === 'Bengaluru (CC)') {
+              cityName = 'Bengaluru';
+            }
+            
+            const cityLabel = `${cityName}, ${state}`;
             if (!citySet.has(cityLabel)) {
               combinedOptions.push({
-                value: city,
+                value: cityName,
                 label: cityLabel,
                 type: 'city',
               });
@@ -47,9 +53,15 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
     const { type, label } = selectedOption;
     if (type === 'city') {
       const [city, state] = label.split(', ');
-      setSelectedCity(city);
+      let selectedCityName = city;
+      
+      if (selectedCityName === 'Bangalore' || selectedCityName === 'Bangalore (CC)') {
+        selectedCityName = 'Bengaluru';
+      }
+      
+      setSelectedCity(selectedCityName);
       setSelectedState(state);
-      navigate(`/${city.toLowerCase()}-egg-rate`);
+      navigate(`/${selectedCityName.toLowerCase()}-egg-rate`);
     } else if (type === 'state') {
       setSelectedCity('');
       setSelectedState(label);

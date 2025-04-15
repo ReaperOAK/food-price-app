@@ -47,6 +47,8 @@ if ($html !== false) {
             "Ajmer" => "Rajasthan",
             "Barwala" => "Haryana",
             "Bengaluru (CC)" => "Karnataka",
+            "Bengaluru" => "Karnataka",
+            "Bangalore" => "Karnataka",
             "Brahmapur (OD)" => "Odisha",
             "Chennai (CC)" => "Tamil Nadu",
             "Chittoor" => "Andhra Pradesh",
@@ -88,6 +90,13 @@ if ($html !== false) {
         foreach ($rows as $row) {
             $city = $row[0];
             if (strtolower($city) === 'prevailing prices') continue; // Exclude "Prevailing Prices"
+
+            // Standardize city names
+            if ($city === 'Bangalore' || $city === 'Bangalore (CC)') {
+                $city = 'Bengaluru';
+            } else if ($city === 'Bengaluru (CC)') {
+                $city = 'Bengaluru';
+            }
 
             $rate = $row[$dayOfMonth]; // Get today's rate
 

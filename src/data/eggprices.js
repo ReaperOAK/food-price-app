@@ -25,7 +25,7 @@ const eggprices =   {
             "rate": "5.95"
         },
         {
-            "city": "Bengaluru (CC)",
+            "city": "Bengaluru",
             "state": "Karnataka",
             "date": "2024-12-29",
             "rate": "5.80"
@@ -213,4 +213,4 @@ const eggprices =   {
     ]
 }
 
-export default eggprices;;
+export default eggprices;
