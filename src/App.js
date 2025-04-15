@@ -10,6 +10,23 @@ import BlogPage from './components/BlogPage';
 import blogs from './data/blogs'; // Import the blogs list
 import ScrollToTop from './ScrollToTop'; // Import ScrollToTop
 
+// Special file handler components
+const SitemapHandler = () => {
+  useEffect(() => {
+    // Redirect to the actual sitemap.txt file
+    window.location.href = '/sitemap.txt';
+  }, []);
+  return null;
+};
+
+const RobotsHandler = () => {
+  useEffect(() => {
+    // Redirect to the actual robots.txt file
+    window.location.href = '/robots.txt';
+  }, []);
+  return null;
+};
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     // Get the authentication state from local storage
@@ -72,6 +89,8 @@ function App() {
       <ScrollToTop /> {/* Include ScrollToTop */}
       <Routes>
         <Route path="/" element={<MainPage />} />
+        <Route path="/sitemap.txt" element={<SitemapHandler />} />
+        <Route path="/robots.txt" element={<RobotsHandler />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TOS />} />
         <Route path="/disclaimer" element={<Disclaimer />} />
