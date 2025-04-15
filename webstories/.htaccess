@@ -1,0 +1,5 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Rewrite rule for web stories
+RewriteRule ^([a-z0-9-]+)-egg-rate$ $1-egg-rate.html [L]
