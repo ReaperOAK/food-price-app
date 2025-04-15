@@ -113,8 +113,8 @@ if ($result->num_rows > 0) {
         $textHeight = imagefontheight($font);
         
         // Calculate position for centered text
-        $textX = ($thumbnailWidth - $textWidth) / 2;
-        $textY = $thumbnailHeight - $textHeight - 10;
+        $textX = (int)(($thumbnailWidth - $textWidth) / 2); // Explicitly cast to int
+        $textY = (int)($thumbnailHeight - $textHeight - 10); // Explicitly cast to int
         
         // Draw text shadow
         imagestring($thumbnailImage, $font, $textX + 1, $textY + 1, $city, $shadowColor);

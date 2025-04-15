@@ -62,5 +62,8 @@ file_put_contents($sitemapFile, $xml);
 
 echo "Web stories sitemap generated with $storyCount stories.";
 
-$conn->close();
+// Only close the connection if this script is called directly, not when included
+if (basename($_SERVER['SCRIPT_FILENAME']) == basename(__FILE__)) {
+    $conn->close();
+}
 ?>
