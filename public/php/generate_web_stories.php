@@ -26,6 +26,9 @@ if (!$template) {
 // Get today's date
 $today = date('Y-m-d');
 
+// Clean up old web stories first
+include_once 'delete_old_webstories.php';
+
 // Get the latest egg rates
 $sql = "
     SELECT city, state, rate, date 
@@ -214,5 +217,3 @@ function generateWebStoryIndex($storiesDir, $conn) {
 
 $conn->close();
 ?>
-```
-</file>
