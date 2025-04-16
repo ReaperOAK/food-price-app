@@ -7,14 +7,23 @@ if (!extension_loaded('gd')) {
     die("Error: GD library is not available. Please install it for image processing.");
 }
 
-// Configuration
-$imageDir = '../images/webstories';
+// Configuration with absolute paths
+$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$imageDir = $basePath . '/images/webstories';
 $thumbnailWidth = 400;
 $thumbnailHeight = 300;
 
-// Create the images directory if it doesn't exist
+// Create the images directory if it doesn't exist with error handling
 if (!file_exists($imageDir)) {
-    mkdir($imageDir, 0755, true);
+    try {
+        if (!mkdir($imageDir, 0755, true)) {
+            error_log("Failed to create directory: $imageDir");
+            echo "Failed to create directory: $imageDir. Please check permissions.<br>";
+        }
+    } catch (Exception $e) {
+        error_log("Exception creating directory: " . $e->getMessage());
+        echo "Error creating directory: " . $e->getMessage() . "<br>";
+    }
 }
 
 // Get all available background images

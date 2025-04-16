@@ -7,9 +7,10 @@ if (!function_exists('deleteOldWebStories')) {
     include 'db.php';
 }
 
-// Configuration
-$storiesDir = '../webstories';
-$imageDir = '../images/webstories';
+// Configuration with absolute paths
+$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$storiesDir = $basePath . '/webstories';
+$imageDir = $basePath . '/images/webstories';
 $daysToKeep = 3; // Number of days to keep web stories
 
 /**
@@ -25,7 +26,7 @@ $daysToKeep = 3; // Number of days to keep web stories
 function deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, $closeConnection = false) {
     // Check if the web stories directory exists
     if (!is_dir($storiesDir)) {
-        echo "Web stories directory does not exist.<br>";
+        echo "Web stories directory does not exist: $storiesDir<br>";
         return false;
     }
 
@@ -104,6 +105,10 @@ function deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, $closeC
 
 // Only run the script if called directly, not when included
 if (basename($_SERVER['SCRIPT_FILENAME']) == basename(__FILE__)) {
+    $basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+    $storiesDir = $basePath . '/webstories';
+    $imageDir = $basePath . '/images/webstories';
+    
     $needRegenerateIndex = deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, true);
     
     // Regenerate the index if needed

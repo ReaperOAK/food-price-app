@@ -8,14 +8,23 @@ include 'db.php';
 // Include the function to delete old web stories
 include_once 'delete_old_webstories.php';
 
-// Configuration
-$storiesDir = '../webstories';
-$imageDir = '../images/webstories';
-$templateFile = '../templates/webstory_template.html';
+// Configuration - use absolute paths to avoid permission issues
+$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$storiesDir = $basePath . '/webstories';
+$imageDir = $basePath . '/images/webstories';
+$templateFile = $basePath . '/templates/webstory_template.html';
 
-// Create the stories directory if it doesn't exist
+// Create the stories directory if it doesn't exist with proper error handling
 if (!file_exists($storiesDir)) {
-    mkdir($storiesDir, 0755, true);
+    try {
+        if (!mkdir($storiesDir, 0755, true)) {
+            error_log("Failed to create directory: $storiesDir");
+            echo "Failed to create directory: $storiesDir. Please check permissions.<br>";
+        }
+    } catch (Exception $e) {
+        error_log("Exception creating directory: " . $e->getMessage());
+        echo "Error creating directory: " . $e->getMessage() . "<br>";
+    }
 }
 
 // Get all available background images
@@ -39,10 +48,23 @@ if (empty($backgroundImages)) {
     $backgroundImages[] = '/images/webstories/eggpic.png';
 }
 
-// Get the web story template
-$template = file_get_contents($templateFile);
-if (!$template) {
-    die("Error: Could not load template file");
+// Get the web story template with error handling
+if (file_exists($templateFile)) {
+    $template = file_get_contents($templateFile);
+    if (!$template) {
+        die("Error: Could not read template file $templateFile");
+    }
+} else {
+    // Check alternative locations
+    $alternateTemplateFile = $basePath . '/public_html/templates/webstory_template.html';
+    if (file_exists($alternateTemplateFile)) {
+        $template = file_get_contents($alternateTemplateFile);
+        if (!$template) {
+            die("Error: Could not read template file $alternateTemplateFile");
+        }
+    } else {
+        die("Error: Template file not found at $templateFile or $alternateTemplateFile. Please check the path.");
+    }
 }
 
 // Get today's date

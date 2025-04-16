@@ -5,9 +5,10 @@ ini_set('display_errors', 1);
 // Database connection
 include 'db.php';
 
-// Configuration
-$storiesDir = '../webstories';
-$sitemapFile = '../webstories-sitemap.xml';
+// Configuration with absolute paths
+$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$storiesDir = $basePath . '/webstories';
+$sitemapFile = $basePath . '/webstories-sitemap.xml';
 
 // Create XML sitemap header
 $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
