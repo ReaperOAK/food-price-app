@@ -10,8 +10,9 @@ header('Content-Type: application/json');
 // Database connection
 include 'db.php';
 
-// Directory where web stories are stored
-$storiesDir = '../webstories';
+// Directory where web stories are stored with absolute path
+$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$storiesDir = $basePath . '/webstories';
 
 // Get limit parameter if provided
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : null;
