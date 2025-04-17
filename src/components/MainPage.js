@@ -14,6 +14,7 @@ import StateList from './StateList';
 import SpecialRatesTable from './SpecialRatesTable';
 import BlogList from './BlogList';
 import FAQ from './FAQ'; // Import the FAQ component
+import Breadcrumb from './Breadcrumb'; // Import the new Breadcrumb component
 import blogs from '../data/blogs'; // Import the blogs list
 
 const MainPage = () => {
@@ -26,7 +27,12 @@ const MainPage = () => {
   const [selectedCity, setSelectedCity] = useState(cityParam ? cityParam.replace('-egg-rate', '') : '');
   const [eggRates, setEggRates] = useState([]);
   const displayName = selectedCity ? selectedCity : selectedState ? selectedState : 'India';
-
+  const today = new Date().toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  
   // Fetch states on mount
   useEffect(() => {
     fetch('/php/get_states.php')
@@ -126,15 +132,75 @@ const MainPage = () => {
     }
     if (cityParam) {
       setSelectedCity(cityParam.replace('-egg-rate', ''));
+    }
+    if (!stateParam && !cityParam) {
+      setSelectedCity('');
       setSelectedState('');
     }
   }, [stateParam, cityParam]);
+  
+  // Prepare structured data for search engines
+  const currentRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": `Eggs in ${displayName}`,
+    "description": `Latest egg rates in ${displayName}. Check today's egg prices updated on ${today}.`,
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "INR",
+      "price": currentRate,
+      "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
+      "availability": "https://schema.org/InStock"
+    }
+  };
+  
+  // Add FAQ structured data if we're on a city or state page
+  if ((selectedCity || selectedState) && eggRates.length > 0) {
+    structuredData.mainEntity = {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": `What is the egg rate today in ${displayName}?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": `The egg rate in ${displayName} today (${today}) is ₹${currentRate} per egg.`
+          }
+        },
+        {
+          "@type": "Question",
+          "name": `What is the rate of 30 eggs (one tray) in ${displayName}?`,
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": `The rate of 30 eggs (one tray) in ${displayName} is ₹${(currentRate * 30).toFixed(2)}.`
+          }
+        }
+      ]
+    };
+  }
 
   return (
     <>
       <Helmet>
-        <title>{`Egg Rates in ${displayName}`}</title>
-        <meta name="description" content={`Get the latest egg rates in ${displayName}.`} />
+        <title>{selectedCity ? `Egg Rate in ${selectedCity}, ${selectedState} - Today's Price ₹${currentRate}` : 
+               selectedState ? `Egg Rates in ${selectedState} - Today's NECC Prices` : 
+               'Today Egg Rates - Check Latest Egg Price in India'}</title>
+        <meta name="description" content={selectedCity ? 
+              `Check today's egg rate in ${selectedCity}, ${selectedState}. Current price: ₹${currentRate} per egg. Get the latest egg prices updated on ${today}.` : 
+              selectedState ? 
+              `Check today's egg rates in ${selectedState}. Latest prices from all cities in ${selectedState}. Daily updated NECC egg prices and trends.` : 
+              'Get the latest egg rates across India. Check today\'s egg prices, wholesale rates, and NECC egg price list for all major cities and states.'} />
+        <link rel="canonical" href={`https://todayeggrates.com${location.pathname}`} />
+        {selectedCity || selectedState ? 
+          <meta name="keywords" content={`egg rate, ${displayName.toLowerCase()} egg price, egg market price, necc egg rate, today egg price, ${displayName.toLowerCase()} egg rate today`} /> : 
+          <meta name="keywords" content="egg rates, egg price today, NECC egg rates, egg mandi rate, egg wholesale price, today egg rate, daily egg price" />
+        }
+        
+        {/* Add structured data for rich snippets */}
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
       </Helmet>
       <div className="bg-gray-50 min-h-screen flex flex-col">
         <Navbar
@@ -146,6 +212,9 @@ const MainPage = () => {
           cities={cities} // Pass cities to Navbar
         />
         <div className="flex-grow p-4 md:p-8 lg:p-12">
+          {/* Add Breadcrumb component */}
+          <Breadcrumb selectedCity={selectedCity} selectedState={selectedState} />
+          
           <BodyOne selectedCity={selectedCity} selectedState={selectedState} />
           <div className="bg-white rounded-lg shadow-md p-6">
             {stateMatch ? (
