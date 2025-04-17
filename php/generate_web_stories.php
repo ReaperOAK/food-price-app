@@ -70,9 +70,6 @@ if (file_exists($templateFile)) {
 // Get today's date
 $today = date('Y-m-d');
 
-// Calculate tomorrow's date for schema validity
-$tomorrow = date('Y-m-d', strtotime('+1 day'));
-
 // Clean up old web stories first - but don't close the connection
 $daysToKeep = 3;
 deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
@@ -125,9 +122,8 @@ if ($result->num_rows > 0) {
         $story = str_replace('{{CITY_NAME}}', $city, $story);
         $story = str_replace('{{STATE_NAME}}', $state, $story);
         $story = str_replace('{{EGG_RATE}}', $rate, $story);
-        $story = str_replace('{{EGG_RATE * 30}}', number_format($rate * 30, 2), $story);
+        $story = str_replace('{{EGG_RATE * 30}}', ($rate * 30), $story);
         $story = str_replace('{{DATE}}', $displayDate, $story);
-        $story = str_replace('{{TOMORROW_DATE}}', $tomorrow, $story);
         
         // Replace different background images for different pages
         $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
