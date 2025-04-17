@@ -1,10 +1,16 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Allow: /webstories/
+Allow: /blog/
+Allow: /state/
+Disallow: /php/
+Disallow: /admin/
+Disallow: /login
 
-# Sitemap locations
-Sitemap: https://todayeggrates.com/sitemap.txt
+# Sitemaps
+Sitemap: https://todayeggrates.com/sitemap.xml
 Sitemap: https://todayeggrates.com/webstories-sitemap.xml
 
-# Explicitly allow web stories directories
-Allow: /webstories/
+# Optimize crawl rate
+Crawl-delay: 1
