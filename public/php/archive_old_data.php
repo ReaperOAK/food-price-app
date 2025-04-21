@@ -4,8 +4,8 @@
 
 require_once 'db.php';
 
-// Set the threshold date (e.g., data older than 1 year will be archived)
-$archiveThreshold = date('Y-m-d', strtotime('-1 year'));
+// Set the threshold date (e.g., data older than 7 days will be archived)
+$archiveThreshold = date('Y-m-d', strtotime('-7 days'));
 
 // Begin transaction
 $conn->begin_transaction();
