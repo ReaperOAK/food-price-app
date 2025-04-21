@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[456],{7456:(e,a,t)=>{t.r(a),t.d(a,{default:()=>p});t(5043);var l=t(4672),s=t(579);const p=e=>{let{states:a,selectedState:t,handleStateChange:p}=e;return(0,s.jsx)(l.Ay,{options:a,value:t,onChange:p,className:"w-full mb-4",placeholder:"Select State"})}}}]);
+//# sourceMappingURL=456.c59d6c3c.chunk.js.map
