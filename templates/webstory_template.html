@@ -7,117 +7,47 @@
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <script async src="https://cdn.ampproject.org/v0.js"></script>
     <script async custom-element="amp-story" src="https://cdn.ampproject.org/v0/amp-story-1.0.js"></script>
-    <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
     
-    <!-- SEO Meta Tags - Enhanced -->
-    <meta name="description" content="Today's egg rate in {{CITY_NAME}}, {{STATE_NAME}} is ₹{{EGG_RATE}} per egg. Get the latest NECC egg price updates, wholesale rates, and market trends updated on {{DATE}}.">
-    <meta name="keywords" content="egg rate today, {{CITY_NAME}} egg price, NECC egg rate, egg wholesale price, {{STATE_NAME}} egg market, {{CITY_NAME}} poultry market, egg tray price, egg farm rates">
-    <meta name="author" content="Today Egg Rates">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="1 day">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg. Get the latest egg prices updated on {{DATE}}.">
+    <meta name="keywords" content="egg rate, {{CITY_NAME}} egg price, egg market price, {{STATE_NAME}} egg rates, today egg price">
     
-    <!-- Open Graph Meta Tags for Social Media Sharing - Enhanced -->
+    <!-- Open Graph Meta Tags for Social Media Sharing -->
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Today's Egg Rate: ₹{{EGG_RATE}} in {{CITY_NAME}}, {{STATE_NAME}} - Latest Update">
-    <meta property="og:description" content="Check the current egg price in {{CITY_NAME}}, {{STATE_NAME}}. Price: ₹{{EGG_RATE}} per egg, ₹{{EGG_RATE * 30}} per tray. Updated on {{DATE}} with latest NECC rates.">
+    <meta property="og:title" content="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - Today's Rate ₹{{EGG_RATE}}">
+    <meta property="og:description" content="Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg. Get the latest egg prices updated on {{DATE}}.">
     <meta property="og:url" content="https://todayeggrates.com/webstories/{{CITY_SLUG}}-egg-rate.html">
     <meta property="og:image" content="https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
     <meta property="og:site_name" content="Today Egg Rates">
-    <meta property="article:published_time" content="{{DATE_ISO}}">
-    <meta property="article:modified_time" content="{{DATE_ISO}}">
-    <meta property="article:section" content="Egg Prices">
-    <meta property="article:tag" content="egg price, {{CITY_NAME}}, {{STATE_NAME}}, NECC egg rate">
     
-    <!-- Twitter Card Meta Tags - Enhanced -->
+    <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Today's Egg Rate: ₹{{EGG_RATE}} in {{CITY_NAME}}, {{STATE_NAME}} - Latest Update">
-    <meta name="twitter:description" content="Check the current egg price in {{CITY_NAME}}, {{STATE_NAME}}. Price: ₹{{EGG_RATE}} per egg, ₹{{EGG_RATE * 30}} per tray. Updated on {{DATE}}.">
+    <meta name="twitter:title" content="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - Today's Rate ₹{{EGG_RATE}}">
+    <meta name="twitter:description" content="Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg. Get the latest egg prices updated on {{DATE}}.">
     <meta name="twitter:image" content="https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}">
-    <meta name="twitter:site" content="@todayeggrates">
     
-    <!-- Schema.org markup for Google - Enhanced for Article and Product -->
+    <!-- Schema.org markup for Google -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - Today's Rate ₹{{EGG_RATE}}",
-      "image": [
-        "https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}",
-        "https://todayeggrates.com{{TRAY_BACKGROUND_IMAGE}}",
-        "https://todayeggrates.com{{CTA_BACKGROUND_IMAGE}}"
-      ],
-      "datePublished": "{{DATE_ISO}}",
-      "dateModified": "{{DATE_ISO}}",
+      "image": "https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}",
+      "datePublished": "{{DATE}}",
+      "dateModified": "{{DATE}}",
       "author": {
         "@type": "Organization",
-        "name": "Today Egg Rates",
-        "url": "https://todayeggrates.com"
+        "name": "Today Egg Rates"
       },
       "publisher": {
         "@type": "Organization",
         "name": "Today Egg Rates",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://todayeggrates.com/tee.png",
-          "width": "112",
-          "height": "112"
+          "url": "https://todayeggrates.com/tee.png"
         }
       },
-      "description": "Today's egg rate in {{CITY_NAME}}, {{STATE_NAME}} is ₹{{EGG_RATE}} per egg. Get the latest egg price updates.",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https://todayeggrates.com/webstories/{{CITY_SLUG}}-egg-rate.html"
-      }
-    }
-    </script>
-    
-    <!-- Product Structured Data -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": "Eggs in {{CITY_NAME}}, {{STATE_NAME}}",
-      "image": "https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}",
-      "description": "Fresh eggs available in {{CITY_NAME}}, {{STATE_NAME}} markets at competitive rates.",
-      "offers": {
-        "@type": "Offer",
-        "url": "https://todayeggrates.com/{{CITY_SLUG}}-egg-rate",
-        "priceCurrency": "INR",
-        "price": "{{EGG_RATE}}",
-        "priceValidUntil": "{{TOMORROW_DATE_ISO}}",
-        "availability": "https://schema.org/InStock",
-        "itemCondition": "https://schema.org/NewCondition"
-      },
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.7",
-        "reviewCount": "128",
-        "bestRating": "5",
-        "worstRating": "1"
-      }
-    }
-    </script>
-    
-    <!-- Local Business Structured Data for better local SEO -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "LocalBusiness",
-      "name": "Egg Market in {{CITY_NAME}}, {{STATE_NAME}}",
-      "image": "https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "{{CITY_NAME}}",
-        "addressRegion": "{{STATE_NAME}}",
-        "addressCountry": "IN"
-      },
-      "priceRange": "₹₹",
-      "openingHours": "Mo-Su 06:00-19:00",
-      "url": "https://todayeggrates.com/{{CITY_SLUG}}-egg-rate",
-      "description": "Egg market in {{CITY_NAME}} with daily updated prices. Current rate: ₹{{EGG_RATE}} per egg."
+      "description": "Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg."
     }
     </script>
     
@@ -181,49 +111,9 @@
             display: inline-block;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
-        
-        .price-comparison {
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            padding: 1em;
-            margin: 1em 0;
-        }
-        
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5em;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding-bottom: 0.5em;
-        }
-        
-        .price-label {
-            font-weight: 500;
-        }
-        
-        .price-value {
-            font-weight: bold;
-            color: #FFC107;
-        }
     </style>
 </head>
 <body>
-    <!-- Optional: Analytics for tracking user engagement -->
-    <amp-analytics type="gtag" data-credentials="include">
-        <script type="application/json">
-        {
-            "vars": {
-                "gtag_id": "UA-XXXXXXXX-X",
-                "config": {
-                    "UA-XXXXXXXX-X": {
-                        "groups": "default"
-                    }
-                }
-            }
-        }
-        </script>
-    </amp-analytics>
-
     <amp-story standalone
               title="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - ₹{{EGG_RATE}}"
               publisher="Today Egg Rates"
@@ -231,12 +121,12 @@
               poster-portrait-src="https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}">
         
         <!-- Cover page -->
-        <amp-story-page id="cover" auto-advance-after="7s">
+        <amp-story-page id="cover">
             <amp-story-grid-layer template="fill">
                 <amp-img src="https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}"
                          width="720" height="1280"
                          layout="responsive"
-                         alt="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}}">
+                         alt="Egg Rate background">
                 </amp-img>
             </amp-story-grid-layer>
             <amp-story-grid-layer template="vertical" class="overlay">
@@ -245,21 +135,21 @@
                     <h2>{{STATE_NAME}}</h2>
                     <div class="rate-highlight">₹{{EGG_RATE}}</div>
                     <p>per egg</p>
-                    <p class="date">Updated on: {{DATE}}</p>
+                    <p class="date">{{DATE}}</p>
                 </div>
             </amp-story-grid-layer>
             <amp-story-page-outlink layout="nodisplay">
-                <a href="https://todayeggrates.com/{{CITY_SLUG}}-egg-rate" target="_blank">Check detailed prices</a>
+                <a href="https://todayeggrates.com/{{CITY_SLUG}}-egg-rate" target="_blank">Check more details</a>
             </amp-story-page-outlink>
         </amp-story-page>
         
         <!-- Tray price page -->
-        <amp-story-page id="tray-price" auto-advance-after="7s">
+        <amp-story-page id="tray-price">
             <amp-story-grid-layer template="fill">
                 <amp-img src="https://todayeggrates.com{{TRAY_BACKGROUND_IMAGE}}"
                          width="720" height="1280"
                          layout="responsive"
-                         alt="Egg Tray Price in {{CITY_NAME}}, {{STATE_NAME}}">
+                         alt="Egg Rate background">
                 </amp-img>
             </amp-story-grid-layer>
             <amp-story-grid-layer template="vertical" class="overlay">
@@ -269,60 +159,10 @@
                     <div class="rate-highlight">₹{{EGG_RATE * 30}}</div>
                     <p>per tray</p>
                     <p class="date">{{DATE}}</p>
-                    
-                    <div class="price-comparison">
-                        <div class="price-row">
-                            <span class="price-label">Wholesale Price:</span>
-                            <span class="price-value">₹{{EGG_RATE * 30}}</span>
-                        </div>
-                        <div class="price-row">
-                            <span class="price-label">Retail Price:</span>
-                            <span class="price-value">₹{{(EGG_RATE + 0.35) * 30}}</span>
-                        </div>
-                    </div>
                 </div>
             </amp-story-grid-layer>
             <amp-story-page-outlink layout="nodisplay">
-                <a href="https://todayeggrates.com/{{CITY_SLUG}}-egg-rate" target="_blank">View price history</a>
-            </amp-story-page-outlink>
-        </amp-story-page>
-        
-        <!-- Price Comparison page - New page for more engagement -->
-        <amp-story-page id="price-comparison" auto-advance-after="7s">
-            <amp-story-grid-layer template="fill">
-                <amp-img src="https://todayeggrates.com{{TRAY_BACKGROUND_IMAGE}}"
-                         width="720" height="1280"
-                         layout="responsive"
-                         alt="Egg Price Comparison in {{CITY_NAME}}, {{STATE_NAME}}">
-                </amp-img>
-            </amp-story-grid-layer>
-            <amp-story-grid-layer template="vertical" class="overlay">
-                <div style="padding: 32px; text-align: center;">
-                    <h1>Egg Price Comparison</h1>
-                    <h2>{{CITY_NAME}}, {{STATE_NAME}}</h2>
-                    
-                    <div class="price-comparison">
-                        <div class="price-row">
-                            <span class="price-label">Per Egg:</span>
-                            <span class="price-value">₹{{EGG_RATE}}</span>
-                        </div>
-                        <div class="price-row">
-                            <span class="price-label">Per Dozen:</span>
-                            <span class="price-value">₹{{EGG_RATE * 12}}</span>
-                        </div>
-                        <div class="price-row">
-                            <span class="price-label">Per Tray (30):</span>
-                            <span class="price-value">₹{{EGG_RATE * 30}}</span>
-                        </div>
-                        <div class="price-row">
-                            <span class="price-label">Per Crate (210):</span>
-                            <span class="price-value">₹{{EGG_RATE * 210}}</span>
-                        </div>
-                    </div>
-                </div>
-            </amp-story-grid-layer>
-            <amp-story-page-outlink layout="nodisplay">
-                <a href="https://todayeggrates.com/{{CITY_SLUG}}-egg-rate" target="_blank">View detailed prices</a>
+                <a href="https://todayeggrates.com/{{CITY_SLUG}}-egg-rate" target="_blank">Check more details</a>
             </amp-story-page-outlink>
         </amp-story-page>
         
@@ -332,7 +172,7 @@
                 <amp-img src="https://todayeggrates.com{{CTA_BACKGROUND_IMAGE}}"
                          width="720" height="1280"
                          layout="responsive"
-                         alt="Today's Egg Rate Updates">
+                         alt="Egg Rate background">
                 </amp-img>
             </amp-story-grid-layer>
             <amp-story-grid-layer template="vertical" class="overlay">

@@ -22,7 +22,7 @@ try {
     if ($useNormalizedTables) {
         // Using the normalized database structure
         if ($days) {
-            $sql = "SELECT ern.date, ern.rate, c.name as city, s.name as state
+            $sql = "SELECT ern.date, ern.rate 
                     FROM egg_rates_normalized ern
                     JOIN cities c ON ern.city_id = c.id
                     JOIN states s ON c.state_id = s.id
@@ -31,7 +31,7 @@ try {
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("ssi", $city, $state, $days);
         } else {
-            $sql = "SELECT ern.date, ern.rate, c.name as city, s.name as state
+            $sql = "SELECT ern.date, ern.rate 
                     FROM egg_rates_normalized ern
                     JOIN cities c ON ern.city_id = c.id
                     JOIN states s ON c.state_id = s.id
@@ -58,11 +58,11 @@ try {
 // Fall back to original table if needed
 if (!$useNormalizedTables) {
     if ($days) {
-        $sql = "SELECT date, rate, city, state FROM egg_rates WHERE city = ? AND state = ? ORDER BY date DESC LIMIT ?";
+        $sql = "SELECT date, rate FROM egg_rates WHERE city = ? AND state = ? ORDER BY date DESC LIMIT ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ssi", $city, $state, $days);
     } else {
-        $sql = "SELECT date, rate, city, state FROM egg_rates WHERE city = ? AND state = ? ORDER BY date DESC";
+        $sql = "SELECT date, rate FROM egg_rates WHERE city = ? AND state = ? ORDER BY date DESC";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $city, $state);
     }
@@ -74,22 +74,9 @@ if (!$useNormalizedTables) {
 // Process results
 $rates = [];
 while ($row = $result->fetch_assoc()) {
-    // Make sure city and state are included even if they're not in the result
-    if (!isset($row['city'])) {
-        $row['city'] = $city;
-    }
-    if (!isset($row['state'])) {
-        $row['state'] = $state;
-    }
     $rates[] = $row;
 }
 
-// If no results were found, return a clear error message
-if (empty($rates)) {
-    echo json_encode(["error" => "No rates found for $city, $state"]);
-} else {
-    echo json_encode($rates);
-}
-
+echo json_encode($rates);
 $conn->close();
 ?>

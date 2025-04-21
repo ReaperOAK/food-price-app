@@ -13,7 +13,6 @@ $basePath = realpath($_SERVER['DOCUMENT_ROOT']);
 $storiesDir = $basePath . '/webstories';
 $imageDir = $basePath . '/images/webstories';
 $templateFile = $basePath . '/templates/webstory_template.html';
-$baseURL = 'https://todayeggrates.com'; // Define base URL for canonical links
 
 // Create the stories directory if it doesn't exist with proper error handling
 if (!file_exists($storiesDir)) {
@@ -72,292 +71,297 @@ if (file_exists($templateFile)) {
 $today = date('Y-m-d');
 
 // Clean up old web stories first - but don't close the connection
-$daysToKeep = 7; // Increased from 3 to 7 days for better SEO indexing
+$daysToKeep = 3;
 deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
 
-// Function to create URL-friendly slugs
-function createSlug($string) {
-    $string = strtolower($string);
-    $string = preg_replace('/[^a-z0-9\s-]/', '', $string);
-    $string = preg_replace('/[\s-]+/', '-', $string);
-    $string = trim($string, '-');
-    return $string;
-}
+// Get the latest egg rates
+$sql = "
+    SELECT city, state, rate, date 
+    FROM egg_rates 
+    WHERE (city, date) IN (
+        SELECT city, MAX(date) 
+        FROM egg_rates 
+        GROUP BY city
+    )
+    ORDER BY city
+";
 
-// Function to generate a thumbnail for the webstory
-function generateThumbnail($city, $state, $rate) {
-    // Create slug for file naming
-    $citySlug = createSlug($city);
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    $storiesGenerated = 0;
     
-    // Set paths
-    $templatesPath = $_SERVER['DOCUMENT_ROOT'] . '/templates/';
-    $outputPath = $_SERVER['DOCUMENT_ROOT'] . '/images/webstories/';
-    $fontFile = $templatesPath . 'arial.ttf';
-    
-    // Create directory if it doesn't exist
-    if (!file_exists($outputPath)) {
-        mkdir($outputPath, 0755, true);
+    while ($row = $result->fetch_assoc()) {
+        $city = $row['city'];
+        $state = $row['state'];
+        $rate = $row['rate'];
+        $date = $row['date'];
+        
+        // Skip if the rate is from more than 3 days ago
+        if (strtotime($date) < strtotime('-3 days')) {
+            continue;
+        }
+        
+        // Create a URL-friendly city name
+        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+        
+        // Randomly select different images for different pages
+        shuffle($backgroundImages);
+        $coverImage = $backgroundImages[0];
+        $trayPriceImage = isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0];
+        $ctaImage = isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0];
+        
+        // Store the first image for thumbnail use
+        $thumbnailSourceImage = $coverImage;
+        
+        // Format date for display
+        $displayDate = date('F j, Y', strtotime($date));
+        
+        // Replace placeholders in the template
+        $story = $template;
+        $story = str_replace('{{CITY_NAME}}', $city, $story);
+        $story = str_replace('{{STATE_NAME}}', $state, $story);
+        $story = str_replace('{{EGG_RATE}}', $rate, $story);
+        $story = str_replace('{{EGG_RATE * 30}}', ($rate * 30), $story);
+        $story = str_replace('{{DATE}}', $displayDate, $story);
+        
+        // Replace different background images for different pages
+        $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
+        $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayPriceImage, $story);
+        $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
+        
+        $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
+        
+        // Save the web story
+        $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
+        if (file_put_contents($filename, $story)) {
+            $storiesGenerated++;
+            
+            // Generate thumbnail using the first selected background image
+            generateThumbnail($imageDir, $city, $citySlug, $thumbnailSourceImage);
+        } else {
+            echo "Error: Could not write to file $filename<br>";
+        }
     }
     
-    // Create a 1200x1200 image (optimal for social sharing)
-    $image = imagecreatetruecolor(1200, 1200);
+    // Generate an index file for all web stories
+    generateWebStoryIndex($storiesDir, $conn);
     
-    // Set colors
-    $bgColor = imagecolorallocate($image, 255, 252, 240); // Light cream background
-    $textColor = imagecolorallocate($image, 30, 30, 30); // Dark text
-    $accentColor = imagecolorallocate($image, 245, 158, 11); // Amber accent
-    $priceColor = imagecolorallocate($image, 220, 38, 38); // Price in red
+    echo "Generated $storiesGenerated web stories successfully.";
+} else {
+    echo "No egg rates found.";
+}
+
+// Function to generate thumbnail for a web story
+function generateThumbnail($imageDir, $city, $citySlug, $sourceImage) {
+    // Extract filename from source image path
+    $sourceFilename = basename($sourceImage);
+    $sourceImagePath = $imageDir . '/' . $sourceFilename;
     
-    // Fill background
-    imagefill($image, 0, 0, $bgColor);
+    // Ensure source file exists
+    if (!file_exists($sourceImagePath)) {
+        // Try with the path as is (it might be a full path)
+        $sourceImagePath = $_SERVER['DOCUMENT_ROOT'] . $sourceImage;
+        if (!file_exists($sourceImagePath)) {
+            return false;
+        }
+    }
     
-    // Add decorative elements - top bar
-    imagefilledrectangle($image, 0, 0, 1200, 80, $accentColor);
+    // Configuration
+    $thumbnailWidth = 400;
+    $thumbnailHeight = 300;
     
-    // Add site logo/name
-    $logoText = "TODAY EGG RATES";
-    imagettftext($image, 40, 0, 50, 60, $bgColor, $fontFile, $logoText);
+    // Get image type
+    $imageInfo = getimagesize($sourceImagePath);
+    if ($imageInfo === false) {
+        return false;
+    }
     
-    // Add headline
-    $headline = "Egg Rate in " . $city . ", " . $state;
-    $headlineSize = 70;
-    $headlineBox = imagettfbbox($headlineSize, 0, $fontFile, $headline);
-    $headlineWidth = $headlineBox[2] - $headlineBox[0];
-    $headlineX = (1200 - $headlineWidth) / 2;
-    imagettftext($image, $headlineSize, 0, $headlineX, 300, $textColor, $fontFile, $headline);
+    $sourceType = $imageInfo[2];
     
-    // Add date
-    $date = date("F j, Y");
-    $dateSize = 40;
-    $dateBox = imagettfbbox($dateSize, 0, $fontFile, $date);
-    $dateWidth = $dateBox[2] - $dateBox[0];
-    $dateX = (1200 - $dateWidth) / 2;
-    imagettftext($image, $dateSize, 0, $dateX, 380, $textColor, $fontFile, $date);
+    // Create source image based on type
+    switch ($sourceType) {
+        case IMAGETYPE_JPEG:
+            $sourceImage = imagecreatefromjpeg($sourceImagePath);
+            break;
+        case IMAGETYPE_PNG:
+            $sourceImage = imagecreatefrompng($sourceImagePath);
+            break;
+        case IMAGETYPE_GIF:
+            $sourceImage = imagecreatefromgif($sourceImagePath);
+            break;
+        default:
+            return false;
+    }
     
-    // Add price
-    $priceText = "₹" . $rate;
-    $priceSize = 150;
-    $priceBox = imagettfbbox($priceSize, 0, $fontFile, $priceText);
-    $priceWidth = $priceBox[2] - $priceBox[0];
-    $priceX = (1200 - $priceWidth) / 2;
+    // Create a new thumbnail image
+    $thumbnailImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
     
-    // Add a background circle for the price
-    $centerX = 600;
-    $centerY = 650;
-    $radius = 250;
-    imagefilledellipse($image, $centerX, $centerY, $radius*2, $radius*2, $accentColor);
+    // Preserve transparency for PNG images
+    if ($sourceType == IMAGETYPE_PNG) {
+        imagecolortransparent($thumbnailImage, imagecolorallocate($thumbnailImage, 0, 0, 0));
+        imagealphablending($thumbnailImage, false);
+        imagesavealpha($thumbnailImage, true);
+    }
     
-    // Add price text
-    imagettftext($image, $priceSize, 0, $priceX, 700, $bgColor, $fontFile, $priceText);
+    // Resize the image
+    imagecopyresampled(
+        $thumbnailImage, $sourceImage,
+        0, 0, 0, 0,
+        $thumbnailWidth, $thumbnailHeight,
+        imagesx($sourceImage), imagesy($sourceImage)
+    );
     
-    // Add per egg text
-    $perEggText = "per egg";
-    $perEggSize = 40;
-    $perEggBox = imagettfbbox($perEggSize, 0, $fontFile, $perEggText);
-    $perEggWidth = $perEggBox[2] - $perEggBox[0];
-    $perEggX = (1200 - $perEggWidth) / 2;
-    imagettftext($image, $perEggSize, 0, $perEggX, 770, $bgColor, $fontFile, $perEggText);
+    // Add city name text overlay
+    $textColor = imagecolorallocate($thumbnailImage, 255, 255, 255);
+    $shadowColor = imagecolorallocate($thumbnailImage, 0, 0, 0);
+    $font = 5; // Built-in font
     
-    // Add call to action at bottom
-    $ctaText = "Visit todayeggrates.com for more updates";
-    $ctaSize = 35;
-    $ctaBox = imagettfbbox($ctaSize, 0, $fontFile, $ctaText);
-    $ctaWidth = $ctaBox[2] - $ctaBox[0];
-    $ctaX = (1200 - $ctaWidth) / 2;
+    // Get text dimensions
+    $textWidth = imagefontwidth($font) * strlen($city);
+    $textHeight = imagefontheight($font);
     
-    // Add a bottom bar for CTA
-    imagefilledrectangle($image, 0, 1080, 1200, 1200, $accentColor);
-    imagettftext($image, $ctaSize, 0, $ctaX, 1150, $bgColor, $fontFile, $ctaText);
+    // Calculate position for centered text
+    $textX = (int)(($thumbnailWidth - $textWidth) / 2); // Explicitly cast to int
+    $textY = (int)($thumbnailHeight - $textHeight - 10); // Explicitly cast to int
     
-    // Generate optimized filename with keywords
-    $outputFilename = "thumbnail-" . $citySlug . ".jpg";
-    $outputFile = $outputPath . $outputFilename;
+    // Draw text shadow
+    imagestring($thumbnailImage, $font, $textX + 1, $textY + 1, $city, $shadowColor);
     
-    // Save image with 90% quality (good balance between size and quality)
-    imagejpeg($image, $outputFile, 90);
+    // Draw text
+    imagestring($thumbnailImage, $font, $textX, $textY, $city, $textColor);
+    
+    // Save the thumbnail
+    $thumbnailPath = $imageDir . '/thumbnail-' . $citySlug . '.jpg';
+    imagejpeg($thumbnailImage, $thumbnailPath, 90);
     
     // Clean up
-    imagedestroy($image);
+    imagedestroy($sourceImage);
+    imagedestroy($thumbnailImage);
     
-    return $outputFilename;
+    return true;
 }
 
-// Function to generate Web Story HTML
-function generateWebStory($city, $state, $rate, $rateYesterday, $averageRate, $thumbnailName) {
-    // Create city slug for file naming
-    $citySlug = createSlug($city);
+// Function to generate an index file for all web stories
+function generateWebStoryIndex($storiesDir, $conn) {
+    $indexFile = $storiesDir . '/index.html';
     
-    // Calculate rate change
-    $change = $rate - $rateYesterday;
-    $changeText = "No change from yesterday";
-    $changeClass = "unchanged";
+    // Get the latest egg rates for all cities
+    $sql = "
+        SELECT city, state, rate, date 
+        FROM egg_rates 
+        WHERE (city, date) IN (
+            SELECT city, MAX(date) 
+            FROM egg_rates 
+            GROUP BY city
+        )
+        ORDER BY city
+    ";
     
-    if ($change > 0) {
-        $changeText = "Up ₹" . number_format($change, 2) . " from yesterday";
-        $changeClass = "up";
-    } else if ($change < 0) {
-        $changeText = "Down ₹" . number_format(abs($change), 2) . " from yesterday";
-        $changeClass = "down";
+    $result = $conn->query($sql);
+    
+    $html = '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Egg Rate Web Stories - Today Egg Rates</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .stories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .story-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+        .story-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .story-thumbnail {
+            height: 150px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .story-info {
+            padding: 15px;
+        }
+        .story-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0 0 10px 0;
+        }
+        .story-date {
+            color: #666;
+            font-size: 14px;
+        }
+        .story-rate {
+            color: #e63946;
+            font-weight: bold;
+        }
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <h1>Egg Rate Web Stories</h1>
+    <div class="stories-grid">';
+    
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $city = $row['city'];
+            $state = $row['state'];
+            $rate = $row['rate'];
+            $date = $row['date'];
+            
+            // Create a URL-friendly city name
+            $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+            
+            // Format date for display
+            $displayDate = date('F j, Y', strtotime($date));
+            
+            // Add card to grid
+            $html .= '
+        <a href="/' . $citySlug . '-egg-rate.html" class="story-card">
+            <div class="story-thumbnail" style="background-image: url(\'/images/webstories/thumbnail-' . $citySlug . '.jpg\');">
+            </div>
+            <div class="story-info">
+                <h3 class="story-title">Egg Rate in ' . $city . ', ' . $state . '</h3>
+                <p class="story-date">' . $displayDate . '</p>
+                <p class="story-rate">₹' . $rate . ' per egg</p>
+            </div>
+        </a>';
+        }
     }
     
-    // Get template
-    $templatePath = $_SERVER['DOCUMENT_ROOT'] . '/templates/webstory_template.html';
-    $template = file_get_contents($templatePath);
+    $html .= '
+    </div>
+</body>
+</html>';
     
-    // Format date
-    $date = date("F j, Y");
-    $isoDate = date("c"); // ISO 8601 date for structured data
-    
-    // Calculate tray price (30 eggs)
-    $trayPrice = $rate * 30;
-    
-    // Replace variables in template
-    $template = str_replace('{{CITY_NAME}}', $city, $template);
-    $template = str_replace('{{STATE_NAME}}', $state, $template);
-    $template = str_replace('{{DATE}}', $date, $template);
-    $template = str_replace('{{RATE}}', $rate, $template);
-    $template = str_replace('{{RATE_YESTERDAY}}', $rateYesterday, $template);
-    $template = str_replace('{{CHANGE_TEXT}}', $changeText, $template);
-    $template = str_replace('{{CHANGE_CLASS}}', $changeClass, $template);
-    $template = str_replace('{{AVERAGE_RATE}}', $averageRate, $template);
-    $template = str_replace('{{TRAY_PRICE}}', number_format($trayPrice, 2), $template);
-    $template = str_replace('{{CITY_SLUG}}', $citySlug, $template);
-    $template = str_replace('{{THUMBNAIL_PATH}}', '/images/webstories/' . $thumbnailName, $template);
-    
-    // Add structured data for better SEO
-    $canonicalUrl = "https://todayeggrates.com/webstories/" . $citySlug . "-egg-rate";
-    $structuredData = <<<JSON
-    {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": "Egg Rate in {$city}, {$state} - {$date}",
-        "image": [
-            "https://todayeggrates.com/images/webstories/{$thumbnailName}",
-            "https://todayeggrates.com/eggpic.png"
-        ],
-        "datePublished": "{$isoDate}",
-        "dateModified": "{$isoDate}",
-        "author": {
-            "@type": "Organization",
-            "name": "Today Egg Rates",
-            "url": "https://todayeggrates.com"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "Today Egg Rates",
-            "logo": {
-                "@type": "ImageObject",
-                "url": "https://todayeggrates.com/tee.png",
-                "width": "512",
-                "height": "512"
-            }
-        },
-        "description": "Current egg price in {$city}, {$state} is ₹{$rate} per egg. {$changeText}. Check daily updates on egg prices in India.",
-        "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": "{$canonicalUrl}"
-        },
-        "speakable": {
-           "@type": "SpeakableSpecification",
-           "cssSelector": [".story-content", ".story-headline"]
-        },
-        "about": [
-            {
-                "@type": "Thing",
-                "name": "Egg Prices",
-                "sameAs": "https://en.wikipedia.org/wiki/Egg_as_food"
-            },
-            {
-                "@type": "Place",
-                "name": "{$city}, {$state}, India"
-            }
-        ]
-    }
-JSON;
-    
-    $template = str_replace('{{STRUCTURED_DATA}}', $structuredData, $template);
-    $template = str_replace('{{CANONICAL_URL}}', $canonicalUrl, $template);
-    
-    // Add meta tags for better SEO
-    $metaTags = <<<HTML
-    <meta name="description" content="Today's egg rate in {$city}, {$state} is ₹{$rate} per egg. {$changeText}. Get daily updates on egg prices in India.">
-    <meta name="keywords" content="egg rate, egg price, {$city} egg rate, {$state} egg price, egg market price, poultry rates, today egg price, {$date} egg rate">
-    <meta property="og:title" content="Egg Rate in {$city}, {$state} - {$date}">
-    <meta property="og:description" content="Today's egg rate in {$city}, {$state} is ₹{$rate} per egg. {$changeText}. Get daily updates on egg prices in India.">
-    <meta property="og:image" content="https://todayeggrates.com/images/webstories/{$thumbnailName}">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="1200">
-    <meta property="og:url" content="{$canonicalUrl}">
-    <meta property="og:type" content="article">
-    <meta property="og:site_name" content="Today Egg Rates">
-    <meta property="article:published_time" content="{$isoDate}">
-    <meta property="article:modified_time" content="{$isoDate}">
-    <meta property="article:tag" content="egg rates">
-    <meta property="article:tag" content="{$city}">
-    <meta property="article:tag" content="{$state}">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Egg Rate in {$city}, {$state} - {$date}">
-    <meta name="twitter:description" content="Today's egg rate in {$city}, {$state} is ₹{$rate} per egg. Get daily updates on egg prices.">
-    <meta name="twitter:image" content="https://todayeggrates.com/images/webstories/{$thumbnailName}">
-    <link rel="canonical" href="{$canonicalUrl}">
-HTML;
-    
-    $template = str_replace('{{META_TAGS}}', $metaTags, $template);
-    
-    // Create output directory if it doesn't exist
-    $outputDir = $_SERVER['DOCUMENT_ROOT'] . '/webstories/';
-    if (!file_exists($outputDir)) {
-        mkdir($outputDir, 0755, true);
-    }
-    
-    // Write to file
-    $outputFile = $outputDir . $citySlug . '-egg-rate.html';
-    file_put_contents($outputFile, $template);
-    
-    return $citySlug . '-egg-rate.html';
+    file_put_contents($indexFile, $html);
 }
 
-// Get all cities with rates
-$query = "SELECT r1.city, r1.state, r1.rate, r1.timestamp, 
-          (SELECT rate FROM rates r2 WHERE r2.city = r1.city AND r2.state = r1.state AND r2.timestamp < r1.timestamp ORDER BY r2.timestamp DESC LIMIT 1) as yesterday_rate,
-          (SELECT AVG(rate) FROM rates r3 WHERE r3.city = r1.city AND r3.state = r1.state AND r3.timestamp >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)) as average_rate
-          FROM rates r1
-          WHERE (r1.city, r1.state, r1.timestamp) IN (
-              SELECT city, state, MAX(timestamp) 
-              FROM rates 
-              GROUP BY city, state
-          )
-          ORDER BY r1.state, r1.city";
+// Generate a web stories sitemap after creating all stories
+include_once 'generate_webstories_sitemap.php';
 
-$result = $conn->query($query);
-
-$createdStories = [];
-
-while ($row = $result->fetch_assoc()) {
-    $city = $row['city'];
-    $state = $row['state'];
-    $rate = $row['rate'];
-    $yesterdayRate = $row['yesterday_rate'] ?? $rate;
-    $averageRate = $row['average_rate'] ?? $rate;
-    
-    // Generate thumbnail
-    $thumbnailName = generateThumbnail($city, $state, $rate);
-    
-    // Generate Web Story
-    $storyFile = generateWebStory($city, $state, $rate, $yesterdayRate, $averageRate, $thumbnailName);
-    
-    $createdStories[] = [
-        'city' => $city,
-        'state' => $state,
-        'file' => $storyFile
-    ];
-    
-    echo "Generated web story for $city, $state<br>";
-}
-
-// Close database connection
-$conn->close();
-
-// Return count of stories generated
-echo "<hr>Total webstories generated: " . count($createdStories);
+// Connection is already closed in generate_webstories_sitemap.php, so don't close it again
 ?>

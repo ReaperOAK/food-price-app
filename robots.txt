@@ -1,42 +1,14 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
-Disallow: /php/
-Disallow: /templates/
-Disallow: /*.php$
-
-# Allow all images to be indexed
-Allow: /*.jpg$
-Allow: /*.jpeg$
-Allow: /*.png$
-Allow: /*.gif$
-Allow: /*.svg$
-Allow: /*.webp$
-Allow: /images/webstories/
-
-# Important directories
 Allow: /webstories/
 Allow: /blog/
 Allow: /state/
-Allow: /city/
-
-# Explicitly allow Googlebot and Google's Web Stories crawler
-User-agent: Googlebot
-Allow: /
-Allow: /webstories/
-
-User-agent: Googlebot-Image
-Allow: /*.jpg$
-Allow: /*.jpeg$
-Allow: /*.png$
-Allow: /*.gif$
-Allow: /*.svg$
-Allow: /*.webp$
-Allow: /images/webstories/
-
-User-agent: Bingbot
-Allow: /
-Allow: /webstories/
+Disallow: /php/
+Disallow: /admin/
+Disallow: /login
+Disallow: /disable-site
+Disallow: /maintenance
 
 # Block certain bots that might consume resources
 User-agent: AhrefsBot
@@ -48,7 +20,7 @@ Crawl-delay: 10
 User-agent: MJ12bot
 Crawl-delay: 10
 
-# Sitemap locations
+# Sitemaps
 Sitemap: https://todayeggrates.com/sitemap.xml
 Sitemap: https://todayeggrates.com/webstories-sitemap.xml
 
