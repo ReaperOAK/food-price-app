@@ -40,7 +40,7 @@ function runSQLScript($conn, $sql) {
 
 // 2. Read the SQL from the enhancement file
 echo "Step 2: Reading SQL script file...\n";
-$sqlScriptPath = __DIR__ . '/../../sql/db_enhancements.sql';
+$sqlScriptPath = __DIR__ . '/db_enhancements.sql';
 
 if (!file_exists($sqlScriptPath)) {
     die("Error: SQL script file not found at: $sqlScriptPath\n");
