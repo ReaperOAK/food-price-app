@@ -4,23 +4,9 @@ ini_set('display_errors', 1);
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
-
-
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
 
-$servername = "localhost";
-$username = "u901337298_test";
-$password = "A12345678b*";
-$dbname = "u901337298_test";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
-}
+require_once 'db.php';
 
 // Get city from query parameter
 $city = isset($_GET['city']) ? $_GET['city'] : '';
@@ -30,8 +16,44 @@ if (empty($city)) {
     exit;
 }
 
-// Prepare and execute SQL statement
-$stmt = $conn->prepare("SELECT state FROM egg_rates WHERE city = ?");
+// Try to use normalized tables first
+$useNormalizedTables = true;
+
+try {
+    if ($useNormalizedTables) {
+        // Get state from normalized tables
+        $sql = "SELECT s.name AS state 
+                FROM cities c
+                JOIN states s ON c.state_id = s.id
+                WHERE c.name = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $city);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if (!$result) {
+            throw new Exception($conn->error);
+        }
+        
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+            echo json_encode(['state' => $row['state']]);
+            $stmt->close();
+            $conn->close();
+            exit;
+        } else {
+            // If no results from normalized tables, fall back to original
+            $useNormalizedTables = false;
+        }
+    }
+} catch (Exception $e) {
+    // If there's an error with normalized tables, fall back to original
+    $useNormalizedTables = false;
+    error_log("Error using normalized tables in get_state_for_city.php: " . $e->getMessage());
+}
+
+// Fall back to original table
+$stmt = $conn->prepare("SELECT state FROM egg_rates WHERE city = ? LIMIT 1");
 $stmt->bind_param("s", $city);
 $stmt->execute();
 $result = $stmt->get_result();

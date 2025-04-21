@@ -35,19 +35,40 @@ function deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, $closeC
     
     // Get all city-date combinations from the database that are within the retention period
     $retentionDate = date('Y-m-d', strtotime("-$daysToKeep days"));
-    $sql = "
-        SELECT DISTINCT city, date 
-        FROM egg_rates 
-        WHERE date >= '$retentionDate'
-    ";
+    
+    // Check if using the normalized database structure
+    $tableExists = $conn->query("SHOW TABLES LIKE 'cities'");
+    $usingNormalizedDB = $tableExists && $tableExists->num_rows > 0;
+    
+    // Get active cities based on database structure
+    $activeCities = [];
+    
+    if ($usingNormalizedDB) {
+        // Using normalized database - join cities and rates tables
+        $sql = "
+            SELECT DISTINCT c.city_name, r.rate_date 
+            FROM cities c
+            JOIN rates r ON c.city_id = r.city_id
+            WHERE r.rate_date >= '$retentionDate'
+        ";
+    } else {
+        // Using original database structure
+        $sql = "
+            SELECT DISTINCT city, date 
+            FROM egg_rates 
+            WHERE date >= '$retentionDate'
+        ";
+    }
     
     $result = $conn->query($sql);
-    $activeCities = [];
     
     if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            // Get the city name from the appropriate field based on database structure
+            $cityName = $usingNormalizedDB ? $row['city_name'] : $row['city'];
+            
             // Create a URL-friendly city name
-            $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $row['city']));
+            $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cityName));
             $activeCities[$citySlug] = true;
         }
     }

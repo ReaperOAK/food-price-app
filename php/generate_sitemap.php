@@ -33,13 +33,35 @@ foreach ($staticPages as $page => $settings) {
     $xml .= '  </url>' . PHP_EOL;
 }
 
-// Get all states from database
-$statesSql = "SELECT DISTINCT state FROM egg_rates WHERE state != 'special' ORDER BY state";
-$statesResult = $conn->query($statesSql);
+// Get all states - first try from normalized tables, then fall back to original
+$states = [];
+try {
+    // Try to get states from normalized tables
+    $statesSql = "SELECT id, name FROM states ORDER BY name";
+    $statesResult = $conn->query($statesSql);
+    
+    if ($statesResult && $statesResult->num_rows > 0) {
+        while ($row = $statesResult->fetch_assoc()) {
+            $states[$row['id']] = $row['name'];
+        }
+    } else {
+        throw new Exception("No states found in normalized tables");
+    }
+} catch (Exception $e) {
+    // Fall back to original table
+    $statesSql = "SELECT DISTINCT state FROM egg_rates WHERE state != 'special' ORDER BY state";
+    $statesResult = $conn->query($statesSql);
+    
+    if ($statesResult && $statesResult->num_rows > 0) {
+        while ($row = $statesResult->fetch_assoc()) {
+            $states[] = $row['state'];
+        }
+    }
+}
 
-if ($statesResult && $statesResult->num_rows > 0) {
-    while ($row = $statesResult->fetch_assoc()) {
-        $state = $row['state'];
+// Process each state
+if (!empty($states)) {
+    foreach ($states as $stateId => $state) {
         $stateSlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $state));
         
         // Add state page URL
@@ -50,23 +72,47 @@ if ($statesResult && $statesResult->num_rows > 0) {
         $xml .= '    <priority>0.8</priority>' . PHP_EOL;
         $xml .= '  </url>' . PHP_EOL;
         
-        // Get cities for this state
-        $citiesSql = "SELECT DISTINCT city FROM egg_rates WHERE state = '$state' ORDER BY city";
-        $citiesResult = $conn->query($citiesSql);
-        
-        if ($citiesResult && $citiesResult->num_rows > 0) {
-            while ($cityRow = $citiesResult->fetch_assoc()) {
-                $city = $cityRow['city'];
-                $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+        // Get cities for this state - try normalized tables first
+        $cities = [];
+        try {
+            if (is_numeric($stateId)) {
+                // Using normalized tables (states array has id => name format)
+                $citiesSql = "SELECT name FROM cities WHERE state_id = $stateId ORDER BY name";
+                $citiesResult = $conn->query($citiesSql);
                 
-                // Add city page URL
-                $xml .= '  <url>' . PHP_EOL;
-                $xml .= '    <loc>' . $baseURL . '/' . $citySlug . '-egg-rate</loc>' . PHP_EOL;
-                $xml .= '    <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
-                $xml .= '    <changefreq>daily</changefreq>' . PHP_EOL;
-                $xml .= '    <priority>0.9</priority>' . PHP_EOL;
-                $xml .= '  </url>' . PHP_EOL;
+                if ($citiesResult && $citiesResult->num_rows > 0) {
+                    while ($row = $citiesResult->fetch_assoc()) {
+                        $cities[] = $row['name'];
+                    }
+                } else {
+                    throw new Exception("No cities found for state ID: $stateId");
+                }
+            } else {
+                throw new Exception("State ID is not numeric");
             }
+        } catch (Exception $e) {
+            // Fall back to original table
+            $citiesSql = "SELECT DISTINCT city FROM egg_rates WHERE state = '$state' ORDER BY city";
+            $citiesResult = $conn->query($citiesSql);
+            
+            if ($citiesResult && $citiesResult->num_rows > 0) {
+                while ($row = $citiesResult->fetch_assoc()) {
+                    $cities[] = $row['city'];
+                }
+            }
+        }
+        
+        // Add city pages
+        foreach ($cities as $city) {
+            $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+            
+            // Add city page URL
+            $xml .= '  <url>' . PHP_EOL;
+            $xml .= '    <loc>' . $baseURL . '/' . $citySlug . '-egg-rate</loc>' . PHP_EOL;
+            $xml .= '    <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
+            $xml .= '    <changefreq>daily</changefreq>' . PHP_EOL;
+            $xml .= '    <priority>0.9</priority>' . PHP_EOL;
+            $xml .= '  </url>' . PHP_EOL;
         }
     }
 }
