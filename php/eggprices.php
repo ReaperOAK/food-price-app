@@ -104,16 +104,11 @@ if ($html !== false) {
             // If today's rate is not available, find the last available rate
             if ($rate === '-' || $rate === '') {
                 for ($i = $dayOfMonth - 1; $i > 0; $i--) {
-                    if (isset($row[$i]) && $row[$i] !== '-' && $row[$i] !== '') {
+                    if ($row[$i] !== '-' && $row[$i] !== '') {
                         $rate = $row[$i];
                         break;
                     }
                 }
-            }
-
-            // Skip if we still don't have a valid rate
-            if ($rate === '-' || $rate === '' || !is_numeric($rate)) {
-                continue;
             }
 
             // Convert rate from paisa to rupees

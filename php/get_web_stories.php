@@ -17,56 +17,27 @@ $storiesDir = $basePath . '/webstories';
 // Get limit parameter if provided
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : null;
 
-// First try to get the latest egg rates from normalized tables
-try {
-    $sql = "
-        SELECT c.name as city, s.name as state, r.rate, r.date 
-        FROM egg_rates_normalized r
-        JOIN cities c ON r.city_id = c.id
-        JOIN states s ON c.state_id = s.id
-        WHERE (c.id, r.date) IN (
-            SELECT r2.city_id, MAX(r2.date) 
-            FROM egg_rates_normalized r2
-            GROUP BY r2.city_id
-        )
-        ORDER BY r.date DESC, c.name ASC
-    ";
-    
-    // Add limit if specified
-    if ($limit) {
-        $sql .= " LIMIT " . $limit;
-    }
-    
-    $result = $conn->query($sql);
-    
-    // If no results or error with normalized tables, fall back to original table
-    if (!$result || $result->num_rows === 0) {
-        throw new Exception("No results from normalized tables");
-    }
-} catch (Exception $e) {
-    // Fall back to original table
-    $sql = "
-        SELECT city, state, rate, date 
+// Get the latest egg rates for all cities
+$sql = "
+    SELECT city, state, rate, date 
+    FROM egg_rates 
+    WHERE (city, date) IN (
+        SELECT city, MAX(date) 
         FROM egg_rates 
-        WHERE (city, date) IN (
-            SELECT city, MAX(date) 
-            FROM egg_rates 
-            GROUP BY city
-        )
-        ORDER BY date DESC, city ASC
-    ";
-    
-    // Add limit if specified
-    if ($limit) {
-        $sql .= " LIMIT " . $limit;
-    }
-    
-    $result = $conn->query($sql);
+        GROUP BY city
+    )
+    ORDER BY date DESC, city ASC
+";
+
+// Add limit if specified
+if ($limit) {
+    $sql .= " LIMIT " . $limit;
 }
 
+$result = $conn->query($sql);
 $stories = [];
 
-if ($result && $result->num_rows > 0) {
+if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
         $city = $row['city'];
         $state = $row['state'];

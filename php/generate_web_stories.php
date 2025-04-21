@@ -74,44 +74,21 @@ $today = date('Y-m-d');
 $daysToKeep = 3;
 deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
 
-// Get the latest egg rates - first try normalized tables, then fall back to original
-try {
-    $sql = "
-        SELECT c.name as city, s.name as state, r.rate, r.date 
-        FROM egg_rates_normalized r
-        JOIN cities c ON r.city_id = c.id
-        JOIN states s ON c.state_id = s.id
-        WHERE (c.id, r.date) IN (
-            SELECT r2.city_id, MAX(r2.date) 
-            FROM egg_rates_normalized r2
-            GROUP BY r2.city_id
-        )
-        ORDER BY c.name
-    ";
-    
-    $result = $conn->query($sql);
-    
-    // If no results or error with normalized tables, fall back to original table
-    if (!$result || $result->num_rows === 0) {
-        throw new Exception("No results from normalized tables");
-    }
-} catch (Exception $e) {
-    // Fall back to original table
-    $sql = "
-        SELECT city, state, rate, date 
+// Get the latest egg rates
+$sql = "
+    SELECT city, state, rate, date 
+    FROM egg_rates 
+    WHERE (city, date) IN (
+        SELECT city, MAX(date) 
         FROM egg_rates 
-        WHERE (city, date) IN (
-            SELECT city, MAX(date) 
-            FROM egg_rates 
-            GROUP BY city
-        )
-        ORDER BY city
-    ";
-    
-    $result = $conn->query($sql);
-}
+        GROUP BY city
+    )
+    ORDER BY city
+";
 
-if ($result && $result->num_rows > 0) {
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
     $storiesGenerated = 0;
     
     while ($row = $result->fetch_assoc()) {
@@ -269,42 +246,19 @@ function generateThumbnail($imageDir, $city, $citySlug, $sourceImage) {
 function generateWebStoryIndex($storiesDir, $conn) {
     $indexFile = $storiesDir . '/index.html';
     
-    // Get the latest egg rates for all cities - first try normalized tables
-    try {
-        $sql = "
-            SELECT c.name as city, s.name as state, r.rate, r.date 
-            FROM egg_rates_normalized r
-            JOIN cities c ON r.city_id = c.id
-            JOIN states s ON c.state_id = s.id
-            WHERE (c.id, r.date) IN (
-                SELECT r2.city_id, MAX(r2.date) 
-                FROM egg_rates_normalized r2
-                GROUP BY r2.city_id
-            )
-            ORDER BY c.name
-        ";
-        
-        $result = $conn->query($sql);
-        
-        // If no results or error with normalized tables, fall back to original table
-        if (!$result || $result->num_rows === 0) {
-            throw new Exception("No results from normalized tables");
-        }
-    } catch (Exception $e) {
-        // Fall back to original table
-        $sql = "
-            SELECT city, state, rate, date 
+    // Get the latest egg rates for all cities
+    $sql = "
+        SELECT city, state, rate, date 
+        FROM egg_rates 
+        WHERE (city, date) IN (
+            SELECT city, MAX(date) 
             FROM egg_rates 
-            WHERE (city, date) IN (
-                SELECT city, MAX(date) 
-                FROM egg_rates 
-                GROUP BY city
-            )
-            ORDER BY city
-        ";
-        
-        $result = $conn->query($sql);
-    }
+            GROUP BY city
+        )
+        ORDER BY city
+    ";
+    
+    $result = $conn->query($sql);
     
     $html = '<!DOCTYPE html>
 <html lang="en">
@@ -371,17 +325,12 @@ function generateWebStoryIndex($storiesDir, $conn) {
     <h1>Egg Rate Web Stories</h1>
     <div class="stories-grid">';
     
-    if ($result && $result->num_rows > 0) {
+    if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             $city = $row['city'];
             $state = $row['state'];
             $rate = $row['rate'];
             $date = $row['date'];
-            
-            // Skip if the rate is from more than 3 days ago
-            if (strtotime($date) < strtotime('-3 days')) {
-                continue;
-            }
             
             // Create a URL-friendly city name
             $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
