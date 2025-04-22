@@ -1,80 +1,8 @@
-# Enable URL rewriting
-RewriteEngine On
-
-# Set the base directory
-RewriteBase /
-
-# Redirect to www version
-RewriteCond %{HTTP_HOST} ^todayeggrates\.com [NC]
-RewriteRule ^(.*)$ https://www.todayeggrates.com/$1 [L,R=301]
-
-# Force HTTPS
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-# Remove trailing slashes
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)/$ /$1 [L,R=301]
-
-# Handle city egg rate pages
-RewriteRule ^([a-zA-Z0-9-]+)-egg-rate$ /php/city_rate.php?city=$1 [L,QSA]
-
-# Handle state egg rate pages
-RewriteRule ^state/([a-zA-Z0-9-]+)-egg-rate$ /php/state_rates.php?state=$1 [L,QSA]
-
-# Handle blog posts
-RewriteRule ^blog/([a-zA-Z0-9-]+)$ /php/blog_post.php?slug=$1 [L,QSA]
-
-# Handle blog category/tag pages
-RewriteRule ^blog/tag/([a-zA-Z0-9-]+)$ /php/blog_tag.php?tag=$1 [L,QSA]
-RewriteRule ^blog/category/([a-zA-Z0-9-]+)$ /php/blog_category.php?category=$1 [L,QSA]
-
-# Handle webstory URLs
-RewriteRule ^webstories/?$ /php/webstories_index.php [L,QSA]
-RewriteRule ^webstories/([a-zA-Z0-9-]+)-egg-rate\.html$ /webstories/$1-egg-rate.html [L]
-
-# Special egg rates redirects for SEO
-RewriteRule ^wholesale-egg-rates$ /php/special_rates.php?type=wholesale [L,QSA]
-RewriteRule ^retail-egg-rates$ /php/special_rates.php?type=retail [L,QSA]
-RewriteRule ^farm-egg-rates$ /php/special_rates.php?type=farm [L,QSA]
-RewriteRule ^desi-egg-rates$ /php/special_rates.php?type=desi [L,QSA]
-
-# Error handling
-ErrorDocument 404 /php/error.php?code=404
-ErrorDocument 500 /php/error.php?code=500
-
-# Browser caching 
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType image/jpg "access plus 1 year"
-    ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/gif "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/webp "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-    ExpiresByType image/x-icon "access plus 1 year"
-    ExpiresByType text/css "access plus 1 month"
-    ExpiresByType text/javascript "access plus 1 month"
-    ExpiresByType application/javascript "access plus 1 month"
-    ExpiresByType application/x-javascript "access plus 1 month"
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
 </IfModule>
-
-# Enable compression
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json
-</IfModule>
-
-# Security headers
-<IfModule mod_headers.c>
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-XSS-Protection "1; mode=block"
-    Header set X-Frame-Options "SAMEORIGIN"
-    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
-</IfModule>
-
-# PHP settings
-php_value upload_max_filesize 10M
-php_value post_max_size 10M
-php_value memory_limit 256M
-php_value max_execution_time 180
-php_flag display_errors off

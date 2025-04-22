@@ -1,119 +1,136 @@
 <?php
-/**
- * Generate XML sitemap for better SEO
- */
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Include database connection
-require_once 'db.php';
+// Database connection
+include 'db.php';
 
-// Set content type
-header('Content-Type: text/xml');
+// Configuration with absolute paths
+$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$sitemapFile = $basePath . '/sitemap.xml';
+$baseURL = 'https://todayeggrates.com';
 
-// Start XML output
-echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
-
-// Add homepage
-echo '<url>' . "\n";
-echo '  <loc>https://todayeggrates.com/</loc>' . "\n";
-echo '  <lastmod>' . date('Y-m-d') . '</lastmod>' . "\n";
-echo '  <changefreq>daily</changefreq>' . "\n";
-echo '  <priority>1.0</priority>' . "\n";
-echo '</url>' . "\n";
+// Create XML sitemap header
+$xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
 
 // Add static pages
-$static_pages = [
-    'privacy' => 0.5,
-    'terms' => 0.5,
-    'disclaimer' => 0.5
+$staticPages = [
+    '' => ['priority' => '1.0', 'changefreq' => 'daily'],
+    'blog' => ['priority' => '0.8', 'changefreq' => 'weekly'],
+    'webstories' => ['priority' => '0.9', 'changefreq' => 'daily'],
+    'privacy-policy' => ['priority' => '0.5', 'changefreq' => 'monthly'],
+    'disclaimer' => ['priority' => '0.5', 'changefreq' => 'monthly'],
+    'tos' => ['priority' => '0.5', 'changefreq' => 'monthly']
 ];
 
-foreach ($static_pages as $page => $priority) {
-    echo '<url>' . "\n";
-    echo '  <loc>https://todayeggrates.com/' . $page . '</loc>' . "\n";
-    echo '  <lastmod>' . date('Y-m-d', strtotime('-1 week')) . '</lastmod>' . "\n";
-    echo '  <changefreq>monthly</changefreq>' . "\n";
-    echo '  <priority>' . $priority . '</priority>' . "\n";
-    echo '</url>' . "\n";
-}
-
-// Get all cities from database
-$cities_query = "SELECT city_name, date FROM egg_rates GROUP BY city_name ORDER BY city_name";
-try {
-    $cities_stmt = $pdo->query($cities_query);
-    while ($city = $cities_stmt->fetch(PDO::FETCH_ASSOC)) {
-        // Format city name for URL
-        $city_url = strtolower(str_replace(' ', '-', $city['city_name'])) . '-egg-rate';
-        echo '<url>' . "\n";
-        echo '  <loc>https://todayeggrates.com/' . $city_url . '</loc>' . "\n";
-        echo '  <lastmod>' . date('Y-m-d', strtotime($city['date'])) . '</lastmod>' . "\n";
-        echo '  <changefreq>daily</changefreq>' . "\n";
-        echo '  <priority>0.9</priority>' . "\n";
-        echo '</url>' . "\n";
-    }
-} catch (PDOException $e) {
-    // Log error but continue
-    error_log("Error generating city sitemap entries: " . $e->getMessage());
+foreach ($staticPages as $page => $settings) {
+    $xml .= '  <url>' . PHP_EOL;
+    $xml .= '    <loc>' . $baseURL . '/' . $page . '</loc>' . PHP_EOL;
+    $xml .= '    <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
+    $xml .= '    <changefreq>' . $settings['changefreq'] . '</changefreq>' . PHP_EOL;
+    $xml .= '    <priority>' . $settings['priority'] . '</priority>' . PHP_EOL;
+    $xml .= '  </url>' . PHP_EOL;
 }
 
 // Get all states from database
-$states_query = "SELECT state_name FROM states ORDER BY state_name";
-try {
-    $states_stmt = $pdo->query($states_query);
-    while ($state = $states_stmt->fetch(PDO::FETCH_ASSOC)) {
-        // Format state name for URL
-        $state_url = 'state/' . strtolower(str_replace(' ', '-', $state['state_name'])) . '-egg-rate';
-        echo '<url>' . "\n";
-        echo '  <loc>https://todayeggrates.com/' . $state_url . '</loc>' . "\n";
-        echo '  <lastmod>' . date('Y-m-d') . '</lastmod>' . "\n";
-        echo '  <changefreq>daily</changefreq>' . "\n";
-        echo '  <priority>0.8</priority>' . "\n";
-        echo '</url>' . "\n";
-    }
-} catch (PDOException $e) {
-    // Log error but continue
-    error_log("Error generating state sitemap entries: " . $e->getMessage());
-}
+$statesSql = "SELECT DISTINCT state FROM egg_rates WHERE state != 'special' ORDER BY state";
+$statesResult = $conn->query($statesSql);
 
-// Get blog posts if they exist
-$blog_query = "SELECT slug, updated_at FROM blog_posts ORDER BY updated_at DESC";
-try {
-    $blog_stmt = $pdo->query($blog_query);
-    if ($blog_stmt && $blog_stmt->rowCount() > 0) {
-        while ($blog = $blog_stmt->fetch(PDO::FETCH_ASSOC)) {
-            echo '<url>' . "\n";
-            echo '  <loc>https://todayeggrates.com/blog/' . $blog['slug'] . '</loc>' . "\n";
-            echo '  <lastmod>' . date('Y-m-d', strtotime($blog['updated_at'])) . '</lastmod>' . "\n";
-            echo '  <changefreq>weekly</changefreq>' . "\n";
-            echo '  <priority>0.7</priority>' . "\n";
-            echo '</url>' . "\n";
+if ($statesResult && $statesResult->num_rows > 0) {
+    while ($row = $statesResult->fetch_assoc()) {
+        $state = $row['state'];
+        $stateSlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $state));
+        
+        // Add state page URL
+        $xml .= '  <url>' . PHP_EOL;
+        $xml .= '    <loc>' . $baseURL . '/state/' . $stateSlug . '-egg-rate</loc>' . PHP_EOL;
+        $xml .= '    <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
+        $xml .= '    <changefreq>daily</changefreq>' . PHP_EOL;
+        $xml .= '    <priority>0.8</priority>' . PHP_EOL;
+        $xml .= '  </url>' . PHP_EOL;
+        
+        // Get cities for this state
+        $citiesSql = "SELECT DISTINCT city FROM egg_rates WHERE state = '$state' ORDER BY city";
+        $citiesResult = $conn->query($citiesSql);
+        
+        if ($citiesResult && $citiesResult->num_rows > 0) {
+            while ($cityRow = $citiesResult->fetch_assoc()) {
+                $city = $cityRow['city'];
+                $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+                
+                // Add city page URL
+                $xml .= '  <url>' . PHP_EOL;
+                $xml .= '    <loc>' . $baseURL . '/' . $citySlug . '-egg-rate</loc>' . PHP_EOL;
+                $xml .= '    <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
+                $xml .= '    <changefreq>daily</changefreq>' . PHP_EOL;
+                $xml .= '    <priority>0.9</priority>' . PHP_EOL;
+                $xml .= '  </url>' . PHP_EOL;
+            }
         }
-    } else {
-        // Add known blog posts from sitemap.txt
-        $known_blogs = ['egg-rate-barwala', 'blog-1', 'blog-2'];
-        foreach ($known_blogs as $blog) {
-            echo '<url>' . "\n";
-            echo '  <loc>https://todayeggrates.com/blog/' . $blog . '</loc>' . "\n";
-            echo '  <lastmod>' . date('Y-m-d', strtotime('-1 month')) . '</lastmod>' . "\n";
-            echo '  <changefreq>monthly</changefreq>' . "\n";
-            echo '  <priority>0.7</priority>' . "\n";
-            echo '</url>' . "\n";
-        }
-    }
-} catch (PDOException $e) {
-    // Log error but continue
-    error_log("Error generating blog sitemap entries: " . $e->getMessage());
-    // Add known blog posts from sitemap.txt as fallback
-    $known_blogs = ['egg-rate-barwala', 'blog-1', 'blog-2'];
-    foreach ($known_blogs as $blog) {
-        echo '<url>' . "\n";
-        echo '  <loc>https://todayeggrates.com/blog/' . $blog . '</loc>' . "\n";
-        echo '  <lastmod>' . date('Y-m-d', strtotime('-1 month')) . '</lastmod>' . "\n";
-        echo '  <changefreq>monthly</changefreq>' . "\n";
-        echo '  <priority>0.7</priority>' . "\n";
-        echo '</url>' . "\n";
     }
 }
 
-// Close XML
-echo '</urlset>';
+// Get all blog posts
+// In a real implementation, you would fetch these from a database or file system
+// For now, we'll add the known blog posts
+$blogPosts = [
+    'egg-rate-barwala' => '2023-08-15',
+    'blog-1' => '2023-07-20',
+    'blog-2' => '2023-09-05'
+];
+
+foreach ($blogPosts as $slug => $date) {
+    $xml .= '  <url>' . PHP_EOL;
+    $xml .= '    <loc>' . $baseURL . '/blog/' . $slug . '</loc>' . PHP_EOL;
+    $xml .= '    <lastmod>' . $date . '</lastmod>' . PHP_EOL;
+    $xml .= '    <changefreq>monthly</changefreq>' . PHP_EOL;
+    $xml .= '    <priority>0.7</priority>' . PHP_EOL;
+    $xml .= '  </url>' . PHP_EOL;
+}
+
+// Get all web stories
+$storiesDir = $basePath . '/webstories';
+if (is_dir($storiesDir)) {
+    $files = glob("$storiesDir/*.html");
+    foreach ($files as $file) {
+        // Skip index.html
+        if (basename($file) === 'index.html') {
+            continue;
+        }
+        
+        $filename = basename($file);
+        $lastMod = date('Y-m-d', filemtime($file));
+        
+        $xml .= '  <url>' . PHP_EOL;
+        $xml .= '    <loc>' . $baseURL . '/webstories/' . $filename . '</loc>' . PHP_EOL;
+        $xml .= '    <lastmod>' . $lastMod . '</lastmod>' . PHP_EOL;
+        $xml .= '    <changefreq>daily</changefreq>' . PHP_EOL;
+        $xml .= '    <priority>0.8</priority>' . PHP_EOL;
+        $xml .= '  </url>' . PHP_EOL;
+    }
+}
+
+// Close XML sitemap
+$xml .= '</urlset>';
+
+// Save sitemap to file
+file_put_contents($sitemapFile, $xml);
+
+// Create a text version of the sitemap for Google verification
+$urls = [];
+preg_match_all('/<loc>(.*?)<\/loc>/s', $xml, $matches);
+if (isset($matches[1]) && !empty($matches[1])) {
+    $urls = $matches[1];
+}
+
+$textSitemap = implode("\n", $urls);
+file_put_contents($basePath . '/sitemap.txt', $textSitemap);
+
+echo "Sitemap generated with " . count($urls) . " URLs.<br>";
+echo "XML sitemap: <a href='/sitemap.xml' target='_blank'>/sitemap.xml</a><br>";
+echo "Text sitemap: <a href='/sitemap.txt' target='_blank'>/sitemap.txt</a>";
+
+// Close database connection
+$conn->close();
+?>

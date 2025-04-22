@@ -12,15 +12,5 @@ Disallow: /login
 Sitemap: https://todayeggrates.com/sitemap.xml
 Sitemap: https://todayeggrates.com/webstories-sitemap.xml
 
-# Additional sitemaps for better discovery
-Sitemap: https://todayeggrates.com/city-sitemap.xml
-Sitemap: https://todayeggrates.com/state-sitemap.xml
-Sitemap: https://todayeggrates.com/blog-sitemap.xml
-
 # Optimize crawl rate
 Crawl-delay: 1
-
-# Allow Google images to crawl all image directories
-User-agent: Googlebot-Image
-Allow: /images/
-Allow: /webstories/
