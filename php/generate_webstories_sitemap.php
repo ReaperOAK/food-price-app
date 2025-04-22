@@ -1,70 +1,78 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+/**
+ * Generate XML sitemap specifically for web stories
+ */
 
-// Database connection
-include 'db.php';
+// Include database connection
+require_once 'db.php';
 
-// Configuration with absolute paths
-$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
-$storiesDir = $basePath . '/webstories';
-$sitemapFile = $basePath . '/webstories-sitemap.xml';
+// Set content type
+header('Content-Type: text/xml');
 
-// Create XML sitemap header
-$xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
-$xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
+// Start XML output
+echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+
+// Add main webstories index page
+echo '<url>' . "\n";
+echo '  <loc>https://todayeggrates.com/webstories/</loc>' . "\n";
+echo '  <lastmod>' . date('Y-m-d') . '</lastmod>' . "\n";
+echo '  <changefreq>daily</changefreq>' . "\n";
+echo '  <priority>0.8</priority>' . "\n";
+echo '</url>' . "\n";
 
 // Get all web stories
-$files = glob("$storiesDir/*.html");
-$storyCount = 0;
-
-if (is_array($files)) {
-    foreach ($files as $file) {
-        // Skip index.html
-        if (basename($file) === 'index.html') {
-            continue;
+$webstories_query = "SELECT slug, title, created_at, updated_at FROM webstories ORDER BY updated_at DESC";
+try {
+    $webstories_stmt = $pdo->query($webstories_query);
+    if ($webstories_stmt && $webstories_stmt->rowCount() > 0) {
+        while ($story = $webstories_stmt->fetch(PDO::FETCH_ASSOC)) {
+            echo '<url>' . "\n";
+            echo '  <loc>https://todayeggrates.com/webstories/' . $story['slug'] . '</loc>' . "\n";
+            echo '  <lastmod>' . date('Y-m-d', strtotime($story['updated_at'])) . '</lastmod>' . "\n";
+            echo '  <changefreq>weekly</changefreq>' . "\n";
+            echo '  <priority>0.7</priority>' . "\n";
+            echo '</url>' . "\n";
         }
-        
-        $filename = basename($file, '.html');
-        
-        // Check if it's a valid web story (city-egg-rate.html format)
-        if (preg_match('/^(.*)-egg-rate$/', $filename, $matches)) {
-            $citySlug = $matches[1];
-            
-            // Get the last modified date of the file
-            $lastMod = date('Y-m-d', filemtime($file));
-            
-            // Add URL to sitemap
-            $xml .= '  <url>' . PHP_EOL;
-            $xml .= '    <loc>https://todayeggrates.com/webstories/' . $filename . '.html</loc>' . PHP_EOL;
-            $xml .= '    <lastmod>' . $lastMod . '</lastmod>' . PHP_EOL;
-            $xml .= '    <changefreq>daily</changefreq>' . PHP_EOL;
-            $xml .= '    <priority>0.8</priority>' . PHP_EOL;
-            $xml .= '  </url>' . PHP_EOL;
-            
-            $storyCount++;
+    } else {
+        // Get web stories from directory as fallback
+        $webstories_dir = '../webstories/';
+        if (file_exists($webstories_dir) && is_dir($webstories_dir)) {
+            $files = scandir($webstories_dir);
+            foreach ($files as $file) {
+                if ($file != '.' && $file != '..' && pathinfo($file, PATHINFO_EXTENSION) == 'html') {
+                    $slug = pathinfo($file, PATHINFO_FILENAME);
+                    echo '<url>' . "\n";
+                    echo '  <loc>https://todayeggrates.com/webstories/' . $slug . '</loc>' . "\n";
+                    echo '  <lastmod>' . date('Y-m-d', filemtime($webstories_dir . $file)) . '</lastmod>' . "\n";
+                    echo '  <changefreq>weekly</changefreq>' . "\n";
+                    echo '  <priority>0.7</priority>' . "\n";
+                    echo '</url>' . "\n";
+                }
+            }
+        }
+    }
+} catch (PDOException $e) {
+    // Log error and fallback to directory scanning
+    error_log("Error generating webstories sitemap entries: " . $e->getMessage());
+    
+    // Get web stories from directory as fallback
+    $webstories_dir = '../webstories/';
+    if (file_exists($webstories_dir) && is_dir($webstories_dir)) {
+        $files = scandir($webstories_dir);
+        foreach ($files as $file) {
+            if ($file != '.' && $file != '..' && pathinfo($file, PATHINFO_EXTENSION) == 'html') {
+                $slug = pathinfo($file, PATHINFO_FILENAME);
+                echo '<url>' . "\n";
+                echo '  <loc>https://todayeggrates.com/webstories/' . $slug . '</loc>' . "\n";
+                echo '  <lastmod>' . date('Y-m-d', filemtime($webstories_dir . $file)) . '</lastmod>' . "\n";
+                echo '  <changefreq>weekly</changefreq>' . "\n";
+                echo '  <priority>0.7</priority>' . "\n";
+                echo '</url>' . "\n";
+            }
         }
     }
 }
 
-// Add the web stories index page
-$xml .= '  <url>' . PHP_EOL;
-$xml .= '    <loc>https://todayeggrates.com/webstories/</loc>' . PHP_EOL;
-$xml .= '    <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
-$xml .= '    <changefreq>daily</changefreq>' . PHP_EOL;
-$xml .= '    <priority>0.9</priority>' . PHP_EOL;
-$xml .= '  </url>' . PHP_EOL;
-
-// Close XML sitemap
-$xml .= '</urlset>';
-
-// Save sitemap
-file_put_contents($sitemapFile, $xml);
-
-echo "Web stories sitemap generated with $storyCount stories.";
-
-// Only close the connection if this script is called directly, not when included
-if (basename($_SERVER['SCRIPT_FILENAME']) == basename(__FILE__)) {
-    $conn->close();
-}
-?>
+// Close XML
+echo '</urlset>';
