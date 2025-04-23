@@ -1,28 +1,115 @@
--- Table structure for 'egg_rates'
+-- ========================================================
+-- DATABASE STRUCTURE - FOOD PRICE APPLICATION
+-- ========================================================
+
+-- --------------------------------------------------------
+-- Table: STATES
+-- Description: Contains list of states/provinces
+-- --------------------------------------------------------
+
+DESCRIBE states;
+
+/*
++------------+--------------+------+-----+-------------------+----------------+
+| Field      | Type         | Null | Key | Default           | Extra          |
++------------+--------------+------+-----+-------------------+----------------+
+| id         | int(11)      | NO   | PRI | NULL              | auto_increment |
+| name       | varchar(100) | NO   | UNI | NULL              |                |
+| created_at | timestamp    | YES  |     | current_timestamp |                |
++------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: CITIES
+-- Description: Contains list of cities with state references
+-- --------------------------------------------------------
+
+DESCRIBE cities;
+
+/*
++------------+--------------+------+-----+-------------------+----------------+
+| Field      | Type         | Null | Key | Default           | Extra          |
++------------+--------------+------+-----+-------------------+----------------+
+| id         | int(11)      | NO   | PRI | NULL              | auto_increment |
+| name       | varchar(100) | NO   | MUL | NULL              |                |
+| state_id   | int(11)      | NO   | MUL | NULL              |                |
+| created_at | timestamp    | YES  |     | current_timestamp |                |
++------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: EGG_RATES
+-- Description: Contains raw egg price data by city and state
+-- --------------------------------------------------------
+
 DESCRIBE egg_rates;
 
--- Fields
--- +-------+--------------+------+-----+---------+----------------+
--- | Field | Type         | Null | Key | Default | Extra          |
--- +-------+--------------+------+-----+---------+----------------+
--- | id    | int(11)      | NO   | PRI | NULL    | auto_increment |
--- | city  | varchar(100) | NO   | MUL | NULL    |                |
--- | state | varchar(100) | NO   |     | NULL    |                |
--- | date  | date         | NO   |     | NULL    |                |
--- | rate  | decimal(10,2)| NO   |     | NULL    |                |
--- +-------+--------------+------+-----+---------+----------------+
+/*
++-------+--------------+------+-----+---------+----------------+
+| Field | Type         | Null | Key | Default | Extra          |
++-------+--------------+------+-----+---------+----------------+
+| id    | int(11)      | NO   | PRI | NULL    | auto_increment |
+| city  | varchar(100) | NO   | MUL | NULL    |                |
+| state | varchar(100) | NO   | MUL | NULL    |                |
+| date  | date         | NO   | MUL | NULL    |                |
+| rate  | decimal(10,2)| NO   |     | NULL    |                |
++-------+--------------+------+-----+---------+----------------+
+*/
 
+-- --------------------------------------------------------
+-- Table: EGG_RATES_NORMALIZED
+-- Description: Contains normalized egg price data with city references
+-- --------------------------------------------------------
 
--- Table structure for 'updated_cities'
+DESCRIBE egg_rates_normalized;
+
+/*
++------------+--------------+------+-----+-------------------+----------------+
+| Field      | Type         | Null | Key | Default           | Extra          |
++------------+--------------+------+-----+-------------------+----------------+
+| id         | int(11)      | NO   | PRI | NULL              | auto_increment |
+| city_id    | int(11)      | NO   | MUL | NULL              |                |
+| date       | date         | NO   | MUL | NULL              |                |
+| rate       | decimal(10,2)| NO   |     | NULL              |                |
+| created_at | timestamp    | YES  |     | current_timestamp |                |
++------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: EGG_RATES_ARCHIVE
+-- Description: Contains archived egg price data
+-- --------------------------------------------------------
+
+DESCRIBE egg_rates_archive;
+
+/*
++------------+--------------+------+-----+-------------------+----------------+
+| Field      | Type         | Null | Key | Default           | Extra          |
++------------+--------------+------+-----+-------------------+----------------+
+| id         | int(11)      | NO   | PRI | NULL              | auto_increment |
+| city       | varchar(100) | NO   |     | NULL              |                |
+| state      | varchar(100) | NO   |     | NULL              |                |
+| date       | date         | NO   |     | NULL              |                |
+| rate       | decimal(10,2)| NO   |     | NULL              |                |
+| archived_at| timestamp    | YES  |     | current_timestamp |                |
++------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: UPDATED_CITIES
+-- Description: Contains updated city egg price data
+-- --------------------------------------------------------
+
 DESCRIBE updated_cities;
 
--- Fields
--- +-------+--------------+------+-----+---------+----------------+
--- | Field | Type         | Null | Key | Default | Extra          |
--- +-------+--------------+------+-----+---------+----------------+
--- | id    | int(11)      | NO   | PRI | NULL    | auto_increment |
--- | city  | varchar(255) | NO   |     | NULL    |                |
--- | state | varchar(255) | NO   |     | NULL    |                |
--- | date  | date         | NO   |     | NULL    |                |
--- | rate  | decimal(10,2)| NO   |     | NULL    |                |
--- +-------+--------------+------+-----+---------+----------------+
+/*
++-------+--------------+------+-----+---------+----------------+
+| Field | Type         | Null | Key | Default | Extra          |
++-------+--------------+------+-----+---------+----------------+
+| id    | int(11)      | NO   | PRI | NULL    | auto_increment |
+| city  | varchar(255) | NO   |     | NULL    |                |
+| state | varchar(255) | NO   |     | NULL    |                |
+| date  | date         | NO   |     | NULL    |                |
+| rate  | decimal(10,2)| NO   |     | NULL    |                |
++-------+--------------+------+-----+---------+----------------+
+*/

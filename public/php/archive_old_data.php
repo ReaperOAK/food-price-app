@@ -29,7 +29,7 @@ try {
     $stmt->bind_param("s", $archiveThreshold);
     $stmt->execute();
     
-    // Also archive data from the normalized table if it exists
+    // 3. Archive data from the normalized table
     $archiveNormalizedQuery = "INSERT INTO egg_rates_archive (city, state, date, rate)
                               SELECT c.name, s.name, ern.date, ern.rate
                               FROM egg_rates_normalized ern
@@ -41,7 +41,9 @@ try {
     $stmt->bind_param("s", $archiveThreshold);
     $stmt->execute();
     
-    // Delete archived normalized data
+    $normalizedArchivedRows = $stmt->affected_rows;
+    
+    // 4. Delete archived normalized data
     $deleteNormalizedQuery = "DELETE FROM egg_rates_normalized WHERE date < ?";
     $stmt = $conn->prepare($deleteNormalizedQuery);
     $stmt->bind_param("s", $archiveThreshold);
@@ -50,7 +52,9 @@ try {
     // Commit transaction
     $conn->commit();
     
-    echo "Successfully archived " . $archivedRows . " records older than " . $archiveThreshold;
+    echo "Successfully archived " . ($archivedRows + $normalizedArchivedRows) . " records older than " . $archiveThreshold;
+    echo "<br>Original table: " . $archivedRows . " records";
+    echo "<br>Normalized table: " . $normalizedArchivedRows . " records";
     
 } catch (Exception $e) {
     // Rollback transaction on error
