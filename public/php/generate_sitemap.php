@@ -55,11 +55,15 @@ foreach ($static_pages as $page => $priority) {
     $txt .= $url . PHP_EOL;
 }
 
+// Initialize counters
+$city_count = 0;
+$state_count = 0;
+
 // Get all cities from database
 $cities_query = "SELECT city_name, date FROM egg_rates GROUP BY city_name ORDER BY city_name";
 try {
     $cities_result = $conn->query($cities_query);
-    if ($cities_result) {
+    if ($cities_result && $cities_result->num_rows > 0) {
         while ($city = $cities_result->fetch_assoc()) {
             // Format city name for URL
             $city_url = strtolower(str_replace(' ', '-', $city['city_name'])) . '-egg-rate';
@@ -88,6 +92,8 @@ try {
                 
                 $txt .= $webstory_url . PHP_EOL;
             }
+            
+            $city_count++;
         }
     }
 } catch (Exception $e) {
@@ -99,7 +105,7 @@ try {
 $states_query = "SELECT state_name FROM states ORDER BY state_name";
 try {
     $states_result = $conn->query($states_query);
-    if ($states_result) {
+    if ($states_result && $states_result->num_rows > 0) {
         while ($state = $states_result->fetch_assoc()) {
             // Format state name for URL
             $state_url = 'state/' . strtolower(str_replace(' ', '-', $state['state_name'])) . '-egg-rate';
@@ -113,12 +119,17 @@ try {
             $xml .= '</url>' . PHP_EOL;
             
             $txt .= $url . PHP_EOL;
+            
+            $state_count++;
         }
     }
 } catch (Exception $e) {
     // Log error but continue
     error_log("Error generating state sitemap entries: " . $e->getMessage());
 }
+
+// Initialize blog count
+$blog_count = 0;
 
 // Get blog posts if they exist
 $blog_query = "SELECT slug, updated_at FROM blog_posts ORDER BY updated_at DESC";
@@ -136,6 +147,8 @@ try {
             $xml .= '</url>' . PHP_EOL;
             
             $txt .= $url . PHP_EOL;
+            
+            $blog_count++;
         }
     } else {
         // Add known blog posts from data/blogs.js
@@ -151,6 +164,8 @@ try {
             $xml .= '</url>' . PHP_EOL;
             
             $txt .= $url . PHP_EOL;
+            
+            $blog_count++;
         }
     }
 } catch (Exception $e) {
@@ -169,6 +184,8 @@ try {
         $xml .= '</url>' . PHP_EOL;
         
         $txt .= $url . PHP_EOL;
+        
+        $blog_count++;
     }
 }
 
@@ -194,16 +211,10 @@ echo "<br>TXT Sitemap: <a href='/sitemap.txt' target='_blank'>/sitemap.txt</a>";
 echo "<br><br>Added to sitemap:";
 echo "<br>- Homepage";
 echo "<br>- " . count($static_pages) . " static pages";
-
-$city_count = $cities_result ? $cities_result->num_rows : 0;
 echo "<br>- " . $city_count . " city pages";
-
-$state_count = $states_result ? $states_result->num_rows : 0;
 echo "<br>- " . $state_count . " state pages";
-
-$blog_count = isset($blog_result) && $blog_result ? $blog_result->num_rows : count($known_blogs);
 echo "<br>- " . $blog_count . " blog posts";
 
 // Log completion
-error_log("Sitemap generation completed at " . date('Y-m-d H:i:s'));
+error_log("Sitemap generation completed at " . date('Y-m-d H:i:s') . " - Added $city_count cities, $state_count states, $blog_count blogs");
 ?>
