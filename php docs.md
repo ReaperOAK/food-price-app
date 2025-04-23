@@ -29,6 +29,8 @@
     │       └── update_from_e2necc.php
     ├── 📁config
     │   └── db.php
+    ├── 📁cron
+    │   └── cronjob.php
     ├── 📁database
     │   └── 📁maintenance
     │       └── archive_old_data.php
@@ -231,3 +233,27 @@
 - **RESTRICTED**: Contains functionality for file management
 - **SECURITY**: Requires validation token for access
 - For development team use only
+
+## Automated Tasks
+
+### ⏱️ `cronjob.php` - Automated Task Scheduler
+
+- **Purpose**: Centralized script for running all scheduled maintenance tasks
+- **Features**:
+  - Runs data scraping and updates from external sources
+  - Performs database maintenance operations
+  - Generates and updates web stories and thumbnails
+  - Creates and updates SEO sitemaps
+  - Detailed logging of all operations
+- **Execution Flow**:
+  1. Updates egg rates from e2necc source
+  2. Performs daily data updates for all cities
+  3. Archives old data to maintain database performance
+  4. Generates and updates web stories with current egg rates
+  5. Updates thumbnails for all web stories
+  6. Removes outdated web stories
+  7. Generates main website sitemap
+  8. Generates web stories sitemap
+- **Error Handling**: Logs all successes and failures with execution times
+- **Usage**: Set up as a daily cron job on the server (recommended to run at off-peak hours)
+- **Command**: `php /path/to/php/cron/cronjob.php`
