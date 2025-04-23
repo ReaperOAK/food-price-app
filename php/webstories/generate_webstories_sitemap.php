@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Database connection
-include dirname(__DIR__) . '/config/db.php';
+include_once dirname(__DIR__) . '/config/db.php';
 
 // Configuration with absolute paths
 $basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
