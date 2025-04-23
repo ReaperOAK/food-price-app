@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css'; // Ensure Tailwind CSS is imported
-import RateTable from '../RateTable';
+import RateTable from '../../components/rates/RateTable';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -9,17 +9,14 @@ const EggRates = () => {
   const [eggRates, setEggRates] = useState([]);
 
   useEffect(() => {
-    // Fetch the rates for the last 7 days
-    fetch('../php/get_rates.php?city=Barwala&state=Haryana&days=7')
-      .then(res => res.json())
+    fetch('../php/api/rates/get_rates.php?city=Barwala&state=Haryana&days=7')
+      .then(response => response.json())
       .then(data => {
-        const convertedData = data.map(item => ({
-          ...item,
-          rate: parseFloat(item.rate), // Convert rate to a number
-        }));
-        setEggRates(convertedData);
+        setEggRates(data);
       })
-      .catch(error => console.error('Error fetching rates:', error));
+      .catch(error => {
+        console.error('Error fetching egg rates:', error);
+      });
   }, []);
 
   const todayRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';

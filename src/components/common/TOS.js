@@ -1,7 +1,7 @@
 import React, { useState} from 'react';
 import { useParams} from 'react-router-dom';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from '../layout/Navbar';
+import Footer from '../layout/Footer';
 
 const TOS = () => {
     const { city, state } = useParams();

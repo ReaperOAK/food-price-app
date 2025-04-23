@@ -1,0 +1,160 @@
+# Food Price App - Documentation
+
+## Project Overview
+This application provides real-time egg price information across different cities and states in India. It offers features like price tracking, historical data, blogs about egg markets, and web stories for visual engagement.
+
+## Directory Structure
+```
+└── 📁src
+    └── 📁components
+        └── 📁admin
+            └── AddCityForm.js
+            └── AddStateForm.js
+            └── LoginPage.js
+            └── RateForm.js
+        └── 📁blog
+            └── BlogCard.js
+            └── BlogList.js
+        └── 📁common
+            └── CitySelect.js
+            └── Disclaimer.js
+            └── FAQ.js
+            └── PrivacyPolicy.js
+            └── StateSelect.js
+            └── TOS.js
+        └── 📁layout
+            └── AdminNavbar.js
+            └── Breadcrumb.js
+            └── Footer.js
+            └── Navbar.js
+        └── 📁rates
+            └── BodyOne.js
+            └── BodyThree.js
+            └── BodyTwo.js
+            └── DefaultTable.js
+            └── EggRatesTable.js
+            └── RateTable.js
+            └── SpecialRatesTable.js
+            └── StateList.js
+            └── StatePage.js
+        └── 📁webstories
+            └── WebStoriesList.js
+            └── WebStoryViewer.js
+    └── 📁data
+        └── blogs.js
+        └── eggprices.js
+    └── 📁pages
+        └── AdminPage.js
+        └── BlogPage.js
+        └── 📁blogs
+            └── blog-1.js
+            └── blog-2.js
+            └── egg-rate-barwala.js
+        └── MainPage.js
+    └── 📁utils
+        └── ScrollToTop.js
+    └── App.css
+    └── App.js
+    └── App.test.js
+    └── index.css
+    └── index.js
+    └── logo.svg
+    └── reportWebVitals.js
+    └── setupTests.js
+```
+
+## Core Components
+
+### Main Application
+
+| File | Purpose |
+|------|---------|
+| **App.js** | Main application component with routing configuration, authentication logic, and maintenance mode handling |
+| **index.js** | Entry point that renders the React application to the DOM |
+| **ScrollToTop.js** | Utility that scrolls to the top of the page on route changes |
+
+### Page Components
+
+| Component | Description |
+|-----------|-------------|
+| **MainPage.js** | Landing page with egg rates, visualizations, and market information. Aggregates multiple sub-components to create a comprehensive dashboard. |
+| **BlogPage.js** | Dynamically loads and renders individual blog posts based on URL parameters. Supports content from the blogs directory. |
+| **StatePage.js** | Displays state-specific egg rate information including historical averages. |
+| **WebStoriesList.js** | Grid layout of visual web stories about egg rates across India. Optimized for mobile viewing. |
+| **WebStoryViewer.js** | Full-screen immersive viewer for individual web stories with seamless navigation. |
+| **LoginPage.js** | Authentication form with validation for admin access. |
+| **AdminPage.js** | Dashboard for administrators to manage egg rates, locations, and content. |
+
+### UI Components
+
+#### Navigation & Structure
+- **Navbar.js**: Main navigation with search dropdown to find cities/states, dynamic links to popular locations
+- **AdminNavbar.js**: Admin-specific navigation with logout functionality
+- **Footer.js**: Site-wide footer with copyright info, social links, and legal page links
+- **Breadcrumb.js**: Context-aware navigation path showing current location in the site hierarchy with structured data for SEO
+
+#### Content Sections
+- **BodyOne.js**: Hero section with location-specific heading, featured web stories, and introduction
+- **BodyTwo.js**: Informational section about egg pricing, NECC, and market factors
+- **BodyThree.js**: Data-driven analysis section with price trends and comparisons
+- **FAQ.js**: Dynamic FAQ section with questions tailored to the selected location
+
+#### Data Display
+- **RateTable.js**: Interactive table showing egg rates with visualization charts for price trends
+- **DefaultTable.js**: Generic table for displaying egg rates when no specific location is selected
+- **SpecialRatesTable.js**: Highlights featured or promoted egg rates from specific markets
+- **StateList.js**: Interactive grid of states and cities with direct navigation links
+- **EggRatesTable.js**: Admin-facing table for managing egg rate entries with sorting and editing capabilities
+
+#### Inputs & Forms
+- **CitySelect.js**: Multi-select dropdown for choosing cities
+- **StateSelect.js**: Dropdown for selecting states with filtering capabilities
+- **RateForm.js**: Form for updating egg rates with batch operations
+- **AddStateForm.js**: Admin form for adding new states to the database
+- **AddCityForm.js**: Admin form for adding new cities with state association
+
+#### Blog Components
+- **BlogList.js**: Grid display of blog posts with sorting and filtering
+- **BlogCard.js**: Card component for individual blog previews
+- **blogs/blog-1.js**: Component for "Understanding Today's Egg Rates Across Major Indian Cities" article
+- **blogs/blog-2.js**: Component for "Understanding Egg Rates in India" article
+- **blogs/egg-rate-barwala.js**: Component for Barwala market analysis article
+
+#### Legal Pages
+- **PrivacyPolicy.js**: Privacy policy information
+- **TOS.js**: Terms of Service details
+- **Disclaimer.js**: Legal disclaimers about the egg price data
+
+### Data Files
+
+- **data/blogs.js**: Configuration for blog posts including metadata and content paths
+- **data/eggprices.js**: Static fallback data for egg prices when API is unavailable
+
+## Key Features
+
+1. **Real-time Egg Price Tracking**: Daily updated egg rates from NECC
+2. **Location-based Price Information**: City and state-specific egg rates
+3. **Historical Data Analysis**: Price trends and comparisons over time
+4. **Visual Web Stories**: Engaging visual presentation of egg rates
+5. **Admin Dashboard**: Content management system for updating prices
+6. **SEO Optimization**: Structured data and metadata for search engines
+7. **Responsive Design**: Mobile-friendly interface across all pages
+
+## Technical Implementation
+
+- Built with React.js for component-based UI
+- React Router for navigation and routing
+- Chart.js for data visualization
+- Tailwind CSS for styling
+- PHP backend API endpoints for data retrieval and management
+- SEO optimization with React Helmet
+- Authentication system for admin access
+
+## Best Practices
+
+- Component composition for reusability
+- Controlled forms for user input
+- Dynamic content loading based on URL parameters
+- Structured data for SEO
+- Responsive design patterns
+- Fallback states for loading and error conditions

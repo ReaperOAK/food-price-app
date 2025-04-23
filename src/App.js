@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import MainPage from './components/MainPage';
-import PrivacyPolicy from './components/PrivacyPolicy';
-import TOS from './components/TOS';
-import Disclaimer from './components/Disclaimer';
-import AdminPage from './components/AdminPage';
-import LoginPage from './components/LoginPage';
-import BlogPage from './components/BlogPage';
+import MainPage from './pages/MainPage';
+import PrivacyPolicy from './components/common/PrivacyPolicy';
+import TOS from './components/common/TOS';
+import Disclaimer from './components/common/Disclaimer';
+import AdminPage from './pages/AdminPage';
+import LoginPage from './components/admin/LoginPage';
+import BlogPage from './pages/BlogPage';
 import blogs from './data/blogs'; // Import the blogs list
-import ScrollToTop from './ScrollToTop'; // Import ScrollToTop
-import WebStoriesList from './components/WebStoriesList'; // Import WebStoriesList
-import WebStoryViewer from './components/WebStoryViewer'; // Import WebStoryViewer
+import ScrollToTop from './utils/ScrollToTop'; // Import ScrollToTop
+import WebStoriesList from './components/webstories/WebStoriesList'; // Import WebStoriesList
+import WebStoryViewer from './components/webstories/WebStoryViewer'; // Import WebStoryViewer
 
 // Special file handler components
 const SitemapHandler = () => {

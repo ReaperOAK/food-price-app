@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from '../layout/Navbar';
+import Footer from '../layout/Footer';
 import { Helmet } from 'react-helmet';
 
 const WebStoriesList = () => {

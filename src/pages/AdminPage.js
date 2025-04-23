@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Select from 'react-select';
-import AdminNavbar from './AdminNavbar';
-import StateSelect from './StateSelect';
-import CitySelect from './CitySelect';
-import RateForm from './RateForm';
-import AddStateForm from './AddStateForm';
-import AddCityForm from './AddCityForm';
-import EggRatesTable from './EggRatesTable';
+import AdminNavbar from '../components/layout/AdminNavbar';
+import StateSelect from '../components/common/StateSelect';
+import CitySelect from '../components/common/CitySelect';
+import RateForm from '../components/admin/RateForm';
+import AddStateForm from '../components/admin/AddStateForm';
+import AddCityForm from '../components/admin/AddCityForm';
+import EggRatesTable from '../components/rates/EggRatesTable';
 
 const AdminPage = ({ setIsAuthenticated }) => {
   const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
@@ -26,35 +26,27 @@ const AdminPage = ({ setIsAuthenticated }) => {
   const [removeCity, setRemoveCity] = useState(null);
   const [removeCityState, setRemoveCityState] = useState(null);
   const [selectedDate, setSelectedDate] = useState(today);
-
+  
+  // Define fetchEggRates function to get egg rates data
   const fetchEggRates = useCallback(() => {
-    fetch(`/php/get_all_rates.php?date=${selectedDate}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const latestRates = data.reduce((acc, rate) => {
-          if (!acc[rate.city] || new Date(rate.date) > new Date(acc[rate.city].date)) {
-            acc[rate.city] = rate;
-          }
-          return acc;
-        }, {});
-        setEggRates(Object.values(latestRates));
+    setLoading(true);
+    fetch(`/php/api/rates/get_all_rates.php?date=${selectedDate}`)
+      .then(res => res.json())
+      .then(data => {
+        setEggRates(data);
         setLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
+      .catch(error => {
+        console.error('Error fetching rates:', error);
         setError(error);
         setLoading(false);
       });
   }, [selectedDate]);
-
-  useEffect(() => {
-    fetchEggRates();
-    fetchCitiesAndStates();
-  }, [selectedDate, fetchEggRates]);
-
-  const fetchCitiesAndStates = () => {
-    fetch('/php/get_states_and_cities.php')
-      .then(response => response.json())
+  
+  // Define fetchCitiesAndStates function to get location data
+  const fetchCitiesAndStates = useCallback(() => {
+    fetch('/php/api/location/get_states_and_cities.php')
+      .then(res => res.json())
       .then(data => {
         const combinedOptions = [];
         const stateOptions = [];
@@ -77,7 +69,17 @@ const AdminPage = ({ setIsAuthenticated }) => {
         setStates(stateOptions);
       })
       .catch(error => console.error('Error fetching states and cities:', error));
-  };
+  }, []);
+
+  // Use fetchEggRates in useEffect instead of duplicate code
+  useEffect(() => {
+    fetchEggRates();
+  }, [fetchEggRates]);
+
+  // Use fetchCitiesAndStates in useEffect
+  useEffect(() => {
+    fetchCitiesAndStates();
+  }, [fetchCitiesAndStates]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -92,7 +94,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
       };
     });
 
-    fetch('/php/update_multiple_rates.php', {
+    fetch('/php/api/rates/update_multiple_rates.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -106,7 +108,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   };
 
   const handleDelete = (rate) => {
-    fetch('/php/delete_rate.php', {
+    fetch('/php/api/rates/delete_rate.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: rate.id }), // Send ID for deletion
@@ -160,7 +162,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   
     const fetchLatestRates = async (cities) => {
       console.log('Fetching latest rates for cities:', cities);
-      const response = await fetch('/php/get_latest_rates.php', {
+      const response = await fetch('/php/api/rates/get_latest_rates.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cities),
@@ -192,7 +194,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   
       console.log('Payload for updating rates:', payload);
   
-      fetch('/php/update_multiple_rates.php', {
+      fetch('/php/api/rates/update_multiple_rates.php', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -211,7 +213,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleAddState = (e) => {
     e.preventDefault();
-    fetch('/php/add_state_city.php', {
+    fetch('/php/api/location/add_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'state', name: newState }),
@@ -230,7 +232,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleAddCity = (e) => {
     e.preventDefault();
-    fetch('/php/add_state_city.php', {
+    fetch('/php/api/location/add_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'city', name: newCity, state: newCityState.value }),
@@ -250,7 +252,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleRemoveState = (e) => {
     e.preventDefault();
-    fetch('/php/remove_state_city.php', {
+    fetch('/php/api/location/remove_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'state', name: removeState }),
@@ -269,7 +271,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleRemoveCity = (e) => {
     e.preventDefault();
-    fetch('/php/remove_state_city.php', {
+    fetch('/php/api/location/remove_state_city.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'city', name: removeCity.label.split(', ')[0], state: removeCityState.value }),
@@ -292,7 +294,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
     setEggRates(updatedRates);
   
     // Send the updated rate to the backend
-    fetch('/php/update_rate.php', {
+    fetch('/php/api/rates/update_rate.php', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(rate),

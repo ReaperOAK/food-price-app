@@ -2,20 +2,20 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
-import Navbar from './Navbar';
-import RateTable from './RateTable';
-import DefaultTable from './DefaultTable';
-import Footer from './Footer';
-import BodyOne from './BodyOne';
-import BodyTwo from './BodyTwo';
-import BodyThree from './BodyThree';
-import StatePage from './StatePage';
-import StateList from './StateList';
-import SpecialRatesTable from './SpecialRatesTable';
-import BlogList from './BlogList';
-import FAQ from './FAQ'; // Import the FAQ component
-import Breadcrumb from './Breadcrumb'; // Import the new Breadcrumb component
-import blogs from '../data/blogs'; // Import the blogs list
+import Navbar from '../components/layout/Navbar';
+import RateTable from '../components/rates/RateTable';
+import DefaultTable from '../components/rates/DefaultTable';
+import Footer from '../components/layout/Footer';
+import BodyOne from '../components/rates/BodyOne';
+import BodyTwo from '../components/rates/BodyTwo';
+import BodyThree from '../components/rates/BodyThree';
+import StatePage from '../components/rates/StatePage';
+import StateList from '../components/rates/StateList';
+import SpecialRatesTable from '../components/rates/SpecialRatesTable';
+import BlogList from '../components/blog/BlogList';
+import FAQ from '../components/common/FAQ';
+import Breadcrumb from '../components/layout/Breadcrumb';
+import blogs from '../data/blogs';
 
 const MainPage = () => {
   const { city: cityParam, state: stateParam } = useParams();
@@ -35,7 +35,7 @@ const MainPage = () => {
   
   // Fetch states on mount
   useEffect(() => {
-    fetch('/php/get_states.php')
+    fetch('/php/api/location/get_states.php')
       .then(res => res.json())
       .then(data => setStates(data))
       .catch(error => console.error('Error fetching states:', error));
@@ -44,7 +44,7 @@ const MainPage = () => {
   // Fetch cities when a state is selected or when the URL changes
   useEffect(() => {
     if (selectedState) {
-      fetch(`/php/get_cities.php?state=${selectedState}`)
+      fetch(`/php/api/location/get_cities.php?state=${selectedState}`)
         .then(res => res.json())
         .then(data => setCities(data))
         .catch(error => console.error('Error fetching cities:', error));
@@ -65,7 +65,7 @@ const MainPage = () => {
       
       setSelectedCity(displayCity);
       
-      fetch(`/php/get_state_for_city.php?city=${displayCity}`)
+      fetch(`/php/api/location/get_state_for_city.php?city=${displayCity}`)
         .then(res => res.json())
         .then(data => {
           if (data.state) {
@@ -80,7 +80,7 @@ const MainPage = () => {
   const handleFetchRates = useCallback(() => {
     if (selectedCity && selectedState) {
       // Fetch rates for selected city and state
-      fetch(`/php/get_rates.php?city=${selectedCity}&state=${selectedState}`)
+      fetch(`/php/api/rates/get_rates.php?city=${selectedCity}&state=${selectedState}`)
         .then(res => res.json())
         .then(data => {
           const convertedData = data.map(item => ({
@@ -92,7 +92,7 @@ const MainPage = () => {
         .catch(error => console.error('Error fetching rates:', error));
     } else {
       // Fetch latest rates when no city/state is selected
-      fetch(`/php/get_latest_rates.php`)
+      fetch(`/php/api/rates/get_latest_rates.php`)
         .then(res => res.json())
         .then(data => {
           const convertedData = data.map(item => ({

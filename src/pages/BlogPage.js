@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import Navbar from '../components/layout/Navbar';
+import Footer from '../components/layout/Footer';
 import blogs from '../data/blogs'; // Import the blogs list
-import BlogList from './BlogList';
+import BlogList from '../components/blog/BlogList';
 
 const BlogPage = () => {
   const { link } = useParams();
