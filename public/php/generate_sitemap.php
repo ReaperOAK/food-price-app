@@ -54,8 +54,8 @@ foreach ($static_pages as $page => $priority) {
 // Get all cities from database
 $cities_query = "SELECT city_name, date FROM egg_rates GROUP BY city_name ORDER BY city_name";
 try {
-    $cities_stmt = $pdo->query($cities_query);
-    while ($city = $cities_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $cities_result = $conn->query($cities_query);
+    while ($city = $cities_result->fetch_assoc()) {
         // Format city name for URL
         $city_url = strtolower(str_replace(' ', '-', $city['city_name'])) . '-egg-rate';
         $url = $baseUrl . '/' . $city_url;
@@ -69,7 +69,7 @@ try {
         
         $txt .= $url . PHP_EOL;
     }
-} catch (PDOException $e) {
+} catch (Exception $e) {
     // Log error but continue
     error_log("Error generating city sitemap entries: " . $e->getMessage());
 }
@@ -77,8 +77,8 @@ try {
 // Get all states from database
 $states_query = "SELECT state_name FROM states ORDER BY state_name";
 try {
-    $states_stmt = $pdo->query($states_query);
-    while ($state = $states_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $states_result = $conn->query($states_query);
+    while ($state = $states_result->fetch_assoc()) {
         // Format state name for URL
         $state_url = 'state/' . strtolower(str_replace(' ', '-', $state['state_name'])) . '-egg-rate';
         $url = $baseUrl . '/' . $state_url;
@@ -92,7 +92,7 @@ try {
         
         $txt .= $url . PHP_EOL;
     }
-} catch (PDOException $e) {
+} catch (Exception $e) {
     // Log error but continue
     error_log("Error generating state sitemap entries: " . $e->getMessage());
 }
@@ -100,9 +100,9 @@ try {
 // Get blog posts if they exist
 $blog_query = "SELECT slug, updated_at FROM blog_posts ORDER BY updated_at DESC";
 try {
-    $blog_stmt = $pdo->query($blog_query);
-    if ($blog_stmt && $blog_stmt->rowCount() > 0) {
-        while ($blog = $blog_stmt->fetch(PDO::FETCH_ASSOC)) {
+    $blog_result = $conn->query($blog_query);
+    if ($blog_result && $blog_result->num_rows > 0) {
+        while ($blog = $blog_result->fetch_assoc()) {
             $url = $baseUrl . '/blog/' . $blog['slug'];
             
             $xml .= '<url>' . PHP_EOL;
@@ -130,7 +130,7 @@ try {
             $txt .= $url . PHP_EOL;
         }
     }
-} catch (PDOException $e) {
+} catch (Exception $e) {
     // Log error but continue
     error_log("Error generating blog sitemap entries: " . $e->getMessage());
     // Add known blog posts from sitemap.txt as fallback
