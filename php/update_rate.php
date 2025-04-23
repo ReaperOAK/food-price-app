@@ -8,16 +8,7 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
-$servername = "localhost";
-$username = "u901337298_test";
-$password = "A12345678b*";
-$dbname = "u901337298_test";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
-}
+require_once 'db.php';
 
 // Get the input data
 $input = file_get_contents('php://input');
@@ -30,19 +21,28 @@ if (isset($data['id']) && isset($data['city']) && isset($data['state']) && isset
     $date = $data['date'];
     $rate = $data['rate'];
 
-    // Update the rate in the database
-    $stmt = $conn->prepare("UPDATE egg_rates SET city = ?, state = ?, date = ?, rate = ? WHERE id = ?");
-    $stmt->bind_param("ssssi", $city, $state, $date, $rate, $id);
-
-    if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
-    } else {
-        echo json_encode(['success' => false, 'error' => $stmt->error]);
+    // Begin transaction
+    $conn->begin_transaction();
+    
+    try {
+        // Update the rate in the original database
+        $stmt = $conn->prepare("UPDATE egg_rates SET city = ?, state = ?, date = ?, rate = ? WHERE id = ?");
+        $stmt->bind_param("sssdi", $city, $state, $date, $rate, $id);
+        $stmt->execute();
+        
+        // Also update in normalized structure
+        if (updateEggRate($conn, $city, $state, $date, $rate)) {
+            $conn->commit();
+            echo json_encode(['success' => true, 'message' => 'Rate updated in both original and normalized tables']);
+        } else {
+            throw new Exception("Failed to update normalized tables");
+        }
+    } catch (Exception $e) {
+        $conn->rollback();
+        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
     }
-
-    $stmt->close();
 } else {
-    echo json_encode(['success' => false, 'error' => 'Invalid input']);
+    echo json_encode(['success' => false, 'error' => 'Invalid input - missing required fields']);
 }
 
 $conn->close();

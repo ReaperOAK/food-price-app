@@ -60,122 +60,84 @@ foreach ($static_pages as $page => $priority) {
     $txt .= $url . PHP_EOL;
 }
 
-// Get distinct cities and states from egg_rates table
-$cities_query = "SELECT DISTINCT city as city_name, state as state_name, MAX(date) as date FROM egg_rates GROUP BY city, state ORDER BY city";
-
+// Get distinct cities and states - try using normalized tables first
 try {
+    $cities_query = "
+        SELECT DISTINCT c.name as city_name, s.name as state_name, MAX(ern.date) as date 
+        FROM egg_rates_normalized ern
+        JOIN cities c ON ern.city_id = c.id
+        JOIN states s ON c.state_id = s.id
+        GROUP BY c.name, s.name
+        ORDER BY c.name
+    ";
+    
     $cities_result = $conn->query($cities_query);
-    if ($cities_result && $cities_result->num_rows > 0) {
-        // Create an array to track unique states
-        $unique_states = [];
-        
-        while ($row = $cities_result->fetch_assoc()) {
-            // Add city URL
-            $city_url = strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate';
-            $url = $baseUrl . '/' . $city_url;
-            
-            $xml .= '<url>' . PHP_EOL;
-            $xml .= '  <loc>' . $url . '</loc>' . PHP_EOL;
-            $xml .= '  <lastmod>' . date('Y-m-d', strtotime($row['date'])) . '</lastmod>' . PHP_EOL;
-            $xml .= '  <changefreq>daily</changefreq>' . PHP_EOL;
-            $xml .= '  <priority>0.9</priority>' . PHP_EOL;
-            $xml .= '</url>' . PHP_EOL;
-            
-            $txt .= $url . PHP_EOL;
-            $city_count++;
-            
-            // Track unique states
-            if (!isset($unique_states[$row['state_name']])) {
-                $unique_states[$row['state_name']] = true;
-                
-                // Add state URL
-                $state_url = 'state/' . strtolower(str_replace(' ', '-', $row['state_name'])) . '-egg-rate';
-                $state_full_url = $baseUrl . '/' . $state_url;
-                
-                $xml .= '<url>' . PHP_EOL;
-                $xml .= '  <loc>' . $state_full_url . '</loc>' . PHP_EOL;
-                $xml .= '  <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
-                $xml .= '  <changefreq>daily</changefreq>' . PHP_EOL;
-                $xml .= '  <priority>0.8</priority>' . PHP_EOL;
-                $xml .= '</url>' . PHP_EOL;
-                
-                $txt .= $state_full_url . PHP_EOL;
-                $state_count++;
-            }
-            
-            // Also add the webstory URL for this city if it exists
-            $webstory_path = $basePath . '/webstories/' . strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate.html';
-            if (file_exists($webstory_path)) {
-                $webstory_url = $baseUrl . '/webstory/' . strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate';
-                
-                $xml .= '<url>' . PHP_EOL;
-                $xml .= '  <loc>' . $webstory_url . '</loc>' . PHP_EOL;
-                $xml .= '  <lastmod>' . date('Y-m-d', filemtime($webstory_path)) . '</lastmod>' . PHP_EOL;
-                $xml .= '  <changefreq>daily</changefreq>' . PHP_EOL;
-                $xml .= '  <priority>0.8</priority>' . PHP_EOL;
-                $xml .= '</url>' . PHP_EOL;
-                
-                $txt .= $webstory_url . PHP_EOL;
-            }
-        }
-    } else {
-        // No cities found in database, add some fallback cities
-        error_log("No cities found in the database, adding fallback cities");
-        $fallback_cities = [
-            'hyderabad' => 'Telangana',
-            'vijayawada' => 'Andhra Pradesh',
-            'namakkal' => 'Tamil Nadu',
-            'barwala' => 'Haryana',
-            'delhi' => 'Delhi',
-            'mumbai' => 'Maharashtra',
-            'pune' => 'Maharashtra',
-            'bangalore' => 'Karnataka',
-            'chennai' => 'Tamil Nadu'
-        ];
-        
-        $unique_states = [];
-        
-        foreach ($fallback_cities as $city => $state) {
-            // Add city URL
-            $city_url = $city . '-egg-rate';
-            $url = $baseUrl . '/' . $city_url;
-            
-            $xml .= '<url>' . PHP_EOL;
-            $xml .= '  <loc>' . $url . '</loc>' . PHP_EOL;
-            $xml .= '  <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
-            $xml .= '  <changefreq>daily</changefreq>' . PHP_EOL;
-            $xml .= '  <priority>0.9</priority>' . PHP_EOL;
-            $xml .= '</url>' . PHP_EOL;
-            
-            $txt .= $url . PHP_EOL;
-            $city_count++;
-            
-            // Track unique states
-            if (!isset($unique_states[$state])) {
-                $unique_states[$state] = true;
-                
-                // Add state URL
-                $state_url = 'state/' . strtolower(str_replace(' ', '-', $state)) . '-egg-rate';
-                $state_full_url = $baseUrl . '/' . $state_url;
-                
-                $xml .= '<url>' . PHP_EOL;
-                $xml .= '  <loc>' . $state_full_url . '</loc>' . PHP_EOL;
-                $xml .= '  <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
-                $xml .= '  <changefreq>daily</changefreq>' . PHP_EOL;
-                $xml .= '  <priority>0.8</priority>' . PHP_EOL;
-                $xml .= '</url>' . PHP_EOL;
-                
-                $txt .= $state_full_url . PHP_EOL;
-                $state_count++;
-            }
-        }
+    
+    if (!$cities_result || $cities_result->num_rows === 0) {
+        throw new Exception("No results from normalized tables");
     }
 } catch (Exception $e) {
-    // Log error but continue
-    error_log("Error generating city/state sitemap entries: " . $e->getMessage());
+    // Fall back to original table on error
+    $cities_query = "SELECT DISTINCT city as city_name, state as state_name, MAX(date) as date FROM egg_rates GROUP BY city, state ORDER BY city";
+    $cities_result = $conn->query($cities_query);
+}
+
+if ($cities_result && $cities_result->num_rows > 0) {
+    // Create an array to track unique states
+    $unique_states = [];
     
-    // Add fallback cities if database query fails
-    error_log("Database query failed, adding fallback cities");
+    while ($row = $cities_result->fetch_assoc()) {
+        // Add city URL
+        $city_url = strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate';
+        $url = $baseUrl . '/' . $city_url;
+        
+        $xml .= '<url>' . PHP_EOL;
+        $xml .= '  <loc>' . $url . '</loc>' . PHP_EOL;
+        $xml .= '  <lastmod>' . date('Y-m-d', strtotime($row['date'])) . '</lastmod>' . PHP_EOL;
+        $xml .= '  <changefreq>daily</changefreq>' . PHP_EOL;
+        $xml .= '  <priority>0.9</priority>' . PHP_EOL;
+        $xml .= '</url>' . PHP_EOL;
+        
+        $txt .= $url . PHP_EOL;
+        $city_count++;
+        
+        // Track unique states
+        if (!isset($unique_states[$row['state_name']])) {
+            $unique_states[$row['state_name']] = true;
+            
+            // Add state URL
+            $state_url = 'state/' . strtolower(str_replace(' ', '-', $row['state_name'])) . '-egg-rate';
+            $state_full_url = $baseUrl . '/' . $state_url;
+            
+            $xml .= '<url>' . PHP_EOL;
+            $xml .= '  <loc>' . $state_full_url . '</loc>' . PHP_EOL;
+            $xml .= '  <lastmod>' . date('Y-m-d') . '</lastmod>' . PHP_EOL;
+            $xml .= '  <changefreq>daily</changefreq>' . PHP_EOL;
+            $xml .= '  <priority>0.8</priority>' . PHP_EOL;
+            $xml .= '</url>' . PHP_EOL;
+            
+            $txt .= $state_full_url . PHP_EOL;
+            $state_count++;
+        }
+        
+        // Also add the webstory URL for this city if it exists
+        $webstory_path = $basePath . '/webstories/' . strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate.html';
+        if (file_exists($webstory_path)) {
+            $webstory_url = $baseUrl . '/webstory/' . strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate';
+            
+            $xml .= '<url>' . PHP_EOL;
+            $xml .= '  <loc>' . $webstory_url . '</loc>' . PHP_EOL;
+            $xml .= '  <lastmod>' . date('Y-m-d', filemtime($webstory_path)) . '</lastmod>' . PHP_EOL;
+            $xml .= '  <changefreq>daily</changefreq>' . PHP_EOL;
+            $xml .= '  <priority>0.8</priority>' . PHP_EOL;
+            $xml .= '</url>' . PHP_EOL;
+            
+            $txt .= $webstory_url . PHP_EOL;
+        }
+    }
+} else {
+    // No cities found in database, add some fallback cities
+    error_log("No cities found in the database, adding fallback cities");
     $fallback_cities = [
         'hyderabad' => 'Telangana',
         'vijayawada' => 'Andhra Pradesh',

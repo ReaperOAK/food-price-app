@@ -4,46 +4,74 @@ ini_set('display_errors', 1);
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
-
-
 header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
 
-$servername = "localhost";
-$username = "u901337298_test";
-$password = "A12345678b*";
-$dbname = "u901337298_test";
+require_once 'db.php';
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die(json_encode(['error' => 'Connection failed: ' . $conn->connect_error]));
-}
-
-// Fetch states and cities
-$sql = "SELECT state, city FROM egg_rates";
-$result = $conn->query($sql);
-
+// Try to use normalized tables first
+$useNormalizedTables = true;
 $statesAndCities = [];
 
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $state = $row['state'];
-        $city = $row['city'];
+try {
+    if ($useNormalizedTables) {
+        // Get all states
+        $statesSql = "SELECT id, name FROM states ORDER BY name";
+        $statesResult = $conn->query($statesSql);
         
-        if (!isset($statesAndCities[$state])) {
-            $statesAndCities[$state] = [];
+        if ($statesResult && $statesResult->num_rows > 0) {
+            while ($stateRow = $statesResult->fetch_assoc()) {
+                $stateId = $stateRow['id'];
+                $stateName = $stateRow['name'];
+                
+                // Get cities for this state
+                $citiesSql = "SELECT name FROM cities WHERE state_id = ? ORDER BY name";
+                $stmt = $conn->prepare($citiesSql);
+                $stmt->bind_param("i", $stateId);
+                $stmt->execute();
+                $citiesResult = $stmt->get_result();
+                
+                $cities = [];
+                while ($cityRow = $citiesResult->fetch_assoc()) {
+                    $cities[] = $cityRow['name'];
+                }
+                
+                $statesAndCities[$stateName] = $cities;
+            }
+        } else {
+            $useNormalizedTables = false;
         }
-        
-        $statesAndCities[$state][] = $city;
     }
+} catch (Exception $e) {
+    $useNormalizedTables = false;
+    error_log("Error using normalized tables: " . $e->getMessage());
+}
+
+// Fall back to original tables if needed
+if (!$useNormalizedTables) {
+    $sql = "SELECT state, city FROM egg_rates";
+    $result = $conn->query($sql);
+    
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $state = $row['state'];
+            $city = $row['city'];
+            
+            if (!isset($statesAndCities[$state])) {
+                $statesAndCities[$state] = [];
+            }
+            
+            if (!in_array($city, $statesAndCities[$state])) {
+                $statesAndCities[$state][] = $city;
+            }
+        }
+    }
+}
+
+if (!empty($statesAndCities)) {
     echo json_encode($statesAndCities);
 } else {
     echo json_encode(['error' => 'No data found']);
 }
 
-// Close connection
 $conn->close();
 ?>

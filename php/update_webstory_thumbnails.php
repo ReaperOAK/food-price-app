@@ -45,9 +45,24 @@ if (is_dir($imageDir)) {
 // Database connection
 include 'db.php';
 
-// Get all cities from database
-$sql = "SELECT DISTINCT city FROM egg_rates ORDER BY city";
-$result = $conn->query($sql);
+// Get all cities from database - try normalized tables first
+try {
+    $sql = "
+        SELECT DISTINCT c.name AS city 
+        FROM cities c
+        JOIN states s ON c.state_id = s.id
+        ORDER BY c.name
+    ";
+    $result = $conn->query($sql);
+    
+    if (!$result || $result->num_rows === 0) {
+        throw new Exception("No results from normalized tables");
+    }
+} catch (Exception $e) {
+    // Fall back to original table
+    $sql = "SELECT DISTINCT city FROM egg_rates ORDER BY city";
+    $result = $conn->query($sql);
+}
 
 if ($result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {

@@ -74,19 +74,51 @@ $today = date('Y-m-d');
 $daysToKeep = 3;
 deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
 
-// Get the latest egg rates
-$sql = "
-    SELECT city, state, rate, date 
-    FROM egg_rates 
-    WHERE (city, date) IN (
-        SELECT city, MAX(date) 
-        FROM egg_rates 
-        GROUP BY city
-    )
-    ORDER BY city
-";
+// Get the latest egg rates - use the normalized tables first
+try {
+    $sql = "
+        SELECT c.name as city, s.name as state, ern.rate, ern.date 
+        FROM egg_rates_normalized ern
+        JOIN cities c ON ern.city_id = c.id
+        JOIN states s ON c.state_id = s.id
+        WHERE (ern.city_id, ern.date) IN (
+            SELECT city_id, MAX(date)
+            FROM egg_rates_normalized
+            GROUP BY city_id
+        )
+        ORDER BY c.name
+    ";
 
-$result = $conn->query($sql);
+    $result = $conn->query($sql);
+    
+    if (!$result || $result->num_rows === 0) {
+        // Fall back to original table
+        $sql = "
+            SELECT city, state, rate, date 
+            FROM egg_rates 
+            WHERE (city, date) IN (
+                SELECT city, MAX(date) 
+                FROM egg_rates 
+                GROUP BY city
+            )
+            ORDER BY city
+        ";
+        $result = $conn->query($sql);
+    }
+} catch (Exception $e) {
+    // Fall back to original table on error
+    $sql = "
+        SELECT city, state, rate, date 
+        FROM egg_rates 
+        WHERE (city, date) IN (
+            SELECT city, MAX(date) 
+            FROM egg_rates 
+            GROUP BY city
+        )
+        ORDER BY city
+    ";
+    $result = $conn->query($sql);
+}
 
 if ($result->num_rows > 0) {
     $storiesGenerated = 0;
@@ -246,19 +278,40 @@ function generateThumbnail($imageDir, $city, $citySlug, $sourceImage) {
 function generateWebStoryIndex($storiesDir, $conn) {
     $indexFile = $storiesDir . '/index.html';
     
-    // Get the latest egg rates for all cities
-    $sql = "
-        SELECT city, state, rate, date 
-        FROM egg_rates 
-        WHERE (city, date) IN (
-            SELECT city, MAX(date) 
+    // Try normalized table first for getting latest egg rates
+    try {
+        $sql = "
+            SELECT c.name as city, s.name as state, ern.rate, ern.date 
+            FROM egg_rates_normalized ern
+            JOIN cities c ON ern.city_id = c.id
+            JOIN states s ON c.state_id = s.id
+            WHERE (ern.city_id, ern.date) IN (
+                SELECT city_id, MAX(date)
+                FROM egg_rates_normalized
+                GROUP BY city_id
+            )
+            ORDER BY c.name
+        ";
+        
+        $result = $conn->query($sql);
+        
+        if (!$result || $result->num_rows === 0) {
+            throw new Exception("No results from normalized table");
+        }
+    } catch (Exception $e) {
+        // Fall back to original table
+        $sql = "
+            SELECT city, state, rate, date 
             FROM egg_rates 
-            GROUP BY city
-        )
-        ORDER BY city
-    ";
-    
-    $result = $conn->query($sql);
+            WHERE (city, date) IN (
+                SELECT city, MAX(date) 
+                FROM egg_rates 
+                GROUP BY city
+            )
+            ORDER BY city
+        ";
+        $result = $conn->query($sql);
+    }
     
     $html = '<!DOCTYPE html>
 <html lang="en">

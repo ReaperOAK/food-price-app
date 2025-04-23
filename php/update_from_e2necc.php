@@ -5,20 +5,10 @@ header('Content-Type: application/json');
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
-ini_set('error_log', '/path/to/error.log'); // Update with the correct path to your error log file
+ini_set('error_log', '/error.log'); // Update with the correct path to your error log file
 
 // Database connection
-$servername = "localhost";
-$username = "u901337298_test";
-$password = "A12345678b*";
-$dbname = "u901337298_test";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    error_log("Connection failed: " . $conn->connect_error);
-    die(json_encode(['error' => "Connection failed: " . $conn->connect_error]));
-}
+require_once 'db.php';
 
 // Set a timeout for the HTTP request
 $context = stream_context_create([
@@ -35,67 +25,64 @@ if ($response !== false) {
     $data = json_decode($response, true);
 
     if (isset($data['rows']) && is_array($data['rows'])) {
-        // Insert or update data in the database
-        foreach ($data['rows'] as $row) {
-            $city = $row['city'];
-            $state = $row['state'];
-            $date = $row['date'];
-            $rate = $row['rate'];
-
-            // Clean city name
-            $city = preg_replace('/\s*\(.*?\)\s*/', '', $city);
-            $city = trim($city);
+        // Begin transaction
+        $conn->begin_transaction();
+        
+        try {
+            $updatedCount = 0;
+            $errors = [];
             
-            // Standardize city names with consistent capitalization
-            if (strtolower($city) === 'bangalore' || strtolower($city) === 'bengaluru') {
-                $city = 'Bengaluru'; // Always use this capitalization
-            }
-
-            // Check if data for today already exists
-            $checkQuery = "SELECT * FROM egg_rates WHERE city = ? AND date = ?";
-            $stmt = $conn->prepare($checkQuery);
-            if (!$stmt) {
-                error_log("Prepare failed: " . $conn->error);
-                die(json_encode(['error' => "Prepare failed: " . $conn->error]));
-            }
-            $stmt->bind_param("ss", $city, $date);
+            // Clear the updated_cities table for today's date
+            $today = date('Y-m-d');
+            $stmt = $conn->prepare("DELETE FROM updated_cities WHERE date = ?");
+            $stmt->bind_param("s", $today);
             $stmt->execute();
-            $result = $stmt->get_result();
+            
+            // Insert or update data in the database
+            foreach ($data['rows'] as $row) {
+                $city = $row['city'];
+                $state = $row['state'];
+                $date = $row['date'];
+                $rate = $row['rate'];
 
-            if ($result->num_rows == 0) {
-                // Insert new data
-                $insertQuery = "INSERT INTO egg_rates (city, state, date, rate) VALUES (?, ?, ?, ?)";
-                $stmt = $conn->prepare($insertQuery);
-                if (!$stmt) {
-                    error_log("Prepare failed: " . $conn->error);
-                    die(json_encode(['error' => "Prepare failed: " . $conn->error]));
+                // Clean city name
+                $city = preg_replace('/\s*\(.*?\)\s*/', '', $city);
+                $city = trim($city);
+                
+                // Standardize city names with consistent capitalization
+                if (strtolower($city) === 'bangalore' || strtolower($city) === 'bengaluru') {
+                    $city = 'Bengaluru'; // Always use this capitalization
                 }
-                $stmt->bind_param("ssss", $city, $state, $date, $rate);
-                $stmt->execute();
-            } else {
-                // Update existing data
-                $updateQuery = "UPDATE egg_rates SET rate = ? WHERE city = ? AND date = ?";
-                $stmt = $conn->prepare($updateQuery);
-                if (!$stmt) {
-                    error_log("Prepare failed: " . $conn->error);
-                    die(json_encode(['error' => "Prepare failed: " . $conn->error]));
-                }
-                $stmt->bind_param("sss", $rate, $city, $date);
-                $stmt->execute();
-            }
 
-            // Track updated cities
-            $trackQuery = "INSERT INTO updated_cities (city, state, date, rate) VALUES (?, ?, ?, ?)";
-            $stmt = $conn->prepare($trackQuery);
-            if (!$stmt) {
-                error_log("Prepare failed: " . $conn->error);
-                die(json_encode(['error' => "Prepare failed: " . $conn->error]));
+                // Update egg rates in both original and normalized tables
+                if (updateEggRate($conn, $city, $state, $date, $rate)) {
+                    $updatedCount++;
+                    
+                    // Track updated cities
+                    $stmt = $conn->prepare("INSERT INTO updated_cities (city, state, date, rate) VALUES (?, ?, ?, ?)");
+                    $stmt->bind_param("sssd", $city, $state, $date, $rate);
+                    $stmt->execute();
+                } else {
+                    $errors[] = "Failed to update rate for $city, $state";
+                }
             }
-            $stmt->bind_param("ssss", $city, $state, $date, $rate);
-            $stmt->execute();
+            
+            // Commit transaction
+            $conn->commit();
+            
+            echo json_encode([
+                'status' => 'success', 
+                'message' => 'Data updated successfully',
+                'updated' => $updatedCount,
+                'errors' => $errors
+            ]);
+            
+        } catch (Exception $e) {
+            // Rollback on error
+            $conn->rollback();
+            error_log("Error updating data: " . $e->getMessage());
+            echo json_encode(['error' => 'Transaction failed: ' . $e->getMessage()]);
         }
-
-        echo json_encode(['status' => 'success', 'message' => 'Data updated successfully']);
     } else {
         error_log("Invalid data format");
         echo json_encode(['error' => 'Invalid data format']);

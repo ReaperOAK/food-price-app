@@ -8,16 +8,7 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
-$servername = "localhost";
-$username = "u901337298_test";
-$password = "A12345678b*";
-$dbname = "u901337298_test";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
-}
+require_once 'db.php';
 
 // Get the JSON payload
 $data = json_decode(file_get_contents('php://input'), true);
@@ -31,19 +22,94 @@ $type = $data['type'];
 $name = $conn->real_escape_string($data['name']);
 $state = isset($data['state']) ? $conn->real_escape_string($data['state']) : null;
 
-if ($type === 'state') {
-    $sql = "DELETE FROM egg_rates WHERE state='$name'";
-} else if ($type === 'city' && $state) {
-    $sql = "DELETE FROM egg_rates WHERE city='$name' AND state='$state'";
-} else {
-    echo json_encode(["error" => "Invalid data provided"]);
-    exit();
-}
+// Begin transaction
+$conn->begin_transaction();
 
-if ($conn->query($sql) === TRUE) {
-    echo json_encode(["success" => "$type removed successfully"]);
-} else {
-    echo json_encode(["error" => "Error removing $type: " . $conn->error]);
+try {
+    if ($type === 'state') {
+        // First, delete from the original table
+        $stmt = $conn->prepare("DELETE FROM egg_rates WHERE state = ?");
+        $stmt->bind_param("s", $name);
+        $stmt->execute();
+        
+        // Get state ID
+        $stmt = $conn->prepare("SELECT id FROM states WHERE name = ?");
+        $stmt->bind_param("s", $name);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $stateId = $result->fetch_assoc()['id'];
+            
+            // Get all cities in this state
+            $stmt = $conn->prepare("SELECT id FROM cities WHERE state_id = ?");
+            $stmt->bind_param("i", $stateId);
+            $stmt->execute();
+            $citiesResult = $stmt->get_result();
+            
+            while ($cityRow = $citiesResult->fetch_assoc()) {
+                $cityId = $cityRow['id'];
+                
+                // Delete from egg_rates_normalized for this city
+                $stmt = $conn->prepare("DELETE FROM egg_rates_normalized WHERE city_id = ?");
+                $stmt->bind_param("i", $cityId);
+                $stmt->execute();
+            }
+            
+            // Delete all cities in this state
+            $stmt = $conn->prepare("DELETE FROM cities WHERE state_id = ?");
+            $stmt->bind_param("i", $stateId);
+            $stmt->execute();
+            
+            // Finally, delete the state
+            $stmt = $conn->prepare("DELETE FROM states WHERE id = ?");
+            $stmt->bind_param("i", $stateId);
+            $stmt->execute();
+        }
+    } else if ($type === 'city' && $state) {
+        // First, delete from the original table
+        $stmt = $conn->prepare("DELETE FROM egg_rates WHERE city = ? AND state = ?");
+        $stmt->bind_param("ss", $name, $state);
+        $stmt->execute();
+        
+        // Get state ID
+        $stmt = $conn->prepare("SELECT id FROM states WHERE name = ?");
+        $stmt->bind_param("s", $state);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if ($result->num_rows > 0) {
+            $stateId = $result->fetch_assoc()['id'];
+            
+            // Get city ID
+            $stmt = $conn->prepare("SELECT id FROM cities WHERE name = ? AND state_id = ?");
+            $stmt->bind_param("si", $name, $stateId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                $cityId = $result->fetch_assoc()['id'];
+                
+                // Delete from egg_rates_normalized
+                $stmt = $conn->prepare("DELETE FROM egg_rates_normalized WHERE city_id = ?");
+                $stmt->bind_param("i", $cityId);
+                $stmt->execute();
+                
+                // Delete the city
+                $stmt = $conn->prepare("DELETE FROM cities WHERE id = ?");
+                $stmt->bind_param("i", $cityId);
+                $stmt->execute();
+            }
+        }
+    } else {
+        throw new Exception("Invalid data provided");
+    }
+    
+    $conn->commit();
+    echo json_encode(["success" => "$type removed successfully from both original and normalized tables"]);
+} catch (Exception $e) {
+    $conn->rollback();
+    echo json_encode(["error" => "Error removing $type: " . $e->getMessage()]);
 }
 
 $conn->close();

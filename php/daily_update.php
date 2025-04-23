@@ -8,23 +8,17 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
-$servername = "localhost";
-$username = "u901337298_test";
-$password = "A12345678b*";
-$dbname = "u901337298_test";
-
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
-}
+require_once 'db.php';
 
 // Get today's date
 $today = date('Y-m-d');
 
 // Fetch the cities updated by update_from_e2necc.php
-$updatedCitiesQuery = "SELECT city, state, rate FROM updated_cities WHERE date = '$today'";
-$updatedCitiesResult = $conn->query($updatedCitiesQuery);
+$updatedCitiesQuery = "SELECT city, state, rate FROM updated_cities WHERE date = ?";
+$stmt = $conn->prepare($updatedCitiesQuery);
+$stmt->bind_param("s", $today);
+$stmt->execute();
+$updatedCitiesResult = $stmt->get_result();
 
 $updatedCities = [];
 $stateRates = [];
@@ -46,81 +40,99 @@ foreach ($stateRates as $state => $rates) {
     $stateAverageRates[$state] = array_sum($rates) / count($rates);
 }
 
-// Fetch the cities that were not updated by update_from_e2necc.php
-$sql = "
-    SELECT city, state
-    FROM egg_rates
-    WHERE city NOT IN ('" . implode("','", $updatedCities) . "')
-    GROUP BY city, state
-";
-
-$result = $conn->query($sql);
-
-if ($result->num_rows > 0) {
+// Try to use normalized tables first
+try {
+    $conn->begin_transaction();
+    
+    // Get all cities that need updates (not in updated_cities)
+    $sql = "
+        SELECT c.id AS city_id, c.name AS city, s.id AS state_id, s.name AS state
+        FROM cities c
+        JOIN states s ON c.state_id = s.id
+        WHERE c.name NOT IN ('" . implode("','", $updatedCities) . "')
+    ";
+    
+    $result = $conn->query($sql);
+    $updateCount = 0;
     $errors = [];
-    while ($row = $result->fetch_assoc()) {
-        $city = $conn->real_escape_string($row['city']);
-        $state = $conn->real_escape_string($row['state']);
-        
-        // Check if the state has an average rate calculated
-        if (isset($stateAverageRates[$state])) {
-            $rate = $stateAverageRates[$state]; // Use the state average rate
-        } else {
-            // If no average rate is available, use the last available rate
-            $lastAvailableRate = null;
-            $dateToCheck = strtotime('-1 day', strtotime($today));
-
-            while (!$lastAvailableRate) {
-                $previousDay = date('Y-m-d', $dateToCheck);
-                $previousRateSql = "SELECT rate FROM egg_rates WHERE city='$city' AND state='$state' AND date='$previousDay'";
-                $previousRateResult = $conn->query($previousRateSql);
-
-                if ($previousRateResult->num_rows > 0) {
-                    $previousRateRow = $previousRateResult->fetch_assoc();
-                    $lastAvailableRate = $previousRateRow['rate'];
+    
+    if ($result && $result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $cityId = $row['city_id'];
+            $city = $row['city'];
+            $stateId = $row['state_id'];
+            $state = $row['state'];
+            
+            // Check if the state has an average rate calculated
+            if (isset($stateAverageRates[$state])) {
+                $rate = $stateAverageRates[$state]; // Use the state average rate
+            } else {
+                // If no average rate is available, use the last available rate
+                $lastRateSql = "
+                    SELECT rate 
+                    FROM egg_rates_normalized 
+                    WHERE city_id = ? 
+                    ORDER BY date DESC 
+                    LIMIT 1
+                ";
+                $stmt = $conn->prepare($lastRateSql);
+                $stmt->bind_param("i", $cityId);
+                $stmt->execute();
+                $lastRateResult = $stmt->get_result();
+                
+                if ($lastRateResult->num_rows > 0) {
+                    $lastRateRow = $lastRateResult->fetch_assoc();
+                    $rate = $lastRateRow['rate'];
                 } else {
-                    $dateToCheck = strtotime('-1 day', $dateToCheck);
-                    if ($dateToCheck < strtotime('-30 days', strtotime($today))) {
-                        // Break the loop if no rate is found within the last 30 days
-                        break;
+                    // No rate found, check the original table
+                    $fallbackSql = "
+                        SELECT rate
+                        FROM egg_rates
+                        WHERE city = ? AND state = ?
+                        ORDER BY date DESC
+                        LIMIT 1
+                    ";
+                    $stmt = $conn->prepare($fallbackSql);
+                    $stmt->bind_param("ss", $city, $state);
+                    $stmt->execute();
+                    $fallbackResult = $stmt->get_result();
+                    
+                    if ($fallbackResult->num_rows > 0) {
+                        $fallbackRow = $fallbackResult->fetch_assoc();
+                        $rate = $fallbackRow['rate'];
+                    } else {
+                        $errors[] = "No available rate found for $city, $state";
+                        continue;
                     }
                 }
             }
-
-            if ($lastAvailableRate) {
-                $rate = $lastAvailableRate;
+            
+            // Update in both tables using the helper function
+            if (updateEggRate($conn, $city, $state, $today, $rate)) {
+                $updateCount++;
             } else {
-                $errors[] = "No available rate found for $city, $state within the last 30 days";
-                continue;
-            }
-        }
-
-        // Check if the rate already exists for today's date
-        $checkSql = "SELECT * FROM egg_rates WHERE city='$city' AND state='$state' AND date='$today'";
-        $checkResult = $conn->query($checkSql);
-
-        if ($checkResult->num_rows > 0) {
-            // Update existing rate for today's date
-            $updateSql = "UPDATE egg_rates SET rate='$rate' WHERE city='$city' AND state='$state' AND date='$today'";
-            if (!$conn->query($updateSql)) {
-                $errors[] = "Error updating rate for $city, $state: " . $conn->error;
-            }
-        } else {
-            // Insert new rate for today's date
-            $insertSql = "INSERT INTO egg_rates (city, state, date, rate) VALUES ('$city', '$state', '$today', '$rate')";
-            if (!$conn->query($insertSql)) {
-                $errors[] = "Error inserting rate for $city, $state: " . $conn->error;
+                $errors[] = "Error updating rate for $city, $state";
             }
         }
     }
-
+    
+    $conn->commit();
+    
     if (empty($errors)) {
-        echo json_encode(["success" => "Rates updated successfully"]);
+        echo json_encode([
+            "success" => "Rates updated successfully",
+            "count" => $updateCount
+        ]);
     } else {
-        echo json_encode(["errors" => $errors]);
+        echo json_encode([
+            "partial_success" => "Some rates were updated",
+            "count" => $updateCount,
+            "errors" => $errors
+        ]);
     }
-} else {
-    echo json_encode(["message" => "No rates found"]);
+} catch (Exception $e) {
+    $conn->rollback();
+    echo json_encode(["error" => "Update failed: " . $e->getMessage()]);
 }
 
 $conn->close();

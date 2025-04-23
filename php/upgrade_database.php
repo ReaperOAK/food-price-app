@@ -94,7 +94,39 @@ try {
     // Begin transaction for data migration
     $conn->begin_transaction();
     
-    // Extract INSERT statements
+    // First, populate the states table
+    $stmt = $conn->prepare("INSERT IGNORE INTO states (name) SELECT DISTINCT state FROM egg_rates");
+    if (!$stmt->execute()) {
+        throw new Exception("Error populating states table: " . $stmt->error);
+    }
+    echo "Populated states table\n";
+    
+    // Next, populate the cities table
+    $stmt = $conn->prepare("
+        INSERT IGNORE INTO cities (name, state_id)
+        SELECT DISTINCT er.city, s.id
+        FROM egg_rates er
+        JOIN states s ON er.state = s.name
+    ");
+    if (!$stmt->execute()) {
+        throw new Exception("Error populating cities table: " . $stmt->error);
+    }
+    echo "Populated cities table\n";
+    
+    // Finally, populate the egg_rates_normalized table
+    $stmt = $conn->prepare("
+        INSERT IGNORE INTO egg_rates_normalized (city_id, date, rate)
+        SELECT c.id, er.date, er.rate
+        FROM egg_rates er
+        JOIN states s ON er.state = s.name
+        JOIN cities c ON er.city = c.name AND c.state_id = s.id
+    ");
+    if (!$stmt->execute()) {
+        throw new Exception("Error populating egg_rates_normalized table: " . $stmt->error);
+    }
+    echo "Populated egg_rates_normalized table\n";
+    
+    // Extract INSERT statements from SQL file and execute them
     preg_match_all('/INSERT IGNORE INTO (.*?);/s', $sqlScript, $insertMatches);
     
     foreach ($insertMatches[0] as $insertQuery) {
