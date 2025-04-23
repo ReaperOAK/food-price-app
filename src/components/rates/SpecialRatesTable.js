@@ -4,7 +4,7 @@ const SpecialRatesTable = () => {
   const [specialRates, setSpecialRates] = useState([]);
 
   useEffect(() => {
-    fetch('/php/get_special_rates.php')
+    fetch('/php/api/rates/get_special_rates.php')
       .then(response => response.json())
       .then(data => {
         setSpecialRates(data);

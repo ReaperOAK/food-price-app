@@ -9,7 +9,7 @@ const EggRates = () => {
   const [eggRates, setEggRates] = useState([]);
 
   useEffect(() => {
-    fetch('../php/api/rates/get_rates.php?city=Barwala&state=Haryana&days=7')
+    fetch('/php/api/rates/get_rates.php?city=Barwala&state=Haryana&days=7')
       .then(response => response.json())
       .then(data => {
         setEggRates(data);
