@@ -28,7 +28,7 @@ function runScript($scriptPath, $taskName) {
     }
     
     // Add some delay between tasks to reduce server load
-    sleep(25);
+    sleep(10);
 }
 
 // Base directory
