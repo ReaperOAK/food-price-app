@@ -3,13 +3,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Database connection
-include 'db.php';
+include dirname(__DIR__) . '/config/db.php';
 
 // Include the function to delete old web stories
-include_once 'delete_old_webstories.php';
+include_once __DIR__ . '/delete_old_webstories.php';
 
 // Configuration - use absolute paths to avoid permission issues
-$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
 $storiesDir = $basePath . '/webstories';
 $imageDir = $basePath . '/images/webstories';
 $templateFile = $basePath . '/templates/webstory_template.html';

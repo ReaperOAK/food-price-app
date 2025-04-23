@@ -4,11 +4,11 @@ ini_set('display_errors', 1);
 
 // Only include db.php if this script is called directly, not when included in another file
 if (!function_exists('deleteOldWebStories')) {
-    include 'db.php';
+    include dirname(__DIR__) . '/config/db.php';
 }
 
 // Configuration with absolute paths
-$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
 $storiesDir = $basePath . '/webstories';
 $imageDir = $basePath . '/images/webstories';
 $daysToKeep = 3; // Number of days to keep web stories
@@ -105,7 +105,7 @@ function deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, $closeC
 
 // Only run the script if called directly, not when included
 if (basename($_SERVER['SCRIPT_FILENAME']) == basename(__FILE__)) {
-    $basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+    $basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
     $storiesDir = $basePath . '/webstories';
     $imageDir = $basePath . '/images/webstories';
     

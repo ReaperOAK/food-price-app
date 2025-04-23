@@ -7,7 +7,7 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
-require_once 'db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
 
 // Get the date parameter from the query string
 $date = isset($_GET['date']) ? $conn->real_escape_string($_GET['date']) : null;

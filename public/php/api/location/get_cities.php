@@ -2,7 +2,7 @@
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
-require_once 'db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
 
 // Get the selected state from the query parameter
 $state = isset($_GET['state']) ? $_GET['state'] : '';

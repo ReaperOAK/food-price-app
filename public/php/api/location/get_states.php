@@ -2,7 +2,7 @@
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 
-require_once 'db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
 
 // Try to use the normalized table first
 try {

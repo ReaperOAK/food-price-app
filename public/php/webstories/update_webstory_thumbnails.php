@@ -8,7 +8,7 @@ if (!extension_loaded('gd')) {
 }
 
 // Configuration with absolute paths
-$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
 $imageDir = $basePath . '/images/webstories';
 $thumbnailWidth = 400;
 $thumbnailHeight = 300;
@@ -43,7 +43,7 @@ if (is_dir($imageDir)) {
 }
 
 // Database connection
-include 'db.php';
+include dirname(__DIR__) . '/config/db.php';
 
 // Get all cities from database - try normalized tables first
 try {

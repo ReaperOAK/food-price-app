@@ -8,7 +8,7 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
-require_once 'db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
 
 // Get today's date
 $today = date('Y-m-d');

@@ -2,7 +2,7 @@
 // Archive old egg rates data
 // This script should be run periodically (e.g., monthly) via a cron job
 
-require_once 'db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
 
 // Set the threshold date (e.g., data older than 7 days will be archived)
 $archiveThreshold = date('Y-m-d', strtotime('-7 days'));
