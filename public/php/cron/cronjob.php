@@ -9,26 +9,48 @@ function runScript($scriptPath, $taskName) {
     $startTime = microtime(true);
     echo "Starting task: $taskName...\n";
     
-    // Include the script
+    // Include the script using output buffering to capture output and errors
     ob_start();
-    $result = include($scriptPath);
-    $output = ob_get_clean();
     
-    $endTime = microtime(true);
-    $executionTime = round($endTime - $startTime, 2);
-    
-    // Log the result
-    if ($result === false) {
-        echo "❌ Task failed: $taskName (took {$executionTime}s)\n";
-        error_log("CRON ERROR: Failed running $taskName");
+    // Use try-catch to prevent script termination on fatal errors
+    try {
+        // Use include with @ to suppress fatal errors from stopping execution
+        $result = @include($scriptPath);
+        $output = ob_get_clean();
+        
+        $endTime = microtime(true);
+        $executionTime = round($endTime - $startTime, 2);
+        
+        if ($result === false) {
+            echo "❌ Task failed: $taskName (took {$executionTime}s)\n";
+            error_log("CRON ERROR: Failed running $taskName");
+            error_log("Output: " . $output);
+            return false;
+        } else {
+            echo "✅ Task completed: $taskName (took {$executionTime}s)\n";
+            error_log("CRON SUCCESS: $taskName completed in {$executionTime}s");
+            return true;
+        }
+    } catch (Throwable $e) {
+        // Catch any exceptions or errors that might occur
+        $output = ob_get_clean();
+        $endTime = microtime(true);
+        $executionTime = round($endTime - $startTime, 2);
+        
+        echo "❌ Task failed with exception: $taskName (took {$executionTime}s)\n";
+        error_log("CRON ERROR: Exception in $taskName: " . $e->getMessage());
         error_log("Output: " . $output);
-    } else {
-        echo "✅ Task completed: $taskName (took {$executionTime}s)\n";
-        error_log("CRON SUCCESS: $taskName completed in {$executionTime}s");
+        return false;
     }
     
-    // Add some delay between tasks to reduce server load
-    sleep(10);
+    // In case we didn't return in the try-catch
+    $output = ob_get_clean();
+    $endTime = microtime(true);
+    $executionTime = round($endTime - $startTime, 2);
+    echo "⚠️ Task ended abnormally: $taskName (took {$executionTime}s)\n";
+    error_log("CRON WARNING: Task ended abnormally: $taskName");
+    error_log("Output: " . $output);
+    return false;
 }
 
 // Base directory
@@ -63,7 +85,10 @@ error_log("CRON: Started daily scheduled tasks run at $date");
 // Run each script in sequence
 foreach ($scripts as [$scriptPath, $taskName]) {
     if (file_exists($scriptPath)) {
-        runScript($scriptPath, $taskName);
+        // Even if the script fails, continue with the next script
+        $success = runScript($scriptPath, $taskName);
+        // Add some delay between tasks to reduce server load
+        sleep(10);
     } else {
         echo "❌ Script not found: $scriptPath\n";
         error_log("CRON ERROR: Script not found: $scriptPath");
