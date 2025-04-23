@@ -6,6 +6,23 @@
 // Include database connection
 require_once dirname(__DIR__) . '/config/db.php';
 
+// Verify that $conn exists, otherwise create the connection
+if (!isset($conn) || $conn->connect_error) {
+    // Connection details
+    $servername = "localhost";
+    $username = "u901337298_test";
+    $password = "A12345678b*";
+    $dbname = "u901337298_test";
+    
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Check connection
+    if ($conn->connect_error) {
+        die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
+    }
+}
+
 // Define file paths
 $basePath = dirname(dirname(__DIR__)); // Go up two levels from seo directory
 $sitemapXmlFile = $basePath . '/sitemap.xml';
@@ -13,6 +30,12 @@ $sitemapTxtFile = $basePath . '/sitemap.txt';
 
 // Also create a copy in the php directory for local testing
 $phpDirSitemapXml = dirname(__DIR__) . '/sitemap.xml';
+
+// Make sure the directories exist and are writable
+$baseDir = dirname($sitemapXmlFile);
+if (!file_exists($baseDir)) {
+    mkdir($baseDir, 0755, true);
+}
 
 // Start XML output buffer
 $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
@@ -253,25 +276,40 @@ $txt .= $baseUrl . '/webstories-sitemap.xml' . PHP_EOL;
 // Close XML
 $xml .= '</urlset>';
 
-// Write XML file to root directory
-file_put_contents($sitemapXmlFile, $xml);
+// Create error handling for file writes
+try {
+    // Write XML file to root directory with error checking
+    if (file_put_contents($sitemapXmlFile, $xml) === false) {
+        throw new Exception("Failed to write XML sitemap to $sitemapXmlFile");
+    }
 
-// Also save a copy in the php directory for reference
-file_put_contents($phpDirSitemapXml, $xml);
+    // Also save a copy in the php directory for reference
+    if (file_put_contents($phpDirSitemapXml, $xml) === false) {
+        error_log("Warning: Failed to write copy of XML sitemap to $phpDirSitemapXml");
+    }
 
-// Write TXT file
-file_put_contents($sitemapTxtFile, $txt);
+    // Write TXT file with error checking
+    if (file_put_contents($sitemapTxtFile, $txt) === false) {
+        throw new Exception("Failed to write TXT sitemap to $sitemapTxtFile");
+    }
 
-// Output success message
-echo "Sitemap generated successfully!";
-echo "<br>XML Sitemap: <a href='/sitemap.xml' target='_blank'>/sitemap.xml</a>";
-echo "<br>TXT Sitemap: <a href='/sitemap.txt' target='_blank'>/sitemap.txt</a>";
-echo "<br><br>Added to sitemap:";
-echo "<br>- Homepage";
-echo "<br>- " . count($static_pages) . " static pages";
-echo "<br>- " . $city_count . " city pages";
-echo "<br>- " . $state_count . " state pages";
-echo "<br>- " . $blog_count . " blog posts";
+    // Output success message
+    echo "Sitemap generated successfully!";
+    echo "<br>XML Sitemap: <a href='/sitemap.xml' target='_blank'>/sitemap.xml</a>";
+    echo "<br>TXT Sitemap: <a href='/sitemap.txt' target='_blank'>/sitemap.txt</a>";
+    echo "<br><br>Added to sitemap:";
+    echo "<br>- Homepage";
+    echo "<br>- " . count($static_pages) . " static pages";
+    echo "<br>- " . $city_count . " city pages";
+    echo "<br>- " . $state_count . " state pages";
+    echo "<br>- " . $blog_count . " blog posts";
+
+    // Log completion
+    error_log("Sitemap generation completed at " . date('Y-m-d H:i:s') . " - Added $city_count cities, $state_count states, $blog_count blogs");
+} catch (Exception $e) {
+    error_log("Sitemap generation error: " . $e->getMessage());
+    echo "Error generating sitemap: " . $e->getMessage();
+}
 
 // Debug info
 echo "<br><br>Database Info:";
@@ -288,6 +326,8 @@ if ($result) {
     echo "<br>- Distinct cities in egg_rates: " . $result->num_rows;
 }
 
-// Log completion
-error_log("Sitemap generation completed at " . date('Y-m-d H:i:s') . " - Added $city_count cities, $state_count states, $blog_count blogs");
+// Close the connection if it exists
+if (isset($conn)) {
+    $conn->close();
+}
 ?>
