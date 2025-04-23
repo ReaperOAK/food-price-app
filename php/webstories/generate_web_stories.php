@@ -2,11 +2,28 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database connection
-include_once dirname(__DIR__) . '/config/db.php';
+// Database connection - using require_once instead of include to avoid duplicate function declarations
+require_once dirname(__DIR__) . '/config/db.php';
 
-// Include the function to delete old web stories
-include_once __DIR__ . '/delete_old_webstories.php';
+// Verify that $conn exists, otherwise create the connection
+if (!isset($conn) || $conn->connect_error) {
+    // Connection details
+    $servername = "localhost";
+    $username = "u901337298_test";
+    $password = "A12345678b*";
+    $dbname = "u901337298_test";
+    
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Check connection
+    if ($conn->connect_error) {
+        die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
+    }
+}
+
+// Include the function to delete old web stories, we're using require_once to avoid duplicate declarations
+require_once __DIR__ . '/delete_old_webstories.php';
 
 // Configuration - use absolute paths to avoid permission issues
 $basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
@@ -185,135 +202,138 @@ if ($result->num_rows > 0) {
 }
 
 // Function to generate thumbnail for a web story
-function generateThumbnail($imageDir, $city, $citySlug, $sourceImage) {
-    // Extract filename from source image path
-    $sourceFilename = basename($sourceImage);
-    $sourceImagePath = $imageDir . '/' . $sourceFilename;
-    
-    // Ensure source file exists
-    if (!file_exists($sourceImagePath)) {
-        // Try with the path as is (it might be a full path)
-        $sourceImagePath = $_SERVER['DOCUMENT_ROOT'] . $sourceImage;
+if (!function_exists('generateThumbnail')) {
+    function generateThumbnail($imageDir, $city, $citySlug, $sourceImage) {
+        // Extract filename from source image path
+        $sourceFilename = basename($sourceImage);
+        $sourceImagePath = $imageDir . '/' . $sourceFilename;
+        
+        // Ensure source file exists
         if (!file_exists($sourceImagePath)) {
+            // Try with the path as is (it might be a full path)
+            $sourceImagePath = $_SERVER['DOCUMENT_ROOT'] . $sourceImage;
+            if (!file_exists($sourceImagePath)) {
+                return false;
+            }
+        }
+        
+        // Configuration
+        $thumbnailWidth = 400;
+        $thumbnailHeight = 300;
+        
+        // Get image type
+        $imageInfo = getimagesize($sourceImagePath);
+        if ($imageInfo === false) {
             return false;
         }
+        
+        $sourceType = $imageInfo[2];
+        
+        // Create source image based on type
+        switch ($sourceType) {
+            case IMAGETYPE_JPEG:
+                $sourceImage = imagecreatefromjpeg($sourceImagePath);
+                break;
+            case IMAGETYPE_PNG:
+                $sourceImage = imagecreatefrompng($sourceImagePath);
+                break;
+            case IMAGETYPE_GIF:
+                $sourceImage = imagecreatefromgif($sourceImagePath);
+                break;
+            default:
+                return false;
+        }
+        
+        // Create a new thumbnail image
+        $thumbnailImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
+        
+        // Preserve transparency for PNG images
+        if ($sourceType == IMAGETYPE_PNG) {
+            imagecolortransparent($thumbnailImage, imagecolorallocate($thumbnailImage, 0, 0, 0));
+            imagealphablending($thumbnailImage, false);
+            imagesavealpha($thumbnailImage, true);
+        }
+        
+        // Resize the image
+        imagecopyresampled(
+            $thumbnailImage, $sourceImage,
+            0, 0, 0, 0,
+            $thumbnailWidth, $thumbnailHeight,
+            imagesx($sourceImage), imagesy($sourceImage)
+        );
+        
+        // Add city name text overlay
+        $textColor = imagecolorallocate($thumbnailImage, 255, 255, 255);
+        $shadowColor = imagecolorallocate($thumbnailImage, 0, 0, 0);
+        $font = 5; // Built-in font
+        
+        // Get text dimensions
+        $textWidth = imagefontwidth($font) * strlen($city);
+        $textHeight = imagefontheight($font);
+        
+        // Calculate position for centered text
+        $textX = (int)(($thumbnailWidth - $textWidth) / 2); // Explicitly cast to int
+        $textY = (int)($thumbnailHeight - $textHeight - 10); // Explicitly cast to int
+        
+        // Draw text shadow
+        imagestring($thumbnailImage, $font, $textX + 1, $textY + 1, $city, $shadowColor);
+        
+        // Draw text
+        imagestring($thumbnailImage, $font, $textX, $textY, $city, $textColor);
+        
+        // Save the thumbnail
+        $thumbnailPath = $imageDir . '/thumbnail-' . $citySlug . '.jpg';
+        imagejpeg($thumbnailImage, $thumbnailPath, 90);
+        
+        // Clean up
+        imagedestroy($sourceImage);
+        imagedestroy($thumbnailImage);
+        
+        return true;
     }
-    
-    // Configuration
-    $thumbnailWidth = 400;
-    $thumbnailHeight = 300;
-    
-    // Get image type
-    $imageInfo = getimagesize($sourceImagePath);
-    if ($imageInfo === false) {
-        return false;
-    }
-    
-    $sourceType = $imageInfo[2];
-    
-    // Create source image based on type
-    switch ($sourceType) {
-        case IMAGETYPE_JPEG:
-            $sourceImage = imagecreatefromjpeg($sourceImagePath);
-            break;
-        case IMAGETYPE_PNG:
-            $sourceImage = imagecreatefrompng($sourceImagePath);
-            break;
-        case IMAGETYPE_GIF:
-            $sourceImage = imagecreatefromgif($sourceImagePath);
-            break;
-        default:
-            return false;
-    }
-    
-    // Create a new thumbnail image
-    $thumbnailImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
-    
-    // Preserve transparency for PNG images
-    if ($sourceType == IMAGETYPE_PNG) {
-        imagecolortransparent($thumbnailImage, imagecolorallocate($thumbnailImage, 0, 0, 0));
-        imagealphablending($thumbnailImage, false);
-        imagesavealpha($thumbnailImage, true);
-    }
-    
-    // Resize the image
-    imagecopyresampled(
-        $thumbnailImage, $sourceImage,
-        0, 0, 0, 0,
-        $thumbnailWidth, $thumbnailHeight,
-        imagesx($sourceImage), imagesy($sourceImage)
-    );
-    
-    // Add city name text overlay
-    $textColor = imagecolorallocate($thumbnailImage, 255, 255, 255);
-    $shadowColor = imagecolorallocate($thumbnailImage, 0, 0, 0);
-    $font = 5; // Built-in font
-    
-    // Get text dimensions
-    $textWidth = imagefontwidth($font) * strlen($city);
-    $textHeight = imagefontheight($font);
-    
-    // Calculate position for centered text
-    $textX = (int)(($thumbnailWidth - $textWidth) / 2); // Explicitly cast to int
-    $textY = (int)($thumbnailHeight - $textHeight - 10); // Explicitly cast to int
-    
-    // Draw text shadow
-    imagestring($thumbnailImage, $font, $textX + 1, $textY + 1, $city, $shadowColor);
-    
-    // Draw text
-    imagestring($thumbnailImage, $font, $textX, $textY, $city, $textColor);
-    
-    // Save the thumbnail
-    $thumbnailPath = $imageDir . '/thumbnail-' . $citySlug . '.jpg';
-    imagejpeg($thumbnailImage, $thumbnailPath, 90);
-    
-    // Clean up
-    imagedestroy($sourceImage);
-    imagedestroy($thumbnailImage);
-    
-    return true;
 }
 
 // Function to generate an index file for all web stories
-function generateWebStoryIndex($storiesDir, $conn) {
-    $indexFile = $storiesDir . '/index.html';
-    
-    // Try normalized table first for getting latest egg rates
-    try {
-        $sql = "
-            SELECT c.name as city, s.name as state, ern.rate, ern.date 
-            FROM egg_rates_normalized ern
-            JOIN cities c ON ern.city_id = c.id
-            JOIN states s ON c.state_id = s.id
-            WHERE (ern.city_id, ern.date) IN (
-                SELECT city_id, MAX(date)
-                FROM egg_rates_normalized
-                GROUP BY city_id
-            )
-            ORDER BY c.name
-        ";
+if (!function_exists('generateWebStoryIndex')) {
+    function generateWebStoryIndex($storiesDir, $conn) {
+        $indexFile = $storiesDir . '/index.html';
         
-        $result = $conn->query($sql);
-        
-        if (!$result || $result->num_rows === 0) {
-            throw new Exception("No results from normalized table");
-        }
-    } catch (Exception $e) {
-        // Fall back to original table
-        $sql = "
-            SELECT city, state, rate, date 
-            FROM egg_rates 
-            WHERE (city, date) IN (
-                SELECT city, MAX(date) 
+        // Try normalized table first for getting latest egg rates
+        try {
+            $sql = "
+                SELECT c.name as city, s.name as state, ern.rate, ern.date 
+                FROM egg_rates_normalized ern
+                JOIN cities c ON ern.city_id = c.id
+                JOIN states s ON c.state_id = s.id
+                WHERE (ern.city_id, ern.date) IN (
+                    SELECT city_id, MAX(date)
+                    FROM egg_rates_normalized
+                    GROUP BY city_id
+                )
+                ORDER BY c.name
+            ";
+            
+            $result = $conn->query($sql);
+            
+            if (!$result || $result->num_rows === 0) {
+                throw new Exception("No results from normalized table");
+            }
+        } catch (Exception $e) {
+            // Fall back to original table
+            $sql = "
+                SELECT city, state, rate, date 
                 FROM egg_rates 
-                GROUP BY city
-            )
-            ORDER BY city
-        ";
-        $result = $conn->query($sql);
-    }
-    
-    $html = '<!DOCTYPE html>
+                WHERE (city, date) IN (
+                    SELECT city, MAX(date) 
+                    FROM egg_rates 
+                    GROUP BY city
+                )
+                ORDER BY city
+            ";
+            $result = $conn->query($sql);
+        }
+        
+        $html = '<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -377,22 +397,22 @@ function generateWebStoryIndex($storiesDir, $conn) {
 <body>
     <h1>Egg Rate Web Stories</h1>
     <div class="stories-grid">';
-    
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            $city = $row['city'];
-            $state = $row['state'];
-            $rate = $row['rate'];
-            $date = $row['date'];
-            
-            // Create a URL-friendly city name
-            $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-            
-            // Format date for display
-            $displayDate = date('F j, Y', strtotime($date));
-            
-            // Add card to grid
-            $html .= '
+        
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $city = $row['city'];
+                $state = $row['state'];
+                $rate = $row['rate'];
+                $date = $row['date'];
+                
+                // Create a URL-friendly city name
+                $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+                
+                // Format date for display
+                $displayDate = date('F j, Y', strtotime($date));
+                
+                // Add card to grid
+                $html .= '
         <a href="/' . $citySlug . '-egg-rate.html" class="story-card">
             <div class="story-thumbnail" style="background-image: url(\'/images/webstories/thumbnail-' . $citySlug . '.jpg\');">
             </div>
@@ -402,19 +422,20 @@ function generateWebStoryIndex($storiesDir, $conn) {
                 <p class="story-rate">₹' . $rate . ' per egg</p>
             </div>
         </a>';
+            }
         }
-    }
-    
-    $html .= '
+        
+        $html .= '
     </div>
 </body>
 </html>';
-    
-    file_put_contents($indexFile, $html);
+        
+        file_put_contents($indexFile, $html);
+    }
 }
 
-// Generate a web stories sitemap after creating all stories
-include_once 'generate_webstories_sitemap.php';
+// Use require_once to avoid double inclusion issues
+require_once 'generate_webstories_sitemap.php';
 
 // Connection is already closed in generate_webstories_sitemap.php, so don't close it again
 ?>
