@@ -8,7 +8,25 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
+// Make sure to properly include the database configuration
 require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
+
+// Verify that $conn exists, otherwise create the connection
+if (!isset($conn) || $conn->connect_error) {
+    // Connection details
+    $servername = "localhost";
+    $username = "u901337298_test";
+    $password = "A12345678b*";
+    $dbname = "u901337298_test";
+    
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Check connection
+    if ($conn->connect_error) {
+        die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
+    }
+}
 
 // Get today's date
 $today = date('Y-m-d');
