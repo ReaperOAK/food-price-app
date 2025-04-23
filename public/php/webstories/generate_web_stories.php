@@ -3,7 +3,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Database connection
-include dirname(__DIR__) . '/config/db.php';
+include_once dirname(__DIR__) . '/config/db.php';
 
 // Include the function to delete old web stories
 include_once __DIR__ . '/delete_old_webstories.php';
