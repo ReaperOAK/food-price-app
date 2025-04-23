@@ -3,10 +3,10 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 // Database connection
-include 'db.php';
+include dirname(__DIR__) . '/config/db.php';
 
 // Configuration with absolute paths
-$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
 $storiesDir = $basePath . '/webstories';
 $sitemapFile = $basePath . '/webstories-sitemap.xml';
 

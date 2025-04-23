@@ -7,10 +7,10 @@ header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
-require_once 'db.php';
+require_once __DIR__ . '/config/db.php';
 
 // Directory where web stories are stored with absolute path
-$basePath = realpath($_SERVER['DOCUMENT_ROOT']);
+$basePath = dirname(dirname(__FILE__)); // Go up one level from php dir
 $storiesDir = $basePath . '/webstories';
 
 // Get limit parameter if provided

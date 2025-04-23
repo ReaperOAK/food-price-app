@@ -4,15 +4,15 @@
  */
 
 // Include database connection
-require_once 'db.php';
+require_once dirname(__DIR__) . '/config/db.php';
 
 // Define file paths
-$basePath = dirname(dirname(__FILE__)); // Go up one level from php directory
+$basePath = dirname(dirname(__DIR__)); // Go up two levels from seo directory
 $sitemapXmlFile = $basePath . '/sitemap.xml';
 $sitemapTxtFile = $basePath . '/sitemap.txt';
 
 // Also create a copy in the php directory for local testing
-$phpDirSitemapXml = __DIR__ . '/sitemap.xml';
+$phpDirSitemapXml = dirname(__DIR__) . '/sitemap.xml';
 
 // Start XML output buffer
 $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
@@ -201,6 +201,7 @@ try {
             $xml .= '  <lastmod>' . date('Y-m-d', strtotime($blog['updated_at'])) . '</lastmod>' . PHP_EOL;
             $xml .= '  <changefreq>weekly</changefreq>' . PHP_EOL;
             $xml .= '  <priority>0.7</priority>' . PHP_EOL;
+            
             $xml .= '</url>' . PHP_EOL;
             
             $txt .= $url . PHP_EOL;
