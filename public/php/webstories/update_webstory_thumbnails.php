@@ -4,13 +4,15 @@ ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', dirname(dirname(__FILE__)) . '/error.log');
 
-// Helper function for structured debugging
-function debug_log($step, $message, $data = null) {
-    $log = date('Y-m-d H:i:s') . " [THUMBNAILS] " . $step . ": " . $message;
-    if ($data !== null) {
-        $log .= " - " . json_encode($data, JSON_UNESCAPED_SLASHES);
+// Helper function for structured debugging - only declare if it doesn't already exist
+if (!function_exists('debug_log')) {
+    function debug_log($step, $message, $data = null) {
+        $log = date('Y-m-d H:i:s') . " [THUMBNAILS] " . $step . ": " . $message;
+        if ($data !== null) {
+            $log .= " - " . json_encode($data, JSON_UNESCAPED_SLASHES);
+        }
+        error_log($log);
     }
-    error_log($log);
 }
 
 debug_log("START", "Beginning thumbnail generation process");
