@@ -445,6 +445,15 @@ if ($result && $result->num_rows > 0) {
                     debug_log("UPDATE", "Updated poster-portrait-src attribute");
                 } else {
                     debug_log("WARNING", "Could not find amp-story tag with poster-portrait-src attribute");
+                    // Try with a more lenient pattern
+                    $lenientPattern = '/<amp-story/s';
+                    if (preg_match($lenientPattern, $webstoryContent)) {
+                        $replacement = '<amp-story poster-portrait-src="' . $thumbnailUrl . '"';
+                        $webstoryContent = preg_replace($lenientPattern, $replacement, $webstoryContent);
+                        debug_log("UPDATE", "Added poster-portrait-src attribute with lenient pattern");
+                    } else {
+                        debug_log("ERROR", "Could not find amp-story tag at all");
+                    }
                 }
                 
                 // Update or add meta image tag
