@@ -96,6 +96,8 @@ try {
                 $state = $row['state'];
                 $rate = $row['rate'];
                 $date = $row['date'];
+                
+                debug_log("INDEX", "Adding index entry for {$city}, {$state}");
                 $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
                 $html .= "<li><a href='{$citySlug}-egg-rate.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
             }
