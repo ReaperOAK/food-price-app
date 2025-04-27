@@ -1,8 +1,7 @@
-import React, { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const RedirectInterceptor = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const stakeReferralLink = 'https://stake.bet/?c=vcB3Cqwu';
   
