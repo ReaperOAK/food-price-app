@@ -42,113 +42,7 @@ try {
         debug_log("DB", "Using existing database connection");
     }
 
-    // Define functions first to avoid any redeclaration issues
-    if (!function_exists('generateThumbnail')) {
-        debug_log("FUNCTIONS", "Defining generateThumbnail function");
-        function generateThumbnail($imageDir, $city, $citySlug, $sourceImage) {
-            debug_log("THUMBNAIL", "Generating thumbnail for {$city}", ["slug" => $citySlug, "source" => $sourceImage]);
-            
-            // Extract filename from source image path
-            $sourceFilename = basename($sourceImage);
-            $sourceImagePath = $imageDir . '/' . $sourceFilename;
-            
-            // Ensure source file exists
-            if (!file_exists($sourceImagePath)) {
-                debug_log("THUMBNAIL", "Source image not found at {$sourceImagePath}, trying with document root");
-                // Try with the path as is (it might be a full path)
-                $sourceImagePath = $_SERVER['DOCUMENT_ROOT'] . $sourceImage;
-                if (!file_exists($sourceImagePath)) {
-                    debug_log("THUMBNAIL", "Source image not found at either location", ["original" => $imageDir . '/' . $sourceFilename, "alternate" => $_SERVER['DOCUMENT_ROOT'] . $sourceImage]);
-                    return false;
-                }
-            }
-            
-            // Configuration
-            $thumbnailWidth = 400;
-            $thumbnailHeight = 300;
-            
-            // Get image type
-            $imageInfo = getimagesize($sourceImagePath);
-            if ($imageInfo === false) {
-                debug_log("THUMBNAIL", "Failed to get image size information for {$sourceImagePath}");
-                return false;
-            }
-            
-            $sourceType = $imageInfo[2];
-            debug_log("THUMBNAIL", "Image type detected", ["type" => $sourceType, "path" => $sourceImagePath]);
-            
-            // Create source image based on type
-            switch ($sourceType) {
-                case IMAGETYPE_JPEG:
-                    $sourceImage = imagecreatefromjpeg($sourceImagePath);
-                    break;
-                case IMAGETYPE_PNG:
-                    $sourceImage = imagecreatefrompng($sourceImagePath);
-                    break;
-                case IMAGETYPE_GIF:
-                    $sourceImage = imagecreatefromgif($sourceImagePath);
-                    break;
-                default:
-                    debug_log("THUMBNAIL", "Unsupported image type: {$sourceType}");
-                    return false;
-            }
-            
-            if (!$sourceImage) {
-                debug_log("THUMBNAIL", "Failed to create image from file: {$sourceImagePath}");
-                return false;
-            }
-            
-            // Create a new thumbnail image
-            $thumbnailImage = imagecreatetruecolor($thumbnailWidth, $thumbnailHeight);
-            
-            // Preserve transparency for PNG images
-            if ($sourceType == IMAGETYPE_PNG) {
-                imagecolortransparent($thumbnailImage, imagecolorallocate($thumbnailImage, 0, 0, 0));
-                imagealphablending($thumbnailImage, false);
-                imagesavealpha($thumbnailImage, true);
-            }
-            
-            // Resize the image
-            imagecopyresampled(
-                $thumbnailImage, $sourceImage,
-                0, 0, 0, 0,
-                $thumbnailWidth, $thumbnailHeight,
-                imagesx($sourceImage), imagesy($sourceImage)
-            );
-            
-            // Add city name text overlay
-            $textColor = imagecolorallocate($thumbnailImage, 255, 255, 255);
-            $shadowColor = imagecolorallocate($thumbnailImage, 0, 0, 0);
-            $font = 5; // Built-in font
-            
-            // Get text dimensions
-            $textWidth = imagefontwidth($font) * strlen($city);
-            $textHeight = imagefontheight($font);
-            
-            // Calculate position for centered text
-            $textX = (int)(($thumbnailWidth - $textWidth) / 2); // Explicitly cast to int
-            $textY = (int)($thumbnailHeight - $textHeight - 10); // Explicitly cast to int
-            
-            // Draw text shadow
-            imagestring($thumbnailImage, $font, $textX + 1, $textY + 1, $city, $shadowColor);
-            
-            // Draw text
-            imagestring($thumbnailImage, $font, $textX, $textY, $city, $textColor);
-            
-            // Save the thumbnail
-            $thumbnailPath = $imageDir . '/thumbnail-' . $citySlug . '.jpg';
-            debug_log("THUMBNAIL", "Saving thumbnail to {$thumbnailPath}");
-            $result = imagejpeg($thumbnailImage, $thumbnailPath, 90);
-            
-            // Clean up
-            imagedestroy($sourceImage);
-            imagedestroy($thumbnailImage);
-            
-            debug_log("THUMBNAIL", "Thumbnail generation " . ($result ? "successful" : "failed") . " for {$city}");
-            return $result;
-        }
-    }
-
+    // Function to generate web story index
     if (!function_exists('generateWebStoryIndex')) {
         debug_log("FUNCTIONS", "Defining generateWebStoryIndex function");
         function generateWebStoryIndex($storiesDir, $conn) {
@@ -229,6 +123,7 @@ try {
     $templateFile = $basePath . '/templates/webstory_template.html';
     
     debug_log("CONFIG", "Paths configured", [
+        "basePath" => $basePath,
         "storiesDir" => $storiesDir,
         "imageDir" => $imageDir,
         "templateFile" => $templateFile
@@ -238,13 +133,21 @@ try {
     foreach ([$storiesDir, $imageDir] as $dir) {
         if (!file_exists($dir)) {
             debug_log("DIRS", "Creating directory: {$dir}");
-            if (!mkdir($dir, 0755, true)) {
-                debug_log("DIRS", "Failed to create directory: {$dir}");
-                throw new Exception("Failed to create directory: {$dir}. Please check permissions.");
+            if (!mkdir($dir, 0777, true)) {
+                $error = error_get_last();
+                debug_log("DIRS", "Failed to create directory: {$dir}", $error);
+                throw new Exception("Failed to create directory: {$dir}. Error: " . ($error['message'] ?? 'Unknown error'));
             }
+            // After creation, ensure it's writable
+            chmod($dir, 0777);
+            debug_log("DIRS", "Directory created successfully: {$dir}");
         } elseif (!is_writable($dir)) {
             debug_log("DIRS", "Directory not writable: {$dir}");
-            throw new Exception("Directory not writable: {$dir}. Please check permissions.");
+            // Try to make it writable
+            chmod($dir, 0777);
+            if (!is_writable($dir)) {
+                throw new Exception("Directory not writable: {$dir}. Please check permissions.");
+            }
         } else {
             debug_log("DIRS", "Directory exists and is writable: {$dir}");
         }
@@ -262,12 +165,14 @@ try {
         
         foreach ($files as $file) {
             $extension = pathinfo($file, PATHINFO_EXTENSION);
-            if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif']) && $file !== '.' && $file !== '..') {
+            if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']) && $file !== '.' && $file !== '..') {
                 // Skip thumbnail files
                 if (strpos($file, 'thumbnail-') === 0) {
                     continue;
                 }
-                $backgroundImages[] = '/images/webstories/' . $file;
+                // Store just the filename, not the full path
+                $backgroundImages[] = $file;
+                debug_log("IMAGES", "Found background image: {$file}");
             }
         }
         debug_log("IMAGES", "Found " . count($backgroundImages) . " background images");
@@ -276,31 +181,52 @@ try {
     // If no images found, use a default image
     if (empty($backgroundImages)) {
         debug_log("IMAGES", "No background images found, using default");
-        $defaultImage = $basePath . '/eggpic.png';
-        if (file_exists($defaultImage)) {
-            debug_log("IMAGES", "Default image found: {$defaultImage}");
-            // Make sure the images directory exists
-            if (!file_exists($imageDir)) {
-                debug_log("IMAGES", "Creating images directory for default image: {$imageDir}");
-                if (!mkdir($imageDir, 0755, true)) {
-                    debug_log("IMAGES", "Failed to create directory: {$imageDir}");
-                    throw new Exception("Failed to create directory: {$imageDir}");
+        // Check multiple locations for default image
+        $defaultImageLocations = [
+            $basePath . '/eggpic.png',
+            $basePath . '/public/eggpic.png',
+            $basePath . '/build/eggpic.png'
+        ];
+        
+        $defaultImageFound = false;
+        foreach ($defaultImageLocations as $defaultImage) {
+            if (file_exists($defaultImage)) {
+                debug_log("IMAGES", "Found default image at: {$defaultImage}");
+                // Copy default image to webstories image directory
+                $targetImage = $imageDir . '/default.png';
+                if (copy($defaultImage, $targetImage)) {
+                    debug_log("IMAGES", "Copied default image to: {$targetImage}");
+                    $backgroundImages[] = 'default.png';
+                    $defaultImageFound = true;
+                    break;
+                } else {
+                    $error = error_get_last();
+                    debug_log("ERROR", "Failed to copy default image", $error);
                 }
             }
+        }
+        
+        if (!$defaultImageFound) {
+            // Create a simple default image
+            debug_log("IMAGES", "Creating a simple default image");
+            $simpleImage = imagecreatetruecolor(800, 600);
+            $bgColor = imagecolorallocate($simpleImage, 240, 240, 240);
+            $textColor = imagecolorallocate($simpleImage, 0, 0, 0);
+            imagefill($simpleImage, 0, 0, $bgColor);
+            imagestring($simpleImage, 5, 300, 280, "Egg Rate", $textColor);
             
-            // Copy the default image to the webstories image directory
-            $targetImage = $imageDir . '/eggpic.png';
-            debug_log("IMAGES", "Copying default image to: {$targetImage}");
-            if (!copy($defaultImage, $targetImage)) {
-                debug_log("IMAGES", "Failed to copy default image to: {$targetImage}");
-                throw new Exception("Failed to copy default image to {$targetImage}");
+            // Save the simple image
+            $simpleImagePath = $imageDir . '/default.png';
+            imagepng($simpleImage, $simpleImagePath);
+            imagedestroy($simpleImage);
+            
+            if (file_exists($simpleImagePath)) {
+                debug_log("IMAGES", "Created simple default image at: {$simpleImagePath}");
+                $backgroundImages[] = 'default.png';
+            } else {
+                debug_log("ERROR", "Failed to create simple default image");
+                throw new Exception("No background images found and could not create a default image.");
             }
-            
-            $backgroundImages[] = '/images/webstories/eggpic.png';
-            debug_log("IMAGES", "Using default image as background");
-        } else {
-            debug_log("IMAGES", "Default image not found: {$defaultImage}");
-            throw new Exception("No background images found and default image does not exist at {$defaultImage}");
         }
     }
 
@@ -407,12 +333,11 @@ try {
             
             // Randomly select different images for different pages
             shuffle($backgroundImages);
-            $coverImage = $backgroundImages[0];
-            $trayPriceImage = isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0];
-            $ctaImage = isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0];
             
-            // Store the first image for thumbnail use
-            $thumbnailSourceImage = $coverImage;
+            // For each page in the web story, construct the proper path to the image
+            $coverImage = '/images/webstories/' . $backgroundImages[0];
+            $trayPriceImage = '/images/webstories/' . (isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0]);
+            $ctaImage = '/images/webstories/' . (isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0]);
             
             // Format date for display
             $displayDate = date('F j, Y', strtotime($date));
@@ -440,13 +365,6 @@ try {
             if ($writeResult !== false) {
                 $storiesGenerated++;
                 debug_log("STORY", "Web story saved successfully for {$city}");
-                
-                // Generate thumbnail using the first selected background image
-                debug_log("STORY", "Generating thumbnail for {$city}");
-                $thumbnailResult = generateThumbnail($imageDir, $city, $citySlug, $thumbnailSourceImage);
-                if (!$thumbnailResult) {
-                    debug_log("STORY", "Warning: Thumbnail generation failed for {$city}");
-                }
             } else {
                 debug_log("STORY", "Failed to write web story file for {$city} to {$filename}");
                 throw new Exception("Could not write to file {$filename}");
@@ -458,7 +376,13 @@ try {
         generateWebStoryIndex($storiesDir, $conn);
         
         debug_log("COMPLETE", "Generated {$storiesGenerated} web stories successfully");
-        echo "Generated {$storiesGenerated} web stories successfully.";
+        echo "Generated {$storiesGenerated} web stories successfully.<br>";
+        
+        // Call the thumbnail update script to generate thumbnails for all web stories
+        debug_log("THUMBNAILS", "Calling update_webstory_thumbnails.php to generate thumbnails");
+        echo "Generating thumbnails for web stories...<br>";
+        include_once __DIR__ . '/update_webstory_thumbnails.php';
+        
     } else {
         debug_log("ERROR", "No egg rates found in the database");
         echo "No egg rates found in the database. Please check your data.";
