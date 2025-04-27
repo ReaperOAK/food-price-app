@@ -15,6 +15,7 @@ import SpecialRatesTable from '../components/rates/SpecialRatesTable';
 import BlogList from '../components/blog/BlogList';
 import FAQ from '../components/common/FAQ';
 import Breadcrumb from '../components/layout/Breadcrumb';
+import StakeAdPopup from '../components/common/StakeAdPopup';
 import blogs from '../data/blogs';
 
 const MainPage = () => {
@@ -241,6 +242,7 @@ const MainPage = () => {
           <BodyThree selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} /> {/* Pass props to BodyThree */}
           <FAQ selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} /> {/* Pass props to FAQ */}
         </div>
+        <StakeAdPopup />
         <Footer />
       </div>
     </>

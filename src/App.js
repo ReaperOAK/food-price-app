@@ -9,6 +9,7 @@ import LoginPage from './components/admin/LoginPage';
 import BlogPage from './pages/BlogPage';
 import blogs from './data/blogs'; // Import the blogs list
 import ScrollToTop from './utils/ScrollToTop'; // Import ScrollToTop
+import RedirectInterceptor from './components/common/RedirectInterceptor'; // Import RedirectInterceptor
 import WebStoriesList from './components/webstories/WebStoriesList'; // Import WebStoriesList
 import WebStoryViewer from './components/webstories/WebStoryViewer'; // Import WebStoryViewer
 
@@ -97,6 +98,7 @@ function App() {
   return (
     <Router>
       <ScrollToTop /> {/* Include ScrollToTop */}
+      <RedirectInterceptor /> {/* Include RedirectInterceptor to occasionally redirect navigation */}
       <Routes>
         <Route path="/" element={<MainPage />} />
         <Route path="/sitemap.txt" element={<SitemapHandler />} />
