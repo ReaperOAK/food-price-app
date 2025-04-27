@@ -2,23 +2,58 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
+import { Helmet } from 'react-helmet';
 
 const WebStoryViewer = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [error] = useState(null);
+  const [error, setError] = useState(null);
   const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
+  const [storyData, setStoryData] = useState(null);
 
   useEffect(() => {
-    // We'll redirect to the actual web story HTML file
-    window.location.href = `/webstories/${slug}.html`;
-    
-    // The following code won't execute because of the redirect,
-    // but we'll keep it as a fallback
-    setLoading(false);
+    // First try to fetch the story data to get city/state info
+    fetch('/php/get_web_stories.php')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to fetch web stories data');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const story = data.find(s => s.slug === slug);
+        if (story) {
+          setStoryData(story);
+        }
+        
+        // Regardless of whether we found the story data,
+        // we'll proceed with the iframe approach
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching web story data:', err);
+        setLoading(false);
+      });
   }, [slug]);
+
+  // If story data is available, set the metadata for SEO
+  const renderHelmet = () => {
+    if (storyData) {
+      return (
+        <Helmet>
+          <title>{storyData.title} - Today Egg Rates</title>
+          <meta name="description" content={`Egg Rate in ${storyData.city}, ${storyData.state}: ₹${storyData.rate} per egg. Updated on ${storyData.date}.`} />
+          <meta property="og:title" content={storyData.title} />
+          <meta property="og:description" content={`Egg Rate in ${storyData.city}, ${storyData.state}: ₹${storyData.rate} per egg. Updated on ${storyData.date}.`} />
+          <meta property="og:image" content={storyData.thumbnail} />
+          <meta property="og:type" content="article" />
+        </Helmet>
+      );
+    }
+    return null;
+  };
 
   if (loading) {
     return (
@@ -64,14 +99,28 @@ const WebStoryViewer = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
+      {renderHelmet()}
       <Navbar
         selectedState={selectedState}
         setSelectedState={setSelectedState}
         setSelectedCity={setSelectedCity}
         selectedCity={selectedCity}
       />
-      <div className="container mx-auto p-6 flex-grow flex items-center justify-center">
-        <p>Redirecting to web story...</p>
+      <div className="flex-grow relative w-full">
+        <iframe 
+          src={`/webstories/${slug}.html`}
+          title={storyData ? storyData.title : `Web Story - ${slug}`}
+          className="w-full h-full absolute inset-0 border-none"
+          allowFullScreen
+        ></iframe>
+      </div>
+      <div className="p-4 bg-white shadow-md">
+        <button 
+          onClick={() => navigate('/webstories')}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Back to All Web Stories
+        </button>
       </div>
       <Footer />
     </div>

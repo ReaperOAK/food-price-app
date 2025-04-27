@@ -50,11 +50,9 @@ const BodyOne = ({ selectedCity, selectedState }) => {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 {featuredWebStories.map((story, index) => (
-                  <a 
+                  <Link 
                     key={index}
-                    href={`/webstories/${story.slug}.html`}
-                    target="_blank" 
-                    rel="noopener noreferrer"
+                    to={`/webstory/${story.slug}`}
                     className="block bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
                   >
                     <div className="aspect-w-9 aspect-h-16 mb-2">
@@ -65,10 +63,10 @@ const BodyOne = ({ selectedCity, selectedState }) => {
                         loading="lazy"
                       />
                     </div>
-                    <h3 className="font-bold">{story.title}</h3>
-                    <p className="text-sm text-gray-600">{story.date}</p>
-                    <p className="text-red-600 font-bold mt-1">₹{story.rate} per egg</p>
-                  </a>
+                    <h3 className="font-bold text-lg mb-1">{story.title}</h3>
+                    <p className="text-red-600 font-bold mb-1">₹{story.rate} per egg</p>
+                    <p className="text-gray-600 text-sm">{story.date}</p>
+                  </Link>
                 ))}
               </div>
               <div className="text-center mt-4">
