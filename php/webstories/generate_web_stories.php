@@ -366,10 +366,12 @@ try {
             shuffle($backgroundImages);
             
             // For each page in the web story, construct the proper path to the image
-            // We'll use full absolute URLs to ensure they're accessible
-            $coverImage = $backgroundImages[0];  // Remove the /images/webstories/ prefix 
-            $trayPriceImage = isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0];
-            $ctaImage = isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0];
+            $coverImage = formatImagePath($backgroundImages[0]);  
+            $trayPriceImage = formatImagePath(isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0]);
+            $ctaImage = formatImagePath(isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0]);
+            
+            // Generate thumbnail image path
+            $thumbnailPath = '/images/webstories/thumbnail-' . $citySlug . '.jpg';
             
             // Format date for display
             $displayDate = date('F j, Y', strtotime($date));
@@ -379,59 +381,50 @@ try {
             $story = str_replace('{{CITY_NAME}}', $city, $story);
             $story = str_replace('{{STATE_NAME}}', $state, $story);
             $story = str_replace('{{EGG_RATE}}', $rate, $story);
+            
             // Calculate the tray price properly instead of literal string replacement
             $trayPrice = number_format($rate * 30, 1);
             $story = str_replace('{{EGG_RATE * 30}}', $trayPrice, $story);
             $story = str_replace('{{DATE}}', $displayDate, $story);
             
-            // Format image paths properly with the correct path prefix
-            $formattedCoverImage = formatImagePath($coverImage);
-            $formattedTrayImage = formatImagePath($trayPriceImage);
-            $formattedCtaImage = formatImagePath($ctaImage);
-            
             debug_log("IMAGES", "Formatted image paths", [
-                "Original cover" => $coverImage,
-                "Formatted cover" => $formattedCoverImage,
-                "Original tray" => $trayPriceImage,
-                "Formatted tray" => $formattedTrayImage,
-                "Original CTA" => $ctaImage,
-                "Formatted CTA" => $formattedCtaImage
+                "Cover" => $coverImage,
+                "Tray" => $trayPriceImage,
+                "CTA" => $ctaImage,
+                "Thumbnail" => $thumbnailPath
             ]);
             
-            // Replace different background images for different pages with correctly formatted paths
-            $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $formattedCoverImage, $story);
-            $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $formattedTrayImage, $story);
-            $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $formattedCtaImage, $story);
+            // Replace image paths
+            $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
+            $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayPriceImage, $story);
+            $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
             
+            // Replace city slug
             $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
             
-            // Check all img tags to ensure no duplicate paths
-            $story = preg_replace('#src="[/]?images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
-            $story = preg_replace('#src="/+images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
-            $story = preg_replace('#src="/images/webstories//images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
+            // Fix any structural issues in the template that could cause rendering problems
             
-            // Fix duplicate paths in meta tags
-            $story = preg_replace('#content="https://todayeggrates.com/images/webstories//images/webstories/([^"]+)"#', 'content="https://todayeggrates.com/images/webstories/$1"', $story);
-            
-            // Make sure the amp-story tag has all required attributes
-            if (strpos($story, '<amp-story poster-portrait-src') !== false && strpos($story, 'standalone') === false) {
-                debug_log("STORY", "Fixing missing attributes in amp-story tag");
-                $story = str_replace(
-                    '<amp-story poster-portrait-src',
-                    '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src',
-                    $story
-                );
-            }
-            
-            // Additional thorough check for amp-story tag
-            if (preg_match('/<amp-story(?!\s+standalone)[^>]*>/', $story)) {
-                debug_log("STORY", "Ensuring amp-story tag has all required attributes");
+            // Ensure amp-story has the standalone attribute and other required attributes
+            if (strpos($story, '<amp-story standalone') === false) {
+                debug_log("FIX", "Adding standalone attribute to amp-story tag");
                 $story = preg_replace(
-                    '/<amp-story[^>]*>/',
-                    '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src="' . $formattedCoverImage . '">',
+                    '/<amp-story(?!\s+standalone)[^>]*>/',
+                    '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src="' . $coverImage . '">',
                     $story
                 );
             }
+            
+            // Make sure each amp-story-grid-layer has a matching closing tag
+            $story = preg_replace('/<amp-story-grid-layer[^>]*>(?![\s\S]*?<\/amp-story-grid-layer>)/i', 
+                                '$0</amp-story-grid-layer>', $story);
+            
+            // Remove any nested amp-story tags (common issue)
+            $story = preg_replace('/<amp-story[^>]*>(?=[\s\S]*?<amp-story[^>]*>)/i', '', $story);
+            $story = preg_replace('/<\/amp-story>(?=[\s\S]*?<\/amp-story>)/i', '', $story);
+            
+            // Remove any nested amp-story-page tags
+            $story = preg_replace('/<amp-story-page[^>]*>(?=[\s\S]*?<amp-story-page[^>]*>)/i', '', $story);
+            $story = preg_replace('/<\/amp-story-page>(?=[\s\S]*?<\/amp-story-page>)/i', '', $story);
             
             // Save the web story
             $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
