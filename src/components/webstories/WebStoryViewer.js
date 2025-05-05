@@ -28,9 +28,19 @@ const WebStoryViewer = () => {
           setStoryData(story);
         }
         
-        // Regardless of whether we found the story data,
-        // we'll proceed with the iframe approach
-        setLoading(false);
+        // Check if the webstory file exists
+        fetch(`/webstories/${slug}.html`, { method: 'HEAD' })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`Webstory file does not exist: ${slug}.html`);
+            }
+            setLoading(false);
+          })
+          .catch(err => {
+            console.error('Error checking webstory file:', err);
+            setError(err.message || 'Failed to load web story file');
+            setLoading(false);
+          });
       })
       .catch(err => {
         console.error('Error fetching web story data:', err);
@@ -107,12 +117,13 @@ const WebStoryViewer = () => {
         setSelectedCity={setSelectedCity}
         selectedCity={selectedCity}
       />
-      <div className="flex-grow relative w-full">
+      <div className="flex-grow relative w-full" style={{ height: 'calc(100vh - 140px)' }}>
         <iframe 
           src={`/webstories/${slug}.html`}
           title={storyData ? storyData.title : `Web Story - ${slug}`}
           className="w-full h-full absolute inset-0 border-none"
           allowFullScreen
+          sandbox="allow-scripts allow-same-origin allow-popups"
         ></iframe>
       </div>
       <div className="p-4 bg-white shadow-md">
