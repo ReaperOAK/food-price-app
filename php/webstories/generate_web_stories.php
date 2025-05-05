@@ -1,395 +1,88 @@
 <?php
+// Simple error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', dirname(dirname(__FILE__)) . '/error.log');
 
-// Helper function for structured debugging
-function debug_log($step, $message, $data = null) {
-    $log = date('Y-m-d H:i:s') . " [WEB STORIES] " . $step . ": " . $message;
-    if ($data !== null) {
-        $log .= " - " . json_encode($data, JSON_UNESCAPED_SLASHES);
-    }
-    error_log($log);
+// Helper function for logging
+function log_message($message) {
+    error_log(date('Y-m-d H:i:s') . " [WEB STORIES] " . $message);
+    echo $message . "<br>";
 }
 
-// Helper function to ensure image URLs are properly formatted
-function formatImagePath($imagePath) {
-    // Strip any leading slashes if they exist
-    $imagePath = ltrim($imagePath, '/');
-    
-    // Remove any duplicate path segments
-    if (preg_match('#(^|/)images/webstories/.*#', $imagePath)) {
-        // Extract just the filename by finding the last occurrence of images/webstories/
-        $pattern = '#.*images/webstories/([^/]+)$#';
-        if (preg_match($pattern, $imagePath, $matches)) {
-            $filename = $matches[1];
-            return '/images/webstories/' . $filename;
-        }
+// Helper function to format image path
+function format_image_path($image) {
+    if (strpos($image, '/') === 0) {
+        return $image;
     }
-    
-    // If it's just a filename without path, add the path
-    if (strpos($imagePath, '/') === false) {
-        return '/images/webstories/' . $imagePath;
-    }
-    
-    // For other cases, ensure it has the correct prefix
-    if (strpos($imagePath, 'images/webstories/') === 0) {
-        return '/' . $imagePath;
-    }
-    
-    // Default case - add the standard path
-    return '/images/webstories/' . $imagePath;
+    return '/images/webstories/' . $image;
 }
 
-// Function to fix AMP issues in generated web story content
-function fixAmpStoryStructure($html) {
-    // Add DOMDocument parsing with better error handling
-    $dom = new DOMDocument('1.0', 'UTF-8');
-    $previousValue = libxml_use_internal_errors(true); // Suppress warnings for malformed HTML
-    
-    // Use a regular expression to fix common issues before DOM parsing
-    $html = preg_replace('/<amp-story(?!\s+standalone)[^>]*>/', 
-                        '<amp-story standalone title="Egg Rate" publisher="Today Egg Rates" publisher-logo-src="/tee.png">', 
-                        $html);
-    
-    // Fix incorrect nesting of amp-story-page inside another amp-story-page
-    $html = preg_replace('/<amp-story-page\s+id="auto-id-[^"]*"\s*>\s*<a\s+href="([^"]+)"[^>]*>([^<]+)<\/a>\s*<\/amp-story-page>/i', 
-                        '<amp-story-page-outlink layout="nodisplay"><a href="$1" target="_blank">$2</a></amp-story-page-outlink>', 
-                        $html);
-    
-    // Remove any extra closing tags that might be causing issues
-    $html = preg_replace('/(<\/amp-story-page>){2,}/i', '</amp-story-page>', $html);
-    
-    try {
-        $dom->loadHTML($html);
-        
-        // Fix amp-story element
-        $ampStoryElements = $dom->getElementsByTagName('amp-story');
-        if ($ampStoryElements->length > 0) {
-            $ampStory = $ampStoryElements->item(0);
-            if (!$ampStory->hasAttribute('standalone')) {
-                $ampStory->setAttribute('standalone', '');
-            }
-        }
-        
-        // Find incorrectly nested amp-story-page elements
-        $storyPages = $dom->getElementsByTagName('amp-story-page');
-        $pagesToRemove = [];
-        
-        // First pass - identify nested pages
-        for ($i = 0; $i < $storyPages->length; $i++) {
-            $page = $storyPages->item($i);
-            $parentNode = $page->parentNode;
-            
-            // If parent is not amp-story, it's incorrectly nested
-            if ($parentNode && $parentNode->nodeName !== 'amp-story') {
-                if ($parentNode->nodeName === 'amp-story-grid-layer') {
-                    // This is a nested page that needs to be converted to outlink
-                    $pagesToRemove[] = $page;
-                    
-                    // Create a new outlink element
-                    $outlink = $dom->createElement('amp-story-page-outlink');
-                    $outlink->setAttribute('layout', 'nodisplay');
-                    
-                    // Get the link information from the nested page
-                    $links = $page->getElementsByTagName('a');
-                    if ($links->length > 0) {
-                        $link = $links->item(0);
-                        $href = $link->getAttribute('href');
-                        $text = $link->textContent;
-                        
-                        // Create proper link inside outlink
-                        $newLink = $dom->createElement('a', $text);
-                        $newLink->setAttribute('href', $href);
-                        $newLink->setAttribute('target', '_blank');
-                        $outlink->appendChild($newLink);
-                        
-                        // Add the outlink to the grid layer
-                        $parentNode->appendChild($outlink);
-                    }
-                }
-            }
-        }
-        
-        // Remove the incorrectly nested pages (must do this after the loop)
-        foreach ($pagesToRemove as $pageToRemove) {
-            if ($pageToRemove->parentNode) {
-                $pageToRemove->parentNode->removeChild($pageToRemove);
-            }
-        }
-        
-        // Format the output with proper encoding
-        $html = $dom->saveHTML();
-        
-    } catch (Exception $e) {
-        debug_log("WARNING", "DOM fix failed: " . $e->getMessage());
-        // Keep using the regex-fixed version if DOM parsing fails
-    }
-    
-    libxml_use_internal_errors($previousValue);
-    return $html;
-}
-
-// Use a try-catch block around the entire script to catch any unexpected errors
 try {
-    debug_log("START", "Beginning web stories generation");
+    log_message("Starting web stories generation");
     
-    // Database connection - using require_once instead of include to avoid duplicate function declarations
-    debug_log("DB", "Including database configuration");
+    // Database connection
     require_once dirname(__DIR__) . '/config/db.php';
-
-    // Verify that $conn exists, otherwise create the connection
+    
+    // If $conn is not set, create a connection
     if (!isset($conn) || $conn->connect_error) {
-        debug_log("DB", "Creating new database connection");
-        // Connection details
         $servername = "localhost";
         $username = "u901337298_test";
         $password = "A12345678b*";
         $dbname = "u901337298_test";
         
-        // Create connection
         $conn = new mysqli($servername, $username, $password, $dbname);
         
-        // Check connection
         if ($conn->connect_error) {
             throw new Exception("Connection failed: " . $conn->connect_error);
         }
-        debug_log("DB", "New database connection created successfully");
-    } else {
-        debug_log("DB", "Using existing database connection");
     }
-
-    // Function to generate web story index
-    if (!function_exists('generateWebStoryIndex')) {
-        debug_log("FUNCTIONS", "Defining generateWebStoryIndex function");
-        function generateWebStoryIndex($storiesDir, $conn) {
-            debug_log("INDEX", "Generating web stories index page");
-            $indexFile = $storiesDir . '/index.html';
-            
-            // Try normalized table first for getting latest egg rates
-            try {
-                debug_log("INDEX", "Querying normalized tables for rates");
-                $sql = "
-                    SELECT c.name as city, s.name as state, ern.rate, ern.date 
-                    FROM egg_rates_normalized ern
-                    JOIN cities c ON ern.city_id = c.id
-                    JOIN states s ON c.state_id = s.id
-                    WHERE (ern.city_id, ern.date) IN (
-                        SELECT city_id, MAX(date)
-                        FROM egg_rates_normalized
-                        GROUP BY city_id
-                    )
-                    ORDER BY c.name
-                ";
-                
-                $result = $conn->query($sql);
-                
-                if (!$result || $result->num_rows === 0) {
-                    debug_log("INDEX", "No results from normalized table, falling back to original table");
-                    throw new Exception("No results from normalized table");
-                }
-            } catch (Exception $e) {
-                // Fall back to original table
-                debug_log("INDEX", "Using original table: " . $e->getMessage());
-                $sql = "
-                    SELECT city, state, rate, date 
-                    FROM egg_rates 
-                    WHERE (city, date) IN (
-                        SELECT city, MAX(date) 
-                        FROM egg_rates 
-                        GROUP BY city
-                    )
-                    ORDER BY city
-                ";
-                $result = $conn->query($sql);
-            }
-            
-            // Generate HTML for index file
-            $html = "<!DOCTYPE html><html><head><title>Web Stories Index</title></head><body>";
-            $html .= "<h1>Web Stories Index</h1><ul>";
-            
-            while ($row = $result->fetch_assoc()) {
-                $city = $row['city'];
-                $state = $row['state'];
-                $rate = $row['rate'];
-                $date = $row['date'];
-                
-                debug_log("INDEX", "Adding index entry for {$city}, {$state}");
-                $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-                $html .= "<li><a href='{$citySlug}-egg-rate.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
-            }
-            
-            $html .= "</ul></body></html>";
-            
-            debug_log("INDEX", "Saving index file to {$indexFile}");
-            $writeResult = file_put_contents($indexFile, $html);
-            if ($writeResult === false) {
-                debug_log("INDEX", "Failed to write index file to {$indexFile}");
-                throw new Exception("Failed to write index file to {$indexFile}");
-            }
-            debug_log("INDEX", "Web stories index page generated successfully");
-        }
-    }
-
-    // Include the function to delete old web stories, we're using require_once to avoid duplicate declarations
-    debug_log("INCLUDES", "Including delete_old_webstories.php");
-    require_once __DIR__ . '/delete_old_webstories.php';
-
-    // Configuration - use absolute paths to avoid permission issues
-    $basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
+    
+    // Set up directories
+    $basePath = dirname(dirname(dirname(__FILE__)));
     $storiesDir = $basePath . '/webstories';
     $imageDir = $basePath . '/images/webstories';
     $templateFile = $basePath . '/templates/webstory_template.html';
     
-    debug_log("CONFIG", "Paths configured", [
-        "basePath" => $basePath,
-        "storiesDir" => $storiesDir,
-        "imageDir" => $imageDir,
-        "templateFile" => $templateFile
-    ]);
-
-    // Create the necessary directories if they don't exist
+    // Create directories if they don't exist
     foreach ([$storiesDir, $imageDir] as $dir) {
         if (!file_exists($dir)) {
-            debug_log("DIRS", "Creating directory: {$dir}");
-            if (!mkdir($dir, 0777, true)) {
-                $error = error_get_last();
-                debug_log("DIRS", "Failed to create directory: {$dir}", $error);
-                throw new Exception("Failed to create directory: {$dir}. Error: " . ($error['message'] ?? 'Unknown error'));
-            }
-            // After creation, ensure it's writable
-            chmod($dir, 0777);
-            debug_log("DIRS", "Directory created successfully: {$dir}");
-        } elseif (!is_writable($dir)) {
-            debug_log("DIRS", "Directory not writable: {$dir}");
-            // Try to make it writable
-            chmod($dir, 0777);
-            if (!is_writable($dir)) {
-                throw new Exception("Directory not writable: {$dir}. Please check permissions.");
-            }
-        } else {
-            debug_log("DIRS", "Directory exists and is writable: {$dir}");
+            mkdir($dir, 0777, true);
         }
     }
-
-    // Get all available background images
+    
+    // Get background images
     $backgroundImages = [];
     if (is_dir($imageDir)) {
-        debug_log("IMAGES", "Scanning directory for background images: {$imageDir}");
         $files = scandir($imageDir);
-        if ($files === false) {
-            debug_log("IMAGES", "Failed to scan directory: {$imageDir}");
-            throw new Exception("Failed to scan directory: {$imageDir}");
-        }
-        
         foreach ($files as $file) {
             $extension = pathinfo($file, PATHINFO_EXTENSION);
-            if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']) && $file !== '.' && $file !== '..') {
-                // Skip thumbnail files
-                if (strpos($file, 'thumbnail-') === 0) {
-                    continue;
-                }
-                // Store just the filename, not the full path
+            if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']) && $file !== '.' && $file !== '..' && strpos($file, 'thumbnail-') !== 0) {
                 $backgroundImages[] = $file;
-                debug_log("IMAGES", "Found background image: {$file}");
             }
         }
-        debug_log("IMAGES", "Found " . count($backgroundImages) . " background images");
     }
-
-    // If no images found, use a default image
+    
+    // Use default image if no images found
     if (empty($backgroundImages)) {
-        debug_log("IMAGES", "No background images found, using default");
-        // Check multiple locations for default image
-        $defaultImageLocations = [
-            $basePath . '/eggpic.png',
-            $basePath . '/public/eggpic.png',
-            $basePath . '/build/eggpic.png'
-        ];
-        
-        $defaultImageFound = false;
-        foreach ($defaultImageLocations as $defaultImage) {
-            if (file_exists($defaultImage)) {
-                debug_log("IMAGES", "Found default image at: {$defaultImage}");
-                // Copy default image to webstories image directory
-                $targetImage = $imageDir . '/default.png';
-                if (copy($defaultImage, $targetImage)) {
-                    debug_log("IMAGES", "Copied default image to: {$targetImage}");
-                    $backgroundImages[] = 'default.png';
-                    $defaultImageFound = true;
-                    break;
-                } else {
-                    $error = error_get_last();
-                    debug_log("ERROR", "Failed to copy default image", $error);
-                }
-            }
-        }
-        
-        if (!$defaultImageFound) {
-            // Create a simple default image
-            debug_log("IMAGES", "Creating a simple default image");
-            $simpleImage = imagecreatetruecolor(800, 600);
-            $bgColor = imagecolorallocate($simpleImage, 240, 240, 240);
-            $textColor = imagecolorallocate($simpleImage, 0, 0, 0);
-            imagefill($simpleImage, 0, 0, $bgColor);
-            imagestring($simpleImage, 5, 300, 280, "Egg Rate", $textColor);
-            
-            // Save the simple image
-            $simpleImagePath = $imageDir . '/default.png';
-            imagepng($simpleImage, $simpleImagePath);
-            imagedestroy($simpleImage);
-            
-            if (file_exists($simpleImagePath)) {
-                debug_log("IMAGES", "Created simple default image at: {$simpleImagePath}");
-                $backgroundImages[] = 'default.png';
-            } else {
-                debug_log("ERROR", "Failed to create simple default image");
-                throw new Exception("No background images found and could not create a default image.");
-            }
-        }
+        log_message("No background images found");
+        $backgroundImages[] = 'eggpic.png';
     }
-
-    // Get the web story template with error handling
-    debug_log("TEMPLATE", "Looking for template file: {$templateFile}");
-    if (file_exists($templateFile)) {
-        debug_log("TEMPLATE", "Reading template file: {$templateFile}");
-        $template = file_get_contents($templateFile);
-        if ($template === false) {
-            debug_log("TEMPLATE", "Could not read template file: {$templateFile}");
-            throw new Exception("Could not read template file {$templateFile}");
-        }
-        debug_log("TEMPLATE", "Template file read successfully (" . strlen($template) . " bytes)");
-    } else {
-        // Check alternative locations
-        $alternateTemplateFile = $basePath . '/public_html/templates/webstory_template.html';
-        debug_log("TEMPLATE", "Template not found, trying alternate: {$alternateTemplateFile}");
-        if (file_exists($alternateTemplateFile)) {
-            debug_log("TEMPLATE", "Reading alternate template file: {$alternateTemplateFile}");
-            $template = file_get_contents($alternateTemplateFile);
-            if ($template === false) {
-                debug_log("TEMPLATE", "Could not read alternate template file: {$alternateTemplateFile}");
-                throw new Exception("Could not read template file {$alternateTemplateFile}");
-            }
-            debug_log("TEMPLATE", "Alternate template file read successfully (" . strlen($template) . " bytes)");
-        } else {
-            debug_log("TEMPLATE", "No template file found at either location");
-            throw new Exception("Template file not found at {$templateFile} or {$alternateTemplateFile}");
-        }
+    
+    // Read template file
+    if (!file_exists($templateFile)) {
+        throw new Exception("Template file not found at: " . $templateFile);
     }
-
-    // Get today's date
-    $today = date('Y-m-d');
-    debug_log("DATE", "Current date: {$today}");
-
-    // Clean up old web stories first - but don't close the connection
-    $daysToKeep = 3;
-    debug_log("CLEANUP", "Cleaning up old web stories (keeping {$daysToKeep} days)");
-    deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
-
-    // Get the latest egg rates - use the normalized tables first
+    
+    $template = file_get_contents($templateFile);
+    if ($template === false) {
+        throw new Exception("Could not read template file: " . $templateFile);
+    }
+    
+    // Get egg rates data
     try {
-        debug_log("DATA", "Querying normalized tables for egg rates");
+        // First try normalized tables
         $sql = "
             SELECT c.name as city, s.name as state, ern.rate, ern.date 
             FROM egg_rates_normalized ern
@@ -402,16 +95,15 @@ try {
             )
             ORDER BY c.name
         ";
-
+        
         $result = $conn->query($sql);
         
         if (!$result || $result->num_rows === 0) {
-            debug_log("DATA", "No results from normalized tables, falling back to original table");
             throw new Exception("No results from normalized tables");
         }
     } catch (Exception $e) {
         // Fall back to original table
-        debug_log("DATA", "Using original table: " . $e->getMessage());
+        log_message("Falling back to original table: " . $e->getMessage());
         $sql = "
             SELECT city, state, rate, date 
             FROM egg_rates 
@@ -423,121 +115,104 @@ try {
             ORDER BY city
         ";
         $result = $conn->query($sql);
-        
-        if (!$result) {
-            debug_log("DATA", "Database query failed: " . $conn->error);
-            throw new Exception("Database query failed: " . $conn->error);
-        }
     }
-
-    if ($result && $result->num_rows > 0) {
-        debug_log("PROCESS", "Found " . $result->num_rows . " cities to generate web stories for");
-        $storiesGenerated = 0;
-        
-        while ($row = $result->fetch_assoc()) {
-            $city = $row['city'];
-            $state = $row['state'];
-            $rate = $row['rate'];
-            $date = $row['date'];
-            
-            debug_log("STORY", "Processing city: {$city}, {$state}");
-            
-            // Skip if the rate is from more than 3 days ago
-            if (strtotime($date) < strtotime('-3 days')) {
-                debug_log("STORY", "Skipping {$city} - rate from {$date} is too old");
-                continue;
-            }
-            
-            // Create a URL-friendly city name
-            $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-            
-            // Randomly select different images for different pages
-            shuffle($backgroundImages);
-            
-            // For each page in the web story, construct the proper path to the image
-            $coverImage = formatImagePath($backgroundImages[0]);  
-            $trayPriceImage = formatImagePath(isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0]);
-            $ctaImage = formatImagePath(isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0]);
-            
-            // Generate thumbnail image path
-            $thumbnailPath = '/images/webstories/thumbnail-' . $citySlug . '.jpg';
-            
-            // Format date for display
-            $displayDate = date('F j, Y', strtotime($date));
-            
-            // Calculate tray price (30 eggs)
-            $trayPrice = number_format($rate * 30, 1);
-            
-            debug_log("STORY", "Calculated tray price for {$city}: {$trayPrice} (rate: {$rate})");
-            
-            // Replace placeholders in the template
-            $story = $template;
-            $story = str_replace('{{CITY_NAME}}', $city, $story);
-            $story = str_replace('{{STATE_NAME}}', $state, $story);
-            $story = str_replace('{{EGG_RATE}}', $rate, $story);
-            $story = str_replace('{{TRAY_PRICE}}', $trayPrice, $story);
-            $story = str_replace('{{DATE}}', $displayDate, $story);
-            $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
-            
-            debug_log("IMAGES", "Formatted image paths", [
-                "Cover" => $coverImage,
-                "Tray" => $trayPriceImage,
-                "CTA" => $ctaImage,
-                "Thumbnail" => $thumbnailPath
-            ]);
-            
-            // Replace image paths
-            $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
-            $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayPriceImage, $story);
-            $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
-            
-            // Apply strict validation and fixes to AMP story structure
-            $story = fixAmpStoryStructure($story);
-            
-            // Save the web story
-            $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
-            debug_log("STORY", "Saving web story for {$city} to {$filename}");
-            $writeResult = file_put_contents($filename, $story);
-            
-            if ($writeResult !== false) {
-                $storiesGenerated++;
-                debug_log("STORY", "Web story saved successfully for {$city}");
-            } else {
-                debug_log("STORY", "Failed to write web story file for {$city} to {$filename}");
-                throw new Exception("Could not write to file {$filename}");
-            }
-        }
-        
-        // Generate an index file for all web stories
-        debug_log("INDEX", "Generating index file for {$storiesGenerated} web stories");
-        generateWebStoryIndex($storiesDir, $conn);
-        
-        debug_log("COMPLETE", "Generated {$storiesGenerated} web stories successfully");
-        echo "Generated {$storiesGenerated} web stories successfully.<br>";
-        
-        // Call the thumbnail update script to generate thumbnails for all web stories
-        debug_log("THUMBNAILS", "Calling update_webstory_thumbnails.php to generate thumbnails");
-        echo "Generating thumbnails for web stories...<br>";
-        include_once __DIR__ . '/update_webstory_thumbnails.php';
-        
-    } else {
-        debug_log("ERROR", "No egg rates found in the database");
-        echo "No egg rates found in the database. Please check your data.";
-    }
-
-    // Use require_once to avoid double inclusion issues
-    debug_log("SITEMAP", "Generating web stories sitemap");
-    require_once 'generate_webstories_sitemap.php';
-
-    // Success message
-    debug_log("SUCCESS", "Web stories generation completed successfully");
-
-} catch (Exception $e) {
-    // Log any exceptions that occur
-    debug_log("ERROR", "Web stories generation error: " . $e->getMessage(), ["trace" => $e->getTraceAsString()]);
-    echo "Error generating web stories: " . $e->getMessage();
     
-    // Make sure we return a non-zero exit code to indicate an error
-    exit(1);
+    // Generate web stories for each city
+    $storiesGenerated = 0;
+    
+    while ($row = $result->fetch_assoc()) {
+        $city = $row['city'];
+        $state = $row['state'];
+        $rate = $row['rate'];
+        $date = $row['date'];
+        
+        log_message("Processing: " . $city . ", " . $state);
+        
+        // Skip outdated rates (more than 3 days old)
+        if (strtotime($date) < strtotime('-3 days')) {
+            log_message("Skipping " . $city . " - rate is too old");
+            continue;
+        }
+        
+        // Create URL-friendly city name
+        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+        
+        // Select random images for different pages
+        shuffle($backgroundImages);
+        $coverImage = format_image_path($backgroundImages[0]);
+        $trayImage = format_image_path($backgroundImages[1 % count($backgroundImages)]);
+        $ctaImage = format_image_path($backgroundImages[2 % count($backgroundImages)]);
+        
+        // Calculate tray price (30 eggs)
+        $trayPrice = number_format($rate * 30, 1);
+        
+        // Format date for display
+        $displayDate = date('F j, Y', strtotime($date));
+        
+        // Replace placeholders
+        $story = $template;
+        $story = str_replace('{{CITY_NAME}}', $city, $story);
+        $story = str_replace('{{STATE_NAME}}', $state, $story);
+        $story = str_replace('{{EGG_RATE}}', $rate, $story);
+        $story = str_replace('{{TRAY_PRICE}}', $trayPrice, $story);
+        $story = str_replace('{{DATE}}', $displayDate, $story);
+        $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
+        $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
+        $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayImage, $story);
+        $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
+        
+        // Save the web story
+        $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
+        $writeResult = file_put_contents($filename, $story);
+        
+        if ($writeResult !== false) {
+            $storiesGenerated++;
+            log_message("Web story saved for " . $city);
+        } else {
+            log_message("Error saving web story for " . $city);
+        }
+    }
+    
+    // Generate an index file
+    log_message("Generating index file");
+    $indexFile = $storiesDir . '/index.html';
+    $html = "<!DOCTYPE html><html><head><title>Web Stories Index</title></head><body>";
+    $html .= "<h1>Web Stories Index</h1><ul>";
+    
+    $sql = "
+        SELECT city, state, rate, date 
+        FROM egg_rates 
+        WHERE (city, date) IN (
+            SELECT city, MAX(date) 
+            FROM egg_rates 
+            GROUP BY city
+        )
+        ORDER BY city
+    ";
+    $result = $conn->query($sql);
+    
+    while ($row = $result->fetch_assoc()) {
+        $city = $row['city'];
+        $state = $row['state'];
+        $rate = $row['rate'];
+        $date = $row['date'];
+        
+        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+        $html .= "<li><a href='{$citySlug}-egg-rate.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
+    }
+    
+    $html .= "</ul></body></html>";
+    file_put_contents($indexFile, $html);
+    
+    log_message("Generation complete - created " . $storiesGenerated . " web stories");
+    
+    // Generate thumbnails
+    include_once __DIR__ . '/update_webstory_thumbnails.php';
+    
+    // Generate sitemap
+    include_once __DIR__ . '/generate_webstories_sitemap.php';
+    
+} catch (Exception $e) {
+    log_message("Error: " . $e->getMessage());
 }
 ?>
