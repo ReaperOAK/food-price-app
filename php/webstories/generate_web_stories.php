@@ -1,5 +1,4 @@
 <?php
-// Simple error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 ini_set('log_errors', 1);
@@ -7,103 +6,59 @@ ini_set('error_log', dirname(dirname(__FILE__)) . '/error.log');
 
 // Helper function for logging
 function log_message($message) {
-    error_log(date('Y-m-d H:i:s') . " [WEB STORIES] " . $message);
+    error_log(date('Y-m-d H:i:s') . " [WEBSTORIES] " . $message);
     echo $message . "<br>";
 }
 
-// Helper function to format image path
-function format_image_path($image) {
-    if (strpos($image, '/') === 0) {
-        return $image;
-    }
-    return '/images/webstories/' . $image;
-}
-
 try {
-    log_message("Starting web stories generation");
-    
+    log_message("Starting web story generation");
+
     // Database connection
     require_once dirname(__DIR__) . '/config/db.php';
     
     // Set up directories
     $basePath = dirname(dirname(dirname(__FILE__)));
-    $storiesDir = $basePath . '/webstories';
-    $imageDir = $basePath . '/images/webstories';
-    $templateFile = $basePath . '/templates/webstory_template.html';
+    $templatePath = $basePath . '/templates/webstory_template.html';
+    $outputDir = $basePath . '/webstories';
     
-    // Create directories if they don't exist
-    foreach ([$storiesDir, $imageDir] as $dir) {
-        if (!file_exists($dir)) {
-            mkdir($dir, 0777, true);
-        }
-    }
-    
-    // Get background images
-    $backgroundImages = [];
-    if (is_dir($imageDir)) {
-        $files = scandir($imageDir);
-        foreach ($files as $file) {
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
-            if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']) && $file !== '.' && $file !== '..' && strpos($file, 'thumbnail-') !== 0) {
-                $backgroundImages[] = $file;
-            }
-        }
-    }
-    
-    // Use default image if no images found
-    if (empty($backgroundImages)) {
-        log_message("No background images found");
-        $backgroundImages[] = 'eggpic.png';
+    // Create output directory if it doesn't exist
+    if (!file_exists($outputDir)) {
+        mkdir($outputDir, 0777, true);
+        log_message("Created output directory: " . $outputDir);
     }
     
     // Read template file
-    if (!file_exists($templateFile)) {
-        throw new Exception("Template file not found at: " . $templateFile);
+    if (!file_exists($templatePath)) {
+        throw new Exception("Template file not found: " . $templatePath);
     }
     
-    $template = file_get_contents($templateFile);
+    $template = file_get_contents($templatePath);
     if ($template === false) {
-        throw new Exception("Could not read template file: " . $templateFile);
+        throw new Exception("Failed to read template file");
     }
     
-    // Get egg rates data
-    try {
-        // First try normalized tables
-        $sql = "
-            SELECT c.name as city, s.name as state, ern.rate, ern.date 
-            FROM egg_rates_normalized ern
-            JOIN cities c ON ern.city_id = c.id
-            JOIN states s ON c.state_id = s.id
-            WHERE (ern.city_id, ern.date) IN (
-                SELECT city_id, MAX(date)
-                FROM egg_rates_normalized
-                GROUP BY city_id
-            )
-            ORDER BY c.name
-        ";
-        
-        $result = $conn->query($sql);
-        
-        if (!$result || $result->num_rows === 0) {
-            throw new Exception("No results from normalized tables");
-        }
-    } catch (Exception $e) {
-        // Fall back to original table
-        log_message("Falling back to original table: " . $e->getMessage());
-        $sql = "
-            SELECT city, state, rate, date 
-            FROM egg_rates 
-            WHERE (city, date) IN (
-                SELECT city, MAX(date) 
-                FROM egg_rates 
-                GROUP BY city
-            )
-            ORDER BY city
-        ";
-        $result = $conn->query($sql);
+    log_message("Template loaded successfully");
+    
+    // Get the most recent egg rates for each city
+    $sql = "
+        SELECT er.city, er.state, er.rate, er.date, 
+               COALESCE(prev.rate, 0) as previous_rate
+        FROM egg_rates er
+        INNER JOIN (
+            SELECT city, MAX(date) as max_date
+            FROM egg_rates
+            GROUP BY city
+        ) latest ON er.city = latest.city AND er.date = latest.max_date
+        LEFT JOIN egg_rates prev ON er.city = prev.city AND prev.date < er.date
+        ORDER BY er.city
+    ";
+    
+    $result = $conn->query($sql);
+    
+    if (!$result) {
+        throw new Exception("Database query failed: " . $conn->error);
     }
     
-    // Generate web stories for each city
     $storiesGenerated = 0;
     
     while ($row = $result->fetch_assoc()) {
@@ -111,96 +66,53 @@ try {
         $state = $row['state'];
         $rate = $row['rate'];
         $date = $row['date'];
+        $previousRate = $row['previous_rate'];
         
-        log_message("Processing: " . $city . ", " . $state);
+        // Create URL-friendly city name for file naming
+        $slug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
         
-        // Skip outdated rates (more than 3 days old)
-        if (strtotime($date) < strtotime('-3 days')) {
-            log_message("Skipping " . $city . " - rate is too old");
-            continue;
+        // Calculate rate change
+        $rateChange = $rate - $previousRate;
+        $rateChangePercentage = ($previousRate > 0) ? ($rateChange / $previousRate * 100) : 0;
+        $rateChangeText = ($rateChange >= 0) ? "increased by ₹$rateChange" : "decreased by ₹" . abs($rateChange);
+        
+        if ($previousRate == 0) {
+            $rateChangeText = "no previous data available for comparison";
         }
-        
-        // Create URL-friendly city name
-        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-        
-        // Select random images for different pages
-        shuffle($backgroundImages);
-        $coverImage = format_image_path($backgroundImages[0]);
-        $trayImage = format_image_path($backgroundImages[1 % count($backgroundImages)]);
-        $ctaImage = format_image_path($backgroundImages[2 % count($backgroundImages)]);
-        
-        // Calculate tray price (30 eggs)
-        $trayPrice = number_format($rate * 30, 1);
         
         // Format date for display
         $displayDate = date('F j, Y', strtotime($date));
         
-        // Replace placeholders with proper escaping and tag name protection
-        $replacements = [
-            '{{CITY_NAME}}' => htmlspecialchars($city),
-            '{{STATE_NAME}}' => htmlspecialchars($state),
-            '{{EGG_RATE}}' => htmlspecialchars($rate),
-            '{{TRAY_PRICE}}' => htmlspecialchars($trayPrice),
-            '{{DATE}}' => htmlspecialchars($displayDate),
-            '{{CITY_SLUG}}' => htmlspecialchars($citySlug),
-            '{{COVER_BACKGROUND_IMAGE}}' => htmlspecialchars($coverImage),
-            '{{TRAY_BACKGROUND_IMAGE}}' => htmlspecialchars($trayImage),
-            '{{CTA_BACKGROUND_IMAGE}}' => htmlspecialchars($ctaImage)
-        ];
+        // Replace placeholders in template
+        $storyContent = $template;
+        $storyContent = str_replace('{{CITY}}', $city, $storyContent);
+        $storyContent = str_replace('{{STATE}}', $state, $storyContent);
+        $storyContent = str_replace('{{RATE}}', $rate, $storyContent);
+        $storyContent = str_replace('{{DATE}}', $displayDate, $storyContent);
+        $storyContent = str_replace('{{RATE_CHANGE}}', $rateChangeText, $storyContent);
+        $storyContent = str_replace('{{RATE_CHANGE_PERCENTAGE}}', round($rateChangePercentage, 2), $storyContent);
         
-        // Safe replacement that won't corrupt AMP tag names
-        $story = str_replace(array_keys($replacements), array_values($replacements), $template);
+        // Determine trend (up or down)
+        $trend = ($rateChange > 0) ? 'up' : (($rateChange < 0) ? 'down' : 'stable');
+        $storyContent = str_replace('{{TREND}}', $trend, $storyContent);
         
-        // Save the web story
-        $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
-        $writeResult = file_put_contents($filename, $story);
+        // Generate file path
+        $filePath = $outputDir . '/' . $slug . '.html';
         
-        if ($writeResult !== false) {
-            $storiesGenerated++;
-            log_message("Web story saved for " . $city);
+        // Write to file
+        if (file_put_contents($filePath, $storyContent) === false) {
+            log_message("Failed to write story file: " . $filePath);
         } else {
-            log_message("Error saving web story for " . $city);
+            $storiesGenerated++;
+            log_message("Generated story for " . $city . ", " . $state);
         }
     }
     
-    // Generate an index file
-    log_message("Generating index file");
-    $indexFile = $storiesDir . '/index.html';
-    $html = "<!DOCTYPE html><html><head><title>Web Stories Index</title></head><body>";
-    $html .= "<h1>Web Stories Index</h1><ul>";
-    
-    $sql = "
-        SELECT city, state, rate, date 
-        FROM egg_rates 
-        WHERE (city, date) IN (
-            SELECT city, MAX(date) 
-            FROM egg_rates 
-            GROUP BY city
-        )
-        ORDER BY city
-    ";
-    $result = $conn->query($sql);
-    
-    while ($row = $result->fetch_assoc()) {
-        $city = $row['city'];
-        $state = $row['state'];
-        $rate = $row['rate'];
-        $date = $row['date'];
-        
-        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-        $html .= "<li><a href='{$citySlug}-egg-rate.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
-    }
-    
-    $html .= "</ul></body></html>";
-    file_put_contents($indexFile, $html);
-    
-    log_message("Generation complete - created " . $storiesGenerated . " web stories");
+    log_message("Web story generation complete - created " . $storiesGenerated . " stories");
     
     // Generate thumbnails
+    log_message("Generating thumbnails...");
     include_once __DIR__ . '/update_webstory_thumbnails.php';
-    
-    // Generate sitemap
-    include_once __DIR__ . '/generate_webstories_sitemap.php';
     
 } catch (Exception $e) {
     log_message("Error: " . $e->getMessage());
