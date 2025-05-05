@@ -15,6 +15,9 @@ function debug_log($step, $message, $data = null) {
 
 // Helper function to ensure image URLs are properly formatted
 function formatImagePath($imagePath) {
+    // Remove any duplicate /images/webstories/ prefixes
+    $imagePath = preg_replace('#(/images/webstories/)+#', '/images/webstories/', $imagePath);
+    
     // Check if the path already starts with /images/webstories/
     if (strpos($imagePath, '/images/webstories/') === 0) {
         return $imagePath; // Already properly formatted
@@ -377,6 +380,16 @@ try {
             $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $formattedCtaImage, $story);
             
             $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
+            
+            // Make sure the amp-story tag has all required attributes
+            if (strpos($story, '<amp-story poster-portrait-src') !== false && strpos($story, 'standalone') === false) {
+                debug_log("STORY", "Fixing missing attributes in amp-story tag");
+                $story = str_replace(
+                    '<amp-story poster-portrait-src',
+                    '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src',
+                    $story
+                );
+            }
             
             // Save the web story
             $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
