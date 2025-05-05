@@ -433,8 +433,56 @@ try {
             // Attempt to load and fix HTML
             try {
                 $dom->loadHTML($story);
+                
+                // Fix for amp-story lacking standalone attribute
+                $ampStoryElements = $dom->getElementsByTagName('amp-story');
+                if ($ampStoryElements->length > 0) {
+                    $ampStory = $ampStoryElements->item(0);
+                    if (!$ampStory->hasAttribute('standalone')) {
+                        $ampStory->setAttribute('standalone', '');
+                        $ampStory->setAttribute('title', "Egg Rate in {$city}, {$state} - ₹{$rate}");
+                        $ampStory->setAttribute('publisher', "Today Egg Rates");
+                        $ampStory->setAttribute('publisher-logo-src', "/tee.png");
+                        $ampStory->setAttribute('poster-portrait-src', $coverImage);
+                    }
+                }
+                
+                // Fix for amp-story-page-outlink placement
+                $outlinks = $dom->getElementsByTagName('amp-story-page-outlink');
+                $outlinkCount = $outlinks->length;
+                
+                // We need to process in reverse order because the DOM structure changes as we move elements
+                for ($i = $outlinkCount - 1; $i >= 0; $i--) {
+                    $outlink = $outlinks->item($i);
+                    
+                    // Find the parent amp-story-page element
+                    $parent = $outlink->parentNode;
+                    
+                    // Check if the parent of outlink is incorrectly another amp-story-page
+                    if ($parent->nodeName === 'amp-story-page') {
+                        // Find the correct amp-story-page that should contain this outlink
+                        $correctParent = $parent;
+                        
+                        // Make sure the outlink is the last child of its parent amp-story-page
+                        $correctParent->appendChild($outlink);
+                    }
+                }
+                
+                // Remove any duplicate auto-generated IDs within the same page
+                $ampStoryPages = $dom->getElementsByTagName('amp-story-page');
+                $usedIds = array();
+                
+                foreach ($ampStoryPages as $page) {
+                    $id = $page->getAttribute('id');
+                    if (in_array($id, $usedIds) && strpos($id, 'auto-id-') === 0) {
+                        $page->setAttribute('id', 'auto-id-' . uniqid());
+                    } else {
+                        $usedIds[] = $id;
+                    }
+                }
+                
                 $story = $dom->saveHTML();
-                debug_log("FIX", "Fixed HTML structure using DOMDocument");
+                debug_log("FIX", "Fixed HTML structure using DOMDocument with special handling for outlinks");
             } catch (Exception $e) {
                 debug_log("WARNING", "Could not fix HTML with DOMDocument: " . $e->getMessage());
                 // Continue with the original story if DOMDocument fails
