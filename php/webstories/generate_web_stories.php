@@ -107,7 +107,10 @@ function direct_fix_amp_story($html) {
         
         // Replace all additional amp-story opening tags
         $afterTag = preg_replace('/<amp-story(?![^>]*standalone)([^>]*)>/', '<amp-story standalone$1>', $afterTag, 1);
-        $afterTag = preg_replace('/<amp-story[^>]*>/', '<!-- removed -->', $afterTag, -1, $count, PREG_OFFSET_CAPTURE);
+        
+        // Count replacements but don't use PREG_OFFSET_CAPTURE which causes the error
+        $count = 0;
+        $afterTag = preg_replace('/<amp-story[^>]*>/', '<!-- removed -->', $afterTag, -1, $count);
         if ($count > 0) {
             log_message("Removed $count duplicate amp-story tags");
         }
