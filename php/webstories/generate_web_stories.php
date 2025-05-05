@@ -376,16 +376,19 @@ try {
             // Format date for display
             $displayDate = date('F j, Y', strtotime($date));
             
+            // Calculate tray price (30 eggs)
+            $trayPrice = number_format($rate * 30, 1);
+            
+            debug_log("STORY", "Calculated tray price for {$city}: {$trayPrice} (rate: {$rate})");
+            
             // Replace placeholders in the template
             $story = $template;
             $story = str_replace('{{CITY_NAME}}', $city, $story);
             $story = str_replace('{{STATE_NAME}}', $state, $story);
             $story = str_replace('{{EGG_RATE}}', $rate, $story);
-            
-            // Calculate the tray price properly instead of literal string replacement
-            $trayPrice = number_format($rate * 30, 1);
-            $story = str_replace('{{EGG_RATE * 30}}', $trayPrice, $story);
+            $story = str_replace('{{TRAY_PRICE}}', $trayPrice, $story);
             $story = str_replace('{{DATE}}', $displayDate, $story);
+            $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
             
             debug_log("IMAGES", "Formatted image paths", [
                 "Cover" => $coverImage,
@@ -399,12 +402,7 @@ try {
             $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayPriceImage, $story);
             $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
             
-            // Replace city slug
-            $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
-            
-            // Fix any structural issues in the template that could cause rendering problems
-            
-            // Ensure amp-story has the standalone attribute and other required attributes
+            // Ensure all required AMP story structure elements are present
             if (strpos($story, '<amp-story standalone') === false) {
                 debug_log("FIX", "Adding standalone attribute to amp-story tag");
                 $story = preg_replace(
@@ -414,17 +412,35 @@ try {
                 );
             }
             
+            // Ensure each amp-story-page has an ID attribute if missing
+            $story = preg_replace('/<amp-story-page(?!\s+id=)[^>]*>/i', 
+                                 '<amp-story-page id="auto-id-' . uniqid() . '">', 
+                                 $story);
+            
+            // Ensure each amp-story-grid-layer has a template attribute
+            $story = preg_replace('/<amp-story-grid-layer(?!\s+template=)[^>]*>/i', 
+                                 '<amp-story-grid-layer template="fill">', 
+                                 $story);
+            
             // Make sure each amp-story-grid-layer has a matching closing tag
             $story = preg_replace('/<amp-story-grid-layer[^>]*>(?![\s\S]*?<\/amp-story-grid-layer>)/i', 
                                 '$0</amp-story-grid-layer>', $story);
             
-            // Remove any nested amp-story tags (common issue)
-            $story = preg_replace('/<amp-story[^>]*>(?=[\s\S]*?<amp-story[^>]*>)/i', '', $story);
-            $story = preg_replace('/<\/amp-story>(?=[\s\S]*?<\/amp-story>)/i', '', $story);
+            // Fix any improperly nested tags or unclosed tags
+            $dom = new DOMDocument();
+            $previousValue = libxml_use_internal_errors(true); // Suppress warnings for malformed HTML
             
-            // Remove any nested amp-story-page tags
-            $story = preg_replace('/<amp-story-page[^>]*>(?=[\s\S]*?<amp-story-page[^>]*>)/i', '', $story);
-            $story = preg_replace('/<\/amp-story-page>(?=[\s\S]*?<\/amp-story-page>)/i', '', $story);
+            // Attempt to load and fix HTML
+            try {
+                $dom->loadHTML($story);
+                $story = $dom->saveHTML();
+                debug_log("FIX", "Fixed HTML structure using DOMDocument");
+            } catch (Exception $e) {
+                debug_log("WARNING", "Could not fix HTML with DOMDocument: " . $e->getMessage());
+                // Continue with the original story if DOMDocument fails
+            }
+            
+            libxml_use_internal_errors($previousValue); // Restore previous error handling
             
             // Save the web story
             $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
