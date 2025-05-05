@@ -135,17 +135,21 @@ try {
         // Format date for display
         $displayDate = date('F j, Y', strtotime($date));
         
-        // Simple placeholder replacement - no validation
-        $story = $template;
-        $story = str_replace('{{CITY_NAME}}', $city, $story);
-        $story = str_replace('{{STATE_NAME}}', $state, $story);
-        $story = str_replace('{{EGG_RATE}}', $rate, $story);
-        $story = str_replace('{{TRAY_PRICE}}', $trayPrice, $story);
-        $story = str_replace('{{DATE}}', $displayDate, $story);
-        $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
-        $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
-        $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayImage, $story);
-        $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
+        // Replace placeholders with proper escaping and tag name protection
+        $replacements = [
+            '{{CITY_NAME}}' => htmlspecialchars($city),
+            '{{STATE_NAME}}' => htmlspecialchars($state),
+            '{{EGG_RATE}}' => htmlspecialchars($rate),
+            '{{TRAY_PRICE}}' => htmlspecialchars($trayPrice),
+            '{{DATE}}' => htmlspecialchars($displayDate),
+            '{{CITY_SLUG}}' => htmlspecialchars($citySlug),
+            '{{COVER_BACKGROUND_IMAGE}}' => htmlspecialchars($coverImage),
+            '{{TRAY_BACKGROUND_IMAGE}}' => htmlspecialchars($trayImage),
+            '{{CTA_BACKGROUND_IMAGE}}' => htmlspecialchars($ctaImage)
+        ];
+        
+        // Safe replacement that won't corrupt AMP tag names
+        $story = str_replace(array_keys($replacements), array_values($replacements), $template);
         
         // Save the web story
         $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
