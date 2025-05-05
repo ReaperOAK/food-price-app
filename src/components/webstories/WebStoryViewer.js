@@ -34,6 +34,7 @@ const WebStoryViewer = () => {
       })
       .catch(err => {
         console.error('Error fetching web story data:', err);
+        setError(err.message || 'Failed to load web story');
         setLoading(false);
       });
   }, [slug]);
