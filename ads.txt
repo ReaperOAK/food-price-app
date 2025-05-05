@@ -1,0 +1,5 @@
+# ads.txt file for todayeggrates.com
+# Format: <adsTxtRecord> = <domain>, <publisherAccountID>, <accountType>, <certificateAuthorityID>
+
+# Google AdSense
+google.com, pub-2664225874856394, DIRECT, f08c47fec0942fa0
