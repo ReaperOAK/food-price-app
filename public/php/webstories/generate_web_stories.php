@@ -13,6 +13,17 @@ function debug_log($step, $message, $data = null) {
     error_log($log);
 }
 
+// Helper function to ensure image URLs are properly formatted
+function formatImagePath($imagePath) {
+    // Check if the path already starts with /images/webstories/
+    if (strpos($imagePath, '/images/webstories/') === 0) {
+        return $imagePath; // Already properly formatted
+    }
+    
+    // Otherwise, prepend the path
+    return '/images/webstories/' . $imagePath;
+}
+
 // Use a try-catch block around the entire script to catch any unexpected errors
 try {
     debug_log("START", "Beginning web stories generation");
@@ -355,10 +366,15 @@ try {
             $story = str_replace('{{EGG_RATE * 30}}', $trayPrice, $story);
             $story = str_replace('{{DATE}}', $displayDate, $story);
             
-            // Replace different background images for different pages
-            $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
-            $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayPriceImage, $story);
-            $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
+            // Format image paths properly with the correct path prefix
+            $formattedCoverImage = formatImagePath($coverImage);
+            $formattedTrayImage = formatImagePath($trayPriceImage);
+            $formattedCtaImage = formatImagePath($ctaImage);
+            
+            // Replace different background images for different pages with correctly formatted paths
+            $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $formattedCoverImage, $story);
+            $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $formattedTrayImage, $story);
+            $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $formattedCtaImage, $story);
             
             $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
             
