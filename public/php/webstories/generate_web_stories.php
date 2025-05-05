@@ -349,7 +349,9 @@ try {
             $story = str_replace('{{CITY_NAME}}', $city, $story);
             $story = str_replace('{{STATE_NAME}}', $state, $story);
             $story = str_replace('{{EGG_RATE}}', $rate, $story);
-            $story = str_replace('{{EGG_RATE * 30}}', ($rate * 30), $story);
+            // Calculate the tray price properly instead of literal string replacement
+            $trayPrice = number_format($rate * 30, 1);
+            $story = str_replace('{{EGG_RATE * 30}}', $trayPrice, $story);
             $story = str_replace('{{DATE}}', $displayDate, $story);
             
             // Replace different background images for different pages

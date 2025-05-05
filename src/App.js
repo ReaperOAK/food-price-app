@@ -4,9 +4,7 @@ import {
   Routes, 
   Route, 
   useNavigate, 
-  Navigate,
-  createBrowserRouter,
-  RouterProvider
+  Navigate
 } from 'react-router-dom';
 import MainPage from './pages/MainPage';
 import PrivacyPolicy from './components/common/PrivacyPolicy';

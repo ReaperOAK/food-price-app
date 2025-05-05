@@ -123,7 +123,7 @@ const WebStoryViewer = () => {
           title={storyData ? storyData.title : `Web Story - ${slug}`}
           className="w-full h-full absolute inset-0 border-none"
           allowFullScreen
-          sandbox="allow-scripts allow-same-origin allow-popups"
+          sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
         ></iframe>
       </div>
       <div className="p-4 bg-white shadow-md">
