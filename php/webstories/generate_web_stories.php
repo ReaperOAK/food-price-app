@@ -19,26 +19,85 @@ function format_image_path($image) {
     return '/images/webstories/' . $image;
 }
 
-// Enhanced validator to check and fix common AMP issues
+// Completely rewrite the AMP story validation function to be more robust
 function validate_amp_story($html) {
-    // Force standalone attribute on amp-story
-    if (strpos($html, '<amp-story standalone') === false) {
-        // If amp-story tag exists without standalone attribute
-        $html = preg_replace('/<amp-story(?!\s+standalone)([^>]*)>/', '<amp-story standalone$1>', $html);
+    // Simple string check for standalone attribute
+    if (strpos($html, '<amp-story standalone') === false && strpos($html, '<amp-story ') !== false) {
+        $html = str_replace('<amp-story ', '<amp-story standalone ', $html);
+        log_message("Added missing standalone attribute to amp-story tag");
     }
     
-    // Make sure amp-story is properly closed
-    if (substr_count($html, '<amp-story') != substr_count($html, '</amp-story>')) {
-        log_message("Warning: Mismatched amp-story tags detected");
+    // Fix poster-portrait-src attribute if it's missing the proper path
+    if (strpos($html, 'poster-portrait-src="/images/webstories/thumbnail-') === false) {
+        $html = preg_replace('/(poster-portrait-src=")(?!\/images\/webstories\/thumbnail-)([^"]+)"/', '$1/images/webstories/thumbnail-$2"', $html);
+    }
+
+    // Simple count to check if tags are balanced
+    $openTags = substr_count($html, '<amp-story');
+    $closeTags = substr_count($html, '</amp-story>');
+    
+    if ($openTags > $closeTags) {
+        log_message("Found $openTags opening amp-story tags but only $closeTags closing tags. Adding missing closing tags.");
+        // Add missing closing tags
+        $html .= str_repeat('</amp-story>', $openTags - $closeTags);
+    } else if ($closeTags > $openTags) {
+        log_message("Found $closeTags closing amp-story tags but only $openTags opening tags. Removing extra closing tags.");
+        // Remove extra closing tags using a simple approach
+        $pattern = '/<\/amp-story>/';
+        $replacement = '';
+        $count = $closeTags - $openTags;
+        $html = preg_replace($pattern, $replacement, $html, $count);
+    }
+
+    // Use DOMDocument for more advanced cleanup
+    $dom = new DOMDocument();
+    libxml_use_internal_errors(true); // Suppress warnings for malformed HTML
+    $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+    libxml_clear_errors();
+    
+    // Make sure amp-story has standalone attribute
+    $ampStories = $dom->getElementsByTagName('amp-story');
+    if ($ampStories->length > 0) {
+        $mainStory = $ampStories->item(0);
+        if (!$mainStory->hasAttribute('standalone')) {
+            $mainStory->setAttribute('standalone', '');
+            log_message("Added standalone attribute via DOM manipulation");
+        }
+        
+        // Remove any nested amp-story elements (which are invalid)
+        for ($i = 1; $i < $ampStories->length; $i++) {
+            $nestedStory = $ampStories->item($i);
+            $nestedStory->parentNode->removeChild($nestedStory);
+            log_message("Removed invalid nested amp-story element");
+            // Need to decrement because removing changes the NodeList
+            $i--;
+        }
     }
     
-    // Make sure all story pages have unique IDs
-    $matches = [];
-    preg_match_all('/<amp-story-page id="([^"]+)"/', $html, $matches);
-    $ids = $matches[1];
-    $duplicateIds = array_diff_assoc($ids, array_unique($ids));
-    if (!empty($duplicateIds)) {
-        log_message("Warning: Duplicate amp-story-page IDs detected: " . implode(', ', array_unique($duplicateIds)));
+    // Generate clean HTML
+    $html = $dom->saveHTML();
+    
+    return $html;
+}
+
+// Clean up a specific string before writing it to a file
+function clean_final_output($html) {
+    // Remove duplicate opening amp-story tags - safer approach
+    $pattern = '/(<amp-story\s+[^>]*standalone[^>]*>).*?(<amp-story\s+[^>]*>)/s';
+    while (preg_match($pattern, $html)) {
+        $html = preg_replace($pattern, '$1', $html);
+    }
+    
+    // Make sure there's exactly one amp-story opening and closing tag
+    $html = preg_replace('/<amp-story\s+[^>]*>(?=.*<amp-story\s)/s', '<!-- removed duplicate amp-story -->', $html);
+    
+    // Remove any extra closing tags that might be there
+    $openTags = substr_count($html, '<amp-story');
+    $closeTags = substr_count($html, '</amp-story>');
+    if ($openTags == 1 && $closeTags > 1) {
+        // Keep just the last closing tag
+        $lastPos = strrpos($html, '</amp-story>');
+        $html = substr($html, 0, $lastPos) . str_replace('</amp-story>', '', substr($html, 0, $lastPos)) . substr($html, $lastPos);
     }
     
     return $html;
@@ -103,6 +162,11 @@ try {
     $template = file_get_contents($templateFile);
     if ($template === false) {
         throw new Exception("Could not read template file: " . $templateFile);
+    }
+    
+    // Verify template has standalone attribute
+    if (strpos($template, '<amp-story standalone') === false) {
+        log_message("WARNING: Template is missing standalone attribute on amp-story tag!");
     }
     
     // Get egg rates data
@@ -189,11 +253,13 @@ try {
         // Run enhanced AMP validation to fix common issues
         $story = validate_amp_story($story);
         
-        // Final check for standalone attribute to make absolutely sure it's present
+        // Final cleanup before saving
+        $story = clean_final_output($story);
+        
+        // One last check - absolutely ensure standalone attribute is present
         if (strpos($story, '<amp-story standalone') === false) {
-            log_message("Warning: Failed to add standalone attribute to amp-story for {$city}");
-            // Last resort fix - replace any amp-story tag
-            $story = preg_replace('/<amp-story/', '<amp-story standalone', $story, 1);
+            log_message("CRITICAL ERROR: Still missing standalone attribute for {$city}");
+            $story = str_replace('<amp-story ', '<amp-story standalone ', $story);
         }
         
         // Save the web story
