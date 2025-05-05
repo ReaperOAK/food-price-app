@@ -19,6 +19,15 @@ function format_image_path($image) {
     return '/images/webstories/' . $image;
 }
 
+// Quick validator to check for common AMP issues
+function validate_amp_story($html) {
+    // Make sure amp-story has standalone attribute
+    if (strpos($html, '<amp-story poster-portrait-src=') !== false && strpos($html, '<amp-story standalone') === false) {
+        $html = str_replace('<amp-story poster-portrait-src=', '<amp-story standalone poster-portrait-src=', $html);
+    }
+    return $html;
+}
+
 try {
     log_message("Starting web stories generation");
     
@@ -160,6 +169,9 @@ try {
         $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
         $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayImage, $story);
         $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
+        
+        // Final validation check - make sure we have standalone attribute
+        $story = validate_amp_story($story);
         
         // Save the web story
         $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
