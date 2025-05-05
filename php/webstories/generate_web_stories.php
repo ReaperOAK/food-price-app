@@ -42,6 +42,95 @@ function formatImagePath($imagePath) {
     return '/images/webstories/' . $imagePath;
 }
 
+// Function to fix AMP issues in generated web story content
+function fixAmpStoryStructure($html) {
+    // Add DOMDocument parsing with better error handling
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $previousValue = libxml_use_internal_errors(true); // Suppress warnings for malformed HTML
+    
+    // Use a regular expression to fix common issues before DOM parsing
+    $html = preg_replace('/<amp-story(?!\s+standalone)[^>]*>/', 
+                        '<amp-story standalone title="Egg Rate" publisher="Today Egg Rates" publisher-logo-src="/tee.png">', 
+                        $html);
+    
+    // Fix incorrect nesting of amp-story-page inside another amp-story-page
+    $html = preg_replace('/<amp-story-page\s+id="auto-id-[^"]*"\s*>\s*<a\s+href="([^"]+)"[^>]*>([^<]+)<\/a>\s*<\/amp-story-page>/i', 
+                        '<amp-story-page-outlink layout="nodisplay"><a href="$1" target="_blank">$2</a></amp-story-page-outlink>', 
+                        $html);
+    
+    // Remove any extra closing tags that might be causing issues
+    $html = preg_replace('/(<\/amp-story-page>){2,}/i', '</amp-story-page>', $html);
+    
+    try {
+        $dom->loadHTML($html);
+        
+        // Fix amp-story element
+        $ampStoryElements = $dom->getElementsByTagName('amp-story');
+        if ($ampStoryElements->length > 0) {
+            $ampStory = $ampStoryElements->item(0);
+            if (!$ampStory->hasAttribute('standalone')) {
+                $ampStory->setAttribute('standalone', '');
+            }
+        }
+        
+        // Find incorrectly nested amp-story-page elements
+        $storyPages = $dom->getElementsByTagName('amp-story-page');
+        $pagesToRemove = [];
+        
+        // First pass - identify nested pages
+        for ($i = 0; $i < $storyPages->length; $i++) {
+            $page = $storyPages->item($i);
+            $parentNode = $page->parentNode;
+            
+            // If parent is not amp-story, it's incorrectly nested
+            if ($parentNode && $parentNode->nodeName !== 'amp-story') {
+                if ($parentNode->nodeName === 'amp-story-grid-layer') {
+                    // This is a nested page that needs to be converted to outlink
+                    $pagesToRemove[] = $page;
+                    
+                    // Create a new outlink element
+                    $outlink = $dom->createElement('amp-story-page-outlink');
+                    $outlink->setAttribute('layout', 'nodisplay');
+                    
+                    // Get the link information from the nested page
+                    $links = $page->getElementsByTagName('a');
+                    if ($links->length > 0) {
+                        $link = $links->item(0);
+                        $href = $link->getAttribute('href');
+                        $text = $link->textContent;
+                        
+                        // Create proper link inside outlink
+                        $newLink = $dom->createElement('a', $text);
+                        $newLink->setAttribute('href', $href);
+                        $newLink->setAttribute('target', '_blank');
+                        $outlink->appendChild($newLink);
+                        
+                        // Add the outlink to the grid layer
+                        $parentNode->appendChild($outlink);
+                    }
+                }
+            }
+        }
+        
+        // Remove the incorrectly nested pages (must do this after the loop)
+        foreach ($pagesToRemove as $pageToRemove) {
+            if ($pageToRemove->parentNode) {
+                $pageToRemove->parentNode->removeChild($pageToRemove);
+            }
+        }
+        
+        // Format the output with proper encoding
+        $html = $dom->saveHTML();
+        
+    } catch (Exception $e) {
+        debug_log("WARNING", "DOM fix failed: " . $e->getMessage());
+        // Keep using the regex-fixed version if DOM parsing fails
+    }
+    
+    libxml_use_internal_errors($previousValue);
+    return $html;
+}
+
 // Use a try-catch block around the entire script to catch any unexpected errors
 try {
     debug_log("START", "Beginning web stories generation");
@@ -402,93 +491,8 @@ try {
             $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayPriceImage, $story);
             $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
             
-            // Ensure all required AMP story structure elements are present
-            if (strpos($story, '<amp-story standalone') === false) {
-                debug_log("FIX", "Adding standalone attribute to amp-story tag");
-                $story = preg_replace(
-                    '/<amp-story(?!\s+standalone)[^>]*>/',
-                    '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src="' . $coverImage . '">',
-                    $story
-                );
-            }
-            
-            // Ensure each amp-story-page has an ID attribute if missing
-            $story = preg_replace('/<amp-story-page(?!\s+id=)[^>]*>/i', 
-                                 '<amp-story-page id="auto-id-' . uniqid() . '">', 
-                                 $story);
-            
-            // Ensure each amp-story-grid-layer has a template attribute
-            $story = preg_replace('/<amp-story-grid-layer(?!\s+template=)[^>]*>/i', 
-                                 '<amp-story-grid-layer template="fill">', 
-                                 $story);
-            
-            // Make sure each amp-story-grid-layer has a matching closing tag
-            $story = preg_replace('/<amp-story-grid-layer[^>]*>(?![\s\S]*?<\/amp-story-grid-layer>)/i', 
-                                '$0</amp-story-grid-layer>', $story);
-            
-            // Fix any improperly nested tags or unclosed tags
-            $dom = new DOMDocument();
-            $previousValue = libxml_use_internal_errors(true); // Suppress warnings for malformed HTML
-            
-            // Attempt to load and fix HTML
-            try {
-                $dom->loadHTML($story);
-                
-                // Fix for amp-story lacking standalone attribute
-                $ampStoryElements = $dom->getElementsByTagName('amp-story');
-                if ($ampStoryElements->length > 0) {
-                    $ampStory = $ampStoryElements->item(0);
-                    if (!$ampStory->hasAttribute('standalone')) {
-                        $ampStory->setAttribute('standalone', '');
-                        $ampStory->setAttribute('title', "Egg Rate in {$city}, {$state} - ₹{$rate}");
-                        $ampStory->setAttribute('publisher', "Today Egg Rates");
-                        $ampStory->setAttribute('publisher-logo-src', "/tee.png");
-                        $ampStory->setAttribute('poster-portrait-src', $coverImage);
-                    }
-                }
-                
-                // Fix for amp-story-page-outlink placement
-                $outlinks = $dom->getElementsByTagName('amp-story-page-outlink');
-                $outlinkCount = $outlinks->length;
-                
-                // We need to process in reverse order because the DOM structure changes as we move elements
-                for ($i = $outlinkCount - 1; $i >= 0; $i--) {
-                    $outlink = $outlinks->item($i);
-                    
-                    // Find the parent amp-story-page element
-                    $parent = $outlink->parentNode;
-                    
-                    // Check if the parent of outlink is incorrectly another amp-story-page
-                    if ($parent->nodeName === 'amp-story-page') {
-                        // Find the correct amp-story-page that should contain this outlink
-                        $correctParent = $parent;
-                        
-                        // Make sure the outlink is the last child of its parent amp-story-page
-                        $correctParent->appendChild($outlink);
-                    }
-                }
-                
-                // Remove any duplicate auto-generated IDs within the same page
-                $ampStoryPages = $dom->getElementsByTagName('amp-story-page');
-                $usedIds = array();
-                
-                foreach ($ampStoryPages as $page) {
-                    $id = $page->getAttribute('id');
-                    if (in_array($id, $usedIds) && strpos($id, 'auto-id-') === 0) {
-                        $page->setAttribute('id', 'auto-id-' . uniqid());
-                    } else {
-                        $usedIds[] = $id;
-                    }
-                }
-                
-                $story = $dom->saveHTML();
-                debug_log("FIX", "Fixed HTML structure using DOMDocument with special handling for outlinks");
-            } catch (Exception $e) {
-                debug_log("WARNING", "Could not fix HTML with DOMDocument: " . $e->getMessage());
-                // Continue with the original story if DOMDocument fails
-            }
-            
-            libxml_use_internal_errors($previousValue); // Restore previous error handling
+            // Apply strict validation and fixes to AMP story structure
+            $story = fixAmpStoryStructure($story);
             
             // Save the web story
             $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
