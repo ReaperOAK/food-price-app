@@ -131,13 +131,13 @@
     <amp-story standalone
               title="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - ₹{{EGG_RATE}}"
               publisher="Today Egg Rates"
-              publisher-logo-src="https://todayeggrates.com/tee.png"
-              poster-portrait-src="https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}">
+              publisher-logo-src="/tee.png"
+              poster-portrait-src="{{COVER_BACKGROUND_IMAGE}}">
         
         <!-- Cover page -->
         <amp-story-page id="cover">
             <amp-story-grid-layer template="fill">
-                <amp-img src="https://todayeggrates.com/images/webstories/{{COVER_BACKGROUND_IMAGE}}"
+                <amp-img src="/images/webstories/{{COVER_BACKGROUND_IMAGE}}"
                          width="720" height="1280"
                          layout="responsive"
                          alt="Egg Rate background">
@@ -160,7 +160,7 @@
         <!-- Tray price page -->
         <amp-story-page id="tray-price">
             <amp-story-grid-layer template="fill">
-                <amp-img src="https://todayeggrates.com/images/webstories/{{TRAY_BACKGROUND_IMAGE}}"
+                <amp-img src="/images/webstories/{{TRAY_BACKGROUND_IMAGE}}"
                          width="720" height="1280"
                          layout="responsive"
                          alt="Egg Rate background">
@@ -176,14 +176,14 @@
                 </div>
             </amp-story-grid-layer>
             <amp-story-page-outlink layout="nodisplay">
-                <a href="https://todayeggrates.com/{{CITY_SLUG}}-egg-rate" target="_blank">Check more details</a>
+                <a href="/{{CITY_SLUG}}-egg-rate" target="_blank">Check more details</a>
             </amp-story-page-outlink>
         </amp-story-page>
         
         <!-- CTA page -->
         <amp-story-page id="cta">
             <amp-story-grid-layer template="fill">
-                <amp-img src="https://todayeggrates.com/images/webstories/{{CTA_BACKGROUND_IMAGE}}"
+                <amp-img src="/images/webstories/{{CTA_BACKGROUND_IMAGE}}"
                          width="720" height="1280"
                          layout="responsive"
                          alt="Egg Rate background">
