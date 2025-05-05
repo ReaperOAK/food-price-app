@@ -437,18 +437,29 @@ if ($result && $result->num_rows > 0) {
                 $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.jpg';
                 
                 // Update or add poster-portrait-src
-                $pattern = '/<amp-story.*?poster-portrait-src="[^"]*"/s';
-                $replacement = '<amp-story poster-portrait-src="' . $thumbnailUrl . '"';
+                // Previous problematic code that would strip the standalone attribute:
+                // $pattern = '/<amp-story.*?poster-portrait-src="[^"]*"/s';
+                // $replacement = '<amp-story poster-portrait-src="' . $thumbnailUrl . '"';
+                
+                // New approach that preserves all attributes including standalone
+                $pattern = '/<amp-story([^>]*?)(?:poster-portrait-src="[^"]*")?([^>]*?)>/s';
+                $replacement = '<amp-story$1 poster-portrait-src="' . $thumbnailUrl . '"$2>';
                 
                 if (preg_match($pattern, $webstoryContent)) {
                     $webstoryContent = preg_replace($pattern, $replacement, $webstoryContent);
-                    debug_log("UPDATE", "Updated poster-portrait-src attribute");
+                    debug_log("UPDATE", "Updated poster-portrait-src attribute while preserving other attributes");
                 } else {
-                    debug_log("WARNING", "Could not find amp-story tag with poster-portrait-src attribute");
+                    debug_log("WARNING", "Could not find amp-story tag with regex pattern");
                     // Try with a more lenient pattern
-                    $lenientPattern = '/<amp-story/s';
+                    $lenientPattern = '/<amp-story([^>]*)>/s';
                     if (preg_match($lenientPattern, $webstoryContent)) {
-                        $replacement = '<amp-story poster-portrait-src="' . $thumbnailUrl . '"';
+                        // Make sure we add standalone if it's not present
+                        if (strpos($webstoryContent, '<amp-story standalone') === false) {
+                            $replacement = '<amp-story standalone poster-portrait-src="' . $thumbnailUrl . '"$1>';
+                            debug_log("UPDATE", "Adding standalone attribute along with poster-portrait-src");
+                        } else {
+                            $replacement = '<amp-story$1 poster-portrait-src="' . $thumbnailUrl . '">';
+                        }
                         $webstoryContent = preg_replace($lenientPattern, $replacement, $webstoryContent);
                         debug_log("UPDATE", "Added poster-portrait-src attribute with lenient pattern");
                     } else {
