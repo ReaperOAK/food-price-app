@@ -19,12 +19,28 @@ function format_image_path($image) {
     return '/images/webstories/' . $image;
 }
 
-// Quick validator to check for common AMP issues
+// Enhanced validator to check and fix common AMP issues
 function validate_amp_story($html) {
-    // Make sure amp-story has standalone attribute
-    if (strpos($html, '<amp-story poster-portrait-src=') !== false && strpos($html, '<amp-story standalone') === false) {
-        $html = str_replace('<amp-story poster-portrait-src=', '<amp-story standalone poster-portrait-src=', $html);
+    // Force standalone attribute on amp-story
+    if (strpos($html, '<amp-story standalone') === false) {
+        // If amp-story tag exists without standalone attribute
+        $html = preg_replace('/<amp-story(?!\s+standalone)([^>]*)>/', '<amp-story standalone$1>', $html);
     }
+    
+    // Make sure amp-story is properly closed
+    if (substr_count($html, '<amp-story') != substr_count($html, '</amp-story>')) {
+        log_message("Warning: Mismatched amp-story tags detected");
+    }
+    
+    // Make sure all story pages have unique IDs
+    $matches = [];
+    preg_match_all('/<amp-story-page id="([^"]+)"/', $html, $matches);
+    $ids = $matches[1];
+    $duplicateIds = array_diff_assoc($ids, array_unique($ids));
+    if (!empty($duplicateIds)) {
+        log_message("Warning: Duplicate amp-story-page IDs detected: " . implode(', ', array_unique($duplicateIds)));
+    }
+    
     return $html;
 }
 
@@ -170,8 +186,15 @@ try {
         $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayImage, $story);
         $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
         
-        // Final validation check - make sure we have standalone attribute
+        // Run enhanced AMP validation to fix common issues
         $story = validate_amp_story($story);
+        
+        // Final check for standalone attribute to make absolutely sure it's present
+        if (strpos($story, '<amp-story standalone') === false) {
+            log_message("Warning: Failed to add standalone attribute to amp-story for {$city}");
+            // Last resort fix - replace any amp-story tag
+            $story = preg_replace('/<amp-story/', '<amp-story standalone', $story, 1);
+        }
         
         // Save the web story
         $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
