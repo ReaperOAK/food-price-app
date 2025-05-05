@@ -15,21 +15,30 @@ function debug_log($step, $message, $data = null) {
 
 // Helper function to ensure image URLs are properly formatted
 function formatImagePath($imagePath) {
-    // First, clean up any paths that may already have /images/webstories/
-    if (strpos($imagePath, '/images/webstories/') === 0) {
-        // Already has the full path, just return it
-        return $imagePath;
+    // Strip any leading slashes if they exist
+    $imagePath = ltrim($imagePath, '/');
+    
+    // Remove any duplicate path segments
+    if (preg_match('#(^|/)images/webstories/.*#', $imagePath)) {
+        // Extract just the filename by finding the last occurrence of images/webstories/
+        $pattern = '#.*images/webstories/([^/]+)$#';
+        if (preg_match($pattern, $imagePath, $matches)) {
+            $filename = $matches[1];
+            return '/images/webstories/' . $filename;
+        }
     }
     
-    // If path contains duplicate segments, clean them up
-    if (strpos($imagePath, 'images/webstories/') !== false) {
-        // Extract just the filename part
-        $parts = explode('images/webstories/', $imagePath);
-        $filename = end($parts);
-        return '/images/webstories/' . $filename;
+    // If it's just a filename without path, add the path
+    if (strpos($imagePath, '/') === false) {
+        return '/images/webstories/' . $imagePath;
     }
     
-    // Otherwise, it's just a filename, prepend the path
+    // For other cases, ensure it has the correct prefix
+    if (strpos($imagePath, 'images/webstories/') === 0) {
+        return '/' . $imagePath;
+    }
+    
+    // Default case - add the standard path
     return '/images/webstories/' . $imagePath;
 }
 
@@ -380,12 +389,29 @@ try {
             $formattedTrayImage = formatImagePath($trayPriceImage);
             $formattedCtaImage = formatImagePath($ctaImage);
             
+            debug_log("IMAGES", "Formatted image paths", [
+                "Original cover" => $coverImage,
+                "Formatted cover" => $formattedCoverImage,
+                "Original tray" => $trayPriceImage,
+                "Formatted tray" => $formattedTrayImage,
+                "Original CTA" => $ctaImage,
+                "Formatted CTA" => $formattedCtaImage
+            ]);
+            
             // Replace different background images for different pages with correctly formatted paths
             $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $formattedCoverImage, $story);
             $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $formattedTrayImage, $story);
             $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $formattedCtaImage, $story);
             
             $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
+            
+            // Check all img tags to ensure no duplicate paths
+            $story = preg_replace('#src="[/]?images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
+            $story = preg_replace('#src="/+images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
+            $story = preg_replace('#src="/images/webstories//images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
+            
+            // Fix duplicate paths in meta tags
+            $story = preg_replace('#content="https://todayeggrates.com/images/webstories//images/webstories/([^"]+)"#', 'content="https://todayeggrates.com/images/webstories/$1"', $story);
             
             // Make sure the amp-story tag has all required attributes
             if (strpos($story, '<amp-story poster-portrait-src') !== false && strpos($story, 'standalone') === false) {
@@ -397,8 +423,8 @@ try {
                 );
             }
             
-            // Additional check to ensure proper amp-story tag replacement was done
-            if (strpos($story, '<amp-story>') !== false || strpos($story, '<amp-story poster-portrait-src') !== false && strpos($story, 'standalone') === false) {
+            // Additional thorough check for amp-story tag
+            if (preg_match('/<amp-story(?!\s+standalone)[^>]*>/', $story)) {
                 debug_log("STORY", "Ensuring amp-story tag has all required attributes");
                 $story = preg_replace(
                     '/<amp-story[^>]*>/',
