@@ -19,86 +19,105 @@ function format_image_path($image) {
     return '/images/webstories/' . $image;
 }
 
-// Completely rewrite the AMP story validation function to be more robust
+// Fixed validation function that will work properly with DOM
 function validate_amp_story($html) {
-    // Simple string check for standalone attribute
-    if (strpos($html, '<amp-story standalone') === false && strpos($html, '<amp-story ') !== false) {
-        $html = str_replace('<amp-story ', '<amp-story standalone ', $html);
-        log_message("Added missing standalone attribute to amp-story tag");
+    // First, fix common issues with a simple find & replace before DOM parsing
+    if (strpos($html, '<amp-story standalone') === false && strpos($html, '<amp-story') !== false) {
+        $html = preg_replace('/<amp-story(\s+|>)/', '<amp-story standalone$1', $html, 1);
+        log_message("Added missing standalone attribute");
     }
     
-    // Fix poster-portrait-src attribute if it's missing the proper path
-    if (strpos($html, 'poster-portrait-src="/images/webstories/thumbnail-') === false) {
-        $html = preg_replace('/(poster-portrait-src=")(?!\/images\/webstories\/thumbnail-)([^"]+)"/', '$1/images/webstories/thumbnail-$2"', $html);
+    // Count amp-story tags before DOM parsing (for debugging)
+    $openTagsCount = substr_count($html, '<amp-story');
+    $closeTagsCount = substr_count($html, '</amp-story>');
+    if ($openTagsCount != 1 || $closeTagsCount != 1) {
+        log_message("Before DOM fix: Found $openTagsCount opening tags and $closeTagsCount closing tags");
     }
 
-    // Simple count to check if tags are balanced
-    $openTags = substr_count($html, '<amp-story');
-    $closeTags = substr_count($html, '</amp-story>');
+    // Use a simple regex approach first to clean up obviously duplicated amp-story tags
+    $pattern = '/(<amp-story\s+[^>]*>)(?=.*<amp-story\s)/';
+    $html = preg_replace($pattern, '<!-- removed duplicate amp-story tag -->', $html);
     
-    if ($openTags > $closeTags) {
-        log_message("Found $openTags opening amp-story tags but only $closeTags closing tags. Adding missing closing tags.");
-        // Add missing closing tags
-        $html .= str_repeat('</amp-story>', $openTags - $closeTags);
-    } else if ($closeTags > $openTags) {
-        log_message("Found $closeTags closing amp-story tags but only $openTags opening tags. Removing extra closing tags.");
-        // Remove extra closing tags using a simple approach
-        $pattern = '/<\/amp-story>/';
-        $replacement = '';
-        $count = $closeTags - $openTags;
-        $html = preg_replace($pattern, $replacement, $html, $count);
-    }
-
-    // Use DOMDocument for more advanced cleanup
-    $dom = new DOMDocument();
-    libxml_use_internal_errors(true); // Suppress warnings for malformed HTML
+    // Load HTML into DOMDocument with error suppression
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $dom->formatOutput = true;
+    libxml_use_internal_errors(true); // Suppress warnings
+    
+    // Use loadHTML with options to avoid adding doctype and html/body tags
     $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
     libxml_clear_errors();
     
-    // Make sure amp-story has standalone attribute
+    // Find all amp-story elements
     $ampStories = $dom->getElementsByTagName('amp-story');
-    if ($ampStories->length > 0) {
-        $mainStory = $ampStories->item(0);
-        if (!$mainStory->hasAttribute('standalone')) {
-            $mainStory->setAttribute('standalone', '');
-            log_message("Added standalone attribute via DOM manipulation");
-        }
+    
+    // If there are multiple amp-story elements (which is invalid), keep only the first one
+    if ($ampStories->length > 1) {
+        log_message("DOM found {$ampStories->length} amp-story elements, fixing...");
         
-        // Remove any nested amp-story elements (which are invalid)
+        // Keep only the first amp-story element
+        $mainStory = $ampStories->item(0);
+        
+        // Get all children from other amp-story elements and move them to the first one
         for ($i = 1; $i < $ampStories->length; $i++) {
-            $nestedStory = $ampStories->item($i);
-            $nestedStory->parentNode->removeChild($nestedStory);
-            log_message("Removed invalid nested amp-story element");
-            // Need to decrement because removing changes the NodeList
+            $extraStory = $ampStories->item($i);
+            
+            // Move all children to the main story
+            while ($extraStory->childNodes->length > 0) {
+                $child = $extraStory->childNodes->item(0);
+                $extraStory->removeChild($child);
+                $mainStory->appendChild($child);
+            }
+            
+            // Remove the extra amp-story element
+            $extraStory->parentNode->removeChild($extraStory);
+            
+            // Need to get elements again as the DOM has changed
+            $ampStories = $dom->getElementsByTagName('amp-story');
             $i--;
         }
     }
     
-    // Generate clean HTML
-    $html = $dom->saveHTML();
+    // Ensure the main amp-story element has the standalone attribute
+    if ($ampStories->length > 0) {
+        $mainStory = $ampStories->item(0);
+        if (!$mainStory->hasAttribute('standalone')) {
+            $mainStory->setAttribute('standalone', '');
+            log_message("Added standalone attribute via DOM");
+        }
+    } else {
+        log_message("ERROR: No amp-story element found!");
+    }
     
-    return $html;
+    // Convert the DOM back to HTML
+    $cleanedHtml = $dom->saveHTML();
+    
+    // Final regex cleanup - one last check to ensure correct tags
+    $cleanedHtml = preg_replace('/<amp-story(?!\s+standalone)/', '<amp-story standalone ', $cleanedHtml);
+    
+    return $cleanedHtml;
 }
 
-// Clean up a specific string before writing it to a file
-function clean_final_output($html) {
-    // Remove duplicate opening amp-story tags - safer approach
-    $pattern = '/(<amp-story\s+[^>]*standalone[^>]*>).*?(<amp-story\s+[^>]*>)/s';
-    while (preg_match($pattern, $html)) {
-        $html = preg_replace($pattern, '$1', $html);
+// Simple function to directly fix the HTML string without DOM manipulation
+function direct_fix_amp_story($html) {
+    // Step 1: Remove all but the first opening amp-story tag
+    $firstPos = strpos($html, '<amp-story');
+    if ($firstPos !== false) {
+        $beforeTag = substr($html, 0, $firstPos);
+        $afterTag = substr($html, $firstPos);
+        
+        // Replace all additional amp-story opening tags
+        $afterTag = preg_replace('/<amp-story(?![^>]*standalone)([^>]*)>/', '<amp-story standalone$1>', $afterTag, 1);
+        $afterTag = preg_replace('/<amp-story[^>]*>/', '<!-- removed -->', $afterTag, -1, $count, PREG_OFFSET_CAPTURE);
+        if ($count > 0) {
+            log_message("Removed $count duplicate amp-story tags");
+        }
+        
+        $html = $beforeTag . $afterTag;
     }
     
-    // Make sure there's exactly one amp-story opening and closing tag
-    $html = preg_replace('/<amp-story\s+[^>]*>(?=.*<amp-story\s)/s', '<!-- removed duplicate amp-story -->', $html);
-    
-    // Remove any extra closing tags that might be there
-    $openTags = substr_count($html, '<amp-story');
-    $closeTags = substr_count($html, '</amp-story>');
-    if ($openTags == 1 && $closeTags > 1) {
-        // Keep just the last closing tag
-        $lastPos = strrpos($html, '</amp-story>');
-        $html = substr($html, 0, $lastPos) . str_replace('</amp-story>', '', substr($html, 0, $lastPos)) . substr($html, $lastPos);
-    }
+    // Step 2: Ensure there's exactly one closing amp-story tag at the end
+    $html = preg_replace('/<\/amp-story>/', '', $html);
+    $html = $html . '</amp-story>';
     
     return $html;
 }
@@ -108,20 +127,6 @@ try {
     
     // Database connection
     require_once dirname(__DIR__) . '/config/db.php';
-    
-    // If $conn is not set, create a connection
-    if (!isset($conn) || $conn->connect_error) {
-        $servername = "localhost";
-        $username = "u901337298_test";
-        $password = "A12345678b*";
-        $dbname = "u901337298_test";
-        
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        
-        if ($conn->connect_error) {
-            throw new Exception("Connection failed: " . $conn->connect_error);
-        }
-    }
     
     // Set up directories
     $basePath = dirname(dirname(dirname(__FILE__)));
@@ -164,9 +169,18 @@ try {
         throw new Exception("Could not read template file: " . $templateFile);
     }
     
-    // Verify template has standalone attribute
+    // Verify template is valid before starting
     if (strpos($template, '<amp-story standalone') === false) {
-        log_message("WARNING: Template is missing standalone attribute on amp-story tag!");
+        log_message("WARNING: Template is missing standalone attribute on amp-story tag! Adding it now.");
+        $template = preg_replace('/<amp-story(\s+|>)/', '<amp-story standalone$1', $template, 1);
+    }
+    
+    // Pre-check the template for proper tag structure
+    $openTags = substr_count($template, '<amp-story');
+    $closeTags = substr_count($template, '</amp-story>');
+    if ($openTags != 1 || $closeTags != 1) {
+        log_message("Template has $openTags opening amp-story tags and $closeTags closing tags. Fixing...");
+        $template = validate_amp_story($template);
     }
     
     // Get egg rates data
@@ -250,17 +264,8 @@ try {
         $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayImage, $story);
         $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
         
-        // Run enhanced AMP validation to fix common issues
-        $story = validate_amp_story($story);
-        
-        // Final cleanup before saving
-        $story = clean_final_output($story);
-        
-        // One last check - absolutely ensure standalone attribute is present
-        if (strpos($story, '<amp-story standalone') === false) {
-            log_message("CRITICAL ERROR: Still missing standalone attribute for {$city}");
-            $story = str_replace('<amp-story ', '<amp-story standalone ', $story);
-        }
+        // Apply a much simpler direct fix that works reliably
+        $story = direct_fix_amp_story($story);
         
         // Save the web story
         $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
