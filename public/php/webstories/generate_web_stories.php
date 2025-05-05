@@ -337,9 +337,10 @@ try {
             shuffle($backgroundImages);
             
             // For each page in the web story, construct the proper path to the image
-            $coverImage = '/images/webstories/' . $backgroundImages[0];
-            $trayPriceImage = '/images/webstories/' . (isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0]);
-            $ctaImage = '/images/webstories/' . (isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0]);
+            // We'll use full absolute URLs to ensure they're accessible
+            $coverImage = $backgroundImages[0];  // Remove the /images/webstories/ prefix 
+            $trayPriceImage = isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0];
+            $ctaImage = isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0];
             
             // Format date for display
             $displayDate = date('F j, Y', strtotime($date));
