@@ -19,112 +19,6 @@ function format_image_path($image) {
     return '/images/webstories/' . $image;
 }
 
-// Fixed validation function that will work properly with DOM
-function validate_amp_story($html) {
-    // First, fix common issues with a simple find & replace before DOM parsing
-    if (strpos($html, '<amp-story standalone') === false && strpos($html, '<amp-story') !== false) {
-        $html = preg_replace('/<amp-story(\s+|>)/', '<amp-story standalone$1', $html, 1);
-        log_message("Added missing standalone attribute");
-    }
-    
-    // Count amp-story tags before DOM parsing (for debugging)
-    $openTagsCount = substr_count($html, '<amp-story');
-    $closeTagsCount = substr_count($html, '</amp-story>');
-    if ($openTagsCount != 1 || $closeTagsCount != 1) {
-        log_message("Before DOM fix: Found $openTagsCount opening tags and $closeTagsCount closing tags");
-    }
-
-    // Use a simple regex approach first to clean up obviously duplicated amp-story tags
-    $pattern = '/(<amp-story\s+[^>]*>)(?=.*<amp-story\s)/';
-    $html = preg_replace($pattern, '<!-- removed duplicate amp-story tag -->', $html);
-    
-    // Load HTML into DOMDocument with error suppression
-    $dom = new DOMDocument('1.0', 'UTF-8');
-    $dom->formatOutput = true;
-    libxml_use_internal_errors(true); // Suppress warnings
-    
-    // Use loadHTML with options to avoid adding doctype and html/body tags
-    $dom->loadHTML($html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-    libxml_clear_errors();
-    
-    // Find all amp-story elements
-    $ampStories = $dom->getElementsByTagName('amp-story');
-    
-    // If there are multiple amp-story elements (which is invalid), keep only the first one
-    if ($ampStories->length > 1) {
-        log_message("DOM found {$ampStories->length} amp-story elements, fixing...");
-        
-        // Keep only the first amp-story element
-        $mainStory = $ampStories->item(0);
-        
-        // Get all children from other amp-story elements and move them to the first one
-        for ($i = 1; $i < $ampStories->length; $i++) {
-            $extraStory = $ampStories->item($i);
-            
-            // Move all children to the main story
-            while ($extraStory->childNodes->length > 0) {
-                $child = $extraStory->childNodes->item(0);
-                $extraStory->removeChild($child);
-                $mainStory->appendChild($child);
-            }
-            
-            // Remove the extra amp-story element
-            $extraStory->parentNode->removeChild($extraStory);
-            
-            // Need to get elements again as the DOM has changed
-            $ampStories = $dom->getElementsByTagName('amp-story');
-            $i--;
-        }
-    }
-    
-    // Ensure the main amp-story element has the standalone attribute
-    if ($ampStories->length > 0) {
-        $mainStory = $ampStories->item(0);
-        if (!$mainStory->hasAttribute('standalone')) {
-            $mainStory->setAttribute('standalone', '');
-            log_message("Added standalone attribute via DOM");
-        }
-    } else {
-        log_message("ERROR: No amp-story element found!");
-    }
-    
-    // Convert the DOM back to HTML
-    $cleanedHtml = $dom->saveHTML();
-    
-    // Final regex cleanup - one last check to ensure correct tags
-    $cleanedHtml = preg_replace('/<amp-story(?!\s+standalone)/', '<amp-story standalone ', $cleanedHtml);
-    
-    return $cleanedHtml;
-}
-
-// Simple function to directly fix the HTML string without DOM manipulation
-function direct_fix_amp_story($html) {
-    // Step 1: Remove all but the first opening amp-story tag
-    $firstPos = strpos($html, '<amp-story');
-    if ($firstPos !== false) {
-        $beforeTag = substr($html, 0, $firstPos);
-        $afterTag = substr($html, $firstPos);
-        
-        // Replace all additional amp-story opening tags
-        $afterTag = preg_replace('/<amp-story(?![^>]*standalone)([^>]*)>/', '<amp-story standalone$1>', $afterTag, 1);
-        
-        // Count replacements but don't use PREG_OFFSET_CAPTURE which causes the error
-        $count = 0;
-        $afterTag = preg_replace('/<amp-story[^>]*>/', '<!-- removed -->', $afterTag, -1, $count);
-        if ($count > 0) {
-            log_message("Removed $count duplicate amp-story tags");
-        }
-        
-        $html = $beforeTag . $afterTag;
-    }
-    
-    // Step 2: Ensure there's exactly one closing amp-story tag at the end
-    $html = preg_replace('/<\/amp-story>/', '', $html);
-    $html = $html . '</amp-story>';
-    
-    return $html;
-}
-
 try {
     log_message("Starting web stories generation");
     
@@ -170,20 +64,6 @@ try {
     $template = file_get_contents($templateFile);
     if ($template === false) {
         throw new Exception("Could not read template file: " . $templateFile);
-    }
-    
-    // Verify template is valid before starting
-    if (strpos($template, '<amp-story standalone') === false) {
-        log_message("WARNING: Template is missing standalone attribute on amp-story tag! Adding it now.");
-        $template = preg_replace('/<amp-story(\s+|>)/', '<amp-story standalone$1', $template, 1);
-    }
-    
-    // Pre-check the template for proper tag structure
-    $openTags = substr_count($template, '<amp-story');
-    $closeTags = substr_count($template, '</amp-story>');
-    if ($openTags != 1 || $closeTags != 1) {
-        log_message("Template has $openTags opening amp-story tags and $closeTags closing tags. Fixing...");
-        $template = validate_amp_story($template);
     }
     
     // Get egg rates data
@@ -255,7 +135,7 @@ try {
         // Format date for display
         $displayDate = date('F j, Y', strtotime($date));
         
-        // Replace placeholders
+        // Simple placeholder replacement - no validation
         $story = $template;
         $story = str_replace('{{CITY_NAME}}', $city, $story);
         $story = str_replace('{{STATE_NAME}}', $state, $story);
@@ -266,9 +146,6 @@ try {
         $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImage, $story);
         $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayImage, $story);
         $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImage, $story);
-        
-        // Apply a much simpler direct fix that works reliably
-        $story = direct_fix_amp_story($story);
         
         // Save the web story
         $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
