@@ -15,15 +15,21 @@ function debug_log($step, $message, $data = null) {
 
 // Helper function to ensure image URLs are properly formatted
 function formatImagePath($imagePath) {
-    // Remove any duplicate /images/webstories/ prefixes
-    $imagePath = preg_replace('#(/images/webstories/)+#', '/images/webstories/', $imagePath);
-    
-    // Check if the path already starts with /images/webstories/
+    // First, clean up any paths that may already have /images/webstories/
     if (strpos($imagePath, '/images/webstories/') === 0) {
-        return $imagePath; // Already properly formatted
+        // Already has the full path, just return it
+        return $imagePath;
     }
     
-    // Otherwise, prepend the path
+    // If path contains duplicate segments, clean them up
+    if (strpos($imagePath, 'images/webstories/') !== false) {
+        // Extract just the filename part
+        $parts = explode('images/webstories/', $imagePath);
+        $filename = end($parts);
+        return '/images/webstories/' . $filename;
+    }
+    
+    // Otherwise, it's just a filename, prepend the path
     return '/images/webstories/' . $imagePath;
 }
 
@@ -387,6 +393,16 @@ try {
                 $story = str_replace(
                     '<amp-story poster-portrait-src',
                     '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src',
+                    $story
+                );
+            }
+            
+            // Additional check to ensure proper amp-story tag replacement was done
+            if (strpos($story, '<amp-story>') !== false || strpos($story, '<amp-story poster-portrait-src') !== false && strpos($story, 'standalone') === false) {
+                debug_log("STORY", "Ensuring amp-story tag has all required attributes");
+                $story = preg_replace(
+                    '/<amp-story[^>]*>/',
+                    '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src="' . $formattedCoverImage . '">',
                     $story
                 );
             }
