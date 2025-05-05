@@ -458,7 +458,7 @@ if ($result && $result->num_rows > 0) {
                 
                 // Update or add meta image tag
                 $metaPattern = '/<meta property="og:image" content="[^"]*"/';
-                $metaReplacement = '<meta property="og:image" content="' . $thumbnailUrl . '"';
+                $metaReplacement = '<meta property="og:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlug . '.jpg"';
                 
                 if (preg_match($metaPattern, $webstoryContent)) {
                     $webstoryContent = preg_replace($metaPattern, $metaReplacement, $webstoryContent);
