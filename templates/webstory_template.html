@@ -137,24 +137,25 @@
     </style>
 </head>
 <body>
-    <amp-analytics type="gtag" data-credentials="include">
-        <script type="application/json">
-        {
-            "vars" : {
-                "gtag_id": "G-PK6FMNGL4N",
-                "config" : {
-                    "G-PK6FMNGL4N": { "groups": "default" }
-                }
-            }
-        }
-        </script>
-    </amp-analytics>
-    
     <amp-story standalone
               title="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - ₹{{EGG_RATE}}"
               publisher="Today Egg Rates"
               publisher-logo-src="/tee.png"
               poster-portrait-src="{{COVER_BACKGROUND_IMAGE}}">
+        
+        <!-- Analytics must be inside the amp-story tag -->
+        <amp-analytics type="gtag" data-credentials="include">
+            <script type="application/json">
+            {
+                "vars" : {
+                    "gtag_id": "G-PK6FMNGL4N",
+                    "config" : {
+                        "G-PK6FMNGL4N": { "groups": "default" }
+                    }
+                }
+            }
+            </script>
+        </amp-analytics>
         
         <!-- Auto ads configuration - this is the proper way to add ads to AMP stories -->
         <amp-story-auto-ads>
