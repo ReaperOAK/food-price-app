@@ -7,8 +7,8 @@
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <script async src="https://cdn.ampproject.org/v0.js"></script>
     <script async custom-element="amp-story" src="https://cdn.ampproject.org/v0/amp-story-1.0.js"></script>
+    <script async custom-element="amp-story-auto-ads" src="https://cdn.ampproject.org/v0/amp-story-auto-ads-0.1.js"></script>
     <meta name="google-adsense-account" content="ca-pub-2664225874856394">
-    <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2664225874856394" crossorigin="anonymous"></script>
     <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N"></script>
@@ -123,16 +123,45 @@
             display: inline-block;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
+
+        /* Ad page styles */
+        .ad-page-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .ad-container {
+            width: 300px;
+            height: 250px;
+            background-color: #f8f8f8;
+            border-radius: 8px;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
-    <amp-auto-ads type="adsense" data-ad-client="ca-pub-2664225874856394"></amp-auto-ads>
     
     <amp-story standalone
               title="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - ₹{{EGG_RATE}}"
               publisher="Today Egg Rates"
               publisher-logo-src="/tee.png"
               poster-portrait-src="{{COVER_BACKGROUND_IMAGE}}">
+        
+        <!-- Auto ads configuration - this is the proper way to add ads to AMP stories -->
+        <amp-story-auto-ads>
+            <script type="application/json">
+                {
+                    "ad-attributes": {
+                        "type": "adsense",
+                        "data-ad-client": "ca-pub-2664225874856394"
+                    }
+                }
+            </script>
+        </amp-story-auto-ads>
         
         <!-- Cover page -->
         <amp-story-page id="cover">
