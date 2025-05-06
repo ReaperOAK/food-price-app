@@ -374,11 +374,16 @@ try {
             // Format date for display
             $displayDate = date('F j, Y', strtotime($date));
             
+            // Format ISO date for Schema.org
+            $isoDate = date('c', strtotime($date));
+            
             // Replace placeholders in the template
             $story = $template;
             $story = str_replace('{{CITY_NAME}}', $city, $story);
             $story = str_replace('{{STATE_NAME}}', $state, $story);
             $story = str_replace('{{EGG_RATE}}', $rate, $story);
+            $story = str_replace('{{ISO_DATE}}', $isoDate, $story);
+            
             // Calculate the tray price properly instead of literal string replacement
             $trayPrice = number_format($rate * 30, 1);
             $story = str_replace('{{EGG_RATE * 30}}', $trayPrice, $story);

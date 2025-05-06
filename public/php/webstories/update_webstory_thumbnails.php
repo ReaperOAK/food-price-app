@@ -27,8 +27,9 @@ if (!extension_loaded('gd')) {
 $basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
 $imageDir = $basePath . '/images/webstories';
 $webstoriesDir = $basePath . '/webstories';
-$thumbnailWidth = 400;
-$thumbnailHeight = 300;
+// Update thumbnail dimensions to match Google's Web Story requirements (proper aspect ratio)
+$thumbnailWidth = 640;  // Updated for better quality
+$thumbnailHeight = 853; // Updated for 3:4 portrait aspect ratio (Google recommended)
 
 debug_log("CONFIG", "Paths configured", [
     "basePath" => $basePath,
