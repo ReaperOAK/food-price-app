@@ -413,24 +413,25 @@ try {
             // Fix duplicate paths in meta tags
             $story = preg_replace('#content="https://todayeggrates.com/images/webstories//images/webstories/([^"]+)"#', 'content="https://todayeggrates.com/images/webstories/$1"', $story);
             
-            // Make sure the amp-story tag has all required attributes
-            if (strpos($story, '<amp-story poster-portrait-src') !== false && strpos($story, 'standalone') === false) {
-                debug_log("STORY", "Fixing missing attributes in amp-story tag");
-                $story = str_replace(
-                    '<amp-story poster-portrait-src',
-                    '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src',
-                    $story
-                );
-            }
+            // Properly handle amp-story attributes by finding the main amp-story tag and ensuring it has all required attributes
+            // First, check if the standalone attribute exists in the amp-story tag
+            $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.jpg';
+            $ampStoryPattern = '/<amp-story[^>]*>/';
             
-            // Additional thorough check for amp-story tag
-            if (preg_match('/<amp-story(?!\s+standalone)[^>]*>/', $story)) {
-                debug_log("STORY", "Ensuring amp-story tag has all required attributes");
-                $story = preg_replace(
-                    '/<amp-story[^>]*>/',
-                    '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" publisher="Today Egg Rates" publisher-logo-src="/tee.png" poster-portrait-src="' . $formattedCoverImage . '">',
-                    $story
-                );
+            if (preg_match($ampStoryPattern, $story, $matches)) {
+                $originalTag = $matches[0];
+                debug_log("STORY", "Found amp-story tag: {$originalTag}");
+                
+                // Create a new amp-story tag with all required attributes
+                $newTag = '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" ' .
+                         'publisher="Today Egg Rates" publisher-logo-src="/tee.png" ' . 
+                         'poster-portrait-src="' . $thumbnailUrl . '">';
+                
+                // Replace the original tag with our complete one
+                $story = str_replace($originalTag, $newTag, $story);
+                debug_log("STORY", "Updated amp-story tag with all required attributes");
+            } else {
+                debug_log("ERROR", "Could not find amp-story tag in template");
             }
             
             // Save the web story
