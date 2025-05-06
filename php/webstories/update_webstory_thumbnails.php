@@ -436,24 +436,28 @@ if ($result && $result->num_rows > 0) {
                 
                 $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.jpg';
                 
-                // Update or add poster-portrait-src
-                $pattern = '/<amp-story.*?poster-portrait-src="[^"]*"/s';
-                $replacement = '<amp-story poster-portrait-src="' . $thumbnailUrl . '"';
+                // Improved pattern matching for the amp-story tag to avoid creating multiple nested tags
+                // We'll search for the entire amp-story opening tag and replace just the poster-portrait-src attribute
+                $mainAmpStoryPattern = '/<amp-story[^>]*>/';
                 
-                if (preg_match($pattern, $webstoryContent)) {
-                    $webstoryContent = preg_replace($pattern, $replacement, $webstoryContent);
-                    debug_log("UPDATE", "Updated poster-portrait-src attribute");
-                } else {
-                    debug_log("WARNING", "Could not find amp-story tag with poster-portrait-src attribute");
-                    // Try with a more lenient pattern
-                    $lenientPattern = '/<amp-story/s';
-                    if (preg_match($lenientPattern, $webstoryContent)) {
-                        $replacement = '<amp-story poster-portrait-src="' . $thumbnailUrl . '"';
-                        $webstoryContent = preg_replace($lenientPattern, $replacement, $webstoryContent);
-                        debug_log("UPDATE", "Added poster-portrait-src attribute with lenient pattern");
+                if (preg_match($mainAmpStoryPattern, $webstoryContent, $matches)) {
+                    $originalTag = $matches[0];
+                    debug_log("UPDATE", "Found amp-story tag: {$originalTag}");
+                    
+                    // If tag already has poster-portrait-src attribute, replace it
+                    if (strpos($originalTag, 'poster-portrait-src') !== false) {
+                        $updatedTag = preg_replace('/poster-portrait-src="[^"]*"/', 'poster-portrait-src="' . $thumbnailUrl . '"', $originalTag);
+                        debug_log("UPDATE", "Replacing poster-portrait-src attribute");
                     } else {
-                        debug_log("ERROR", "Could not find amp-story tag at all");
+                        // Otherwise insert the attribute before the closing >
+                        $updatedTag = str_replace('>', ' poster-portrait-src="' . $thumbnailUrl . '">', $originalTag);
+                        debug_log("UPDATE", "Adding poster-portrait-src attribute");
                     }
+                    
+                    // Replace the opening amp-story tag with our updated version
+                    $webstoryContent = str_replace($originalTag, $updatedTag, $webstoryContent);
+                } else {
+                    debug_log("ERROR", "Could not find amp-story tag");
                 }
                 
                 // Update or add meta image tag
@@ -469,6 +473,15 @@ if ($result && $result->num_rows > 0) {
                     $headReplacement = '<head>' . PHP_EOL . '    ' . $metaReplacement;
                     $webstoryContent = preg_replace($headPattern, $headReplacement, $webstoryContent);
                     debug_log("UPDATE", "Added og:image meta tag");
+                }
+                
+                // Also update Twitter card image
+                $twitterPattern = '/<meta name="twitter:image" content="[^"]*"/';
+                $twitterReplacement = '<meta name="twitter:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlug . '.jpg"';
+                
+                if (preg_match($twitterPattern, $webstoryContent)) {
+                    $webstoryContent = preg_replace($twitterPattern, $twitterReplacement, $webstoryContent);
+                    debug_log("UPDATE", "Updated twitter:image meta tag");
                 }
                 
                 // Save the updated webstory
