@@ -1,15 +1,55 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Egg Rates",
+  "name": "Today Egg Rates - Daily NECC Egg Prices",
+  "description": "Check today's egg rates in major Indian cities. Updated daily NECC egg prices, market trends and wholesale egg rates.",
   "icons": [
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
       "type": "image/x-icon"
-     }
+    },
+    {
+      "src": "eggpic.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "eggpic.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#3b82f6",
+  "background_color": "#f3f4f6",
+  "orientation": "portrait",
+  "scope": "/",
+  "shortcuts": [
+    {
+      "name": "Mumbai Egg Rate",
+      "short_name": "Mumbai",
+      "description": "Check today's egg rate in Mumbai",
+      "url": "/mumbai-egg-rate",
+      "icons": [{ "src": "eggpic.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Chennai Egg Rate",
+      "short_name": "Chennai",
+      "description": "Check today's egg rate in Chennai",
+      "url": "/chennai-egg-rate",
+      "icons": [{ "src": "eggpic.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Bangalore Egg Rate",
+      "short_name": "Bangalore",
+      "description": "Check today's egg rate in Bangalore",
+      "url": "/bangalore-egg-rate",
+      "icons": [{ "src": "eggpic.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
 }

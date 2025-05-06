@@ -1,16 +1,28 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
+Allow: /sitemap.xml
 Allow: /webstories/
 Allow: /blog/
-Allow: /state/
+
+# Priority pages - allow more frequent crawling
+Allow: /mumbai-egg-rate
+Allow: /chennai-egg-rate
+Allow: /bangalore-egg-rate
+Allow: /kolkata-egg-rate
+Allow: /barwala-egg-rate
+Allow: /siliguri-egg-rate
+Allow: /durgapur-egg-rate
+Allow: /hyderabad-egg-rate
+
+# Disallow duplicate content
+Disallow: /build/
 Disallow: /php/
 Disallow: /admin/
 Disallow: /login
 
-# Sitemaps
-Sitemap: https://todayeggrates.com/sitemap.xml
-Sitemap: https://todayeggrates.com/webstories-sitemap.xml
+# Sitemap locations
+Sitemap: https://todayeggrates.com/sitemap-index.xml
 
 # Optimize crawl rate
 Crawl-delay: 1
