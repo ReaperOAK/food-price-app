@@ -3,48 +3,94 @@
 ## File Structure
 
 ```
-└── 📁php
-    ├── 📁api
-    │   ├── 📁location
-    │   │   ├── add_state_city.php
-    │   │   ├── get_cities.php
-    │   │   ├── get_state_for_city.php
-    │   │   ├── get_states_and_cities.php
-    │   │   ├── get_states.php
-    │   │   └── remove_state_city.php
-    │   ├── 📁rates
-    │   │   ├── add_rate.php
-    │   │   ├── delete_rate.php
-    │   │   ├── get_all_rates.php
-    │   │   ├── get_average_rates_by_state.php
-    │   │   ├── get_latest_rate.php
-    │   │   ├── get_latest_rates.php
-    │   │   ├── get_rates.php
-    │   │   ├── get_special_rates.php
-    │   │   ├── update_multiple_rates.php
-    │   │   └── update_rate.php
-    │   └── 📁scraper
-    │       ├── daily_update.php
-    │       ├── eggprices.php
-    │       └── update_from_e2necc.php
-    ├── 📁config
-    │   └── db.php
-    ├── 📁cron
-    │   └── cronjob.php
-    ├── 📁database
-    │   └── 📁maintenance
-    │       └── archive_old_data.php
-    ├── 📁seo
-    │   └── generate_sitemap.php
+└── 📁public
+    ├── 📁images
+    │   └── 📁webstories
+    │       ├── 1.jpg
+    │       ├── 10.jpg
+    │       ├── 11.jpg
+    │       ├── 12.jpg
+    │       ├── 13.jpg
+    │       ├── 14.jpg
+    │       ├── 15.jpg
+    │       ├── 16.jpg
+    │       ├── 17.jpg
+    │       ├── 18.jpg
+    │       ├── 19.jpg
+    │       ├── 2.jpg
+    │       ├── 20.jpg
+    │       ├── 3.jpg
+    │       ├── 4.jpg
+    │       ├── 5.jpg
+    │       ├── 6.jpg
+    │       ├── 7.jpg
+    │       ├── 8.jpg
+    │       └── 9.jpg
+    ├── 📁php
+    │   ├── 📁api
+    │   │   ├── 📁location
+    │   │   │   ├── add_state_city.php
+    │   │   │   ├── get_cities.php
+    │   │   │   ├── get_state_for_city.php
+    │   │   │   ├── get_states_and_cities.php
+    │   │   │   ├── get_states.php
+    │   │   │   └── remove_state_city.php
+    │   │   ├── 📁rates
+    │   │   │   ├── add_rate.php
+    │   │   │   ├── delete_rate.php
+    │   │   │   ├── get_all_rates.php
+    │   │   │   ├── get_average_rates_by_state.php
+    │   │   │   ├── get_latest_rate.php
+    │   │   │   ├── get_latest_rates.php
+    │   │   │   ├── get_rates.php
+    │   │   │   ├── get_special_rates.php
+    │   │   │   ├── update_multiple_rates.php
+    │   │   │   └── update_rate.php
+    │   │   └── 📁scraper
+    │   │       ├── daily_update.php
+    │   │       ├── eggprices.php
+    │   │       └── update_from_e2necc.php
+    │   ├── 📁config
+    │   │   └── db.php
+    │   ├── 📁cron
+    │   │   └── cronjob.php
+    │   ├── 📁database
+    │   │   └── 📁maintenance
+    │   │       └── archive_old_data.php
+    │   ├── 📁seo
+    │   │   └── generate_sitemap.php
+    │   ├── 📁webstories
+    │   │   ├── delete_old_webstories.php
+    │   │   ├── generate_web_stories.php
+    │   │   ├── generate_webstories_sitemap.php
+    │   │   └── update_webstory_thumbnails.php
+    │   ├── error.log
+    │   ├── get_web_stories.php
+    │   ├── index.php
+    │   └── pricecheckROAK.php
+    ├── 📁templates
+    │   └── webstory_template.html
     ├── 📁webstories
-    │   ├── delete_old_webstories.php
-    │   ├── generate_web_stories.php
-    │   ├── generate_webstories_sitemap.php
-    │   └── update_webstory_thumbnails.php
-    ├── error.log
-    ├── get_web_stories.php
-    ├── index.php
-    └── pricecheckROAK.php
+    │   └── .htaccess
+    ├── .htaccess
+    ├── ads.js
+    ├── ads.txt
+    ├── desiegg.jpg
+    ├── eggchicken.jpg
+    ├── eggpic.png
+    ├── eggrate2.jpg
+    ├── eggrate3.jpg
+    ├── Favicon.ico
+    ├── index.html
+    ├── manifest.json
+    ├── robots.txt
+    ├── service-worker.js
+    ├── sitemap-index.xml
+    ├── sitemap.txt
+    ├── sitemap.xml
+    ├── tee.avif
+    ├── tee.png
+    └── webstories-sitemap.xml
 ```
 
 ## Database Utilities

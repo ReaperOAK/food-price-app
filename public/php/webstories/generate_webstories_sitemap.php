@@ -1,151 +1,62 @@
 <?php
-// Generate a sitemap specifically for web stories
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-ini_set('log_errors', 1);
-ini_set('error_log', dirname(dirname(__FILE__)) . '/error.log');
+/**
+ * Web Stories Sitemap Generator
+ * 
+ * This script generates a dedicated XML sitemap specifically for Web Stories,
+ * which helps Google discover and index your Web Stories for better visibility
+ * in search results, especially on mobile devices.
+ */
 
-// Helper function for structured debugging - only declare if it doesn't already exist
-if (!function_exists('debug_log')) {
-    function debug_log($step, $message, $data = null) {
-        $log = date('Y-m-d H:i:s') . " [SITEMAP] " . $step . ": " . $message;
-        if ($data !== null) {
-            $log .= " - " . json_encode($data, JSON_UNESCAPED_SLASHES);
-        }
-        error_log($log);
+// Set header to XML
+header('Content-Type: application/xml; charset=utf-8');
+
+// Database connection
+require_once('../config/db.php');
+
+// Get all web stories from the database
+$webstories_sql = "SELECT * FROM webstories WHERE status = 'published' ORDER BY publish_date DESC";
+$webstories_result = $conn->query($webstories_sql);
+
+// Start XML output
+echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">' . PHP_EOL;
+
+// Base URL for the website
+$base_url = 'https://todayeggrates.com';
+
+// Add each web story to the sitemap
+if ($webstories_result->num_rows > 0) {
+    while($story = $webstories_result->fetch_assoc()) {
+        $url = $base_url . '/webstory/' . $story['slug'];
+        $last_mod = date('c', strtotime($story['updated_at']));
+        
+        echo '  <url>' . PHP_EOL;
+        echo '    <loc>' . htmlspecialchars($url) . '</loc>' . PHP_EOL;
+        echo '    <lastmod>' . $last_mod . '</lastmod>' . PHP_EOL;
+        echo '    <changefreq>weekly</changefreq>' . PHP_EOL;
+        echo '    <priority>0.8</priority>' . PHP_EOL;
+        echo '  </url>' . PHP_EOL;
     }
-}
-
-debug_log("START", "Beginning web stories sitemap generation");
-
-// Configuration paths
-$basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
-$storiesDir = $basePath . '/webstories';
-$sitemapFile = $basePath . '/webstories-sitemap.xml';
-
-debug_log("CONFIG", "Paths configured", [
-    "basePath" => $basePath,
-    "storiesDir" => $storiesDir,
-    "sitemapFile" => $sitemapFile
-]);
-
-// Start the XML sitemap
-$sitemap = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
-$sitemap .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" ' . 
-            'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ' . 
-            'xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 ' .
-            'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd"' . 
-            '>' . "\n";
-
-// Scan the web stories directory
-if (file_exists($storiesDir) && is_dir($storiesDir)) {
-    debug_log("SCAN", "Scanning web stories directory: {$storiesDir}");
-    $files = scandir($storiesDir);
-    
-    if ($files === false) {
-        debug_log("ERROR", "Failed to scan directory: {$storiesDir}");
-        echo "Error: Failed to scan the web stories directory.";
-        exit(1);
-    }
-    
-    $storyCount = 0;
-    
-    foreach ($files as $file) {
-        // Skip directories and non-HTML files
-        if ($file === '.' || $file === '..' || !preg_match('/\.html$/', $file) || $file === 'index.html') {
-            continue;
-        }
-        
-        // Get the file's last modification time
-        $filePath = $storiesDir . '/' . $file;
-        $lastMod = filemtime($filePath);
-        
-        if ($lastMod === false) {
-            debug_log("ERROR", "Failed to get modification time for: {$filePath}");
-            $lastMod = time(); // Use current time as fallback
-        }
-        
-        // Format the URL properly with clean URL structure
-        $url = 'https://todayeggrates.com/webstories/' . $file;
-        $lastModDate = date('c', $lastMod); // ISO 8601 date format (required by Google)
-        
-        // Add this URL to the sitemap with appropriate change frequency and priority
-        $sitemap .= "  <url>\n";
-        $sitemap .= "    <loc>" . htmlspecialchars($url) . "</loc>\n";
-        $sitemap .= "    <lastmod>" . $lastModDate . "</lastmod>\n";
-        $sitemap .= "    <changefreq>daily</changefreq>\n";
-        $sitemap .= "    <priority>0.8</priority>\n";
-        $sitemap .= "  </url>\n";
-        
-        $storyCount++;
-    }
-    
-    // Close the sitemap
-    $sitemap .= '</urlset>';
-    
-    // Save the sitemap
-    debug_log("SAVE", "Saving sitemap to: {$sitemapFile}");
-    $writeResult = file_put_contents($sitemapFile, $sitemap);
-    
-    if ($writeResult === false) {
-        debug_log("ERROR", "Failed to write sitemap file: {$sitemapFile}");
-        echo "Error: Failed to save the sitemap file.";
-        exit(1);
-    }
-    
-    debug_log("SUCCESS", "Sitemap generated successfully with {$storyCount} web stories");
-    echo "Sitemap generated successfully with {$storyCount} web stories.<br>";
-    
-    // Add reference to this sitemap in the main sitemap index if it exists
-    $mainSitemapIndexFile = $basePath . '/sitemap.xml';
-    
-    if (file_exists($mainSitemapIndexFile)) {
-        debug_log("INDEX", "Checking main sitemap index: {$mainSitemapIndexFile}");
-        
-        $mainSitemapIndex = file_get_contents($mainSitemapIndexFile);
-        
-        if ($mainSitemapIndex !== false) {
-            // Check if webstories sitemap is already included
-            if (strpos($mainSitemapIndex, 'webstories-sitemap.xml') === false) {
-                debug_log("INDEX", "Adding webstories sitemap to main sitemap index");
-                
-                // Extract the closing tag
-                $indexContent = preg_replace('/<\/sitemapindex>\s*$/', '', $mainSitemapIndex);
-                
-                // Add our sitemap
-                $indexContent .= "  <sitemap>\n";
-                $indexContent .= "    <loc>https://todayeggrates.com/webstories-sitemap.xml</loc>\n";
-                $indexContent .= "    <lastmod>" . date('c') . "</lastmod>\n";
-                $indexContent .= "  </sitemap>\n";
-                $indexContent .= "</sitemapindex>\n";
-                
-                // Save updated sitemap index
-                $writeResult = file_put_contents($mainSitemapIndexFile, $indexContent);
-                
-                if ($writeResult === false) {
-                    debug_log("ERROR", "Failed to update main sitemap index");
-                    echo "Warning: Failed to update the main sitemap index.<br>";
-                } else {
-                    debug_log("SUCCESS", "Updated main sitemap index successfully");
-                    echo "Updated main sitemap index successfully.<br>";
-                }
-            } else {
-                debug_log("INDEX", "Web stories sitemap already included in main sitemap index");
-                echo "Web stories sitemap already included in main sitemap index.<br>";
-            }
-        } else {
-            debug_log("ERROR", "Failed to read main sitemap index");
-            echo "Warning: Failed to read the main sitemap index.<br>";
-        }
-    } else {
-        debug_log("INFO", "Main sitemap index not found, skipping integration");
-        echo "Note: Main sitemap index not found, skipping integration.<br>";
-    }
-    
-    debug_log("END", "Web stories sitemap generation completed");
 } else {
-    debug_log("ERROR", "Web stories directory not found: {$storiesDir}");
-    echo "Error: Web stories directory not found: {$storiesDir}";
-    exit(1);
+    // If no web stories found, add a placeholder URL
+    echo '  <url>' . PHP_EOL;
+    echo '    <loc>' . htmlspecialchars($base_url . '/webstories') . '</loc>' . PHP_EOL;
+    echo '    <lastmod>' . date('c') . '</lastmod>' . PHP_EOL;
+    echo '    <changefreq>weekly</changefreq>' . PHP_EOL;
+    echo '    <priority>0.8</priority>' . PHP_EOL;
+    echo '  </url>' . PHP_EOL;
 }
+
+// Close the XML
+echo '</urlset>';
+
+// Save the sitemap to a file
+$sitemap_content = ob_get_contents();
+file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/webstories-sitemap.xml', $sitemap_content);
+
+// Close the database connection
+$conn->close();
 ?>

@@ -1,10 +1,75 @@
-# Getting Started with Create React App
+# Today Egg Rates - Food Price App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[![Website](https://img.shields.io/website?url=https%3A%2F%2Ftodayeggrates.com&label=Production)](https://todayeggrates.com)
 
-Project Deployed and accessible at [Today Egg Rates](https://todayeggrates.com).
+A comprehensive platform for tracking egg prices across cities and states in India. This project combines React for the frontend and PHP for backend APIs.
 
-## Available Scripts
+![Today Egg Rates](./public/eggpic.png)
+
+## 🌟 Features
+
+- Real-time egg price tracking across Indian cities
+- Historical price data and trends analysis
+- City and state-specific egg rate information
+- AMP Web Stories for mobile-optimized content
+- Educational blog content about egg markets
+- Admin dashboard for data management
+
+## 🗂️ Project Structure
+
+The project is organized into frontend (React) and backend (PHP) components:
+
+```
+food-price-app/
+├── src/                  # React frontend source files
+├── public/               # Static public assets
+│   ├── images/           # Image assets including webstory thumbnails
+│   ├── php/              # PHP backend files
+│   │   ├── api/          # API endpoints for data operations
+│   │   ├── config/       # Configuration files
+│   │   ├── cron/         # Automated task scripts
+│   │   └── webstories/   # Web story generation scripts
+│   ├── templates/        # HTML templates
+│   └── webstories/       # Generated web stories
+├── build/                # Production build output
+└── reports/              # Analytics and performance reports
+```
+
+For detailed documentation:
+- [Frontend Documentation](./documentation.md)
+- [PHP API Documentation](./php%20docs.md)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v14+)
+- PHP (v7.4+)
+- MySQL database
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/food-price-app.git
+cd food-price-app
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+3. Configure database
+   - Create a MySQL database
+   - Update `public/php/config/db.php` with your database credentials
+
+4. Start development server
+```bash
+npm start
+```
+
+## 📝 Available Scripts
 
 In the project directory, you can run:
 
@@ -41,32 +106,43 @@ Instead, it will copy all the configuration files and the transitive dependencie
 
 You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+## 🔄 Data Update Process
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The application fetches egg prices from various sources including:
+- National Egg Coordination Committee (NECC) website
+- Direct API submissions from market reporters
+- Administrative updates through the CMS
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Data is automatically refreshed through scheduled cron jobs:
 
-### Code Splitting
+```bash
+# Schedule daily updates (typically set on server)
+0 9 * * * php /path/to/public/php/cron/cronjob.php
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## 🌐 Deployment
 
-### Analyzing the Bundle Size
+The site is deployed at [Today Egg Rates](https://todayeggrates.com).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Deploy your own instance:
 
-### Making a Progressive Web App
+1. Build the React application
+```bash
+npm run build
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+2. Upload the build directory contents to your web server
+3. Ensure PHP and MySQL are properly configured
+4. Set up cron jobs for automatic data updates
 
-### Advanced Configuration
+## 📊 Analytics
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Performance and user engagement data can be found in the `reports/` directory.
 
-### Deployment
+## 📄 License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+This project is proprietary and not open for redistribution or use without permission.
 
-### `npm run build` fails to minify
+## 📞 Contact
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+For questions or support, contact us at info@todayeggrates.com

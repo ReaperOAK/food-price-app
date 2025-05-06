@@ -22,12 +22,15 @@ food-price-app/
     │   │   └── RateForm.js
     │   ├── blog/
     │   │   ├── BlogCard.js
-    │   │   └── BlogList.js
+    │   │   ├── BlogList.js
+    │   │   └── TableOfContents.js
     │   ├── common/
     │   │   ├── CitySelect.js
     │   │   ├── Disclaimer.js
     │   │   ├── FAQ.js
     │   │   ├── PrivacyPolicy.js
+    │   │   ├── RedirectInterceptor.js
+    │   │   ├── StakeAdPopup.js
     │   │   ├── StateSelect.js
     │   │   └── TOS.js
     │   ├── layout/
@@ -100,12 +103,14 @@ food-price-app/
 - **AdminNavbar.js**: Admin-specific navigation with logout functionality
 - **Footer.js**: Site-wide footer with copyright info and legal links
 - **Breadcrumb.js**: Context-aware navigation path with structured data for SEO
+- **RedirectInterceptor.js**: Manages internal redirects and navigation paths for legacy URLs
 
 #### Content Sections
 - **BodyOne.js**: Hero section with location-specific heading and featured stories
 - **BodyTwo.js**: Informational section about egg pricing, NECC, and market factors
 - **BodyThree.js**: Data-driven analysis section with price trends and comparisons
 - **FAQ.js**: Dynamic FAQ section with location-tailored questions
+- **StakeAdPopup.js**: Promotional component for displaying targeted advertisements
 
 #### Data Display
 - **RateTable.js**: Interactive table showing egg rates with visualization charts
@@ -124,6 +129,7 @@ food-price-app/
 #### Blog Components
 - **BlogList.js**: Grid display of blog posts with sorting and filtering
 - **BlogCard.js**: Card component for individual blog previews
+- **TableOfContents.js**: Dynamic table of contents for blog posts with anchor links
 - **blogs/blog-1.js**: "Understanding Today's Egg Rates Across Major Indian Cities"
 - **blogs/blog-2.js**: "Understanding Egg Rates in India"
 - **blogs/egg-rate-barwala.js**: Barwala market analysis article

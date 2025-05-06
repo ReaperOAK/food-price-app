@@ -1,86 +1,95 @@
 import React, { useState } from 'react';
 
-const FAQ = ({ selectedCity, selectedState, eggRates }) => {
+const FAQ = ({ location = {} }) => {
   const [openFAQ, setOpenFAQ] = useState(null);
-  const currentRate = eggRates && eggRates.length > 0 ? eggRates[0].rate : 'varies';
+  const cityName = location.cityName || '';
+  const stateName = location.stateName || '';
   
-  // Create contextual FAQ list based on location
-  let faqList = [];
+  // Default FAQs
+  const defaultFAQs = [
+    {
+      question: `What is today's egg rate in India?`,
+      answer: `Today's egg rates in India vary by location. The national average egg rate today is updated daily from NECC (National Egg Coordination Committee) sources. Visit our homepage for the latest egg rates across all major cities.`
+    },
+    {
+      question: `What is NECC egg rate today?`,
+      answer: `The official NECC (National Egg Coordination Committee) egg rate today is updated on our website daily. NECC announces egg prices for different zones including Namakkal, Chennai, Delhi, Mumbai, Kolkata and other major markets.`
+    },
+    {
+      question: `How are egg rates determined in India?`,
+      answer: `Egg rates in India are determined by the National Egg Coordination Committee (NECC) based on factors like production costs, demand-supply dynamics, seasonal variations, and regional differences. These rates are announced daily and serve as a benchmark for wholesale egg prices across the country.`
+    },
+    {
+      question: `What is a peti of eggs and how much does it cost today?`,
+      answer: `A "peti" (box) of eggs typically contains 30 eggs (one tray). The price of 1 peti egg varies by location. Based on today's rates, a peti of eggs costs approximately ₹150-₹200 depending on your city. Check our city-specific pages for exact prices in your area.`
+    },
+    {
+      question: `Why do egg prices fluctuate?`,
+      answer: `Egg prices fluctuate due to factors like seasonal demand, feed costs, production levels, transportation costs, festivals, weather conditions, and disease outbreaks affecting poultry. The National Egg Coordination Committee (NECC) monitors these factors when setting daily egg rates.`
+    },
+    {
+      question: `What is the difference between farm eggs and market eggs?`,
+      answer: `Farm eggs come directly from producers without passing through the formal market system, while market eggs are distributed through the organized channels regulated by bodies like NECC. Market egg rates are standardized while farm egg prices may vary based on local factors.`
+    },
+    {
+      question: `How much does a tray of 30 eggs cost today?`,
+      answer: `The cost of a tray of 30 eggs (commonly referred to as 1 peti) varies by location. In major cities, the current price ranges from ₹150 to ₹200. Our website provides daily updated city-specific egg rates across India.`
+    },
+    {
+      question: `What are the factors that affect egg rates?`,
+      answer: `Egg rates are affected by multiple factors including: production costs (feed, labor, maintenance), seasonal demand fluctuations, transportation costs, regional supply-demand balance, weather conditions, disease outbreaks in poultry, and government policies regarding the poultry industry.`
+    }
+  ];
   
-  if (selectedCity && selectedState) {
-    faqList = [
-      {
-        question: `What is the current egg rate in ${selectedCity}, ${selectedState}?`,
-        answer: `As of today, the egg rate in ${selectedCity}, ${selectedState} is ₹${currentRate} per egg. This price is based on the latest NECC (National Egg Coordination Committee) rates.`
-      },
-      {
-        question: `How often are the egg rates in ${selectedCity} updated?`,
-        answer: `The egg rates in ${selectedCity} are updated daily based on market conditions and official NECC publications. Our website ensures you always have access to the most current egg prices.`
-      },
-      {
-        question: `What is the price for a tray of eggs (30 eggs) in ${selectedCity}?`,
-        answer: `Based on the current rate of ₹${currentRate} per egg, a full tray of 30 eggs in ${selectedCity} would cost approximately ₹${(currentRate * 30).toFixed(2)}.`
-      },
-      {
-        question: `Why do egg prices fluctuate in ${selectedCity}?`,
-        answer: `Egg prices in ${selectedCity} and other regions fluctuate due to various factors including feed costs, seasonal demand, production volumes, transportation costs, and overall market conditions. During festivals and winters, prices often increase due to higher demand.`
-      },
-      {
-        question: `Where can I buy eggs at wholesale rates in ${selectedCity}?`,
-        answer: `For wholesale egg purchases in ${selectedCity}, you can check local poultry farms, NECC distribution centers, or wholesale markets. Prices are generally lower when buying in bulk directly from these sources.`
+  // Location-specific FAQs
+  const locationSpecificFAQs = cityName ? [
+    {
+      question: `What is today's egg rate in ${cityName}, ${stateName}?`,
+      answer: `Today's egg rate in ${cityName}, ${stateName} is updated daily on our website. We source our information directly from the National Egg Coordination Committee (NECC) and local poultry associations to provide the most accurate prices.`
+    },
+    {
+      question: `How do egg prices in ${cityName} compare to national average?`,
+      answer: `Egg prices in ${cityName} may differ from the national average based on local factors like transportation costs, regional demand, and distribution network efficiency. You can compare ${cityName}'s egg rates with other cities on our main rates page.`
+    },
+    {
+      question: `Where can I buy eggs in ${cityName} at wholesale prices?`,
+      answer: `In ${cityName}, wholesale eggs are typically available at major poultry markets, NECC distribution centers, and large poultry farms. The wholesale price generally follows the official NECC rate with minimal variation.`
+    },
+    {
+      question: `How often do egg rates change in ${cityName}?`,
+      answer: `In ${cityName}, egg rates typically update daily based on NECC announcements. However, the retail prices might not change daily as retailers may adjust their prices less frequently, typically weekly or when there are significant changes in the wholesale rates.`
+    }
+  ] : stateName ? [
+    {
+      question: `What is the average egg rate in ${stateName}?`,
+      answer: `The average egg rate in ${stateName} varies across different cities. We calculate the state average based on NECC rates from major cities in ${stateName}. This information is updated daily on our website.`
+    },
+    {
+      question: `How do egg prices in ${stateName} compare to other states?`,
+      answer: `Egg prices in ${stateName} may be higher or lower than other states depending on factors like local production capacity, transportation networks, and consumer demand. You can compare rates across different states on our website.`
+    },
+    {
+      question: `Which city in ${stateName} has the lowest egg prices?`,
+      answer: `Egg prices can vary within ${stateName}. Cities closer to major production centers typically have lower prices. Check our state page for ${stateName} to see a comparison of egg rates across different cities in the state.`
+    }
+  ] : [];
+
+  // Combine default and location-specific FAQs
+  const faqList = [...locationSpecificFAQs, ...defaultFAQs];
+
+  // Generate FAQ Schema for SEO
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqList.map((faq) => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
       }
-    ];
-  } else if (selectedState) {
-    faqList = [
-      {
-        question: `What are the current egg rates across ${selectedState}?`,
-        answer: `Egg rates across different cities in ${selectedState} typically range based on local market conditions. You can view the detailed city-wise rates in our rate table above.`
-      },
-      {
-        question: `Which city in ${selectedState} has the lowest egg prices?`,
-        answer: `Egg prices can vary between cities in ${selectedState} based on supply chain efficiency and local demand. We recommend checking our comprehensive rate table for the most competitive prices in your area.`
-      },
-      {
-        question: `How does ${selectedState} egg production compare to other states?`,
-        answer: `${selectedState} contributes significantly to India's egg production. The state's production volumes affect local pricing, with areas near major production centers typically enjoying more competitive rates.`
-      },
-      {
-        question: `Are egg prices in ${selectedState} affected by seasonal changes?`,
-        answer: `Yes, egg prices in ${selectedState} often show seasonal variations. Prices typically increase during winter months and festival seasons due to higher demand and sometimes reduced production.`
-      },
-      {
-        question: `Where can I find official egg rates for ${selectedState}?`,
-        answer: `Official egg rates for ${selectedState} are published by the National Egg Coordination Committee (NECC). Our website provides these rates daily, aggregated from official sources.`
-      }
-    ];
-  } else {
-    faqList = [
-      {
-        question: "How are egg rates determined in India?",
-        answer: "Egg rates in India are primarily determined by the National Egg Coordination Committee (NECC), which publishes daily prices based on supply, demand, production costs, and market conditions across different regions."
-      },
-      {
-        question: "Why do egg prices vary between different cities in India?",
-        answer: "Egg prices vary between cities due to factors like proximity to production centers, transportation costs, local demand, storage facilities, and state-specific market conditions. Cities closer to major egg-producing regions like Namakkal or Barwala often have lower prices."
-      },
-      {
-        question: "When are egg prices typically the highest in India?",
-        answer: "Egg prices in India typically peak during winter months (November to February) and during major festival seasons when demand increases. Prices are generally lower during summer months when consumption decreases."
-      },
-      {
-        question: "What affects egg production costs in India?",
-        answer: "Egg production costs in India are affected by poultry feed prices (primarily maize and soybean), healthcare costs for birds, farm maintenance, electricity, labor costs, and transportation. Feed alone constitutes about 70% of production costs."
-      },
-      {
-        question: "Are brown eggs more expensive than white eggs?",
-        answer: "In India, brown eggs are typically priced slightly higher than white eggs. This price difference is primarily due to consumer perception of brown eggs being more nutritious, though nutritionally they are very similar to white eggs."
-      },
-      {
-        question: "How do egg prices today compare to previous years?",
-        answer: "Egg prices in India have shown an overall increasing trend over the years, influenced by rising production costs, growing demand, and inflation. However, short-term fluctuations occur based on seasonal factors and market conditions."
-      }
-    ];
-  }
+    }))
+  };
 
   const toggleFAQ = (index) => {
     if (openFAQ === index) {
@@ -91,32 +100,43 @@ const FAQ = ({ selectedCity, selectedState, eggRates }) => {
   };
 
   return (
-    <div className="p-6 mt-6 mx-auto bg-white shadow-lg rounded-lg">
+    <div className="p-6 mt-6 mx-auto bg-white shadow-lg rounded-lg" id="faq-section">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Frequently Asked Questions</h2>
-      {faqList.map((faq, index) => (
-        <div key={index} className="mb-4 border-b pb-4">
-          <div
-            className="flex justify-between items-center cursor-pointer transition hover:bg-gray-100 p-4 rounded-lg"
-            onClick={() => toggleFAQ(index)}
-          >
-            <span className="font-semibold text-gray-800">{faq.question}</span>
-            <svg
-              className={`w-5 h-5 transform transition-transform ${openFAQ === index ? "rotate-180 text-blue-500" : "text-gray-500"}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+      
+      {/* FAQ Schema for SEO */}
+      <script type="application/ld+json">
+        {JSON.stringify(faqSchema)}
+      </script>
+      
+      <div className="divide-y divide-gray-200">
+        {faqList.map((faq, index) => (
+          <div key={index} className="py-4">
+            <button
+              className="flex justify-between items-center w-full text-left font-semibold text-gray-800 hover:text-blue-600 transition p-2 rounded-lg"
+              onClick={() => toggleFAQ(index)}
+              aria-expanded={openFAQ === index}
+              aria-controls={`faq-answer-${index}`}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-            </svg>
-          </div>
-          {openFAQ === index && (
-            <div className="mt-2 text-gray-700 px-4 pb-2 animate-fade-in">
-              <p>{faq.answer}</p>
+              <span className="pr-8">{faq.question}</span>
+              <svg
+                className={`w-5 h-5 transform transition-transform ${openFAQ === index ? "rotate-180 text-blue-500" : "text-gray-500"}`}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </button>
+            <div 
+              id={`faq-answer-${index}`} 
+              className={`mt-2 text-gray-700 px-2 overflow-hidden transition-all duration-300 ${openFAQ === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
+            >
+              <p className="pb-4">{faq.answer}</p>
             </div>
-          )}
-        </div>
-      ))}
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

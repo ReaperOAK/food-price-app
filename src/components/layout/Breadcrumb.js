@@ -1,176 +1,100 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 
-const Breadcrumb = ({ selectedCity, selectedState }) => {
+const Breadcrumb = () => {
   const location = useLocation();
   const pathSegments = location.pathname.split('/').filter(segment => segment !== '');
   
-  // Generate structured data for breadcrumbs
-  const generateStructuredData = () => {
-    const items = [{ name: 'Home', url: 'https://todayeggrates.com/' }];
+  // Skip rendering if we're on the homepage
+  if (pathSegments.length === 0) {
+    return null;
+  }
+  
+  // Generate breadcrumb items
+  const breadcrumbItems = [
+    {
+      name: 'Home',
+      path: '/',
+      position: 1
+    }
+  ];
+  
+  // Build the breadcrumb path segments
+  let currentPath = '';
+  pathSegments.forEach((segment, index) => {
+    currentPath += `/${segment}`;
     
-    if (selectedState && !selectedCity) {
-      items.push({ 
-        name: `${selectedState} Egg Rates`, 
-        url: `https://todayeggrates.com/state/${selectedState.toLowerCase()}-egg-rate` 
-      });
+    // Format the segment name to be more readable
+    let name = segment;
+    
+    // Handle special cases
+    if (segment.includes('-egg-rate')) {
+      name = segment.replace('-egg-rate', '');
+      name = name.charAt(0).toUpperCase() + name.slice(1) + ' Egg Rate';
+    } else if (segment === 'blog' && index === 0) {
+      name = 'Blog';
+    } else if (segment === 'state' && index === 0) {
+      name = 'States';
+    } else if (segment === 'webstories') {
+      name = 'Web Stories';
+    } else {
+      // Capitalize and replace hyphens with spaces for other segments
+      name = segment
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
     }
     
-    if (selectedCity) {
-      if (selectedState) {
-        items.push({ 
-          name: `${selectedState} Egg Rates`, 
-          url: `https://todayeggrates.com/state/${selectedState.toLowerCase()}-egg-rate` 
-        });
-      }
-      items.push({ 
-        name: `${selectedCity} Egg Rate`, 
-        url: `https://todayeggrates.com/${selectedCity.toLowerCase()}-egg-rate` 
-      });
-    }
-    
-    if (pathSegments.includes('webstories')) {
-      items.push({ 
-        name: 'Web Stories', 
-        url: 'https://todayeggrates.com/webstories' 
-      });
-    }
-    
-    if (pathSegments.includes('blog')) {
-      items.push({ 
-        name: 'Blog', 
-        url: 'https://todayeggrates.com/blog' 
-      });
-      
-      if (pathSegments.length > 1) {
-        const blogSlug = pathSegments[pathSegments.length - 1];
-        items.push({ 
-          name: blogSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()), 
-          url: `https://todayeggrates.com/blog/${blogSlug}` 
-        });
-      }
-    }
-    
-    return {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      "itemListElement": items.map((item, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "name": item.name,
-        "item": item.url
-      }))
-    };
+    breadcrumbItems.push({
+      name,
+      path: currentPath,
+      position: index + 2
+    });
+  });
+  
+  // Create schema for breadcrumbs
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": breadcrumbItems.map(item => ({
+      "@type": "ListItem",
+      "position": item.position,
+      "name": item.name,
+      "item": `https://todayeggrates.com${item.path}`
+    }))
   };
-  
-  let breadcrumbItems = [];
-  
-  // Home link is always present
-  breadcrumbItems.push(
-    <li key="home" className="inline-flex items-center">
-      <Link to="/" className="text-gray-600 hover:text-blue-500">Home</Link>
-      <span className="mx-2 text-gray-400">/</span>
-    </li>
-  );
-  
-  // Add state if available
-  if (selectedState && !selectedCity) {
-    breadcrumbItems.push(
-      <li key="state" className="inline-flex items-center">
-        <Link to={`/state/${selectedState.toLowerCase()}-egg-rate`} className="text-gray-800 font-medium">
-          {selectedState} Egg Rates
-        </Link>
-      </li>
-    );
-  }
-  
-  // Add state and city if both available
-  if (selectedCity) {
-    if (selectedState) {
-      breadcrumbItems.push(
-        <li key="state" className="inline-flex items-center">
-          <Link to={`/state/${selectedState.toLowerCase()}-egg-rate`} className="text-gray-600 hover:text-blue-500">
-            {selectedState}
-          </Link>
-          <span className="mx-2 text-gray-400">/</span>
-        </li>
-      );
-    }
-    
-    breadcrumbItems.push(
-      <li key="city" className="inline-flex items-center">
-        <span className="text-gray-800 font-medium">{selectedCity} Egg Rate</span>
-      </li>
-    );
-  }
-  
-  // Handle other paths
-  if (pathSegments.includes('webstories')) {
-    if (pathSegments.length === 1) {
-      breadcrumbItems = [
-        <li key="home" className="inline-flex items-center">
-          <Link to="/" className="text-gray-600 hover:text-blue-500">Home</Link>
-          <span className="mx-2 text-gray-400">/</span>
-        </li>,
-        <li key="webstories" className="inline-flex items-center">
-          <span className="text-gray-800 font-medium">Web Stories</span>
-        </li>
-      ];
-    } else {
-      const storyName = pathSegments[pathSegments.length - 1].replace(/\.html$/, '').replace(/-/g, ' ');
-      breadcrumbItems = [
-        <li key="home" className="inline-flex items-center">
-          <Link to="/" className="text-gray-600 hover:text-blue-500">Home</Link>
-          <span className="mx-2 text-gray-400">/</span>
-        </li>,
-        <li key="webstories" className="inline-flex items-center">
-          <Link to="/webstories" className="text-gray-600 hover:text-blue-500">Web Stories</Link>
-          <span className="mx-2 text-gray-400">/</span>
-        </li>,
-        <li key="webstory" className="inline-flex items-center">
-          <span className="text-gray-800 font-medium">{storyName}</span>
-        </li>
-      ];
-    }
-  }
-  
-  if (pathSegments.includes('blog')) {
-    if (pathSegments.length === 1) {
-      breadcrumbItems = [
-        <li key="home" className="inline-flex items-center">
-          <Link to="/" className="text-gray-600 hover:text-blue-500">Home</Link>
-          <span className="mx-2 text-gray-400">/</span>
-        </li>,
-        <li key="blog" className="inline-flex items-center">
-          <span className="text-gray-800 font-medium">Blog</span>
-        </li>
-      ];
-    } else {
-      const blogTitle = pathSegments[pathSegments.length - 1].replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      breadcrumbItems = [
-        <li key="home" className="inline-flex items-center">
-          <Link to="/" className="text-gray-600 hover:text-blue-500">Home</Link>
-          <span className="mx-2 text-gray-400">/</span>
-        </li>,
-        <li key="blog" className="inline-flex items-center">
-          <Link to="/blog" className="text-gray-600 hover:text-blue-500">Blog</Link>
-          <span className="mx-2 text-gray-400">/</span>
-        </li>,
-        <li key="blogpost" className="inline-flex items-center">
-          <span className="text-gray-800 font-medium">{blogTitle}</span>
-        </li>
-      ];
-    }
-  }
   
   return (
     <>
-      <script type="application/ld+json">
-        {JSON.stringify(generateStructuredData())}
-      </script>
-      <nav className="flex py-3 px-4 text-sm bg-gray-100 rounded mb-4" aria-label="Breadcrumb">
-        <ol className="inline-flex items-center flex-wrap">
-          {breadcrumbItems}
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+      </Helmet>
+      
+      <nav className="flex mb-5 text-sm" aria-label="Breadcrumb">
+        <ol className="inline-flex items-center space-x-1 md:space-x-3">
+          {breadcrumbItems.map((item, index) => (
+            <li key={index} className="inline-flex items-center">
+              {index > 0 && (
+                <span className="mx-2 text-gray-500">/</span>
+              )}
+              
+              {index === breadcrumbItems.length - 1 ? (
+                <span className="text-gray-700 font-medium" aria-current="page">
+                  {item.name}
+                </span>
+              ) : (
+                <Link 
+                  to={item.path} 
+                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {item.name}
+                </Link>
+              )}
+            </li>
+          ))}
         </ol>
       </nav>
     </>

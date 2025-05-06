@@ -28,11 +28,6 @@ const MainPage = () => {
   const [selectedCity, setSelectedCity] = useState(cityParam ? cityParam.replace('-egg-rate', '') : '');
   const [eggRates, setEggRates] = useState([]);
   const displayName = selectedCity ? selectedCity : selectedState ? selectedState : 'India';
-  const today = new Date().toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
   
   // Fetch states on mount
   useEffect(() => {
@@ -140,13 +135,23 @@ const MainPage = () => {
     }
   }, [stateParam, cityParam]);
   
-  // Prepare structured data for search engines
+  // Get formatted date for SEO
+  const formattedDate = new Date().toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  
+  // Get current rate and tray price
   const currentRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
+  const trayPrice = currentRate !== 'N/A' ? (currentRate * 30).toFixed(2) : 'N/A';
+  
+  // Prepare structured data for search engines
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `Eggs in ${displayName}`,
-    "description": `Latest egg rates in ${displayName}. Check today's egg prices updated on ${today}.`,
+    "description": `Latest egg rates in ${displayName}. Check today's egg prices updated on ${formattedDate}.`,
     "offers": {
       "@type": "Offer",
       "priceCurrency": "INR",
@@ -156,52 +161,153 @@ const MainPage = () => {
     }
   };
   
-  // Add FAQ structured data if we're on a city or state page
-  if ((selectedCity || selectedState) && eggRates.length > 0) {
-    structuredData.mainEntity = {
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": `What is the egg rate today in ${displayName}?`,
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": `The egg rate in ${displayName} today (${today}) is ₹${currentRate} per egg.`
-          }
-        },
-        {
-          "@type": "Question",
-          "name": `What is the rate of 30 eggs (one tray) in ${displayName}?`,
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": `The rate of 30 eggs (one tray) in ${displayName} is ₹${(currentRate * 30).toFixed(2)}.`
-          }
+  // Add FAQPage structured data
+  const faqStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": []
+  };
+  
+  // Add FAQ items based on location
+  if (selectedCity) {
+    faqStructuredData.mainEntity.push(
+      {
+        "@type": "Question",
+        "name": `What is today's egg rate in ${selectedCity}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Today's egg rate in ${selectedCity}, ${selectedState} is ₹${currentRate} per egg (as of ${formattedDate}).`
         }
-      ]
-    };
+      },
+      {
+        "@type": "Question",
+        "name": `What is the price of 30 eggs (1 tray) in ${selectedCity} today?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The price of 30 eggs (1 tray) in ${selectedCity} today is ₹${trayPrice} (as of ${formattedDate}).`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `What is the NECC egg rate in ${selectedCity} today?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `The NECC egg rate in ${selectedCity} today is ₹${currentRate} per egg. NECC (National Egg Coordination Committee) updates egg prices daily based on market conditions.`
+        }
+      }
+    );
+  } else if (selectedState) {
+    faqStructuredData.mainEntity.push(
+      {
+        "@type": "Question",
+        "name": `What are today's egg rates in ${selectedState}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Today's egg rates in ${selectedState} vary by city. The average egg rate in ${selectedState} is approximately ₹${currentRate} per egg (as of ${formattedDate}).`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": `How much does a tray of 30 eggs cost in ${selectedState}?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `A tray of 30 eggs in ${selectedState} costs approximately ₹${trayPrice} (as of ${formattedDate}). Prices may vary slightly between cities.`
+        }
+      }
+    );
+  } else {
+    faqStructuredData.mainEntity.push(
+      {
+        "@type": "Question",
+        "name": "What is today's egg rate in India?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Today's all India egg rate average is ₹${currentRate} per egg (as of ${formattedDate}). Prices vary by city and region.`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the NECC egg rate today?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Today's NECC egg rate is ₹${currentRate} per egg. The National Egg Coordination Committee (NECC) updates egg prices daily across India.`
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much does a tray of 30 eggs cost in India today?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `A tray of 30 eggs costs approximately ₹${trayPrice} in India today (as of ${formattedDate}). Prices may vary by city and market conditions.`
+        }
+      }
+    );
   }
+  
+  // Create SEO title and description based on location
+  const getSeoTitle = () => {
+    if (selectedCity) {
+      return `${selectedCity} Egg Rate Today - ₹${currentRate} (${formattedDate}) | NECC Egg Price`;
+    } else if (selectedState) {
+      return `${selectedState} Egg Rates Today - NECC Egg Prices in ${selectedState} (${formattedDate})`;
+    } else {
+      return 'Today Egg Rate - Check Latest NECC Egg Price Across India';
+    }
+  };
+  
+  const getSeoDescription = () => {
+    if (selectedCity) {
+      return `Today's egg rate in ${selectedCity}, ${selectedState}: ₹${currentRate}/egg, ₹${trayPrice}/tray (30 eggs). Check latest NECC egg price in ${selectedCity} updated on ${formattedDate}. Daily updated wholesale and retail rates.`;
+    } else if (selectedState) {
+      return `Today's egg rates in all cities of ${selectedState}. Check latest NECC egg prices in ${selectedState} updated on ${formattedDate}. Compare egg prices across all major markets in ${selectedState}.`;
+    } else {
+      return `Today's egg rate: Check latest NECC egg price across India. Daily updated egg rates for Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare wholesale & retail egg prices across India (${formattedDate}).`;
+    }
+  };
+  
+  const getSeoKeywords = () => {
+    if (selectedCity) {
+      return `egg rate today, ${selectedCity.toLowerCase()} egg rate, ${selectedCity.toLowerCase()} egg price today, necc egg rate ${selectedCity.toLowerCase()}, ${selectedCity.toLowerCase()} today egg rate, egg price in ${selectedCity.toLowerCase()}, egg rate in ${selectedCity.toLowerCase()} today`;
+    } else if (selectedState) {
+      return `${selectedState.toLowerCase()} egg rate, egg price in ${selectedState.toLowerCase()}, today egg rate in ${selectedState.toLowerCase()}, ${selectedState.toLowerCase()} egg price today, necc egg rate in ${selectedState.toLowerCase()}`;
+    } else {
+      return 'egg rate today, necc egg rate today, today egg rate, egg rate, national egg rate, all india egg rate, today egg rate in mumbai, today egg rate in chennai, today egg rate kolkata, barwala egg rate today';
+    }
+  };
 
   return (
     <>
       <Helmet>
-        <title>{selectedCity ? `Egg Rate in ${selectedCity}, ${selectedState} - Today's Price ₹${currentRate}` : 
-               selectedState ? `Egg Rates in ${selectedState} - Today's NECC Prices` : 
-               'Today Egg Rates - Check Latest Egg Price in India'}</title>
-        <meta name="description" content={selectedCity ? 
-              `Check today's egg rate in ${selectedCity}, ${selectedState}. Current price: ₹${currentRate} per egg. Get the latest egg prices updated on ${today}.` : 
-              selectedState ? 
-              `Check today's egg rates in ${selectedState}. Latest prices from all cities in ${selectedState}. Daily updated NECC egg prices and trends.` : 
-              'Get the latest egg rates across India. Check today\'s egg prices, wholesale rates, and NECC egg price list for all major cities and states.'} />
+        <title>{getSeoTitle()}</title>
+        <meta name="description" content={getSeoDescription()} />
         <link rel="canonical" href={`https://todayeggrates.com${location.pathname}`} />
-        {selectedCity || selectedState ? 
-          <meta name="keywords" content={`egg rate, ${displayName.toLowerCase()} egg price, egg market price, necc egg rate, today egg price, ${displayName.toLowerCase()} egg rate today`} /> : 
-          <meta name="keywords" content="egg rates, egg price today, NECC egg rates, egg mandi rate, egg wholesale price, today egg rate, daily egg price" />
-        }
+        <meta name="keywords" content={getSeoKeywords()} />
         
         {/* Add structured data for rich snippets */}
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
+        
+        {/* Add FAQ structured data */}
+        <script type="application/ld+json">
+          {JSON.stringify(faqStructuredData)}
+        </script>
+        
+        {/* Add lastmod date for search engines */}
+        <meta property="article:modified_time" content={new Date().toISOString()} />
+        
+        {/* Open Graph tags */}
+        <meta property="og:title" content={getSeoTitle()} />
+        <meta property="og:description" content={getSeoDescription()} />
+        <meta property="og:url" content={`https://todayeggrates.com${location.pathname}`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="https://todayeggrates.com/eggpic.png" />
+        
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={getSeoTitle()} />
+        <meta name="twitter:description" content={getSeoDescription()} />
+        <meta name="twitter:image" content="https://todayeggrates.com/eggpic.png" />
       </Helmet>
       <div className="bg-gray-50 min-h-screen flex flex-col">
         <Navbar
@@ -209,12 +315,14 @@ const MainPage = () => {
           setSelectedState={setSelectedState}
           setSelectedCity={setSelectedCity}
           selectedCity={selectedCity}
-          states={states} // Pass states to Navbar
-          cities={cities} // Pass cities to Navbar
+          states={states}
+          cities={cities}
         />
         <div className="flex-grow p-4 md:p-8 lg:p-12">
-          {/* Add Breadcrumb component */}
-          <Breadcrumb selectedCity={selectedCity} selectedState={selectedState} />
+          {/* Breadcrumb component */}
+          <div className="max-w-4xl mx-auto mb-4">
+            <Breadcrumb />
+          </div>
           
           <BodyOne selectedCity={selectedCity} selectedState={selectedState} />
           <div className="bg-white rounded-lg shadow-md p-6">
@@ -234,13 +342,13 @@ const MainPage = () => {
                 )}
               </>
             )}
-            <StateList states={states} cities={cities} /> {/* Pass states and cities to StateList */}
+            <StateList states={states} cities={cities} />
             <SpecialRatesTable />
           </div>
           <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
-          <BlogList blogs={blogs} />
-          <BodyThree selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} /> {/* Pass props to BodyThree */}
-          <FAQ selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} /> {/* Pass props to FAQ */}
+          <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />
+          <BodyThree selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
+          <FAQ selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
         </div>
         <StakeAdPopup />
         <Footer />
