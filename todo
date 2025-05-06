@@ -25,7 +25,7 @@ Implement data caching to reduce API calls
 Add confirmation dialogs for destructive actions (delete operations)
 Implement toast notifications for successful operations
 Accessibility: Improve accessibility with proper ARIA attributes, keyboard navigation, and color contrast.
-
+ 
 4. Feature Additions
 Price Trends Analysis: Enhance the charts to show more detailed price trends and predictions.
 
