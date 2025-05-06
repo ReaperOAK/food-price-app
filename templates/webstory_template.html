@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <script async src="https://cdn.ampproject.org/v0.js"></script>
     <script async custom-element="amp-story" src="https://cdn.ampproject.org/v0/amp-story-1.0.js"></script>
-    <script async custom-element="amp-story-auto-ads" src="https://cdn.ampproject.org/v0/amp-story-auto-ads-0.1.js"></script>
+    <script async custom-element="amp-story-auto-ads" src="https://cdn.ampproject.org/v0/amp-story-auto-ads-1.0.js"></script>
     <meta name="google-adsense-account" content="ca-pub-2664225874856394">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2664225874856394" crossorigin="anonymous"></script>
     <!-- Google tag (gtag.js) -->
@@ -45,8 +45,8 @@
       "@type": "Article",
       "headline": "Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - Today's Rate ₹{{EGG_RATE}}",
       "image": "https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}",
-      "datePublished": "{{DATE}}",
-      "dateModified": "{{DATE}}",
+      "datePublished": "{{ISO_DATE}}",
+      "dateModified": "{{ISO_DATE}}",
       "author": {
         "@type": "Organization",
         "name": "Today Egg Rates"
@@ -56,7 +56,9 @@
         "name": "Today Egg Rates",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://todayeggrates.com/tee.png"
+          "url": "https://todayeggrates.com/tee.png",
+          "width": 600,
+          "height": 60
         }
       },
       "description": "Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg."
