@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import { FaBars, FaTimes } from 'react-icons/fa';
 
@@ -7,6 +7,10 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   const [options, setOptions] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Track navigation lock to prevent redundant navigations
+  const navigationLock = React.useRef(false);
 
   useEffect(() => {
     fetch('/php/api/location/get_states_and_cities.php')
@@ -54,7 +58,11 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   }, []);
 
   const handleChange = (selectedOption) => {
+    if (!selectedOption || navigationLock.current) return;
+    
+    navigationLock.current = true;
     const { type, label } = selectedOption;
+    
     if (type === 'city') {
       const [city, state] = label.split(', ');
       let selectedCityName = city;
@@ -67,26 +75,84 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
         selectedCityName = 'Bengaluru'; // Always use this capitalization
       }
       
+      // Update states first
       setSelectedCity(selectedCityName);
       setSelectedState(state);
-      navigate(`/${selectedCityName.toLowerCase()}-egg-rate`);
+      
+      // Then navigate with a slight delay
+      setTimeout(() => {
+        const path = `/${selectedCityName.toLowerCase()}-egg-rate`;
+        
+        // Only navigate if we're not already on this path
+        if (location.pathname !== path) {
+          navigate(path, { replace: true });
+        }
+        
+        navigationLock.current = false;
+      }, 5);
+      
     } else if (type === 'state') {
+      // Update states first
       setSelectedCity('');
       setSelectedState(label);
-      navigate(`/state/${label.toLowerCase()}-egg-rate`);
+      
+      // Then navigate with a slight delay
+      setTimeout(() => {
+        const path = `/state/${label.toLowerCase()}-egg-rate`;
+        
+        // Only navigate if we're not already on this path
+        if (location.pathname !== path) {
+          navigate(path, { replace: true });
+        }
+        
+        navigationLock.current = false;
+      }, 5);
     }
   };
 
-  const handleHomeClick = () => {
+  const handleHomeClick = (e) => {
+    if (navigationLock.current) {
+      e.preventDefault();
+      return;
+    }
+    
+    navigationLock.current = true;
     setSelectedCity('');
     setSelectedState('');
-    navigate('/');
+    
+    // Only navigate if we're not already on home
+    if (location.pathname !== '/') {
+      navigate('/');
+    }
+    
+    // Release lock after a short delay
+    setTimeout(() => {
+      navigationLock.current = false;
+    }, 5);
   };
 
-  const handleCityClick = (city) => {
+  const handleCityClick = (city, e) => {
+    if (navigationLock.current) {
+      e?.preventDefault();
+      return;
+    }
+    
+    navigationLock.current = true;
+    // Update state first
     setSelectedCity(city);
     setSelectedState('');
-    navigate(`/${city.toLowerCase()}-egg-rate`);
+    
+    // Then navigate with a slight delay
+    setTimeout(() => {
+      const path = `/${city.toLowerCase()}-egg-rate`;
+      
+      // Only navigate if we're not already on this path
+      if (location.pathname !== path) {
+        navigate(path, { replace: true });
+      }
+      
+      navigationLock.current = false;
+    }, 5);
   };
 
   const toggleMenu = () => {
@@ -129,42 +195,42 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
             <Link
               to="/mumbai-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('Mumbai')}
+              onClick={(e) => handleCityClick('Mumbai', e)}
             >
               Mumbai
             </Link>
             <Link
               to="/kolkata-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('Kolkata')}
+              onClick={(e) => handleCityClick('Kolkata', e)}
             >
               Kolkata
             </Link>
             <Link
               to="/luknow-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('luknow')}
+              onClick={(e) => handleCityClick('luknow', e)}
             >
               lucknow
             </Link>
             <Link
               to="/barwala-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('Barwala')}
+              onClick={(e) => handleCityClick('Barwala', e)}
             >
               Barwala
             </Link>
             <Link
               to="/hyderabad-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('Hyderabad')}
+              onClick={(e) => handleCityClick('Hyderabad', e)}
             >
               Hyderabad
             </Link>
             <Link
               to="/chennai-egg-rate"
               className="text-gray-800 hover:text-gray-600 transition duration-300"
-              onClick={() => handleCityClick('Chennai')}
+              onClick={(e) => handleCityClick('Chennai', e)}
             >
               Chennai
             </Link>

@@ -113,26 +113,52 @@ const MainPage = () => {
     location.pathname
   );
 
-  // Update URL when selectedCity or selectedState changes, using memoized callback to prevent race conditions
+  // This memoized function will be used to update URLs based on state changes
+  // but with navigation safeguards to prevent history errors
   const updateURL = useCallback(() => {
-    if (selectedCity && !location.pathname.includes(`-egg-rate`)) {
-      // Update the URL format to /city-egg-rate (for frontend)
-      navigate(`/${selectedCity.toLowerCase()}-egg-rate/`, { replace: true });
-    } else if (selectedState && !selectedCity && !location.pathname.includes(`-egg-rate`)) {
-      // Update the URL format to /state/state-egg-rate (for frontend)
-      navigate(`/state/${selectedState.toLowerCase()}-egg-rate`, { replace: true });
+    // Current path without trailing slash for consistent comparison
+    const currentPath = location.pathname.endsWith('/') 
+      ? location.pathname.slice(0, -1) 
+      : location.pathname;
+    
+    // Only update URL when necessary to avoid redundant history entries
+    if (selectedCity && !currentPath.includes(`-egg-rate`)) {
+      const newPath = `/${selectedCity.toLowerCase()}-egg-rate`;
+      if (currentPath !== newPath) {
+        // Using replace: true to avoid stacking history entries
+        navigate(newPath, { replace: true });
+      }
+    } else if (selectedState && !selectedCity && !currentPath.includes(`-egg-rate`)) {
+      const newPath = `/state/${selectedState.toLowerCase()}-egg-rate`;
+      if (currentPath !== newPath) {
+        navigate(newPath, { replace: true });
+      }
     }
   }, [selectedCity, selectedState, navigate, location.pathname]);
   
-  // Use effect for updating URL with debounce to avoid rapid changes
+  // Use a ref to track if we're currently processing a URL update
+  // to prevent competing updates
+  const isUpdatingRef = React.useRef(false);
+  
+  // Update URL with proper debouncing to prevent rapid changes
   useEffect(() => {
-    const timeoutId = setTimeout(updateURL, 10);
-    return () => clearTimeout(timeoutId);
+    // Skip if we're already processing an update
+    if (isUpdatingRef.current) return;
+    
+    isUpdatingRef.current = true;
+    const timeoutId = setTimeout(() => {
+      updateURL();
+      isUpdatingRef.current = false;
+    }, 50); // Slightly longer timeout for better batching
+    
+    return () => {
+      clearTimeout(timeoutId);
+      isUpdatingRef.current = false;
+    };
   }, [updateURL]);
 
   // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {
-    // Only update if the parameters have actually changed
     if (stateParam) {
       const newState = stateParam.replace('-egg-rate', '');
       if (selectedState !== newState) {
@@ -150,7 +176,7 @@ const MainPage = () => {
       setSelectedCity('');
       setSelectedState('');
     }
-  }, [stateParam, cityParam, selectedCity, selectedState]);
+  }, [stateParam, cityParam, selectedState, selectedCity]);
   
   // Get formatted date for SEO
   const formattedDate = new Date().toLocaleDateString('en-US', {
