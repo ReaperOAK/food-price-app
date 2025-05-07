@@ -113,8 +113,8 @@ const MainPage = () => {
     location.pathname
   );
 
-  // Update URL when selectedCity or selectedState changes
-  useEffect(() => {
+  // Update URL when selectedCity or selectedState changes, using memoized callback to prevent race conditions
+  const updateURL = useCallback(() => {
     if (selectedCity && !location.pathname.includes(`-egg-rate`)) {
       // Update the URL format to /city-egg-rate (for frontend)
       navigate(`/${selectedCity.toLowerCase()}-egg-rate/`, { replace: true });
@@ -123,21 +123,34 @@ const MainPage = () => {
       navigate(`/state/${selectedState.toLowerCase()}-egg-rate`, { replace: true });
     }
   }, [selectedCity, selectedState, navigate, location.pathname]);
+  
+  // Use effect for updating URL with debounce to avoid rapid changes
+  useEffect(() => {
+    const timeoutId = setTimeout(updateURL, 10);
+    return () => clearTimeout(timeoutId);
+  }, [updateURL]);
 
   // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {
+    // Only update if the parameters have actually changed
     if (stateParam) {
-      setSelectedState(stateParam.replace('-egg-rate', ''));
-      setSelectedCity('');
+      const newState = stateParam.replace('-egg-rate', '');
+      if (selectedState !== newState) {
+        setSelectedState(newState);
+        setSelectedCity('');
+      }
     }
     if (cityParam) {
-      setSelectedCity(cityParam.replace('-egg-rate', ''));
+      const newCity = cityParam.replace('-egg-rate', '');
+      if (selectedCity !== newCity) {
+        setSelectedCity(newCity);
+      }
     }
-    if (!stateParam && !cityParam) {
+    if (!stateParam && !cityParam && (selectedState || selectedCity)) {
       setSelectedCity('');
       setSelectedState('');
     }
-  }, [stateParam, cityParam]);
+  }, [stateParam, cityParam, selectedCity, selectedState]);
   
   // Get formatted date for SEO
   const formattedDate = new Date().toLocaleDateString('en-US', {

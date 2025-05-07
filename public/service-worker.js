@@ -1,5 +1,6 @@
 // Service Worker for Today Egg Rates PWA
 const CACHE_NAME = 'todayeggrates-v1';
+const RUNTIME_CACHE = 'runtime-cache-v1';
 
 // Assets to cache for offline functionality
 const urlsToCache = [
@@ -26,7 +27,7 @@ self.addEventListener('install', event => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
+  const cacheWhitelist = [CACHE_NAME, RUNTIME_CACHE];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
@@ -42,23 +43,50 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch event - serve from cache first, then network
+// Fetch event - handle differently based on request type
 self.addEventListener('fetch', event => {
-  // Skip non-GET requests and those that don't start with http
-  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
+  // Skip requests that aren't http/https
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
+  // Handle navigation requests specially to not interfere with React Router
+  if (event.request.mode === 'navigate' || 
+      (event.request.method === 'GET' && 
+       event.request.headers.get('accept').includes('text/html'))) {
+    
+    event.respondWith(
+      // Try the network first
+      fetch(event.request).catch(() => {
+        // If network fails, fall back to the cached index.html for client-side routing
+        return caches.match('/index.html');
+      })
+    );
     return;
   }
 
   // For API requests, use network-first strategy
-  if (event.request.url.includes('/api/')) {
+  if (event.request.url.includes('/api/') || event.request.url.includes('/php/')) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
+          if (!response || response.status !== 200) {
+            return response;
+          }
+          
           // Clone the response and store in cache
           const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
+          caches.open(RUNTIME_CACHE)
             .then(cache => {
-              cache.put(event.request, responseToCache);
+              // Only cache successful API responses
+              if (response.ok) {
+                cache.put(event.request, responseToCache);
+              }
             });
           return response;
         })
@@ -70,7 +98,7 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // For non-API requests, use cache-first strategy
+  // For static assets, use cache-first strategy
   event.respondWith(
     caches.match(event.request)
       .then(response => {
