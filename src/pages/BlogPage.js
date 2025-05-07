@@ -141,6 +141,7 @@ const BlogPage = () => {
           
           {/* Table of Contents - only show for longer posts */}
           {ContentComponent && <TableOfContents 
+            key={blog.link} 
             contentId="blog-content" 
             blogId={blog.link} 
             isSticky={false} 
