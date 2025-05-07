@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from 'react';
 
-const TableOfContents = ({ contentRef }) => {
+const TableOfContents = ({ contentId }) => {
   const [headings, setHeadings] = useState([]);
   const [activeId, setActiveId] = useState('');
 
   useEffect(() => {
-    if (!contentRef.current) return;
+    const contentElement = document.getElementById(contentId);
+    if (!contentElement) return;
     
     // Get all h2 and h3 elements from the content
-    const elements = contentRef.current.querySelectorAll('h2, h3');
+    const elements = contentElement.querySelectorAll('h2, h3');
     const headingElements = Array.from(elements).map(element => ({
       id: element.id,
       text: element.innerText,
@@ -33,7 +34,7 @@ const TableOfContents = ({ contentRef }) => {
     elements.forEach(element => observer.observe(element));
 
     return () => observer.disconnect();
-  }, [contentRef]);
+  }, [contentId]);
 
   const scrollToHeading = (id) => {
     const element = document.getElementById(id);
