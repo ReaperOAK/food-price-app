@@ -91,12 +91,7 @@ function App() {
 
   if (isSiteDisabled) {
     return (
-      <Router
-        future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true,
-        }}
-      >
+      <Router>
         <ScrollToTop /> {/* Include ScrollToTop */}
         <Routes>
           <Route path="*" element={<MaintenancePage />} />
@@ -106,12 +101,7 @@ function App() {
   }
 
   return (
-    <Router
-      future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true,
-      }}
-    >
+    <Router>
       <ScrollToTop /> {/* Include ScrollToTop */}
       <Routes>
         <Route path="/" element={<MainPage />} />

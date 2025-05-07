@@ -84,13 +84,9 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   };
 
   const handleCityClick = (city) => {
-    setSelectedCity('');
+    setSelectedCity(city);
     setSelectedState('');
-    setTimeout(() => {
-      setSelectedCity(city);
-      setSelectedState('');
-      navigate(`/${city.toLowerCase()}-egg-rate`);
-    }, 0);
+    navigate(`/${city.toLowerCase()}-egg-rate`);
   };
 
   const toggleMenu = () => {

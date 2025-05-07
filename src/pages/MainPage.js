@@ -100,10 +100,12 @@ const MainPage = () => {
     }
   }, [selectedCity, selectedState]);
 
-  // Fetch rates automatically when state or city changes
+  // Fetch rates when component mounts or when city/state changes
   useEffect(() => {
     handleFetchRates();
-  }, [selectedState, selectedCity, handleFetchRates]); // Run effect whenever selectedState or selectedCity changes
+    // Disabling exhaustive deps warning as we only want to run this when these specific props change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedState, selectedCity]);
 
   // Check if the current URL matches /state/:state
   const stateMatch = matchPath(
