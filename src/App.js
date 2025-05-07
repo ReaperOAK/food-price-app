@@ -18,14 +18,6 @@ import ScrollToTop from './utils/ScrollToTop'; // Import ScrollToTop
 import WebStoriesList from './components/webstories/WebStoriesList'; // Import WebStoriesList
 import WebStoryViewer from './components/webstories/WebStoryViewer'; // Import WebStoryViewer
 
-// Configure React Router future flags
-const routerOptions = {
-  future: {
-    v7_startTransition: true,
-    v7_relativeSplatPath: true,
-  },
-};
-
 // Special file handler components
 const SitemapHandler = () => {
   useEffect(() => {
@@ -99,7 +91,12 @@ function App() {
 
   if (isSiteDisabled) {
     return (
-      <Router future={routerOptions.future}>
+      <Router
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
         <ScrollToTop /> {/* Include ScrollToTop */}
         <Routes>
           <Route path="*" element={<MaintenancePage />} />
@@ -109,7 +106,12 @@ function App() {
   }
 
   return (
-    <Router future={routerOptions.future}>
+    <Router
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <ScrollToTop /> {/* Include ScrollToTop */}
       <Routes>
         <Route path="/" element={<MainPage />} />
