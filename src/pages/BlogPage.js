@@ -140,7 +140,11 @@ const BlogPage = () => {
           </div>
           
           {/* Table of Contents - only show for longer posts */}
-          {ContentComponent && <TableOfContents contentId="blog-content" />}
+          {ContentComponent && <TableOfContents 
+            contentId="blog-content" 
+            blogId={blog.link} 
+            isSticky={false} 
+          />}
           
           {/* Blog Content */}
           <div id="blog-content">
