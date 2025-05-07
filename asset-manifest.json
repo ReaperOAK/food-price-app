@@ -1,27 +1,27 @@
 {
   "files": {
-    "main.css": "/static/css/main.39c2f1fd.css",
-    "main.js": "/static/js/main.d7729b66.js",
-    "static/js/212.9a04dcaa.chunk.js": "/static/js/212.9a04dcaa.chunk.js",
+    "main.css": "/static/css/main.8db7e65c.css",
+    "main.js": "/static/js/main.22cf4ff9.js",
+    "static/js/178.25dbbdc0.chunk.js": "/static/js/178.25dbbdc0.chunk.js",
     "static/js/453.ef4d04d9.chunk.js": "/static/js/453.ef4d04d9.chunk.js",
     "static/js/376.50239fbe.chunk.js": "/static/js/376.50239fbe.chunk.js",
     "static/js/867.800d3ab0.chunk.js": "/static/js/867.800d3ab0.chunk.js",
     "static/js/638.540dfc3c.chunk.js": "/static/js/638.540dfc3c.chunk.js",
-    "static/css/808.715ad6db.chunk.css": "/static/css/808.715ad6db.chunk.css",
+    "static/css/808.1e44cf84.chunk.css": "/static/css/808.1e44cf84.chunk.css",
     "static/js/452.7c4a78e2.chunk.js": "/static/js/452.7c4a78e2.chunk.js",
     "index.html": "/index.html",
-    "main.39c2f1fd.css.map": "/static/css/main.39c2f1fd.css.map",
-    "main.d7729b66.js.map": "/static/js/main.d7729b66.js.map",
-    "212.9a04dcaa.chunk.js.map": "/static/js/212.9a04dcaa.chunk.js.map",
+    "main.8db7e65c.css.map": "/static/css/main.8db7e65c.css.map",
+    "main.22cf4ff9.js.map": "/static/js/main.22cf4ff9.js.map",
+    "178.25dbbdc0.chunk.js.map": "/static/js/178.25dbbdc0.chunk.js.map",
     "453.ef4d04d9.chunk.js.map": "/static/js/453.ef4d04d9.chunk.js.map",
     "376.50239fbe.chunk.js.map": "/static/js/376.50239fbe.chunk.js.map",
     "867.800d3ab0.chunk.js.map": "/static/js/867.800d3ab0.chunk.js.map",
     "638.540dfc3c.chunk.js.map": "/static/js/638.540dfc3c.chunk.js.map",
-    "808.715ad6db.chunk.css.map": "/static/css/808.715ad6db.chunk.css.map",
+    "808.1e44cf84.chunk.css.map": "/static/css/808.1e44cf84.chunk.css.map",
     "452.7c4a78e2.chunk.js.map": "/static/js/452.7c4a78e2.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.39c2f1fd.css",
-    "static/js/main.d7729b66.js"
+    "static/css/main.8db7e65c.css",
+    "static/js/main.22cf4ff9.js"
   ]
 }
