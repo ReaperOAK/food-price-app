@@ -32,37 +32,11 @@ root.render(
 
 // Performance measurement for optimization
 reportWebVitals(metric => {
-  // Send metrics to analytics
+  // Send metrics to analytics if needed
   if (metric.name === 'FCP') {
     console.log('First Contentful Paint (FCP):', metric.value);
   }
   if (metric.name === 'LCP') {
     console.log('Largest Contentful Paint (LCP):', metric.value);
   }
-  // You can send this data to your analytics service
 });
-
-// Register service worker for PWA support
-// Improved implementation to avoid conflicts with React Router
-if ('serviceWorker' in navigator) {
-  // Delay registration until after the page has loaded to avoid
-  // interfering with the initial page navigation
-  window.addEventListener('load', () => {
-    // Use unregister first to clean up any problematic service workers
-    navigator.serviceWorker.getRegistrations().then(registrations => {
-      // Unregister all existing service workers first
-      return Promise.all(
-        registrations.map(registration => registration.unregister())
-      );
-    }).then(() => {
-      // After unregistering old service workers, register the new one
-      return navigator.serviceWorker.register('/service-worker.js', {
-        scope: '/'
-      });
-    }).then(registration => {
-      console.log('SW registered successfully: ', registration);
-    }).catch(error => {
-      console.error('SW registration failed: ', error);
-    });
-  });
-}
