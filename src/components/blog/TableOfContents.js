@@ -1,52 +1,100 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 const TableOfContents = ({ contentId, blogId, isSticky = false }) => {
   const [headings, setHeadings] = useState([]);
   const [activeId, setActiveId] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const observerRef = useRef(null);
+  const mutationObserverRef = useRef(null);
 
   useEffect(() => {
-    const contentElement = document.getElementById(contentId);
-    if (!contentElement) return;
-    
-    // Get all h2 and h3 elements from the content
-    const elements = contentElement.querySelectorAll('h2, h3');
-    
-    // Add ids to elements that don't have them based on blogId and text
-    elements.forEach((element, index) => {
-      if (!element.id) {
-        const slugifiedText = element.innerText
-          .toLowerCase()
-          .replace(/[^\w ]+/g, '')
-          .replace(/ +/g, '-');
-        element.id = `${blogId}-heading-${slugifiedText}`;
+    // Function to extract headings from content
+    const extractHeadings = () => {
+      const contentElement = document.getElementById(contentId);
+      if (!contentElement) return;
+      
+      // Get all h2 and h3 elements from the content
+      const elements = contentElement.querySelectorAll('h2, h3');
+      
+      // Add ids to elements that don't have them based on blogId and text
+      elements.forEach((element, index) => {
+        if (!element.id) {
+          const slugifiedText = element.innerText
+            .toLowerCase()
+            .replace(/[^\w ]+/g, '')
+            .replace(/ +/g, '-');
+          element.id = `${blogId}-heading-${slugifiedText}`;
+        }
+      });
+      
+      const headingElements = Array.from(elements).map(element => ({
+        id: element.id,
+        text: element.innerText,
+        level: element.tagName === 'H2' ? 2 : 3
+      }));
+      
+      setHeadings(headingElements);
+      
+      // Clean up any previous intersection observer
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
-    });
+      
+      // Set up new IntersectionObserver to track active heading
+      observerRef.current = new IntersectionObserver(
+        entries => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              setActiveId(entry.target.id);
+            }
+          });
+        },
+        { rootMargin: '0px 0px -80% 0px' }
+      );
+      
+      // Observe all heading elements
+      elements.forEach(element => observerRef.current.observe(element));
+    };
+
+    // Initial extraction of headings
+    extractHeadings();
     
-    const headingElements = Array.from(elements).map(element => ({
-      id: element.id,
-      text: element.innerText,
-      level: element.tagName === 'H2' ? 2 : 3
-    }));
+    // Set up a MutationObserver to detect when content changes (like when blog content loads)
+    if (mutationObserverRef.current) {
+      mutationObserverRef.current.disconnect();
+    }
     
-    setHeadings(headingElements);
-
-    // Set up IntersectionObserver to track active heading
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: '0px 0px -80% 0px' }
-    );
-
-    // Observe all heading elements
-    elements.forEach(element => observer.observe(element));
-
-    return () => observer.disconnect();
+    const contentElement = document.getElementById(contentId);
+    if (contentElement) {
+      mutationObserverRef.current = new MutationObserver((mutations) => {
+        // If significant changes to content, re-extract headings
+        const shouldUpdate = mutations.some(mutation => 
+          mutation.type === 'childList' && 
+          (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)
+        );
+        
+        if (shouldUpdate) {
+          // Small timeout to ensure DOM is fully updated
+          setTimeout(extractHeadings, 100);
+        }
+      });
+      
+      // Start observing content changes
+      mutationObserverRef.current.observe(contentElement, {
+        childList: true,
+        subtree: true
+      });
+    }
+    
+    return () => {
+      // Clean up observers when component unmounts or contentId/blogId changes
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      if (mutationObserverRef.current) {
+        mutationObserverRef.current.disconnect();
+      }
+    };
   }, [contentId, blogId]);
 
   const scrollToHeading = (id) => {
