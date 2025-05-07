@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { 
-  BrowserRouter as Router, 
-  Routes, 
-  Route, 
-  useNavigate, 
-  Navigate,
-  useLocation
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
+  Navigate
 } from 'react-router-dom';
 
-// Import non-lazy loading dependencies
-import blogs from './data/blogs';
-import ScrollToTop from './utils/ScrollToTop';
+// Import the RootLayout component
+import RootLayout from './components/layout/RootLayout';
 
-// Use React.lazy for code splitting and improved performance
+// Import non-lazy dependencies
+import blogs from './data/blogs';
+
+// Use lazy loading for all pages to improve performance
 const MainPage = lazy(() => import('./pages/MainPage'));
 const PrivacyPolicy = lazy(() => import('./components/common/PrivacyPolicy'));
 const TOS = lazy(() => import('./components/common/TOS'));
@@ -35,7 +36,7 @@ const LoadingFallback = () => (
   </div>
 );
 
-// Static file handlers wrapped in a component that avoids navigation hooks
+// Static file redirects handled by plain HTML redirects
 const StaticFileRedirect = ({ url }) => {
   useEffect(() => {
     window.location.replace(url);
@@ -43,12 +44,9 @@ const StaticFileRedirect = ({ url }) => {
   return null;
 };
 
-// Wrapper component that contains all app routes and functionality
-function AppRoutes() {
-  const location = useLocation();
-  const navigate = useNavigate();
-  
-  // Auth state management
+// Main App component
+function App() {
+  // Auth state management with localStorage persistence
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
     return localStorage.getItem('isAuthenticated') === 'true';
   });
@@ -57,7 +55,7 @@ function AppRoutes() {
     return localStorage.getItem('isSiteDisabled') === 'true';
   });
 
-  // Store auth state in localStorage
+  // Update localStorage when auth state changes
   useEffect(() => {
     localStorage.setItem('isAuthenticated', isAuthenticated);
   }, [isAuthenticated]);
@@ -66,40 +64,34 @@ function AppRoutes() {
     localStorage.setItem('isSiteDisabled', isSiteDisabled);
   }, [isSiteDisabled]);
 
-  // Disable site handler - extracted into a callback to avoid route conflicts
-  const handleDisableSite = useCallback((token) => {
-    if (token === 'ReaperOAK') {
-      setIsSiteDisabled(true);
-      navigate('/maintenance');
-    } else {
-      navigate('/');
-    }
-  }, [navigate]);
-
-  // Check for disable token in URL
-  useEffect(() => {
-    if (location.pathname === '/disable-site') {
-      const token = new URLSearchParams(location.search).get('token');
-      handleDisableSite(token);
-    }
-  }, [location.pathname, location.search, handleDisableSite]);
-
+  // Maintenance page component
   const MaintenancePage = () => (
     <div className="flex items-center justify-center h-screen">
       <h1 className="text-3xl font-bold">Site is under maintenance</h1>
     </div>
   );
 
-  if (isSiteDisabled) {
-    return <Route path="*" element={<MaintenancePage />} />;
-  }
+  // Disable site handler component
+  const DisableSite = () => {
+    const handleDisable = () => {
+      const token = new URLSearchParams(window.location.search).get('token');
+      if (token === 'ReaperOAK') {
+        setIsSiteDisabled(true);
+        return <Navigate to="/maintenance" replace />;
+      }
+      return <Navigate to="/" replace />;
+    };
+    
+    return handleDisable();
+  };
 
-  return (
-    <>
-      <ScrollToTop />
-      <Suspense fallback={<LoadingFallback />}>
-        <Routes>
-          {/* Main routes */}
+  // Create routes based on site state
+  const routes = isSiteDisabled 
+    ? createRoutesFromElements(
+        <Route path="*" element={<MaintenancePage />} />
+      )
+    : createRoutesFromElements(
+        <Route element={<RootLayout />}>
           <Route path="/" element={<MainPage />} />
           <Route path="/:city" element={<MainPage />} />
           <Route path="/state/:state" element={<MainPage />} />
@@ -114,10 +106,10 @@ function AppRoutes() {
           <Route path="/terms" element={<TOS />} />
           <Route path="/disclaimer" element={<Disclaimer />} />
           
-          {/* Admin pages with auth protection */}
+          {/* Auth protected routes */}
           <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
           <Route
-            path="/admin"
+            path="/admin/*"
             element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" replace />}
           />
           
@@ -126,23 +118,28 @@ function AppRoutes() {
           <Route path="/maintenance" element={<MaintenancePage />} />
           <Route path="/webstories" element={<WebStoriesList />} />
           <Route path="/webstory/:slug" element={<WebStoryViewer />} />
+          <Route path="/disable-site" element={<DisableSite />} />
           
-          {/* Replace the separate disable-site route with a check in useEffect */}
-          <Route path="/disable-site" element={<MainPage />} />
-          
-          {/* Catch all for 404s */}
+          {/* 404 fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </>
-  );
-}
+        </Route>
+      );
 
-function App() {
+  // Create router with defined routes and options to prevent history errors
+  const router = createBrowserRouter(routes, {
+    // These options help prevent history errors
+    future: {
+      v7_normalizeFormMethod: true,
+    },
+    // Disable browser history debug mode
+    basename: "",
+  });
+
+  // Return router provider with suspense for code splitting
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <Suspense fallback={<LoadingFallback />}>
+      <RouterProvider router={router} />
+    </Suspense>
   );
 }
 

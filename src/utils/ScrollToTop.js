@@ -1,53 +1,33 @@
-import { useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useLocation, useNavigationType } from 'react-router-dom';
 
 /**
- * ScrollToTop component that safely handles scrolling on route changes
- * Designed to prevent conflicts with React Router history
+ * ScrollRestoration component that safely handles scrolling with createBrowserRouter
+ * Compatible with React Router v6.4+ using RouterProvider
  */
 const ScrollToTop = () => {
   const { pathname, hash } = useLocation();
-  const lastPathRef = useRef(pathname);
+  const navigationType = useNavigationType();
 
-  // Prevent double-scrolling when rapidly navigating between pages
   useEffect(() => {
-    // If pathname changed and there's no hash (anchor link)
-    if (pathname !== lastPathRef.current && !hash) {
-      // Use requestAnimationFrame to ensure DOM is ready
-      const timeoutId = setTimeout(() => {
-        window.requestAnimationFrame(() => {
-          try {
-            window.scrollTo({
-              top: 0,
-              behavior: 'smooth'
-            });
-          } catch (e) {
-            // Fallback for older browsers
-            window.scrollTo(0, 0);
-          }
-        });
-      }, 10);
-      
-      lastPathRef.current = pathname;
-      return () => clearTimeout(timeoutId);
+    // Only scroll to top for PUSH navigation types (not REPLACE or POP)
+    // and when there's no hash fragment
+    if (!hash && navigationType === 'PUSH') {
+      window.scrollTo(0, 0);
     }
     
-    // If there's a hash, scroll to the element with that ID
+    // If there's a hash in the URL, scroll to the element with that ID
     if (hash) {
-      const timeoutId = setTimeout(() => {
-        try {
-          const element = document.querySelector(hash);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth' });
-          }
-        } catch (e) {
-          console.error("Error scrolling to hash:", e);
+      // Small timeout to ensure DOM is ready
+      setTimeout(() => {
+        const id = hash.replace('#', '');
+        const element = document.getElementById(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
         }
       }, 10);
-      
-      return () => clearTimeout(timeoutId);
     }
-  }, [pathname, hash]);
+  }, [pathname, hash, navigationType]);
 
   return null;
 };

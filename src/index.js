@@ -2,10 +2,8 @@ import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter } from 'react-router-dom';
-import ScrollToTop from './utils/ScrollToTop';
 
-// Lazy load the App component for better performance
+// Import lazy-loaded App
 const App = lazy(() => import('./App'));
 
 // Loading component for suspense fallback
@@ -18,16 +16,12 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Create root and render app
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <ScrollToTop />
-      <Suspense fallback={<LoadingFallback />}>
-        <App />
-      </Suspense>
-    </BrowserRouter>
-  </React.StrictMode>
+  <Suspense fallback={<LoadingFallback />}>
+    <App />
+  </Suspense>
 );
 
 // Performance measurement for optimization
