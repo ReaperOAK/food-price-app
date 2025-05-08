@@ -14,8 +14,22 @@ function runScript($scriptPath, $taskName) {
     
     // Use try-catch to prevent script termination on fatal errors
     try {
-        // Use include with @ to suppress fatal errors from stopping execution
-        $result = @include($scriptPath);
+        // Handle web stories sitemap separately due to database connection issues
+        if (strpos($scriptPath, 'generate_webstories_sitemap.php') !== false) {
+            // For sitemap generation, include the database configuration
+            require_once(dirname(__DIR__) . '/config/db.php');
+            $conn = getDbConnection(); // Get a fresh connection
+            
+            // Set variables needed by the sitemap script
+            $generateSitemapOnly = true;
+            
+            // Use include with @ to suppress fatal errors from stopping execution
+            $result = @include($scriptPath);
+        } else {
+            // Use include with @ to suppress fatal errors from stopping execution
+            $result = @include($scriptPath);
+        }
+        
         $output = ob_get_clean();
         
         $endTime = microtime(true);
