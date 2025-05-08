@@ -2,18 +2,38 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-$servername = "localhost";
-$username = "u901337298_test";
-$password = "A12345678b*";
-$dbname = "u901337298_test";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+/**
+ * Get a connection to the database
+ * 
+ * @return mysqli Database connection
+ */
+function getDbConnection() {
+    static $conn = null;
+    
+    // If the connection already exists, return it
+    if ($conn !== null && !$conn->connect_error) {
+        return $conn;
+    }
+    
+    // Database credentials
+    $servername = "localhost";
+    $username = "u901337298_test";
+    $password = "A12345678b*";
+    $dbname = "u901337298_test";
+    
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Check connection
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+    
+    return $conn;
 }
+
+// Create the initial connection to maintain backward compatibility
+$conn = getDbConnection();
 
 /**
  * Get state_id from states table, insert if not exists

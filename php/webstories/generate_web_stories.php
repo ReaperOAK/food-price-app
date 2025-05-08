@@ -50,26 +50,9 @@ try {
     debug_log("DB", "Including database configuration");
     require_once dirname(__DIR__) . '/config/db.php';
 
-    // Verify that $conn exists, otherwise create the connection
-    if (!isset($conn) || $conn->connect_error) {
-        debug_log("DB", "Creating new database connection");
-        // Connection details
-        $servername = "localhost";
-        $username = "u901337298_test";
-        $password = "A12345678b*";
-        $dbname = "u901337298_test";
-        
-        // Create connection
-        $conn = new mysqli($servername, $username, $password, $dbname);
-        
-        // Check connection
-        if ($conn->connect_error) {
-            throw new Exception("Connection failed: " . $conn->connect_error);
-        }
-        debug_log("DB", "New database connection created successfully");
-    } else {
-        debug_log("DB", "Using existing database connection");
-    }
+    // Use the centralized database connection function
+    debug_log("DB", "Getting database connection");
+    $conn = getDbConnection();
 
     // Function to generate web story index
     if (!function_exists('generateWebStoryIndex')) {
