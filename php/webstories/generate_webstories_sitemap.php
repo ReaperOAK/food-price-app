@@ -10,40 +10,28 @@
 // Check if we're being included from another file or run directly
 $generateSitemapOnly = isset($generateSitemapOnly) ? $generateSitemapOnly : false;
 
+// Set header to XML only if not being included from another script
+if (!$generateSitemapOnly) {
+    header('Content-Type: application/xml; charset=utf-8');
+}
+
 // Start output buffering to capture XML
 ob_start();
 
-// Create or verify database connection
-$needToCloseConn = false;
-
-// First, try to check if the connection exists and is valid
-// But wrap in try-catch to prevent fatal errors when the connection is already closed
-try {
-    // If no connection exists or it's closed, create a new one
-    if (!isset($conn) || !is_object($conn)) {
-        require_once dirname(__DIR__) . '/config/db.php';
-        $conn = getDbConnection();
-        $needToCloseConn = true; // We'll need to close this connection when done
-    } 
-    // Use a safe check for ping - try/catch prevents fatal errors if connection is closed
-    else if (method_exists($conn, 'ping')) {
-        if (!$conn->ping()) {
-            // Connection exists but is not responsive, create a new one
-            require_once dirname(__DIR__) . '/config/db.php';
-            $conn = getDbConnection();
-            $needToCloseConn = true;
-        }
-    }
-} catch (Throwable $e) {
-    // If any error occurs when checking connection, create a new one
-    require_once dirname(__DIR__) . '/config/db.php';
-    $conn = getDbConnection();
-    $needToCloseConn = true;
-}
+// ALWAYS create our own database connection - don't rely on existing one
+require_once dirname(__DIR__) . '/config/db.php';
+$sitemap_conn = getDbConnection();
 
 // Get all web stories from the database
 $webstories_sql = "SELECT * FROM webstories WHERE status = 'published' ORDER BY publish_date DESC";
-$webstories_result = $conn->query($webstories_sql);
+
+try {
+    $webstories_result = $sitemap_conn->query($webstories_sql);
+} catch (Exception $e) {
+    // Log error but continue to generate an empty sitemap
+    error_log("Sitemap generator error: " . $e->getMessage());
+    $webstories_result = false;
+}
 
 // Start XML output
 echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
@@ -90,13 +78,12 @@ $doc_root = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : dirna
 $sitemap_path = $doc_root . '/webstories-sitemap.xml';
 file_put_contents($sitemap_path, $sitemap_content);
 
-// Only close the connection if we created it ourselves
-if ($needToCloseConn && isset($conn) && is_object($conn)) {
-    try {
-        $conn->close();
-    } catch (Throwable $e) {
-        // Silently ignore close errors
-    }
+// Always close our own connection
+try {
+    $sitemap_conn->close();
+} catch (Exception $e) {
+    // Silently ignore close errors
+    error_log("Sitemap generator connection close error: " . $e->getMessage());
 }
 
 // Output the sitemap if this script is being run directly

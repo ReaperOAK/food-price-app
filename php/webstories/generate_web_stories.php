@@ -456,14 +456,14 @@ try {
     // Success message
     debug_log("SUCCESS", "Web stories generation completed successfully");
 
-    // Generate sitemap with the existing connection
+    // Generate sitemap after web stories are created
     debug_log("SITEMAP", "Generating web stories sitemap");
     
     // Define a variable to suppress the XML header output since we're not sending to browser
     $generateSitemapOnly = true;
     
-    // Pass the connection to the sitemap generator
-    include_once 'generate_webstories_sitemap.php';
+    // Include the sitemap generator (which now creates its own connection)
+    include_once __DIR__ . '/generate_webstories_sitemap.php';
 
 } catch (Exception $e) {
     // Log any exceptions that occur
