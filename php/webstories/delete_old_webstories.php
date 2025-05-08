@@ -2,11 +2,25 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database connection - using require_once to include db.php
+// Database connection - using require_once instead of include to avoid duplicate function declarations
 require_once dirname(__DIR__) . '/config/db.php';
 
-// Use the getDbConnection function to get a database connection
-$conn = getDbConnection();
+// Verify that $conn exists, otherwise create the connection
+if (!isset($conn) || $conn->connect_error) {
+    // Connection details
+    $servername = "localhost";
+    $username = "u901337298_test";
+    $password = "A12345678b*";
+    $dbname = "u901337298_test";
+    
+    // Create connection
+    $conn = new mysqli($servername, $username, $password, $dbname);
+    
+    // Check connection
+    if ($conn->connect_error) {
+        die(json_encode(["error" => "Connection failed: " . $conn->connect_error]));
+    }
+}
 
 // Configuration with absolute paths
 $basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir

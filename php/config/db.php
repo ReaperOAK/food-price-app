@@ -2,48 +2,18 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-/**
- * Get a connection to the database
- * 
- * @param bool $forceNew If true, forces creation of a new connection instead of using existing one
- * @return mysqli Database connection
- */
-function getDbConnection($forceNew = false) {
-    static $conn = null;
-    
-    // If the connection already exists and is not being forced to renew, return it
-    if (!$forceNew && $conn !== null) {
-        // Check if the connection is still viable
-        try {
-            if ($conn->ping()) {
-                return $conn;
-            }
-            // If ping fails, the connection is dead, so we'll create a new one
-        } catch (Exception $e) {
-            // Connection is not valid, create a new one below
-            error_log("Database connection error: " . $e->getMessage());
-        }
-    }
-    
-    // Database credentials
-    $servername = "localhost";
-    $username = "u901337298_test";
-    $password = "A12345678b*";
-    $dbname = "u901337298_test";
-    
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-    
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    
-    return $conn;
-}
+$servername = "localhost";
+$username = "u901337298_test";
+$password = "A12345678b*";
+$dbname = "u901337298_test";
 
-// Create the initial connection to maintain backward compatibility
-$conn = getDbConnection();
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 /**
  * Get state_id from states table, insert if not exists

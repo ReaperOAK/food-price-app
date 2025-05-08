@@ -50,9 +50,26 @@ try {
     debug_log("DB", "Including database configuration");
     require_once dirname(__DIR__) . '/config/db.php';
 
-    // Use the centralized database connection function
-    debug_log("DB", "Getting database connection");
-    $conn = getDbConnection();
+    // Verify that $conn exists, otherwise create the connection
+    if (!isset($conn) || $conn->connect_error) {
+        debug_log("DB", "Creating new database connection");
+        // Connection details
+        $servername = "localhost";
+        $username = "u901337298_test";
+        $password = "A12345678b*";
+        $dbname = "u901337298_test";
+        
+        // Create connection
+        $conn = new mysqli($servername, $username, $password, $dbname);
+        
+        // Check connection
+        if ($conn->connect_error) {
+            throw new Exception("Connection failed: " . $conn->connect_error);
+        }
+        debug_log("DB", "New database connection created successfully");
+    } else {
+        debug_log("DB", "Using existing database connection");
+    }
 
     // Function to generate web story index
     if (!function_exists('generateWebStoryIndex')) {
@@ -453,17 +470,12 @@ try {
         echo "No egg rates found in the database. Please check your data.";
     }
 
+    // Use require_once to avoid double inclusion issues
+    debug_log("SITEMAP", "Generating web stories sitemap");
+    require_once 'generate_webstories_sitemap.php';
+
     // Success message
     debug_log("SUCCESS", "Web stories generation completed successfully");
-
-    // Generate sitemap after web stories are created
-    debug_log("SITEMAP", "Generating web stories sitemap");
-    
-    // Define a variable to suppress the XML header output since we're not sending to browser
-    $generateSitemapOnly = true;
-    
-    // Include the sitemap generator (which now creates its own connection)
-    include_once __DIR__ . '/generate_webstories_sitemap.php';
 
 } catch (Exception $e) {
     // Log any exceptions that occur
