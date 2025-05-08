@@ -22,23 +22,16 @@ if (!$generateSitemapOnly) {
 // Start output buffering to capture XML
 ob_start();
 
+// Check if database connection is valid or create a new one
+if (!isset($conn) || !is_object($conn) || !method_exists($conn, 'ping') || !$conn->ping()) {
+    // Connection is not valid, create a new one
+    require_once dirname(__DIR__) . '/config/db.php';
+    $conn = getDbConnection();
+}
+
 // Get all web stories from the database
 $webstories_sql = "SELECT * FROM webstories WHERE status = 'published' ORDER BY publish_date DESC";
-
-// Check if connection is valid before using it
-if (isset($conn) && is_object($conn) && !($conn instanceof mysqli && $conn->connect_error)) {
-    $webstories_result = $conn->query($webstories_sql);
-} else {
-    // If connection is invalid, create a new one
-    if (!$generateSitemapOnly) {
-        echo "<!-- Error: Database connection is not valid -->";
-        $webstories_result = false;
-    } else {
-        require_once dirname(__DIR__) . '/config/db.php';
-        $conn = getDbConnection();
-        $webstories_result = $conn->query($webstories_sql);
-    }
-}
+$webstories_result = $conn->query($webstories_sql);
 
 // Start XML output
 echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
@@ -85,8 +78,9 @@ $doc_root = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : dirna
 $sitemap_path = $doc_root . '/webstories-sitemap.xml';
 file_put_contents($sitemap_path, $sitemap_content);
 
-// Only close the connection if we opened it ourselves (and it's still valid)
-if (!$generateSitemapOnly && isset($conn) && is_object($conn) && !($conn instanceof mysqli && $conn->connect_error)) {
+// Only close the connection if we're not being included from another script
+// This ensures we don't close a connection that might be used elsewhere
+if (!$generateSitemapOnly && isset($conn) && is_object($conn) && method_exists($conn, 'close')) {
     // Close the database connection
     $conn->close();
 }
