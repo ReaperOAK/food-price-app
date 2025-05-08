@@ -5,14 +5,24 @@ ini_set('display_errors', 1);
 /**
  * Get a connection to the database
  * 
+ * @param bool $forceNew If true, forces creation of a new connection instead of using existing one
  * @return mysqli Database connection
  */
-function getDbConnection() {
+function getDbConnection($forceNew = false) {
     static $conn = null;
     
-    // If the connection already exists, return it
-    if ($conn !== null && !$conn->connect_error) {
-        return $conn;
+    // If the connection already exists and is not being forced to renew, return it
+    if (!$forceNew && $conn !== null) {
+        // Check if the connection is still viable
+        try {
+            if ($conn->ping()) {
+                return $conn;
+            }
+            // If ping fails, the connection is dead, so we'll create a new one
+        } catch (Exception $e) {
+            // Connection is not valid, create a new one below
+            error_log("Database connection error: " . $e->getMessage());
+        }
     }
     
     // Database credentials
