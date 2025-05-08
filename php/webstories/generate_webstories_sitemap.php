@@ -7,11 +7,20 @@
  * in search results, especially on mobile devices.
  */
 
-// Set header to XML
-header('Content-Type: application/xml; charset=utf-8');
+// Check if we're being included from another file or run directly
+$generateSitemapOnly = isset($generateSitemapOnly) ? $generateSitemapOnly : false;
 
-// Database connection
-require_once('../config/db.php');
+// Set header to XML only if not being included from another script
+if (!$generateSitemapOnly) {
+    header('Content-Type: application/xml; charset=utf-8');
+    // Database connection
+    require_once('../config/db.php');
+    // Get the connection
+    $conn = getDbConnection();
+}
+
+// Start output buffering to capture XML
+ob_start();
 
 // Get all web stories from the database
 $webstories_sql = "SELECT * FROM webstories WHERE status = 'published' ORDER BY publish_date DESC";
@@ -28,7 +37,7 @@ echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
 $base_url = 'https://todayeggrates.com';
 
 // Add each web story to the sitemap
-if ($webstories_result->num_rows > 0) {
+if ($webstories_result && $webstories_result->num_rows > 0) {
     while($story = $webstories_result->fetch_assoc()) {
         $url = $base_url . '/webstory/' . $story['slug'];
         $last_mod = date('c', strtotime($story['updated_at']));
@@ -53,10 +62,23 @@ if ($webstories_result->num_rows > 0) {
 // Close the XML
 echo '</urlset>';
 
-// Save the sitemap to a file
+// Get the sitemap content
 $sitemap_content = ob_get_contents();
-file_put_contents($_SERVER['DOCUMENT_ROOT'] . '/webstories-sitemap.xml', $sitemap_content);
+ob_end_clean();
 
-// Close the database connection
-$conn->close();
+// Save the sitemap to a file
+$doc_root = isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : dirname(dirname(dirname(__FILE__)));
+$sitemap_path = $doc_root . '/webstories-sitemap.xml';
+file_put_contents($sitemap_path, $sitemap_content);
+
+// Only close the connection if we opened it ourselves
+if (!$generateSitemapOnly) {
+    // Close the database connection
+    $conn->close();
+}
+
+// Output the sitemap if this script is being run directly
+if (!$generateSitemapOnly) {
+    echo $sitemap_content;
+}
 ?>

@@ -453,12 +453,17 @@ try {
         echo "No egg rates found in the database. Please check your data.";
     }
 
-    // Use require_once to avoid double inclusion issues
-    debug_log("SITEMAP", "Generating web stories sitemap");
-    require_once 'generate_webstories_sitemap.php';
-
     // Success message
     debug_log("SUCCESS", "Web stories generation completed successfully");
+
+    // Generate sitemap with the existing connection
+    debug_log("SITEMAP", "Generating web stories sitemap");
+    
+    // Define a variable to suppress the XML header output since we're not sending to browser
+    $generateSitemapOnly = true;
+    
+    // Pass the connection to the sitemap generator
+    include_once 'generate_webstories_sitemap.php';
 
 } catch (Exception $e) {
     // Log any exceptions that occur
