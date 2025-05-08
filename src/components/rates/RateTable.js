@@ -21,6 +21,15 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
   const sortedRates = [...eggRates].sort((a, b) => new Date(b.date) - new Date(a.date));
   const latestRate = sortedRates[0]?.rate || "N/A";
   
+  // Filter rates to only show the last 10 days
+  const tenDaysAgo = new Date();
+  tenDaysAgo.setDate(tenDaysAgo.getDate() - 10);
+  
+  const filteredRates = sortedRates.filter(rate => {
+    const rateDate = new Date(rate.date);
+    return rateDate >= tenDaysAgo;
+  });
+  
   // Calculate rate changes
   let rateChange = null;
   let percentageChange = null;
@@ -30,7 +39,7 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
   }
   
   // Format dates for chart
-  const chartLabels = sortedRates.map(rate => {
+  const chartLabels = filteredRates.map(rate => {
     const date = new Date(rate.date);
     return date.toLocaleDateString('en-US', {
       month: 'short', 
@@ -39,7 +48,7 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
   }).reverse();
   
   // Format rates for chart
-  const chartData = sortedRates.map(rate => rate.rate).reverse();
+  const chartData = filteredRates.map(rate => rate.rate).reverse();
   
   // Calculate tray price (30 eggs)
   const trayPrice = latestRate * 30;
@@ -72,7 +81,7 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
       tooltip: {
         callbacks: {
           label: function(context) {
-            return `₹${context.raw} per egg`;
+            return `₹${context.raw.toFixed(2)} per egg`;
           }
         }
       }
@@ -82,7 +91,7 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
         beginAtZero: false,
         ticks: {
           callback: function(value) {
-            return '₹' + value;
+            return '₹' + value.toFixed(2);
           }
         }
       }
@@ -237,15 +246,18 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
               </tr>
             </thead>
             <tbody>
-              {sortedRates.map((rate, index) => {
-                const date = new Date(rate.date).toLocaleDateString('en-US', {
+              {filteredRates.map((rate, index) => {
+                // Fix the date formatting by explicitly creating a new Date object
+                const dateObj = new Date(rate.date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'short',
                   day: 'numeric'
                 });
+                
                 return (
                   <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
-                    <td className="py-3 px-4">{date}</td>
+                    <td className="py-3 px-4">{formattedDate}</td>
                     <td className="py-3 px-4">₹{rate.rate}</td>
                     <td className="py-3 px-4">₹{(rate.rate * 30).toFixed(2)}</td>
                   </tr>

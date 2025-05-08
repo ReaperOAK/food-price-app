@@ -69,7 +69,23 @@ const DefaultTable = ({ eggRates = [] }) => {
         display: true,
         text: 'Egg Rates',
       },
+      tooltip: {
+        callbacks: {
+          label: function(context) {
+            return `₹${context.raw.toFixed(2)}`;
+          }
+        }
+      }
     },
+    scales: {
+      y: {
+        ticks: {
+          callback: function(value) {
+            return '₹' + value.toFixed(2);
+          }
+        }
+      }
+    }
   };
 
   return (
