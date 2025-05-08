@@ -247,13 +247,17 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
             </thead>
             <tbody>
               {filteredRates.map((rate, index) => {
-                // Fix the date formatting by explicitly creating a new Date object
+                // Fix date parsing to properly display unique dates for each entry
+                // Parse the date string from API format (YYYY-MM-DD)
                 const dateObj = new Date(rate.date);
-                const formattedDate = dateObj.toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric'
-                });
+                // Ensure the date is valid before formatting
+                const formattedDate = !isNaN(dateObj.getTime()) 
+                  ? dateObj.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    }) 
+                  : rate.date; // Fallback to the original string if parsing fails
                 
                 return (
                   <tr key={index} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
