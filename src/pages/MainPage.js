@@ -13,7 +13,7 @@ import StatePage from '../components/rates/StatePage';
 import StateList from '../components/rates/StateList';
 import SpecialRatesTable from '../components/rates/SpecialRatesTable';
 import BlogList from '../components/blog/BlogList';
-import FAQ from '../components/common/FAQ';
+import FAQ, { generateFaqSchema } from '../components/common/FAQ';
 import Breadcrumb from '../components/layout/Breadcrumb';
 import blogs from '../data/blogs';
 
@@ -203,89 +203,7 @@ const MainPage = () => {
       "availability": "https://schema.org/InStock"
     }
   };
-  
-  // Add FAQPage structured data
-  const faqStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": []
-  };
-  
-  // Add FAQ items based on location
-  if (selectedCity) {
-    faqStructuredData.mainEntity.push(
-      {
-        "@type": "Question",
-        "name": `What is today's egg rate in ${selectedCity}?`,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": `Today's egg rate in ${selectedCity}, ${selectedState} is ₹${currentRate} per egg (as of ${formattedDate}).`
-        }
-      },
-      {
-        "@type": "Question",
-        "name": `What is the price of 30 eggs (1 tray) in ${selectedCity} today?`,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": `The price of 30 eggs (1 tray) in ${selectedCity} today is ₹${trayPrice} (as of ${formattedDate}).`
-        }
-      },
-      {
-        "@type": "Question",
-        "name": `What is the NECC egg rate in ${selectedCity} today?`,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": `The NECC egg rate in ${selectedCity} today is ₹${currentRate} per egg. NECC (National Egg Coordination Committee) updates egg prices daily based on market conditions.`
-        }
-      }
-    );
-  } else if (selectedState) {
-    faqStructuredData.mainEntity.push(
-      {
-        "@type": "Question",
-        "name": `What are today's egg rates in ${selectedState}?`,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": `Today's egg rates in ${selectedState} vary by city. The average egg rate in ${selectedState} is approximately ₹${currentRate} per egg (as of ${formattedDate}).`
-        }
-      },
-      {
-        "@type": "Question",
-        "name": `How much does a tray of 30 eggs cost in ${selectedState}?`,
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": `A tray of 30 eggs in ${selectedState} costs approximately ₹${trayPrice} (as of ${formattedDate}). Prices may vary slightly between cities.`
-        }
-      }
-    );
-  } else {
-    faqStructuredData.mainEntity.push(
-      {
-        "@type": "Question",
-        "name": "What is today's egg rate in India?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": `Today's all India egg rate average is ₹${currentRate} per egg (as of ${formattedDate}). Prices vary by city and region.`
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "What is the NECC egg rate today?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": `Today's NECC egg rate is ₹${currentRate} per egg. The National Egg Coordination Committee (NECC) updates egg prices daily across India.`
-        }
-      },
-      {
-        "@type": "Question",
-        "name": "How much does a tray of 30 eggs cost in India today?",
-        "acceptedAnswer": {
-          "@type": "Answer",
-          "text": `A tray of 30 eggs costs approximately ₹${trayPrice} in India today (as of ${formattedDate}). Prices may vary by city and market conditions.`
-        }
-      }
-    );
-  }
+    // We'll get FAQ data from the FAQ component instead of duplicating it here
   
   // Create SEO title and description based on location
   const getSeoTitle = () => {
@@ -330,10 +248,9 @@ const MainPage = () => {
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>
-        
-        {/* Add FAQ structured data */}
+          {/* Add FAQ structured data */}
         <script type="application/ld+json">
-          {JSON.stringify(faqStructuredData)}
+          {JSON.stringify(generateFaqSchema(selectedCity, selectedState, eggRates))}
         </script>
         
         {/* Add lastmod date for search engines */}

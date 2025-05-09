@@ -1,11 +1,39 @@
 import React, { useState } from 'react';
 
-const FAQ = ({ location = {} }) => {
-  const [openFAQ, setOpenFAQ] = useState(null);
-  const cityName = location.cityName || '';
-  const stateName = location.stateName || '';
+// Function to generate FAQ schema (separate from component rendering)
+export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
+  // We only need currentRate and trayPrice for the FAQ schema
+  const currentRate = eggRates?.length > 0 ? eggRates[0].rate : 'N/A';
+  const trayPrice = currentRate !== 'N/A' ? (currentRate * 30).toFixed(2) : 'N/A';
   
-  // Default FAQs
+  // Format date for display
+  const formattedDate = new Date().toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  
+  // Generate FAQ items based on data
+  const faqItems = generateFaqList(selectedCity, selectedState, currentRate, trayPrice, formattedDate);
+  
+  // Return the structured data object
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqItems.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer
+      }
+    }))
+  };
+};
+
+// Function to generate the FAQ list (used by both schema and component)
+export const generateFaqList = (selectedCity, selectedState, currentRate, trayPrice, formattedDate) => {
+  // Default FAQs that appear on all pages
   const defaultFAQs = [
     {
       question: `What is today's egg rate in India?`,
@@ -40,56 +68,57 @@ const FAQ = ({ location = {} }) => {
       answer: `Egg rates are affected by multiple factors including: production costs (feed, labor, maintenance), seasonal demand fluctuations, transportation costs, regional supply-demand balance, weather conditions, disease outbreaks in poultry, and government policies regarding the poultry industry.`
     }
   ];
-  
+
   // Location-specific FAQs
-  const locationSpecificFAQs = cityName ? [
+  const locationSpecificFAQs = selectedCity ? [
     {
-      question: `What is today's egg rate in ${cityName}, ${stateName}?`,
-      answer: `Today's egg rate in ${cityName}, ${stateName} is updated daily on our website. We source our information directly from the National Egg Coordination Committee (NECC) and local poultry associations to provide the most accurate prices.`
+      question: `What is today's egg rate in ${selectedCity}?`,
+      answer: `Today's egg rate in ${selectedCity}, ${selectedState || ''} is ₹${currentRate} per egg (as of ${formattedDate}).`
     },
     {
-      question: `How do egg prices in ${cityName} compare to national average?`,
-      answer: `Egg prices in ${cityName} may differ from the national average based on local factors like transportation costs, regional demand, and distribution network efficiency. You can compare ${cityName}'s egg rates with other cities on our main rates page.`
+      question: `What is the price of 30 eggs (1 tray) in ${selectedCity} today?`,
+      answer: `The price of 30 eggs (1 tray) in ${selectedCity} today is ₹${trayPrice} (as of ${formattedDate}).`
     },
     {
-      question: `Where can I buy eggs in ${cityName} at wholesale prices?`,
-      answer: `In ${cityName}, wholesale eggs are typically available at major poultry markets, NECC distribution centers, and large poultry farms. The wholesale price generally follows the official NECC rate with minimal variation.`
+      question: `What is the NECC egg rate in ${selectedCity} today?`,
+      answer: `The NECC egg rate in ${selectedCity} today is ₹${currentRate} per egg. NECC (National Egg Coordination Committee) updates egg prices daily based on market conditions.`
     },
     {
-      question: `How often do egg rates change in ${cityName}?`,
-      answer: `In ${cityName}, egg rates typically update daily based on NECC announcements. However, the retail prices might not change daily as retailers may adjust their prices less frequently, typically weekly or when there are significant changes in the wholesale rates.`
+      question: `How do egg prices in ${selectedCity} compare to national average?`,
+      answer: `Egg prices in ${selectedCity} may differ from the national average based on local factors like transportation costs, regional demand, and distribution network efficiency. You can compare ${selectedCity}'s egg rates with other cities on our main rates page.`
     }
-  ] : stateName ? [
+  ] : selectedState ? [
     {
-      question: `What is the average egg rate in ${stateName}?`,
-      answer: `The average egg rate in ${stateName} varies across different cities. We calculate the state average based on NECC rates from major cities in ${stateName}. This information is updated daily on our website.`
+      question: `What is the average egg rate in ${selectedState}?`,
+      answer: `The average egg rate in ${selectedState} varies across different cities. We calculate the state average based on NECC rates from major cities in ${selectedState}. This information is updated daily on our website.`
     },
     {
-      question: `How do egg prices in ${stateName} compare to other states?`,
-      answer: `Egg prices in ${stateName} may be higher or lower than other states depending on factors like local production capacity, transportation networks, and consumer demand. You can compare rates across different states on our website.`
+      question: `How do egg prices in ${selectedState} compare to other states?`,
+      answer: `Egg prices in ${selectedState} may be higher or lower than other states depending on factors like local production capacity, transportation networks, and consumer demand. You can compare rates across different states on our website.`
     },
     {
-      question: `Which city in ${stateName} has the lowest egg prices?`,
-      answer: `Egg prices can vary within ${stateName}. Cities closer to major production centers typically have lower prices. Check our state page for ${stateName} to see a comparison of egg rates across different cities in the state.`
+      question: `Which city in ${selectedState} has the lowest egg prices?`,
+      answer: `Egg prices can vary within ${selectedState}. Cities closer to major production centers typically have lower prices. Check our state page for ${selectedState} to see a comparison of egg rates across different cities in the state.`
     }
   ] : [];
 
-  // Combine default and location-specific FAQs
-  const faqList = [...locationSpecificFAQs, ...defaultFAQs];
+  // Combine and return all FAQs
+  return [...locationSpecificFAQs, ...defaultFAQs];
+};
 
-  // Generate FAQ Schema for SEO
-  const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": faqList.map((faq) => ({
-      "@type": "Question",
-      "name": faq.question,
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": faq.answer
-      }
-    }))
-  };
+const FAQ = ({ selectedCity, selectedState, eggRates }) => {
+  const [openFAQ, setOpenFAQ] = useState(null);
+  const currentRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
+  const trayPrice = currentRate !== 'N/A' ? (currentRate * 30).toFixed(2) : 'N/A';
+  
+  // Format date for display
+  const formattedDate = new Date().toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  // Get the list of FAQs using the shared function
+  const faqList = generateFaqList(selectedCity, selectedState, currentRate, trayPrice, formattedDate);
 
   const toggleFAQ = (index) => {
     if (openFAQ === index) {
@@ -98,15 +127,11 @@ const FAQ = ({ location = {} }) => {
       setOpenFAQ(index);
     }
   };
-
   return (
     <div className="p-6 mt-6 mx-auto bg-white shadow-lg rounded-lg" id="faq-section">
       <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Frequently Asked Questions</h2>
       
-      {/* FAQ Schema for SEO */}
-      <script type="application/ld+json">
-        {JSON.stringify(faqSchema)}
-      </script>
+      {/* Note: FAQ Schema is now centralized and rendered only in MainPage.js */}
       
       <div className="divide-y divide-gray-200">
         {faqList.map((faq, index) => (
