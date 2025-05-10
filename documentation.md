@@ -12,65 +12,63 @@ The Food Price App provides real-time egg price information across different cit
 ## 🗂️ Directory Structure
 
 ```
-food-price-app/
-└── src/
-    ├── components/
-    │   ├── admin/
-    │   │   ├── AddCityForm.js
-    │   │   ├── AddStateForm.js
-    │   │   ├── LoginPage.js
-    │   │   └── RateForm.js
-    │   ├── blog/
-    │   │   ├── BlogCard.js
-    │   │   ├── BlogList.js
-    │   │   └── TableOfContents.js
-    │   ├── common/
-    │   │   ├── CitySelect.js
-    │   │   ├── Disclaimer.js
-    │   │   ├── FAQ.js
-    │   │   ├── PrivacyPolicy.js
-    │   │   ├── RedirectInterceptor.js
-    │   │   ├── StakeAdPopup.js
-    │   │   ├── StateSelect.js
-    │   │   └── TOS.js
-    │   ├── layout/
-    │   │   ├── AdminNavbar.js
-    │   │   ├── Breadcrumb.js
-    │   │   ├── Footer.js
-    │   │   └── Navbar.js
-    │   ├── rates/
-    │   │   ├── BodyOne.js
-    │   │   ├── BodyThree.js
-    │   │   ├── BodyTwo.js
-    │   │   ├── DefaultTable.js
-    │   │   ├── EggRatesTable.js
-    │   │   ├── RateTable.js
-    │   │   ├── SpecialRatesTable.js
-    │   │   ├── StateList.js
-    │   │   └── StatePage.js
-    │   └── webstories/
-    │       ├── WebStoriesList.js
-    │       └── WebStoryViewer.js
-    ├── data/
-    │   ├── blogs.js
-    │   └── eggprices.js
-    ├── pages/
-    │   ├── blogs/
-    │   │   ├── blog-1.js
-    │   │   ├── blog-2.js
-    │   │   └── egg-rate-barwala.js
-    │   ├── AdminPage.js
-    │   ├── BlogPage.js
-    │   └── MainPage.js
-    ├── utils/
-    │   └── ScrollToTop.js
-    ├── App.css
-    ├── App.js
-    ├── App.test.js
-    ├── index.css
-    ├── index.js
-    ├── logo.svg
-    ├── reportWebVitals.js
+└── 📁src
+    └── 📁components
+        └── 📁admin
+            └── AddCityForm.js
+            └── AddStateForm.js
+            └── LoginPage.js
+            └── RateForm.js
+        └── 📁blog
+            └── BlogCard.js
+            └── BlogList.js
+            └── TableOfContents.js
+        └── 📁common
+            └── CitySelect.js
+            └── Disclaimer.js
+            └── FAQ.js
+            └── PrivacyPolicy.js
+            └── StateSelect.js
+            └── TOS.js
+        └── 📁layout
+            └── AdminNavbar.js
+            └── Breadcrumb.js
+            └── Footer.js
+            └── Navbar.js
+            └── RootLayout.js
+        └── 📁rates
+            └── BodyOne.js
+            └── BodyThree.js
+            └── BodyTwo.js
+            └── DefaultTable.js
+            └── EggRatesTable.js
+            └── RateTable.js
+            └── SpecialRatesTable.js
+            └── StateList.js
+            └── StatePage.js
+        └── 📁webstories
+            └── WebStoriesList.js
+            └── WebStoryViewer.js
+    └── 📁data
+        └── blogs.js
+        └── eggprices.js
+    └── 📁pages
+        └── AdminPage.js
+        └── BlogPage.js
+        └── 📁blogs
+            └── blog-1.js
+            └── blog-2.js
+            └── egg-rate-barwala.js
+        └── MainPage.js
+    └── 📁utils
+        └── ScrollToTop.js
+    └── App.css
+    └── App.js
+    └── App.test.js
+    └── index.css
+    └── index.js
+    └── logo.svg
+    └── reportWebVitals.js
     └── setupTests.js
 ```
 
@@ -103,14 +101,13 @@ food-price-app/
 - **AdminNavbar.js**: Admin-specific navigation with logout functionality
 - **Footer.js**: Site-wide footer with copyright info and legal links
 - **Breadcrumb.js**: Context-aware navigation path with structured data for SEO
-- **RedirectInterceptor.js**: Manages internal redirects and navigation paths for legacy URLs
+- **RootLayout.js**: Main layout component for wrapping pages with common elements
 
 #### Content Sections
 - **BodyOne.js**: Hero section with location-specific heading and featured stories
 - **BodyTwo.js**: Informational section about egg pricing, NECC, and market factors
 - **BodyThree.js**: Data-driven analysis section with price trends and comparisons
 - **FAQ.js**: Dynamic FAQ section with location-tailored questions
-- **StakeAdPopup.js**: Promotional component for displaying targeted advertisements
 
 #### Data Display
 - **RateTable.js**: Interactive table showing egg rates with visualization charts
