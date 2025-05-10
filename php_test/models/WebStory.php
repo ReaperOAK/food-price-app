@@ -157,17 +157,35 @@ class WebStory {
             return false;
         }
     }
-    
-    /**
+      /**
      * Generate a thumbnail image for a web story
      * 
-     * @param string $city City name
-     * @param string $state State name
-     * @param float $rate Egg rate
-     * @param string $thumbnailPath Path to save the thumbnail
+     * @param string $city City name or source image path
+     * @param string $state State name or destination path
+     * @param float|null $rate Egg rate (optional when used with image paths)
+     * @param string|null $thumbnailPath Path to save the thumbnail (optional when used with image paths)
      * @return bool Success status
      */
-    public function generateThumbnail($city, $state, $rate, $thumbnailPath) {
+    public function generateThumbnail($city, $state, $rate = null, $thumbnailPath = null) {
+        // If only two parameters are provided, treat this as a simple image copy operation
+        if ($rate === null && $thumbnailPath === null) {
+            $sourceImage = $city;     // First parameter is source image
+            $destImage = $state;      // Second parameter is destination image
+            
+            // Simple copy of the image
+            try {
+                if (file_exists($sourceImage)) {
+                    return copy($sourceImage, $destImage);
+                } else {
+                    $this->logger->error("Source image does not exist: $sourceImage");
+                    return false;
+                }
+            } catch (Exception $e) {
+                $this->logger->error("Error generating thumbnail from existing image: " . $e->getMessage());
+                return false;
+            }
+        }
+        
         try {
             // Create a blank canvas (600x900 pixels)
             $image = imagecreatetruecolor(600, 900);

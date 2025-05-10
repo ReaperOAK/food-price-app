@@ -99,8 +99,7 @@ class Cache {
         
         return FileSystem::writeFile($cacheFile, $content, true);
     }
-    
-    /**
+      /**
      * Delete a cached item
      * 
      * @param string $key Cache key
@@ -118,6 +117,16 @@ class Cache {
         }
         
         return FileSystem::deleteFile($cacheFile);
+    }
+    
+    /**
+     * Invalidate a cached item (alias of delete for compatibility)
+     * 
+     * @param string $key Cache key
+     * @return bool Success status
+     */
+    public static function invalidate($key) {
+        return self::delete($key);
     }
     
     /**

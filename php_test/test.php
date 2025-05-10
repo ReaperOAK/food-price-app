@@ -31,6 +31,33 @@ $testComponent = isset($argv[1]) ? $argv[1] : 'all';
 $isWebRequest = php_sapi_name() !== 'cli';
 
 /**
+ * Helper function to safely run each test
+ * 
+ * @param string $testName Name of the test
+ * @param callable $testFunction Function to execute
+ * @return void
+ */
+function runTest($testName, $testFunction) {
+    try {
+        output("Starting test: $testName", true, true);
+        $testFunction();
+        output("Completed test: $testName", true);
+    } catch (Exception $e) {
+        output("Test '$testName' failed with exception: " . $e->getMessage(), false);
+    } catch (Error $e) {
+        output("Test '$testName' failed with error: " . $e->getMessage(), false);
+    }
+    
+    // Add a separator between tests
+    global $isWebRequest;
+    if ($isWebRequest) {
+        echo "<hr style='border-top: 1px dashed #ccc; margin: 15px 0;'>";
+    } else {
+        echo "\n";
+    }
+}
+
+/**
  * Get PHP environment information
  */
 function getPhpInfo() {
@@ -44,7 +71,11 @@ function getPhpInfo() {
         'Error Reporting' => ini_get('display_errors') == '1' ? 'On' : 'Off',
         'Current Directory' => getcwd(),
         'Script Path' => $_SERVER['SCRIPT_FILENAME'] ?? __FILE__,
-        'Document Root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown'
+        'Document Root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown',
+        'Database Driver' => extension_loaded('mysqli') ? 'MySQLi Available' : 'MySQLi Not Available',
+        'PDO MySQL' => extension_loaded('pdo_mysql') ? 'PDO MySQL Available' : 'PDO MySQL Not Available',
+        'GD Library' => extension_loaded('gd') ? 'GD Available' : 'GD Not Available',
+        'Server Software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown'
     ];
     
     foreach ($info as $key => $value) {
@@ -54,10 +85,10 @@ function getPhpInfo() {
                 $loaded = extension_loaded($ext);
                 $extensions[] = "$ext: " . ($loaded ? 'Loaded' : 'Not Loaded');
             }
-            $value = implode(', ', $extensions);
+            output($key . ": " . implode(', ', $extensions), true);
+        } else {
+            output($key . ": " . $value, true);
         }
-        
-        output("$key: $value", true);
     }
 }
 
@@ -247,6 +278,12 @@ function testDatabase() {
         
         output("Database config: Host=" . DB_HOST . ", Database=" . DB_NAME, true);
         
+        // Show PHP database extensions
+        $mysqliLoaded = extension_loaded('mysqli');
+        $pdoMysqlLoaded = extension_loaded('pdo_mysql');
+        output("MySQLi extension: " . ($mysqliLoaded ? 'Loaded' : 'Not Available'), $mysqliLoaded);
+        output("PDO MySQL extension: " . ($pdoMysqlLoaded ? 'Loaded' : 'Not Available'), $pdoMysqlLoaded);
+        
         // Try direct mysqli connection first
         output("Testing direct mysqli connection...", true);
         try {
@@ -300,8 +337,7 @@ function testDatabase() {
         } else {
             output("PDO MySQL extension not available", false);
         }
-        
-        // Now test the DatabaseConnection class
+          // Now test the DatabaseConnection class
         output("Testing database connection via singleton...", true);
         try {
             $db = DatabaseConnection::getInstance();
@@ -314,6 +350,15 @@ function testDatabase() {
                 $wrapper = new DatabaseWrapper($db->getConnection());
                 $dbType = $wrapper->getType();
                 output("Connection type: " . $dbType, true);
+                
+                // Test connection performance
+                $startTime = microtime(true);
+                for ($i = 0; $i < 5; $i++) {
+                    $testQuery = $wrapper->query("SELECT 1");
+                }
+                $endTime = microtime(true);
+                $duration = round(($endTime - $startTime) * 1000, 2); // ms
+                output("Connection performance: " . $duration . "ms for 5 queries", true);
                 
                 // Test database schema
                 $tables = ['egg_rates', 'egg_rates_archive', 'states', 'cities'];
