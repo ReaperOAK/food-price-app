@@ -589,4 +589,13 @@ class Rate {
         
         return $cityId;
     }
+    
+    /**
+     * Get all latest rates (alias for getLatestRates for compatibility)
+     * 
+     * @return array Array of rate data
+     */
+    public function getAllLatestRates() {
+        return $this->getLatestRates();
+    }
 }

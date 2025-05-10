@@ -38,12 +38,10 @@ class Location {
         $sql = "SELECT DISTINCT state as name FROM egg_rates WHERE state != '' ORDER BY state";
         return $this->db->fetchAll($sql);
     }
-    
-    /**
+      /**
      * Get all cities for a state
      * 
-     * @param string $state State name
-     * @return array Array of city data
+     * @param string $state State name     * @return array Array of city data
      */
     public function getCitiesForState($state) {
         // Try normalized tables first
@@ -313,7 +311,24 @@ class Location {
         if ($stateId === false) {
             throw new Exception("Failed to insert state: $stateName");
         }
+          return $stateId;
+    }
+    
+    /**
+     * Get cities by state (alias for getCitiesForState for compatibility)
+     * 
+     * @param string $state State name
+     * @return array Array of city names
+     */
+    public function getCitiesByState($state) {
+        $cities = $this->getCitiesForState($state);
         
-        return $stateId;
+        // Convert from detailed objects to simple array of names
+        $result = [];
+        foreach ($cities as $city) {
+            $result[] = $city['name'];
+        }
+        
+        return $result;
     }
 }
