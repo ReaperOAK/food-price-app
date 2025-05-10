@@ -797,27 +797,6 @@ if ($isWebRequest) {
     $testComponent = isset($_GET['component']) ? $_GET['component'] : 'all';
 }
 
-// Helper function to safely run each test
-function runTest($testName, $testFunction) {
-    try {
-        output("Starting test: $testName", true, true);
-        $testFunction();
-        output("Completed test: $testName", true);
-    } catch (Exception $e) {
-        output("Test '$testName' failed with exception: " . $e->getMessage(), false);
-    } catch (Error $e) {
-        output("Test '$testName' failed with error: " . $e->getMessage(), false);
-    }
-    
-    // Add a separator between tests
-    global $isWebRequest;
-    if ($isWebRequest) {
-        echo "<hr style='border-top: 1px dashed #ccc; margin: 15px 0;'>";
-    } else {
-        echo "\n";
-    }
-}
-
 // Run selected tests
 switch ($testComponent) {
     case 'config':
