@@ -52,14 +52,32 @@ class DatabaseConnection {
         }
         return self::$instance;
     }
-    
-    /**
+      /**
      * Get the mysqli connection object
      * 
      * @return mysqli The mysqli connection
      */
     public function getConnection() {
         return $this->connection;
+    }
+    
+    /**
+     * Execute a direct query (non-prepared)
+     * 
+     * @param string $sql SQL query
+     * @return mysqli_result|bool Query result or false on failure
+     */
+    public function query($sql) {
+        try {
+            $result = $this->connection->query($sql);
+            if ($result === false) {
+                $this->logError("Direct query failed: " . $this->connection->error . " for SQL: $sql");
+            }
+            return $result;
+        } catch (Exception $e) {
+            $this->logError("Database query error: " . $e->getMessage() . " for SQL: $sql");
+            return false;
+        }
     }
     
     /**

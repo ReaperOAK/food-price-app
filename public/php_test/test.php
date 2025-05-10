@@ -23,13 +23,183 @@
 
 // Set script execution time to unlimited for comprehensive testing
 set_time_limit(0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
 // Define test component from command line argument
 $testComponent = isset($argv[1]) ? $argv[1] : 'all';
 $isWebRequest = php_sapi_name() !== 'cli';
 
+/**
+ * Get PHP environment information
+ */
+function getPhpInfo() {
+    $info = [
+        'PHP Version' => phpversion(),
+        'PHP SAPI' => php_sapi_name(),
+        'OS' => PHP_OS,
+        'Extensions' => implode(', ', ['PDO', 'mysqli', 'curl', 'gd', 'mbstring']),
+        'Memory Limit' => ini_get('memory_limit'),
+        'Max Execution Time' => ini_get('max_execution_time'),
+        'Error Reporting' => ini_get('display_errors') == '1' ? 'On' : 'Off',
+        'Current Directory' => getcwd(),
+        'Script Path' => $_SERVER['SCRIPT_FILENAME'] ?? __FILE__,
+        'Document Root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown'
+    ];
+    
+    foreach ($info as $key => $value) {
+        $extensions = [];
+        if ($key === 'Extensions') {
+            foreach (explode(', ', $value) as $ext) {
+                $loaded = extension_loaded($ext);
+                $extensions[] = "$ext: " . ($loaded ? 'Loaded' : 'Not Loaded');
+            }
+            $value = implode(', ', $extensions);
+        }
+        
+        output("$key: $value", true);
+    }
+}
+
 // Required files
 require_once __DIR__ . '/config/config.php';
+
+// Create DatabaseWrapper.php before including other files
+if (!file_exists(__DIR__ . '/utils/DatabaseWrapper.php')) {
+    $databaseWrapperContent = file_get_contents(__DIR__ . '/utils/DatabaseWrapper.php');
+    if (!$databaseWrapperContent) {
+        $databaseWrapperContent = '<?php
+/**
+ * Database Wrapper Class
+ * 
+ * This class provides a consistent interface for database operations
+ * regardless of the actual database connection type (mysqli or PDO)
+ */
+
+class DatabaseWrapper {
+    private $connection;
+    private $type;
+    
+    /**
+     * Constructor
+     * 
+     * @param mixed $connection PDO or mysqli connection object
+     */
+    public function __construct($connection) {
+        $this->connection = $connection;
+        
+        if ($connection instanceof PDO) {
+            $this->type = "pdo";
+        } elseif ($connection instanceof mysqli) {
+            $this->type = "mysqli";
+        } else {
+            throw new Exception("Invalid database connection type");
+        }
+    }
+    
+    /**
+     * Execute a query
+     * 
+     * @param string $query SQL query
+     * @param array $params Optional parameters for prepared statement
+     * @return mixed Query result
+     */
+    public function query($query, $params = []) {
+        if ($this->type === "pdo") {
+            if (empty($params)) {
+                return $this->connection->query($query);
+            } else {
+                $stmt = $this->connection->prepare($query);
+                $stmt->execute($params);
+                return $stmt;
+            }
+        } else { // mysqli
+            if (empty($params)) {
+                return $this->connection->query($query);
+            } else {
+                $stmt = $this->connection->prepare($query);
+                
+                // Create parameter types string (all strings for simplicity)
+                $types = str_repeat("s", count($params));
+                
+                // Bind parameters
+                $stmt->bind_param($types, ...$params);
+                $stmt->execute();
+                return $stmt;
+            }
+        }
+    }
+    
+    /**
+     * Get number of rows in result
+     * 
+     * @param mixed $result Query result
+     * @return int Number of rows
+     */
+    public function numRows($result) {
+        if ($this->type === "pdo") {
+            return $result->rowCount();
+        } else { // mysqli
+            return $result->num_rows;
+        }
+    }
+}';
+        file_put_contents(__DIR__ . '/utils/DatabaseWrapper.php', $databaseWrapperContent);
+    }
+}
+
+// Make sure OutputFormatter.php exists
+if (!file_exists(__DIR__ . '/utils/OutputFormatter.php')) {
+    $dir = __DIR__ . '/utils';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+    
+    $code = '<?php
+/**
+ * Output function for both CLI and web interface with improved formatting
+ */
+function output($message, $isSuccess = true, $isHeading = false) {
+    global $isWebRequest;
+    
+    $statusChar = $isSuccess ? "✓" : "✗";
+    $color = $isSuccess ? "green" : "red";
+    $neutralColor = "#555";
+    
+    // Determine if this is an informational message
+    $isInfo = ($message !== "" && $isSuccess === true && $isHeading === false && 
+              (strpos($message, "Testing") === 0 || strpos($message, "...") !== false));
+              
+    if ($isWebRequest) {
+        if ($isHeading) {
+            echo "<h2 style=\'margin: 20px 0 10px; color: #333; font-size: 1.3em;\'>";
+            echo htmlspecialchars($message);
+            echo "</h2>";
+        } else if ($isInfo) {
+            echo "<div style=\'margin: 10px 0 5px; color: $neutralColor;\'>";
+            echo "ℹ️ " . htmlspecialchars($message);
+            echo "</div>";
+        } else {
+            echo "<div style=\'margin: 5px 0; color: $color;\'>";
+            echo "$statusChar " . htmlspecialchars($message);
+            echo "</div>";
+        }
+    } else {
+        if ($isHeading) {
+            echo "\n=== " . strtoupper($message) . " ===\n";
+        } else if ($isInfo) {
+            echo "ℹ️ " . $message . "\n";
+        } else {
+            echo ($isSuccess ? "[+] " : "[-] ") . $message . "\n";
+        }
+    }
+}';
+    file_put_contents(__DIR__ . '/utils/OutputFormatter.php', $code);
+}
+
+// Regular includes
+require_once __DIR__ . '/utils/OutputFormatter.php'; // Include the new formatter
+require_once __DIR__ . '/utils/DatabaseWrapper.php';
 require_once __DIR__ . '/core/DatabaseConnection.php';
 require_once __DIR__ . '/utils/Logger.php';
 require_once __DIR__ . '/utils/ApiResponse.php';
@@ -39,32 +209,6 @@ require_once __DIR__ . '/models/Location.php';
 require_once __DIR__ . '/models/Rate.php';
 require_once __DIR__ . '/models/WebStory.php';
 
-/**
- * Output function for both CLI and web interface
- */
-function output($message, $isSuccess = true, $isHeading = false) {
-    global $isWebRequest;
-    
-    $statusChar = $isSuccess ? '✓' : '✗';
-    $color = $isSuccess ? 'green' : 'red';
-    
-    if ($isWebRequest) {
-        $style = $isHeading ? 'font-size: 1.2em; font-weight: bold; margin-top: 20px;' : '';
-        echo "<div style='margin: 5px 0; color: $color; $style'>";
-        if (!$isHeading) echo "$statusChar ";
-        echo htmlspecialchars($message);
-        echo "</div>";
-    } else {
-        if ($isHeading) {
-            echo "\n\033[1m" . str_repeat('-', 50) . "\n";
-            echo "$message\n";
-            echo str_repeat('-', 50) . "\033[0m\n";
-        } else {
-            echo ($isSuccess ? "\033[32m$statusChar " : "\033[31m$statusChar ");
-            echo "$message\033[0m\n";
-        }
-    }
-}
 
 /**
  * Test configuration file
@@ -96,19 +240,103 @@ function testDatabase() {
     output("Testing Database Connection", true, true);
     
     try {
-        $db = DatabaseConnection::getInstance();
-        $connected = $db->query("SELECT 1");
-        output("Database connection: " . ($connected ? 'Successful' : 'Failed'), $connected !== false);
+        // Check database config
+        if (!defined('DB_HOST') || !defined('DB_USER') || !defined('DB_PASS') || !defined('DB_NAME')) {
+            throw new Exception("Database configuration is incomplete. Please check config.php.");
+        }
         
-        // Test database schema
-        $tables = ['egg_rates', 'egg_rates_archive', 'states', 'cities'];
-        foreach ($tables as $table) {
-            $result = $db->query("SHOW TABLES LIKE '$table'");
-            $exists = $result && $result->rowCount() > 0;
-            output("Table '$table' exists: " . ($exists ? 'Yes' : 'No'), $exists);
+        output("Database config: Host=" . DB_HOST . ", Database=" . DB_NAME, true);
+        
+        // Try direct mysqli connection first
+        output("Testing direct mysqli connection...", true);
+        try {
+            $directMysqli = @new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+            if ($directMysqli->connect_errno) {
+                throw new Exception("Failed: " . $directMysqli->connect_error . " (Error #" . $directMysqli->connect_errno . ")");
+            }
+            output("Direct mysqli connection: Successful", true);
+            
+            // Test a simple query
+            $testQuery = $directMysqli->query("SELECT 1 as test");
+            if ($testQuery) {
+                $row = $testQuery->fetch_assoc();
+                output("Mysqli query test: " . ($row['test'] == 1 ? "Successful" : "Failed"), $row['test'] == 1);
+                $testQuery->free();
+            } else {
+                output("Mysqli query test: Failed - " . $directMysqli->error, false);
+            }
+            
+            $directMysqli->close();
+        } catch (Exception $e) {
+            output("Direct mysqli connection failed: " . $e->getMessage(), false);
+        } catch (Error $e) {
+            output("Direct mysqli error: " . $e->getMessage(), false);
+        }
+        
+        // Try PDO connection if available
+        if (extension_loaded('pdo_mysql')) {
+            output("Testing direct PDO connection...", true);
+            try {
+                $dsn = "mysql:host=" . DB_HOST . ";dbname=" . DB_NAME;
+                $directPdo = new PDO($dsn, DB_USER, DB_PASS, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]);
+                output("Direct PDO connection: Successful", true);
+                
+                // Test a simple query
+                $stmt = $directPdo->query("SELECT 1 as test");
+                if ($stmt) {
+                    $row = $stmt->fetch();
+                    output("PDO query test: " . ($row['test'] == 1 ? "Successful" : "Failed"), $row['test'] == 1);
+                } else {
+                    output("PDO query test: Failed", false);
+                }
+            } catch (PDOException $e) {
+                output("Direct PDO connection failed: " . $e->getMessage(), false);
+            } catch (Exception $e) {
+                output("Direct PDO error: " . $e->getMessage(), false);
+            }
+        } else {
+            output("PDO MySQL extension not available", false);
+        }
+        
+        // Now test the DatabaseConnection class
+        output("Testing database connection via singleton...", true);
+        try {
+            $db = DatabaseConnection::getInstance();
+            $connected = $db->query("SELECT 1");
+            $success = ($connected !== false);
+            output("Database singleton connection: " . ($success ? 'Successful' : 'Failed'), $success);
+            
+            if ($success) {
+                // Create a wrapper that can work with both mysqli and PDO
+                $wrapper = new DatabaseWrapper($db->getConnection());
+                $dbType = $wrapper->getType();
+                output("Connection type: " . $dbType, true);
+                
+                // Test database schema
+                $tables = ['egg_rates', 'egg_rates_archive', 'states', 'cities'];
+                foreach ($tables as $table) {
+                    $query = "SHOW TABLES LIKE '$table'";
+                    $result = $wrapper->query($query);
+                    if ($result === false) {
+                        output("Error checking table '$table': " . $wrapper->errorInfo(), false);
+                        continue;
+                    }
+                    $exists = $wrapper->numRows($result) > 0;
+                    output("Table '$table' exists: " . ($exists ? 'Yes' : 'No'), $exists);
+                }
+            }
+        } catch (Exception $e) {
+            output("Database singleton error: " . $e->getMessage(), false);
+        } catch (Error $e) {
+            output("Fatal database error: " . $e->getMessage(), false);
         }
     } catch (Exception $e) {
-        output("Database error: " . $e->getMessage(), false);
+        output("Database test error: " . $e->getMessage(), false);
+    } catch (Error $e) {
+        output("Fatal error: " . $e->getMessage(), false);
     }
 }
 
@@ -477,11 +705,29 @@ if ($isWebRequest) {
             .error { color: red; }
             form { margin: 20px 0; }
             select, button { padding: 8px; }
+            .diagnostic { background: #f5f5f5; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+            .diagnostic-toggle { cursor: pointer; color: #0066cc; }
         </style>
     </head>
     <body>
         <h1>Food Price App - PHP Test</h1>
         <p>This script tests the functionality of the Food Price App PHP implementation.</p>
+        
+        <div class="diagnostic">
+            <p class="diagnostic-toggle" onclick="document.getElementById(\'diagnostic-info\').style.display = document.getElementById(\'diagnostic-info\').style.display === \'none\' ? \'block\' : \'none\';">
+                ▶ Click to show/hide diagnostic information
+            </p>
+            <div id="diagnostic-info" style="display: none;">
+';
+
+    // Output PHP environment info
+    output("PHP Environment Information", true, true);
+    getPhpInfo();
+
+    echo '
+            </div>
+        </div>
+        
         <form method="get">
             <select name="component">
                 <option value="all"' . ($testComponent == 'all' ? ' selected' : '') . '>All Components</option>
@@ -506,50 +752,71 @@ if ($isWebRequest) {
     $testComponent = isset($_GET['component']) ? $_GET['component'] : 'all';
 }
 
+// Helper function to safely run each test
+function runTest($testName, $testFunction) {
+    try {
+        output("Starting test: $testName", true, true);
+        $testFunction();
+        output("Completed test: $testName", true);
+    } catch (Exception $e) {
+        output("Test '$testName' failed with exception: " . $e->getMessage(), false);
+    } catch (Error $e) {
+        output("Test '$testName' failed with error: " . $e->getMessage(), false);
+    }
+    
+    // Add a separator between tests
+    global $isWebRequest;
+    if ($isWebRequest) {
+        echo "<hr style='border-top: 1px dashed #ccc; margin: 15px 0;'>";
+    } else {
+        echo "\n";
+    }
+}
+
 // Run selected tests
 switch ($testComponent) {
     case 'config':
-        testConfig();
+        runTest('Configuration', 'testConfig');
         break;
     case 'database':
-        testDatabase();
+        runTest('Database', 'testDatabase');
         break;
     case 'logger':
-        testLogger();
+        runTest('Logger', 'testLogger');
         break;
     case 'filesystem':
-        testFileSystem();
+        runTest('FileSystem', 'testFileSystem');
         break;
     case 'cache':
-        testCache();
+        runTest('Cache', 'testCache');
         break;
     case 'location':
-        testLocation();
+        runTest('Location', 'testLocation');
         break;
     case 'rates':
-        testRates();
+        runTest('Rates', 'testRates');
         break;
     case 'webstories':
-        testWebStories();
+        runTest('WebStories', 'testWebStories');
         break;
     case 'sitemap':
-        testSitemap();
+        runTest('Sitemap', 'testSitemap');
         break;
     case 'scraper':
-        testScraper();
+        runTest('Scraper', 'testScraper');
         break;
     case 'all':
     default:
-        testConfig();
-        testDatabase();
-        testLogger();
-        testFileSystem();
-        testCache();
-        testLocation();
-        testRates();
-        testWebStories();
-        testSitemap();
-        testScraper();
+        runTest('Configuration', 'testConfig');
+        runTest('Database', 'testDatabase');
+        runTest('Logger', 'testLogger');
+        runTest('FileSystem', 'testFileSystem');
+        runTest('Cache', 'testCache');
+        runTest('Location', 'testLocation');
+        runTest('Rates', 'testRates');
+        runTest('WebStories', 'testWebStories');
+        runTest('Sitemap', 'testSitemap');
+        runTest('Scraper', 'testScraper');
         break;
 }
 
