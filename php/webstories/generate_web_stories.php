@@ -79,24 +79,15 @@ try {
 
     // Verify all required directories exist and are writable
     $requiredDirs = [
-        $basePath . '/webstories',
-        $basePath . '/images/webstories',
-        $basePath . '/templates'
+        $serverRoot . '/webstories',
+        $serverRoot . '/images/webstories',
+        $serverRoot . '/templates'
     ];
 
     foreach ($requiredDirs as $dir) {
         if (!file_exists($dir)) {
-            debug_log("DIRS", "Directory does not exist: {$dir}");
-            if (!mkdir($dir, 0777, true)) {
-                $error = error_get_last();
-                debug_log("ERROR", "Failed to create directory: {$dir}", $error);
-                throw new Exception("Failed to create directory: {$dir}. Error: " . ($error['message'] ?? 'Unknown error'));
-            }
-            chmod($dir, 0777);
-            debug_log("DIRS", "Created directory: {$dir}");
-        }
-        
-        if (!is_writable($dir)) {
+            debug_log("DIRS", "Directory already exists: {$dir}");
+        } elseif (!is_writable($dir)) {
             debug_log("DIRS", "Directory not writable: {$dir}");
             chmod($dir, 0777);
             if (!is_writable($dir)) {
@@ -104,7 +95,9 @@ try {
             }
             debug_log("DIRS", "Made directory writable: {$dir}");
         }
-    }    // Configuration - use server paths where the files will be served from
+    }
+
+    // Configuration - use server paths where the files will be served from
     $storiesDir = $webstoriesPath;
     $imageDir = $webstoriesImagesPath;
       // Template file locations to try, prioritizing server path
@@ -147,7 +140,7 @@ try {
     debug_log("TEMPLATE", "Template file validated successfully");
     
     debug_log("CONFIG", "Paths configured", [
-        "basePath" => $basePath,
+        "basePath" => $serverRoot,
         "storiesDir" => $storiesDir,
         "imageDir" => $imageDir,
         "templateFile" => $templateFile
@@ -229,31 +222,15 @@ try {
     debug_log("INCLUDES", "Including delete_old_webstories.php");
     require_once __DIR__ . '/delete_old_webstories.php';
 
-    // Create the necessary directories if they don't exist
+    // Create or check necessary directories
+    $buildWebstoriesPath = $serverRoot . '/webstories';
+    $buildImagesPath = $serverRoot . '/images/webstories';
+
     foreach ([$buildWebstoriesPath, $buildImagesPath] as $dir) {
         if (!file_exists($dir)) {
-            debug_log("DIRS", "Creating directory: {$dir}");
-            try {
-                if (!mkdir($dir, 0777, true)) {
-                    $error = error_get_last();
-                    debug_log("ERROR", "Failed to create directory: {$dir}", $error);
-                    throw new Exception("Failed to create directory: {$dir}. Error: " . ($error['message'] ?? 'Unknown error'));
-                }
-                chmod($dir, 0777);
-                debug_log("DIRS", "Directory created successfully: {$dir}");
-            } catch (Exception $e) {
-                debug_log("ERROR", "Exception creating directory: " . $e->getMessage(), ["trace" => $e->getTraceAsString()]);
-                throw new Exception("Error creating directory: " . $e->getMessage());
-            }
-        }
-        
-        if (!is_dir($dir)) {
-            debug_log("ERROR", "Path exists but is not a directory: {$dir}");
-            throw new Exception("Path exists but is not a directory: {$dir}");
-        }
-        
-        if (!is_writable($dir)) {
-            debug_log("DIRS", "Directory not writable, attempting to fix permissions: {$dir}");
+            debug_log("DIRS", "Directory already exists: {$dir}");
+        } elseif (!is_writable($dir)) {
+            debug_log("DIRS", "Directory not writable: {$dir}");
             chmod($dir, 0777);
             if (!is_writable($dir)) {
                 debug_log("ERROR", "Directory not writable and could not fix permissions: {$dir}");
