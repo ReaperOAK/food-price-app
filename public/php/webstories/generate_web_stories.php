@@ -557,12 +557,16 @@ try {
         debug_log("COMPLETE", "Generated {$storiesGenerated} web stories successfully");
         echo "Generated {$storiesGenerated} web stories successfully.<br>";
         
-        // Close the database connection before running other scripts
-        $conn->close();
-        
-        // Run thumbnail updates directly
-        debug_log("THUMBNAILS", "Running thumbnail updates");
+        // Set flag to prevent connection closure in update_webstory_thumbnails.php
+        $suppressConnectionClose = true;
+
+        // Include thumbnail generation script
+        debug_log("THUMBNAILS", "Including thumbnail generation script");
         include_once __DIR__ . '/update_webstory_thumbnails.php';
+
+        debug_log("COMPLETE", "Generation process completed");
+        // Close connection at the very end
+        $conn->close();
         
         // Create new database connection for sitemap
         debug_log("SITEMAP", "Creating new database connection for sitemap");
