@@ -7,9 +7,35 @@ header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
 require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/CacheManager.php';
+
+$cacheConfig = require dirname(dirname(dirname(__FILE__))) . '/config/cache_config.php';
+$cacheManager = new CacheManager($cacheConfig['cache_path']);
+
+// Check if cache should be skipped
+$skipCache = false;
+foreach ($cacheConfig['no_cache_params'] as $param) {
+    if (isset($_GET[$param])) {
+        $skipCache = true;
+        break;
+    }
+}
 
 // Get the JSON payload
 $data = json_decode(file_get_contents('php://input'), true);
+$cacheKey = $cacheManager->getCacheKey([
+    'endpoint' => 'get_latest_rates',
+    'data' => $data
+]);
+
+// Try to get from cache first
+if (!$skipCache) {
+    $cachedData = $cacheManager->get($cacheKey);
+    if ($cachedData !== null) {
+        echo json_encode($cachedData);
+        exit;
+    }
+}
 
 // Try to use normalized tables first
 $useNormalizedTables = true;
@@ -178,14 +204,19 @@ try {
             }
         }
     }
-    
-    if (empty($rates)) {
-        echo json_encode(["message" => "No rates found"]);
-    } else {
-        echo json_encode($rates);
+      $response = empty($rates) ? 
+        ["message" => "No rates found"] : 
+        $rates;
+
+    // Cache the response
+    if ($cacheConfig['cache_enabled'] && !$skipCache) {
+        $cacheManager->set($cacheKey, $response, $cacheConfig['cache_ttl']);
     }
+
+    echo json_encode($response);
 } catch (Exception $e) {
-    echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+    $error = ["error" => "Database error: " . $e->getMessage()];
+    echo json_encode($error);
     error_log("Error in get_latest_rates.php: " . $e->getMessage());
 }
 

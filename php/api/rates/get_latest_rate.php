@@ -9,6 +9,10 @@ header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
 require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/CacheManager.php';
+
+$cacheConfig = require dirname(dirname(dirname(__FILE__))) . '/config/cache_config.php';
+$cacheManager = new CacheManager($cacheConfig['cache_path']);
 
 $city = isset($_GET['city']) ? $conn->real_escape_string($_GET['city']) : '';
 $state = isset($_GET['state']) ? $conn->real_escape_string($_GET['state']) : '';
@@ -16,6 +20,30 @@ $state = isset($_GET['state']) ? $conn->real_escape_string($_GET['state']) : '';
 if (empty($city) || empty($state)) {
     echo json_encode(["error" => "City and state parameters are required"]);
     exit;
+}
+
+// Check if cache should be skipped
+$skipCache = false;
+foreach ($cacheConfig['no_cache_params'] as $param) {
+    if (isset($_GET[$param])) {
+        $skipCache = true;
+        break;
+    }
+}
+
+// Try to get from cache first
+if (!$skipCache && $cacheConfig['cache_enabled']) {
+    $cacheKey = $cacheManager->getCacheKey([
+        'endpoint' => 'get_latest_rate',
+        'city' => $city,
+        'state' => $state
+    ]);
+
+    $cachedData = $cacheManager->get($cacheKey);
+    if ($cachedData !== null) {
+        echo json_encode($cachedData);
+        exit;
+    }
 }
 
 // Try normalized tables first
@@ -58,9 +86,16 @@ if (!$useNormalizedTables) {
 
 if ($result->num_rows > 0) {
     $latestRate = $result->fetch_assoc();
+    
+    // Cache the response if caching is enabled
+    if ($cacheConfig['cache_enabled'] && !$skipCache) {
+        $cacheManager->set($cacheKey, $latestRate, $cacheConfig['cache_ttl']);
+    }
+    
     echo json_encode($latestRate);
 } else {
-    echo json_encode(["error" => "No rates found for $city, $state"]);
+    $error = ["error" => "No rates found for $city, $state"];
+    echo json_encode($error);
 }
 
 $conn->close();

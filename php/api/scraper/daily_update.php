@@ -10,6 +10,10 @@ header('Content-Type: application/json');
 
 // Make sure to properly include the database configuration
 require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/CacheManager.php';
+
+$cacheConfig = require dirname(dirname(dirname(__FILE__))) . '/config/cache_config.php';
+$cacheManager = new CacheManager($cacheConfig['cache_path']);
 
 // Verify that $conn exists, otherwise create the connection
 if (!isset($conn) || $conn->connect_error) {
@@ -135,17 +139,23 @@ try {
     }
     
     $conn->commit();
-    
+      // Invalidate all caches since rates have been updated
+    if ($cacheConfig['cache_enabled']) {
+        $cacheManager->invalidateAll();
+    }
+
     if (empty($errors)) {
         echo json_encode([
             "success" => "Rates updated successfully",
-            "count" => $updateCount
+            "count" => $updateCount,
+            "cache_invalidated" => true
         ]);
     } else {
         echo json_encode([
             "partial_success" => "Some rates were updated",
             "count" => $updateCount,
-            "errors" => $errors
+            "errors" => $errors,
+            "cache_invalidated" => true
         ]);
     }
 } catch (Exception $e) {
