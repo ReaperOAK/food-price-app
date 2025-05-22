@@ -9,44 +9,101 @@ import {
 
 // Import the RootLayout component
 import RootLayout from './components/layout/RootLayout';
-
-// Import non-lazy dependencies
 import blogs from './data/blogs';
 
-// Use lazy loading with prefetch for all pages to improve performance
-const MainPage = lazy(() => import(/* webpackPrefetch: true */ './pages/MainPage'));
-const PrivacyPolicy = lazy(() => import(/* webpackPrefetch: true */ './components/common/PrivacyPolicy'));
-const TOS = lazy(() => import(/* webpackPrefetch: true */ './components/common/TOS'));
-const Disclaimer = lazy(() => import(/* webpackPrefetch: true */ './components/common/Disclaimer'));
-const AdminPage = lazy(() => import(/* webpackChunkName: "admin" */ './pages/AdminPage'));
-const LoginPage = lazy(() => import(/* webpackChunkName: "admin" */ './components/admin/LoginPage'));
-const BlogPage = lazy(() => import(/* webpackChunkName: "blog" */ './pages/BlogPage'));
-const WebStoriesList = lazy(() => import(/* webpackChunkName: "webstories" */ './components/webstories/WebStoriesList'));
-const WebStoryViewer = lazy(() => import(/* webpackChunkName: "webstories" */ './components/webstories/WebStoryViewer'));
+// Reusable component preloader
+const preloadComponent = (importFn) => {
+  const Component = lazy(importFn);
+  Component.preload = importFn;
+  return Component;
+};
 
+// Main pages with smarter prefetching
+const MainPage = preloadComponent(() => {
+  const component = import(/* webpackChunkName: "main-page" */ './pages/MainPage');
+  component.then(() => {
+    // Prefetch critical components
+    import(/* webpackPrefetch: true, webpackChunkName: "rate-table" */ './components/rates/RateTable');
+    import(/* webpackPrefetch: true, webpackChunkName: "default-table" */ './components/rates/DefaultTable');
+    import(/* webpackPrefetch: true, webpackChunkName: "state-list" */ './components/rates/StateList');
+  });
+  return component;
+});
 
+// Legal pages bundle
+const LegalPages = {
+  PrivacyPolicy: preloadComponent(() => import(/* webpackChunkName: "legal-privacy" */ './components/common/PrivacyPolicy')),
+  TOS: preloadComponent(() => import(/* webpackChunkName: "legal-tos" */ './components/common/TOS')),
+  Disclaimer: preloadComponent(() => import(/* webpackChunkName: "legal-disclaimer" */ './components/common/Disclaimer'))
+};
 
-// Loading component for suspense fallback
+// Admin pages with auth prefetch
+const AdminPage = preloadComponent(() => {
+  const component = import(/* webpackChunkName: "admin-page" */ './pages/AdminPage');
+  component.then(() => {
+    import(/* webpackPrefetch: true, webpackChunkName: "admin-forms" */ './components/admin/RateForm');
+  });
+  return component;
+});
+
+const LoginPage = preloadComponent(() => import(/* webpackChunkName: "login-page" */ './components/admin/LoginPage'));
+
+// Blog system with content prefetch
+const BlogPage = preloadComponent(() => {
+  const component = import(/* webpackChunkName: "blog-page" */ './pages/BlogPage');
+  component.then(() => {
+    import(/* webpackPrefetch: true, webpackChunkName: "blog-components" */ './components/blog/BlogList');
+    import(/* webpackPrefetch: true, webpackChunkName: "blog-toc" */ './components/blog/TableOfContents');
+  });
+  return component;
+});
+
+// Web Stories with optimized loading
+const WebStoriesList = preloadComponent(() => 
+  import(/* webpackChunkName: "webstories-list" */ './components/webstories/WebStoriesList')
+);
+const WebStoryViewer = preloadComponent(() => 
+  import(/* webpackChunkName: "webstory-viewer" */ './components/webstories/WebStoryViewer')
+);
+
+// Enhanced loading fallback with priority content
 const LoadingFallback = () => (
   <div className="min-h-screen bg-gray-50">
     <div className="animate-pulse p-4">
-      {/* Header skeleton */}
-      <div className="h-16 bg-gray-200 rounded-lg mb-4"></div>
-      
-      {/* Content skeleton */}
-      <div className="max-w-4xl mx-auto">
-        <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-        <div className="h-4 bg-gray-200 rounded mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-5/6 mb-2"></div>
-        <div className="h-4 bg-gray-200 rounded w-4/6 mb-4"></div>
-        
-        {/* Card skeleton */}
+      {/* Priority content skeleton with fixed dimensions to prevent CLS */}
+      <div className="max-w-4xl mx-auto" style={{ minHeight: "80vh" }}>
+        <div 
+          className="h-16 bg-gray-200 rounded-lg mb-4" 
+          role="presentation"
+          style={{ width: "100%", height: "64px" }}
+        ></div>
+        <div 
+          className="h-8 bg-gray-200 rounded mb-4" 
+          role="presentation"
+          style={{ width: "75%", height: "32px" }}
+        ></div>
+        <div 
+          className="h-4 bg-gray-200 rounded mb-2" 
+          role="presentation"
+          style={{ width: "100%", height: "16px" }}
+        ></div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white p-4 rounded-lg shadow">
-              <div className="h-48 bg-gray-200 rounded mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div 
+              key={i} 
+              className="bg-white p-4 rounded-lg shadow"
+              style={{ aspectRatio: "16/9", height: "auto" }}
+            >
+              <div 
+                className="bg-gray-200 rounded mb-4" 
+                role="presentation"
+                style={{ width: "100%", height: "192px" }}
+              ></div>
+              <div 
+                className="bg-gray-200 rounded mb-2" 
+                role="presentation"
+                style={{ width: "75%", height: "16px" }}
+              ></div>
             </div>
           ))}
         </div>
@@ -104,7 +161,7 @@ function App() {
     return handleDisable();
   };
 
-  // Create routes based on site state
+  // Create routes based on site state with improved performance hints
   const routes = isSiteDisabled 
     ? createRoutesFromElements(
         <Route path="*" element={<MaintenancePage />} />
@@ -121,9 +178,9 @@ function App() {
           <Route path="/robots.txt" element={<StaticFileRedirect url="/robots.txt" />} />
           
           {/* Legal pages */}
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TOS />} />
-          <Route path="/disclaimer" element={<Disclaimer />} />
+          <Route path="/privacy" element={<LegalPages.PrivacyPolicy />} />
+          <Route path="/terms" element={<LegalPages.TOS />} />
+          <Route path="/disclaimer" element={<LegalPages.Disclaimer />} />
           
           {/* Auth protected routes */}
           <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
@@ -144,17 +201,15 @@ function App() {
         </Route>
       );
 
-  // Create router with defined routes and options to prevent history errors
+  // Create router with defined routes and performance optimizations
   const router = createBrowserRouter(routes, {
-    // These options help prevent history errors
     future: {
       v7_normalizeFormMethod: true,
     },
-    // Disable browser history debug mode
     basename: "",
   });
 
-  // Return router provider with suspense for code splitting
+  // Return router provider with optimized suspense fallback
   return (
     <Suspense fallback={<LoadingFallback />}>
       <RouterProvider router={router} />

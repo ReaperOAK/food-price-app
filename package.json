@@ -9,6 +9,7 @@
     "@types/jquery": "^3.5.32",
     "@types/slick-carousel": "^1.6.40",
     "chart.js": "^4.4.7",
+    "intersection-observer": "^0.12.2",
     "jquery": "^3.7.1",
     "ngx-slick-carousel": "^19.0.0",
     "react": "^18.3.1",
@@ -21,6 +22,7 @@
     "react-scripts": "^5.0.1",
     "react-select": "^5.8.1",
     "react-slick": "^0.30.3",
+    "requestidlecallback-polyfill": "^1.0.2",
     "slick-carousel": "^1.8.1",
     "web-vitals": "^2.1.4"
   },

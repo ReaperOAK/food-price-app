@@ -2,18 +2,44 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/Favicon.ico" />    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+    <link rel="icon" href="%PUBLIC_URL%/Favicon.ico" sizes="any" />
+    <link rel="icon" href="%PUBLIC_URL%/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/eggpic.webp" />
+    
+    <!-- Performance and CLS optimizations -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#007bff" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
     
-    <!-- Preload critical resources -->
-    <link rel="preload" href="%PUBLIC_URL%/eggpic.webp" as="image" />
-    <link rel="preconnect" href="https://www.googletagmanager.com" />
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
-    <link rel="preconnect" href="https://analytics.ahrefs.com" />
+    <!-- Resource Hints -->
+    <link rel="preload" href="%PUBLIC_URL%/eggpic.webp" as="image" fetchpriority="high" type="image/webp" />
+    <link rel="preload" href="%PUBLIC_URL%/tee.webp" as="image" fetchpriority="high" type="image/webp" />
+    <link rel="preload" href="/static/css/main.2099c5e4.css" as="style" />
+    <link rel="preload" href="/static/js/main.js" as="script" />
+    
+    <!-- DNS Prefetch and Preconnect -->
+    <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+    <link rel="preconnect" href="//www.googletagmanager.com" crossorigin />
+    <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
+    <link rel="preconnect" href="//pagead2.googlesyndication.com" crossorigin />
+    <link rel="dns-prefetch" href="//analytics.ahrefs.com" />
+    <link rel="preconnect" href="//analytics.ahrefs.com" crossorigin />
+    
+    <!-- Preconnect to critical third-party origins -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <link rel="preconnect" href="https://analytics.ahrefs.com" crossorigin />
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="%PUBLIC_URL%/eggpic.webp" as="image" fetchpriority="high" />
+    <link rel="preload" href="%PUBLIC_URL%/tee.webp" as="image" fetchpriority="high" />
+    <link rel="preload" href="%PUBLIC_URL%/static/css/main.2099c5e4.css" as="style" />
+    <link rel="preload" href="%PUBLIC_URL%/static/js/main.js" as="script" />
+    
+    <!-- Meta tags -->
     <meta
       name="description"
       content="Today's egg rate: Check NECC egg rate today across India. Get daily updated egg prices, egg rate today in Mumbai, Chennai, Bangalore, Kolkata, Barwala & all major cities. Official wholesale egg prices."
@@ -21,27 +47,53 @@
     <meta name="keywords" content="egg rate today, NECC egg rate today, today egg rate, egg rate, national egg rate, all india egg rate, today egg price, egg prices india, egg price in india, daily egg rate, egg rate in chennai, egg rate in bangalore"/>
     <meta name="author" content="Today Egg Rates"/>
     <meta name="robots" content="index, follow"/>
-    <link rel="canonical" href="https://todayeggrates.com/"/>    <meta name="google-adsense-account" content="ca-pub-2664225874856394">
-    <!-- Optimized loading of ad scripts with defer attribute -->
-    <script async defer src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2664225874856394"
-     crossorigin="anonymous"></script>
-     <!-- Google tag (gtag.js) with optimized loading -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N"></script>
-<script>
-  // Optimized analytics loading
-  window.addEventListener('load', function() {
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-PK6FMNGL4N', { 'send_page_view': false });
-    // Send pageview when page is fully loaded
-    setTimeout(function() {
-      gtag('event', 'page_view');
-    }, 100);
-  });
-</script>
-<script src="https://analytics.ahrefs.com/analytics.js" data-key="dRNDN8C4Qb89EJnMutTHlQ" async defer></script>
-    
+    <link rel="canonical" href="https://todayeggrates.com/"/>
+    <meta name="google-adsense-account" content="ca-pub-2664225874856394">    <!-- Progressive Performance Loading -->
+    <script>
+      // Initialize dataLayer early
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+
+      // Performance-focused analytics loading
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(function() {
+          loadAnalytics();
+        }, { timeout: 5000 });
+      } else {
+        window.addEventListener('load', function() {
+          setTimeout(loadAnalytics, 2000);
+        });
+      }
+
+      function loadAnalytics() {
+        // Google Analytics
+        const gtagScript = document.createElement('script');
+        gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N';
+        gtagScript.async = true;
+        document.head.appendChild(gtagScript);
+
+        gtagScript.onload = function() {
+          gtag('js', new Date());
+          gtag('config', 'G-PK6FMNGL4N', { 
+            'send_page_view': false,
+            'transport_type': 'beacon'
+          });
+          // Send optimized pageview
+          gtag('event', 'page_view', {
+            'send_to': 'G-PK6FMNGL4N',
+            'transport_type': 'beacon'
+          });
+        };
+
+        // Ahrefs Analytics
+        const ahrefsScript = document.createElement('script');
+        ahrefsScript.src = 'https://analytics.ahrefs.com/analytics.js';
+        ahrefsScript.dataset.key = 'dRNDN8C4Qb89EJnMutTHlQ';
+        ahrefsScript.async = true;
+        document.head.appendChild(ahrefsScript);
+      }
+    </script>
+
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Egg Rate Today - Check Today's NECC Egg Price in India"/>
     <meta property="og:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025."/>
@@ -52,9 +104,10 @@
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:title" content="Egg Rate Today - Check Today's NECC Egg Price in India"/>
-    <meta name="twitter:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025."/>    <meta name="twitter:image" content="%PUBLIC_URL%/eggpic.webp"/>
+    <meta name="twitter:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025."/>
+    <meta name="twitter:image" content="%PUBLIC_URL%/eggpic.webp"/>
     
-    <!-- Structured Data for Rich Results -->
+    <!-- Structured Data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -82,7 +135,7 @@
     }
     </script>
 
-    <!-- PWA Support with improved icons -->
+    <!-- PWA Support -->
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/eggpic.webp">
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <meta name="apple-mobile-web-app-title" content="Egg Rates">
@@ -92,6 +145,58 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    <script src="%PUBLIC_URL%/ads.js"></script>
+    
+    <!-- Ad script loaded with defer to not block rendering -->    <!-- Load critical scripts first -->
+    <script src="%PUBLIC_URL%/static/js/main.js"></script>
+    
+    <!-- Load non-critical scripts -->
+    <script src="%PUBLIC_URL%/ads.js" defer data-ad="true"></script>
+
+    <!-- Script loading optimization -->
+    <script>
+      // Optimize script loading
+      document.addEventListener('DOMContentLoaded', function() {
+        // Function to load deferred scripts
+        function loadDeferredScripts() {
+          document.querySelectorAll('script[defer]').forEach(script => {
+            if (!script.dataset.loaded) {
+              const newScript = document.createElement('script');
+              Array.from(script.attributes).forEach(attr => {
+                if (attr.name !== 'defer') {
+                  newScript.setAttribute(attr.name, attr.value);
+                }
+              });
+              newScript.dataset.loaded = true;
+              script.parentNode.replaceChild(newScript, script);
+            }
+          });
+        }
+
+        // Load deferred scripts when browser is idle
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadDeferredScripts, { timeout: 2000 });
+        } else {
+          setTimeout(loadDeferredScripts, 2000);
+        }
+      });
+
+      // Add intersection observer for lazy loading
+      if ('IntersectionObserver' in window) {
+        const lazyImageObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const img = entry.target;
+              img.src = img.dataset.src;
+              img.classList.remove('lazy');
+              lazyImageObserver.unobserve(img);
+            }
+          });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+          document.querySelectorAll('img.lazy').forEach(img => lazyImageObserver.observe(img));
+        });
+      }
+    </script>
   </body>
 </html>
