@@ -459,35 +459,35 @@ try {
         
         debug_log("COMPLETE", "Generated {$storiesGenerated} web stories successfully");
         echo "Generated {$storiesGenerated} web stories successfully.<br>";
-      } else {
+        
+        // Close the database connection before running other scripts
+        $conn->close();
+        
+        // Run thumbnail updates directly
+        debug_log("THUMBNAILS", "Running thumbnail updates");
+        include_once __DIR__ . '/update_webstory_thumbnails.php';
+        
+        // Create new database connection for sitemap
+        debug_log("SITEMAP", "Creating new database connection for sitemap");
+        require_once dirname(__DIR__) . '/config/db.php';
+        
+        if (!$conn || $conn->connect_error) {
+            throw new Exception("Failed to create new database connection for sitemap: " . ($conn ? $conn->connect_error : "Connection is null"));
+        }
+        
+        // Generate sitemap with new connection
+        debug_log("SITEMAP", "Generating sitemap");
+        require_once __DIR__ . '/generate_webstories_sitemap.php';
+        
+        // Success message
+        debug_log("SUCCESS", "Web stories generation completed successfully");
+        return true;
+        
+    } else {
         debug_log("ERROR", "No egg rates found in the database");
         echo "No egg rates found in the database. Please check your data.";
-    }
-    
-    // Close the database connection before running other scripts
-    $conn->close();
-        
-    // Call thumbnail update script as a separate process
-    debug_log("THUMBNAILS", "Running update_webstory_thumbnails.php separately");
-    passthru("php " . __DIR__ . "/update_webstory_thumbnails.php", $thumbnailResult);
-    
-    if ($thumbnailResult !== 0) {
-        debug_log("ERROR", "Thumbnail generation failed with code: " . $thumbnailResult);
         return false;
     }
-    
-    // Call sitemap generation as a separate process
-    debug_log("SITEMAP", "Running generate_webstories_sitemap.php separately");
-    passthru("php " . __DIR__ . "/generate_webstories_sitemap.php", $sitemapResult);
-    
-    if ($sitemapResult !== 0) {
-        debug_log("ERROR", "Sitemap generation failed with code: " . $sitemapResult);
-        return false;
-    }
-
-    // Success message
-    debug_log("SUCCESS", "Web stories generation completed successfully");
-    return true;
 
 } catch (Exception $e) {
     // Log any exceptions that occur
