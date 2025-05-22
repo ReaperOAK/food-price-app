@@ -98,7 +98,7 @@ if ($result->num_rows > 0) {
             $stories[] = [
                 'title' => "Egg Rate in $city, $state",
                 'slug' => $citySlug . '-egg-rate',
-                'thumbnail' => "/images/webstories/thumbnail-$citySlug.jpg",
+                'thumbnail' => "/images/webstories/thumbnail-$citySlug.webp",
                 'date' => $displayDate,
                 'rate' => $rate,
                 'city' => $city,

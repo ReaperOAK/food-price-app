@@ -92,10 +92,10 @@ if (!function_exists('deleteOldWebStories')) {
                             echo "Deleted old web story: " . basename($storyFile) . "<br>";
                             
                             // Also delete the associated thumbnail if it exists
-                            $thumbnailFile = "$imageDir/thumbnail-$citySlug.jpg";
+                            $thumbnailFile = "$imageDir/thumbnail-$citySlug.webp";
                             if (file_exists($thumbnailFile)) {
                                 unlink($thumbnailFile);
-                                echo "Deleted associated thumbnail: thumbnail-$citySlug.jpg<br>";
+                                echo "Deleted associated thumbnail: thumbnail-$citySlug.webp<br>";
                             }
                         } else {
                             echo "Failed to delete: " . basename($storyFile) . "<br>";

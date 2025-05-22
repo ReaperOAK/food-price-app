@@ -214,9 +214,9 @@ try {
         debug_log("IMAGES", "No background images found, using default");
         // Check multiple locations for default image
         $defaultImageLocations = [
-            $basePath . '/eggpic.png',
-            $basePath . '/public/eggpic.png',
-            $basePath . '/build/eggpic.png'
+            $basePath . '/eggpic.webp',
+            $basePath . '/public/eggpic.webp',
+            $basePath . '/build/eggpic.webp'
         ];
         
         $defaultImageFound = false;
@@ -224,10 +224,10 @@ try {
             if (file_exists($defaultImage)) {
                 debug_log("IMAGES", "Found default image at: {$defaultImage}");
                 // Copy default image to webstories image directory
-                $targetImage = $imageDir . '/default.png';
+                $targetImage = $imageDir . '/default.webp';
                 if (copy($defaultImage, $targetImage)) {
                     debug_log("IMAGES", "Copied default image to: {$targetImage}");
-                    $backgroundImages[] = 'default.png';
+                    $backgroundImages[] = 'default.webp';
                     $defaultImageFound = true;
                     break;
                 } else {
@@ -247,13 +247,13 @@ try {
             imagestring($simpleImage, 5, 300, 280, "Egg Rate", $textColor);
             
             // Save the simple image
-            $simpleImagePath = $imageDir . '/default.png';
+            $simpleImagePath = $imageDir . '/default.webp';
             imagepng($simpleImage, $simpleImagePath);
             imagedestroy($simpleImage);
             
             if (file_exists($simpleImagePath)) {
                 debug_log("IMAGES", "Created simple default image at: {$simpleImagePath}");
-                $backgroundImages[] = 'default.png';
+                $backgroundImages[] = 'default.webp';
             } else {
                 debug_log("ERROR", "Failed to create simple default image");
                 throw new Exception("No background images found and could not create a default image.");
@@ -420,7 +420,7 @@ try {
             
             // Properly handle amp-story attributes by finding the main amp-story tag and ensuring it has all required attributes
             // First, check if the standalone attribute exists in the amp-story tag
-            $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.jpg';
+            $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.webp';
             $ampStoryPattern = '/<amp-story[^>]*>/';
             
             if (preg_match($ampStoryPattern, $story, $matches)) {
@@ -429,7 +429,7 @@ try {
                 
                 // Create a new amp-story tag with all required attributes
                 $newTag = '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" ' .
-                         'publisher="Today Egg Rates" publisher-logo-src="/tee.png" ' . 
+                         'publisher="Today Egg Rates" publisher-logo-src="/tee.webp" ' . 
                          'poster-portrait-src="' . $thumbnailUrl . '">';
                 
                 // Replace the original tag with our complete one
