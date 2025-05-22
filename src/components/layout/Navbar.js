@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import OptimizedImage from '../common/OptimizedImage';
 
 const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState }) => {
   const [options, setOptions] = useState([]);
@@ -168,9 +169,15 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   return (
     <nav className="bg-white p-4 shadow-lg">
       <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
-        <div className="flex justify-between items-center w-full md:w-auto">
-          <Link to="/" onClick={handleHomeClick} className="mb-4 md:mb-0">
-            <img src="/tee.png" alt="Today Egg Rates Logo" className="h-10" onError={handleLogoError} />
+        <div className="flex justify-between items-center w-full md:w-auto">          <Link to="/" onClick={handleHomeClick} className="mb-4 md:mb-0">
+            <OptimizedImage
+              src="/tee.webp"
+              alt="Today Egg Rates Logo"
+              className="h-10"
+              width={40}
+              height={40}
+              onError={handleLogoError}
+            />
           </Link>
           <button
             className="md:hidden text-gray-800 focus:outline-none"

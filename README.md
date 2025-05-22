@@ -4,7 +4,7 @@
 
 A comprehensive platform for tracking egg prices across cities and states in India. This project combines React for the frontend and PHP for backend APIs.
 
-![Today Egg Rates](./public/eggpic.png)
+![Today Egg Rates](./public/eggpic.webp)
 
 ## 🌟 Features
 

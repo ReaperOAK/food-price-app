@@ -7,6 +7,7 @@ import blogs from '../data/blogs';
 import BlogList from '../components/blog/BlogList';
 import Breadcrumb from '../components/layout/Breadcrumb';
 import TableOfContents from '../components/blog/TableOfContents';
+import OptimizedImage from '../components/common/OptimizedImage';
 
 // Pre-define the import mapping for webpack to analyze
 const blogComponentMap = {
@@ -71,7 +72,7 @@ const BlogPage = () => {
       "name": "Today Egg Rates",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://todayeggrates.com/eggpic.png"
+        "url": "https://todayeggrates.com/eggpic.webp"
       }
     },
     "datePublished": formattedDate,
@@ -129,13 +130,12 @@ const BlogPage = () => {
               </time>
               <span className="mx-2">•</span>
               <span>Today Egg Rates</span>
-            </div>
-            <img 
+            </div>            <OptimizedImage 
               src={blog.image} 
               alt={blog.title} 
               className="w-full h-auto rounded-lg mb-6 object-cover"
-              width="800"
-              height="400"
+              width={800}
+              height={400}
             />
           </div>
           

@@ -261,13 +261,13 @@ const MainPage = () => {
         <meta property="og:description" content={getSeoDescription()} />
         <meta property="og:url" content={`https://todayeggrates.com${location.pathname}`} />
         <meta property="og:type" content="website" />
-        <meta property="og:image" content="https://todayeggrates.com/eggpic.png" />
+        <meta property="og:image" content="https://todayeggrates.com/eggpic.webp" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={getSeoTitle()} />
         <meta name="twitter:description" content={getSeoDescription()} />
-        <meta name="twitter:image" content="https://todayeggrates.com/eggpic.png" />
+        <meta name="twitter:image" content="https://todayeggrates.com/eggpic.webp" />
       </Helmet>
       <div className="bg-gray-50 min-h-screen flex flex-col">
         <Navbar

@@ -13,25 +13,44 @@ import RootLayout from './components/layout/RootLayout';
 // Import non-lazy dependencies
 import blogs from './data/blogs';
 
-// Use lazy loading for all pages to improve performance
-const MainPage = lazy(() => import('./pages/MainPage'));
-const PrivacyPolicy = lazy(() => import('./components/common/PrivacyPolicy'));
-const TOS = lazy(() => import('./components/common/TOS'));
-const Disclaimer = lazy(() => import('./components/common/Disclaimer'));
-const AdminPage = lazy(() => import('./pages/AdminPage'));
-const LoginPage = lazy(() => import('./components/admin/LoginPage'));
-const BlogPage = lazy(() => import('./pages/BlogPage'));
-const WebStoriesList = lazy(() => import('./components/webstories/WebStoriesList'));
-const WebStoryViewer = lazy(() => import('./components/webstories/WebStoryViewer'));
+// Use lazy loading with prefetch for all pages to improve performance
+const MainPage = lazy(() => import(/* webpackPrefetch: true */ './pages/MainPage'));
+const PrivacyPolicy = lazy(() => import(/* webpackPrefetch: true */ './components/common/PrivacyPolicy'));
+const TOS = lazy(() => import(/* webpackPrefetch: true */ './components/common/TOS'));
+const Disclaimer = lazy(() => import(/* webpackPrefetch: true */ './components/common/Disclaimer'));
+const AdminPage = lazy(() => import(/* webpackChunkName: "admin" */ './pages/AdminPage'));
+const LoginPage = lazy(() => import(/* webpackChunkName: "admin" */ './components/admin/LoginPage'));
+const BlogPage = lazy(() => import(/* webpackChunkName: "blog" */ './pages/BlogPage'));
+const WebStoriesList = lazy(() => import(/* webpackChunkName: "webstories" */ './components/webstories/WebStoriesList'));
+const WebStoryViewer = lazy(() => import(/* webpackChunkName: "webstories" */ './components/webstories/WebStoryViewer'));
 
 
 
 // Loading component for suspense fallback
 const LoadingFallback = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center">
-      <h2 className="text-xl font-semibold text-blue-600 mb-2">Loading...</h2>
-      <p className="text-gray-600">Please wait while we fetch the content</p>
+  <div className="min-h-screen bg-gray-50">
+    <div className="animate-pulse p-4">
+      {/* Header skeleton */}
+      <div className="h-16 bg-gray-200 rounded-lg mb-4"></div>
+      
+      {/* Content skeleton */}
+      <div className="max-w-4xl mx-auto">
+        <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+        <div className="h-4 bg-gray-200 rounded mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-5/6 mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-4/6 mb-4"></div>
+        
+        {/* Card skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white p-4 rounded-lg shadow">
+              <div className="h-48 bg-gray-200 rounded mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   </div>
 );

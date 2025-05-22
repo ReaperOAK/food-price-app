@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import OptimizedImage from '../common/OptimizedImage';
 
 const BlogCard = ({ blog }) => {
   const navigate = useNavigate();
@@ -9,9 +10,14 @@ const BlogCard = ({ blog }) => {
   };
 
   return (
-    <div className="max-w-sm w-full h-96 rounded overflow-hidden shadow-lg m-4 cursor-pointer" onClick={handleClick}>
-      <div className="h-48 bg-gray-200 flex items-center justify-center">
-        <img className="h-full w-full object-cover" src={blog.image} alt={blog.title} />
+    <div className="max-w-sm w-full h-96 rounded overflow-hidden shadow-lg m-4 cursor-pointer" onClick={handleClick}>      <div className="h-48 bg-gray-200 flex items-center justify-center">
+        <OptimizedImage
+          src={blog.image}
+          alt={blog.title}
+          className="h-full w-full object-cover"
+          width={400}
+          height={300}
+        />
       </div>
       <div className="px-6 py-4 flex flex-col justify-between h-48">
         <div>

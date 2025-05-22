@@ -117,7 +117,7 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
       "addressRegion": selectedState,
       "addressCountry": "IN"
     },
-    "image": "https://todayeggrates.com/eggpic.png",
+    "image": "https://todayeggrates.com/eggpic.webp",
     "priceRange": "₹₹",
     "telephone": "+91-XXXXXXXXXX",
     "url": `https://todayeggrates.com/${selectedCity.toLowerCase()}-egg-rate`,
@@ -165,7 +165,7 @@ const RateTable = ({ selectedCity, selectedState, eggRates }) => {
     "@type": "Product",
     "name": `Eggs in ${selectedCity}, ${selectedState}`,
     "description": `Fresh eggs available in ${selectedCity}, ${selectedState}. Check today's egg price.`,
-    "image": "https://todayeggrates.com/eggpic.png",
+    "image": "https://todayeggrates.com/eggpic.webp",
     "offers": {
       "@type": "Offer",
       "url": `https://todayeggrates.com/${selectedCity.toLowerCase()}-egg-rate`,

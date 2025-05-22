@@ -1,9 +1,25 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
 Allow: /
-Allow: /sitemap.xml
+
+# Sitemaps
+Sitemap: https://todayeggrates.com/sitemap.txt
+Sitemap: https://todayeggrates.com/sitemap.xml
+Sitemap: https://todayeggrates.com/webstories-sitemap.xml
+
+# Important sections
 Allow: /webstories/
 Allow: /blog/
+Allow: /state/
+Allow: /privacy/
+Allow: /terms/
+Allow: /disclaimer/
+
+# Rate limiting
+Crawl-delay: 1
+
+# Host directive
+Host: https://todayeggrates.com
 
 # Priority pages - allow more frequent crawling
 Allow: /mumbai-egg-rate

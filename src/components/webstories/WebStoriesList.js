@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
 import { Helmet } from 'react-helmet';
+import OptimizedImage from '../common/OptimizedImage';
 
 const WebStoriesList = () => {
   const [webStories, setWebStories] = useState([]);
@@ -98,12 +99,13 @@ const WebStoriesList = () => {
                   className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
                   aria-label={`Web story about egg rates in ${story.city}, ${story.state}`}
                 >
-                  <div className="relative">
-                    <img 
-                      src={story.thumbnail} 
-                      alt={`Egg Rate in ${story.city}, ${story.state}`} 
+                  <div className="relative">                    <OptimizedImage
+                      src={story.thumbnail}
+                      alt={`Egg Rate in ${story.city}, ${story.state}`}
                       className="w-full h-48 object-cover"
-                      loading={index < 8 ? 'eager' : 'lazy'} // Optimize content loading
+                      width={400}
+                      height={300}
+                      loading={index < 8 ? 'eager' : 'lazy'}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
                       <p className="text-white text-sm font-medium">

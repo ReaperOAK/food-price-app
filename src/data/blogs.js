@@ -1,21 +1,21 @@
 const blogs = [
   {
     link: 'egg-rate-barwala',
-    image: '/eggrate2.jpg',
+    image: '/eggrate2.webp',
     title: 'Egg Prices in Barwala, Hisar(Haryana)',
     description: 'Explore the Egg Economy of Barwalas, What Makes Barwala\'s Eggs Special?, Seasonal Trends and Price Fluctuations',
     uploadDate: '2025-01-11',
   },
   {
     link: 'blog-1',
-    image: '/desiegg.jpg',
+    image: '/desiegg.webp',
     title: 'Understanding Today\'s Egg Rates Across Major Indian Cities',
     description: 'Explore the current egg rates in various cities, including Barwala, Hyderabad, Namakkal, Delhi, Mumbai, and more.',
     uploadDate: '2024-10-01',
   },
   {
     link: 'blog-2',
-    image: '/eggpic.png',
+    image: '/eggpic.webp',
     title: 'Understanding Egg Rates in India',
     description: 'A comprehensive guide to understanding the factors that influence egg prices in India.',
     uploadDate: '2024-10-03',

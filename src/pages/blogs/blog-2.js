@@ -1,11 +1,12 @@
 import React from 'react';
 import 'tailwindcss/tailwind.css'; // Ensure Tailwind CSS is imported
+import OptimizedImage from '../../components/common/OptimizedImage';
 
 const EggRates = () => {
   return (
     <div>
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Understanding Egg Rates in India</h1>
-      <img src="/desiegg.jpg" alt="Egg Rates Banner" className="w-full mb-8 rounded-lg shadow-md" />
+      <OptimizedImage src="/desiegg.webp" alt="Egg Rates Banner" className="w-full mb-8 rounded-lg shadow-md" width={800} height={400} />
       
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Introduction</h2>
@@ -26,7 +27,7 @@ const EggRates = () => {
           <li>Seasonal Demand</li>
           <li>Market Supply</li>
         </ul>
-        <img src="/eggchicken.jpg" alt="Egg Production" className="w-full mb-8 rounded-lg shadow-md" />
+        <img src="/eggchicken.webp" alt="Egg Production" className="w-full mb-8 rounded-lg shadow-md" />
       </section>
       
       <section className="mb-8">
@@ -34,7 +35,7 @@ const EggRates = () => {
         <p className="text-lg text-gray-600 mb-4">
           Recently, egg prices have been on the rise due to increased production costs and higher demand during festive seasons. The following chart shows the trend in egg prices over the past year:
         </p>
-        <img src="/eggpic.png" alt="Egg Price Chart" className="w-full mb-8 rounded-lg shadow-md" />
+        <OptimizedImage src="/eggpic.webp" alt="Egg Price Chart" className="w-full mb-8 rounded-lg shadow-md" width={800} height={400} />
       </section>
       
       <section className="mb-8">

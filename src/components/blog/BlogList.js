@@ -52,8 +52,9 @@ const BlogList = ({ blogs, selectedCity, selectedState }) => {
               <img 
                 src={blog.image} 
                 alt={blog.title} 
-                className="w-full h-48 object-cover"
-                loading={index < 3 ? "eager" : "lazy"}
+                className="w-full h-48 object-cover"                loading={index < 3 ? "eager" : "lazy"}
+                width={400}
+                height={300}
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">{blog.title}</h3>

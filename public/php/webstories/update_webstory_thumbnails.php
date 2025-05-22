@@ -108,9 +108,9 @@ if (empty($backgroundImages)) {
     debug_log("IMAGES", "No background images found, using default");
     // Check multiple locations for default image
     $defaultImageLocations = [
-        $basePath . '/eggpic.png',
-        $basePath . '/public/eggpic.png',
-        $basePath . '/build/eggpic.png'
+        $basePath . '/eggpic.webp',
+        $basePath . '/public/eggpic.webp',
+        $basePath . '/build/eggpic.webp'
     ];
     
     $defaultImageFound = false;
@@ -118,10 +118,10 @@ if (empty($backgroundImages)) {
         if (file_exists($defaultImage)) {
             debug_log("IMAGES", "Found default image at: {$defaultImage}");
             // Copy default image to webstories image directory
-            $targetImage = $imageDir . '/default.png';
+            $targetImage = $imageDir . '/default.webp';
             if (copy($defaultImage, $targetImage)) {
                 debug_log("IMAGES", "Copied default image to: {$targetImage}");
-                $backgroundImages[] = 'default.png';
+                $backgroundImages[] = 'default.webp';
                 $defaultImageFound = true;
                 break;
             } else {
@@ -141,13 +141,13 @@ if (empty($backgroundImages)) {
         imagestring($simpleImage, 5, 300, 280, "Egg Rate", $textColor);
         
         // Save the simple image
-        $simpleImagePath = $imageDir . '/default.png';
+        $simpleImagePath = $imageDir . '/default.webp';
         imagepng($simpleImage, $simpleImagePath);
         imagedestroy($simpleImage);
         
         if (file_exists($simpleImagePath)) {
             debug_log("IMAGES", "Created simple default image at: {$simpleImagePath}");
-            $backgroundImages[] = 'default.png';
+            $backgroundImages[] = 'default.webp';
         } else {
             debug_log("ERROR", "Failed to create simple default image");
             die("Error: No background images found and could not create a default image.");
@@ -224,7 +224,7 @@ if ($result && $result->num_rows > 0) {
         
         // Check if we need to update the thumbnail
         $webstoryFile = $webstoriesDir . '/' . $citySlug . '-egg-rate.html';  // FIXED: Correct filename format
-        $thumbnailFile = $imageDir . '/thumbnail-' . $citySlug . '.jpg';
+        $thumbnailFile = $imageDir . '/thumbnail-' . $citySlug . '.webp';
         
         debug_log("FILES", "Checking files", [
             "webstoryFile" => $webstoryFile,
@@ -408,7 +408,7 @@ if ($result && $result->num_rows > 0) {
             }
             
             // Save the thumbnail
-            $thumbnailPath = $imageDir . '/thumbnail-' . $citySlug . '.jpg';
+            $thumbnailPath = $imageDir . '/thumbnail-' . $citySlug . '.webp';
             debug_log("SAVE", "Saving thumbnail to {$thumbnailPath}");
             
             $saveResult = imagejpeg($thumbnailImage, $thumbnailPath, 90);
@@ -435,7 +435,7 @@ if ($result && $result->num_rows > 0) {
                     throw new Exception("Failed to read webstory file: {$webstoryFile}");
                 }
                 
-                $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.jpg';
+                $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.webp';
                 
                 // Improved pattern matching for the amp-story tag to avoid creating multiple nested tags
                 // We'll search for the entire amp-story opening tag and replace just the poster-portrait-src attribute
@@ -463,7 +463,7 @@ if ($result && $result->num_rows > 0) {
                 
                 // Update or add meta image tag
                 $metaPattern = '/<meta property="og:image" content="[^"]*"/';
-                $metaReplacement = '<meta property="og:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlug . '.jpg"';
+                $metaReplacement = '<meta property="og:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlug . '.webp"';
                 
                 if (preg_match($metaPattern, $webstoryContent)) {
                     $webstoryContent = preg_replace($metaPattern, $metaReplacement, $webstoryContent);
@@ -478,7 +478,7 @@ if ($result && $result->num_rows > 0) {
                 
                 // Also update Twitter card image
                 $twitterPattern = '/<meta name="twitter:image" content="[^"]*"/';
-                $twitterReplacement = '<meta name="twitter:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlug . '.jpg"';
+                $twitterReplacement = '<meta name="twitter:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlug . '.webp"';
                 
                 if (preg_match($twitterPattern, $webstoryContent)) {
                     $webstoryContent = preg_replace($twitterPattern, $twitterReplacement, $webstoryContent);
@@ -528,7 +528,7 @@ if (is_dir($imageDir)) {
         foreach ($files as $file) {
             // Check if file is a thumbnail
             if (strpos($file, 'thumbnail-') === 0) {
-                $citySlug = substr($file, 10, -4); // Remove 'thumbnail-' prefix and '.jpg' suffix
+                $citySlug = substr($file, 10, -4); // Remove 'thumbnail-' prefix and '.webp' suffix
                 $webstoryFile = $webstoriesDir . '/' . $citySlug . '-egg-rate.html'; // FIXED: Correct filename format
                 
                 // If webstory doesn't exist, remove the thumbnail
