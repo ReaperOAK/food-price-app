@@ -551,5 +551,10 @@ debug_log("CLEANUP", "Removed {$unusedCount} unused thumbnails");
 echo "Removed " . $unusedCount . " unused thumbnails.<br>";
 
 debug_log("END", "Thumbnail update process completed");
-$conn->close();
+
+// Only close the connection if it wasn't passed from another script
+if (!isset($suppressConnectionClose)) {
+    $conn->close();
+    debug_log("DB", "Closed database connection");
+}
 ?>
