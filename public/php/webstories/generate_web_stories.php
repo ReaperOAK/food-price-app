@@ -459,30 +459,40 @@ try {
         
         debug_log("COMPLETE", "Generated {$storiesGenerated} web stories successfully");
         echo "Generated {$storiesGenerated} web stories successfully.<br>";
-        
-        // Call the thumbnail update script to generate thumbnails for all web stories
-        debug_log("THUMBNAILS", "Calling update_webstory_thumbnails.php to generate thumbnails");
-        echo "Generating thumbnails for web stories...<br>";
-        include_once __DIR__ . '/update_webstory_thumbnails.php';
-        
-    } else {
+      } else {
         debug_log("ERROR", "No egg rates found in the database");
         echo "No egg rates found in the database. Please check your data.";
     }
-
-    // Use require_once to avoid double inclusion issues
-    debug_log("SITEMAP", "Generating web stories sitemap");
-    require_once 'generate_webstories_sitemap.php';
+    
+    // Close the database connection before running other scripts
+    $conn->close();
+        
+    // Call thumbnail update script as a separate process
+    debug_log("THUMBNAILS", "Running update_webstory_thumbnails.php separately");
+    passthru("php " . __DIR__ . "/update_webstory_thumbnails.php", $thumbnailResult);
+    
+    if ($thumbnailResult !== 0) {
+        debug_log("ERROR", "Thumbnail generation failed with code: " . $thumbnailResult);
+        return false;
+    }
+    
+    // Call sitemap generation as a separate process
+    debug_log("SITEMAP", "Running generate_webstories_sitemap.php separately");
+    passthru("php " . __DIR__ . "/generate_webstories_sitemap.php", $sitemapResult);
+    
+    if ($sitemapResult !== 0) {
+        debug_log("ERROR", "Sitemap generation failed with code: " . $sitemapResult);
+        return false;
+    }
 
     // Success message
     debug_log("SUCCESS", "Web stories generation completed successfully");
+    return true;
 
 } catch (Exception $e) {
     // Log any exceptions that occur
     debug_log("ERROR", "Web stories generation error: " . $e->getMessage(), ["trace" => $e->getTraceAsString()]);
     echo "Error generating web stories: " . $e->getMessage();
-    
-    // Make sure we return a non-zero exit code to indicate an error
-    exit(1);
+    return false;
 }
 ?>

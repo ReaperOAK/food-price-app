@@ -174,7 +174,7 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
               src="/tee.webp"
               alt="Today Egg Rates Logo"
               className="h-10"
-              width={40}
+              width={200}
               height={40}
               onError={handleLogoError}
             />
