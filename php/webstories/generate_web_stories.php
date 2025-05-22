@@ -71,6 +71,72 @@ try {
         debug_log("DB", "Using existing database connection");
     }
 
+    // Verify all required directories exist and are writable
+    $requiredDirs = [
+        $basePath . '/webstories',
+        $basePath . '/images/webstories',
+        $basePath . '/templates'
+    ];
+
+    foreach ($requiredDirs as $dir) {
+        if (!file_exists($dir)) {
+            debug_log("DIRS", "Directory does not exist: {$dir}");
+            if (!mkdir($dir, 0777, true)) {
+                $error = error_get_last();
+                debug_log("ERROR", "Failed to create directory: {$dir}", $error);
+                throw new Exception("Failed to create directory: {$dir}. Error: " . ($error['message'] ?? 'Unknown error'));
+            }
+            chmod($dir, 0777);
+            debug_log("DIRS", "Created directory: {$dir}");
+        }
+        
+        if (!is_writable($dir)) {
+            debug_log("DIRS", "Directory not writable: {$dir}");
+            chmod($dir, 0777);
+            if (!is_writable($dir)) {
+                throw new Exception("Directory not writable after chmod: {$dir}");
+            }
+            debug_log("DIRS", "Made directory writable: {$dir}");
+        }
+    }
+
+    // Handle template file with multiple fallback locations
+    $templateLocations = [
+        $basePath . '/templates/webstory_template.html',
+        $basePath . '/public/templates/webstory_template.html',
+        dirname(dirname(__FILE__)) . '/templates/webstory_template.html',
+        __DIR__ . '/templates/webstory_template.html'
+    ];
+
+    $template = null;
+    $templateFound = false;
+
+    foreach ($templateLocations as $templateFile) {
+        debug_log("TEMPLATE", "Checking template at: {$templateFile}");
+        if (file_exists($templateFile)) {
+            debug_log("TEMPLATE", "Found template file at: {$templateFile}");
+            $template = file_get_contents($templateFile);
+            if ($template !== false) {
+                debug_log("TEMPLATE", "Successfully read template file");
+                $templateFound = true;
+                break;
+            }
+        }
+    }
+
+    if (!$templateFound) {
+        debug_log("ERROR", "Could not find or read template file in any location");
+        throw new Exception("Web story template file not found in any location");
+    }
+
+    // Verify template structure
+    if (!strpos($template, '<amp-story') || !strpos($template, '{{CITY_NAME}}')) {
+        debug_log("ERROR", "Template file is invalid - missing required elements");
+        throw new Exception("Web story template file is invalid - missing required elements");
+    }
+
+    debug_log("TEMPLATE", "Template file validated successfully");
+
     // Function to generate web story index
     if (!function_exists('generateWebStoryIndex')) {
         debug_log("FUNCTIONS", "Defining generateWebStoryIndex function");
@@ -184,109 +250,100 @@ try {
         }
     }
 
-    // Get all available background images
+    // Get and validate background images
     $backgroundImages = [];
+    $defaultImageCreated = false;
+
     if (is_dir($imageDir)) {
         debug_log("IMAGES", "Scanning directory for background images: {$imageDir}");
         $files = scandir($imageDir);
         if ($files === false) {
-            debug_log("IMAGES", "Failed to scan directory: {$imageDir}");
-            throw new Exception("Failed to scan directory: {$imageDir}");
+            debug_log("ERROR", "Failed to scan image directory");
+            throw new Exception("Failed to scan image directory: {$imageDir}");
         }
         
         foreach ($files as $file) {
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
-            if (in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'gif']) && $file !== '.' && $file !== '..') {
-                // Skip thumbnail files
-                if (strpos($file, 'thumbnail-') === 0) {
-                    continue;
-                }
-                // Store just the filename, not the full path
-                $backgroundImages[] = $file;
-                debug_log("IMAGES", "Found background image: {$file}");
+            if ($file === '.' || $file === '..') continue;
+            
+            $filePath = $imageDir . '/' . $file;
+            $extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            
+            if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
+                continue;
             }
+
+            // Skip thumbnail files
+            if (strpos($file, 'thumbnail-') === 0) {
+                continue;
+            }
+
+            // Validate image
+            $imageInfo = @getimagesize($filePath);
+            if ($imageInfo === false) {
+                debug_log("ERROR", "Invalid image file: {$file}");
+                continue;
+            }
+
+            $backgroundImages[] = $file;
+            debug_log("IMAGES", "Added valid background image: {$file}");
         }
-        debug_log("IMAGES", "Found " . count($backgroundImages) . " background images");
     }
 
-    // If no images found, use a default image
+    // Create default image if no valid images found
     if (empty($backgroundImages)) {
-        debug_log("IMAGES", "No background images found, using default");
-        // Check multiple locations for default image
-        $defaultImageLocations = [
-            $basePath . '/eggpic.webp',
-            $basePath . '/public/eggpic.webp',
-            $basePath . '/build/eggpic.webp'
-        ];
+        debug_log("IMAGES", "No valid background images found, creating default");
         
-        $defaultImageFound = false;
-        foreach ($defaultImageLocations as $defaultImage) {
-            if (file_exists($defaultImage)) {
-                debug_log("IMAGES", "Found default image at: {$defaultImage}");
-                // Copy default image to webstories image directory
-                $targetImage = $imageDir . '/default.webp';
-                if (copy($defaultImage, $targetImage)) {
-                    debug_log("IMAGES", "Copied default image to: {$targetImage}");
-                    $backgroundImages[] = 'default.webp';
-                    $defaultImageFound = true;
-                    break;
-                } else {
-                    $error = error_get_last();
-                    debug_log("ERROR", "Failed to copy default image", $error);
-                }
+        try {
+            // Create a more visually appealing default image
+            $width = 1200;
+            $height = 1600;
+            $img = imagecreatetruecolor($width, $height);
+            
+            // Create gradient background
+            $topColor = imagecolorallocate($img, 51, 153, 255);    // Light blue
+            $bottomColor = imagecolorallocate($img, 255, 255, 255); // White
+            
+            // Draw gradient
+            for($i = 0; $i < $height; $i++) {
+                $color = imagecolorallocate($img, 
+                    51 + ($i/$height) * (255-51),
+                    153 + ($i/$height) * (255-153),
+                    255);
+                imageline($img, 0, $i, $width, $i, $color);
             }
-        }
-        
-        if (!$defaultImageFound) {
-            // Create a simple default image
-            debug_log("IMAGES", "Creating a simple default image");
-            $simpleImage = imagecreatetruecolor(800, 600);
-            $bgColor = imagecolorallocate($simpleImage, 240, 240, 240);
-            $textColor = imagecolorallocate($simpleImage, 0, 0, 0);
-            imagefill($simpleImage, 0, 0, $bgColor);
-            imagestring($simpleImage, 5, 300, 280, "Egg Rate", $textColor);
             
-            // Save the simple image
-            $simpleImagePath = $imageDir . '/default.webp';
-            imagepng($simpleImage, $simpleImagePath);
-            imagedestroy($simpleImage);
+            // Add text
+            $fontColor = imagecolorallocate($img, 33, 33, 33);
+            $fontSize = 5;
+            $text = "Egg Rate Updates";
             
-            if (file_exists($simpleImagePath)) {
-                debug_log("IMAGES", "Created simple default image at: {$simpleImagePath}");
+            // Center the text
+            $textWidth = strlen($text) * imagefontwidth($fontSize);
+            $textHeight = imagefontheight($fontSize);
+            $x = ($width - $textWidth) / 2;
+            $y = ($height - $textHeight) / 2;
+            
+            imagestring($img, $fontSize, $x, $y, $text, $fontColor);
+            
+            // Save as WebP for better quality/compression
+            $defaultImagePath = $imageDir . '/default.webp';
+            imagewebp($img, $defaultImagePath, 80);
+            imagedestroy($img);
+            
+            if (file_exists($defaultImagePath)) {
                 $backgroundImages[] = 'default.webp';
-            } else {
-                debug_log("ERROR", "Failed to create simple default image");
-                throw new Exception("No background images found and could not create a default image.");
+                $defaultImageCreated = true;
+                debug_log("IMAGES", "Successfully created default background image");
             }
+        } catch (Exception $e) {
+            debug_log("ERROR", "Failed to create default image: " . $e->getMessage());
+            throw new Exception("Could not create default background image: " . $e->getMessage());
         }
     }
 
-    // Get the web story template with error handling
-    debug_log("TEMPLATE", "Looking for template file: {$templateFile}");
-    if (file_exists($templateFile)) {
-        debug_log("TEMPLATE", "Reading template file: {$templateFile}");
-        $template = file_get_contents($templateFile);
-        if ($template === false) {
-            debug_log("TEMPLATE", "Could not read template file: {$templateFile}");
-            throw new Exception("Could not read template file {$templateFile}");
-        }
-        debug_log("TEMPLATE", "Template file read successfully (" . strlen($template) . " bytes)");
-    } else {
-        // Check alternative locations
-        $alternateTemplateFile = $basePath . '/public_html/templates/webstory_template.html';
-        debug_log("TEMPLATE", "Template not found, trying alternate: {$alternateTemplateFile}");
-        if (file_exists($alternateTemplateFile)) {
-            debug_log("TEMPLATE", "Reading alternate template file: {$alternateTemplateFile}");
-            $template = file_get_contents($alternateTemplateFile);
-            if ($template === false) {
-                debug_log("TEMPLATE", "Could not read alternate template file: {$alternateTemplateFile}");
-                throw new Exception("Could not read template file {$alternateTemplateFile}");
-            }
-            debug_log("TEMPLATE", "Alternate template file read successfully (" . strlen($template) . " bytes)");
-        } else {
-            debug_log("TEMPLATE", "No template file found at either location");
-            throw new Exception("Template file not found at {$templateFile} or {$alternateTemplateFile}");
-        }
+    if (empty($backgroundImages)) {
+        debug_log("ERROR", "No valid background images available");
+        throw new Exception("No valid background images available and could not create default");
     }
 
     // Get today's date
@@ -298,9 +355,22 @@ try {
     debug_log("CLEANUP", "Cleaning up old web stories (keeping {$daysToKeep} days)");
     deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
 
-    // Get the latest egg rates - use the normalized tables first
+    // After template validation code
+    // Try normalized tables first with better error handling
     try {
         debug_log("DATA", "Querying normalized tables for egg rates");
+        
+        // Test connection before query
+        if (!$conn->ping()) {
+            debug_log("DB", "Database connection lost, attempting to reconnect");
+            $conn->close();
+            $conn = new mysqli($servername, $username, $password, $dbname);
+            if ($conn->connect_error) {
+                throw new Exception("Failed to reconnect to database: " . $conn->connect_error);
+            }
+            debug_log("DB", "Successfully reconnected to database");
+        }
+
         $sql = "
             SELECT c.name as city, s.name as state, ern.rate, ern.date 
             FROM egg_rates_normalized ern
@@ -309,36 +379,56 @@ try {
             WHERE (ern.city_id, ern.date) IN (
                 SELECT city_id, MAX(date)
                 FROM egg_rates_normalized
+                WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
                 GROUP BY city_id
             )
             ORDER BY c.name
         ";
 
+        debug_log("SQL", "Executing query on normalized tables");
         $result = $conn->query($sql);
         
-        if (!$result || $result->num_rows === 0) {
+        if (!$result) {
+            debug_log("DB", "Query failed: " . $conn->error);
+            throw new Exception("Database query failed: " . $conn->error);
+        }
+
+        if ($result->num_rows === 0) {
             debug_log("DATA", "No results from normalized tables, falling back to original table");
             throw new Exception("No results from normalized tables");
         }
+
+        debug_log("DATA", "Successfully retrieved " . $result->num_rows . " rows from normalized tables");
     } catch (Exception $e) {
-        // Fall back to original table
+        // Fall back to original table with better error handling
         debug_log("DATA", "Using original table: " . $e->getMessage());
+        
         $sql = "
             SELECT city, state, rate, date 
             FROM egg_rates 
-            WHERE (city, date) IN (
+            WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+            AND (city, date) IN (
                 SELECT city, MAX(date) 
                 FROM egg_rates 
+                WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
                 GROUP BY city
             )
             ORDER BY city
         ";
+        
         $result = $conn->query($sql);
         
         if (!$result) {
-            debug_log("DATA", "Database query failed: " . $conn->error);
-            throw new Exception("Database query failed: " . $conn->error);
+            debug_log("ERROR", "Both normalized and original table queries failed");
+            throw new Exception("Database queries failed for both tables: " . $conn->error);
         }
+
+        if ($result->num_rows === 0) {
+            debug_log("ERROR", "No egg rates found in either table");
+            throw new Exception("No egg rates found in the database within the last 3 days");
+        }
+        
+        debug_log("DATA", "Successfully retrieved " . $result->num_rows . " rows from original table");
     }
 
     if ($result && $result->num_rows > 0) {
