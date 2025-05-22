@@ -1,4 +1,8 @@
 <?php
+// Guard against multiple inclusions
+if (!defined('WEBSTORIES_SITEMAP_INCLUDED')) {
+    define('WEBSTORIES_SITEMAP_INCLUDED', true);
+
 /**
  * Web Stories Sitemap Generator
  * 
@@ -109,3 +113,5 @@ if (basename(__FILE__) == basename($_SERVER['SCRIPT_FILENAME'])) {
     $result = generateWebStoriesSitemap();
     exit($result ? 0 : 1);
 }
+
+} // End of inclusion guard
