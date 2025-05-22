@@ -13,20 +13,45 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
+      <!-- Resource Hints - Critical Assets -->
+    <link 
+      rel="preload" 
+      href="%PUBLIC_URL%/eggpic.webp" 
+      as="image" 
+      type="image/webp" 
+      fetchpriority="high" 
+      crossorigin="anonymous"
+    />
+    <link 
+      rel="preload" 
+      href="%PUBLIC_URL%/tee.webp" 
+      as="image" 
+      type="image/webp" 
+      fetchpriority="high" 
+      crossorigin="anonymous"
+    />
+    <link 
+      rel="preload" 
+      href="/static/css/main.2099c5e4.css" 
+      as="style" 
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <link 
+      rel="preload" 
+      href="/static/js/main.js" 
+      as="script" 
+      crossorigin="anonymous"
+    />
     
-    <!-- Resource Hints -->
-    <link rel="preload" href="%PUBLIC_URL%/eggpic.webp" as="image" fetchpriority="high" type="image/webp" />
-    <link rel="preload" href="%PUBLIC_URL%/tee.webp" as="image" fetchpriority="high" type="image/webp" />
-    <link rel="preload" href="/static/css/main.2099c5e4.css" as="style" />
-    <link rel="preload" href="/static/js/main.js" as="script" />
+    <!-- Async CSS Loading Fallback -->
+    <noscript>
+      <link rel="stylesheet" href="/static/css/main.2099c5e4.css">
+    </noscript>
     
-    <!-- DNS Prefetch and Preconnect -->
-    <link rel="dns-prefetch" href="//www.googletagmanager.com" />
-    <link rel="preconnect" href="//www.googletagmanager.com" crossorigin />
-    <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
-    <link rel="preconnect" href="//pagead2.googlesyndication.com" crossorigin />
-    <link rel="dns-prefetch" href="//analytics.ahrefs.com" />
-    <link rel="preconnect" href="//analytics.ahrefs.com" crossorigin />
+    <!-- Optimized Third-party Connections -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <link rel="preconnect" href="https://analytics.ahrefs.com" crossorigin />
     
     <!-- Preconnect to critical third-party origins -->
     <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
@@ -91,6 +116,60 @@
         ahrefsScript.dataset.key = 'dRNDN8C4Qb89EJnMutTHlQ';
         ahrefsScript.async = true;
         document.head.appendChild(ahrefsScript);
+      }
+    </script>
+
+    <!-- Early Performance Optimizations -->
+    <script>
+      // Optimize resource loading
+      document.documentElement.classList.remove('no-js');
+      
+      // Detect modern image loading capabilities
+      if ('loading' in HTMLImageElement.prototype) {
+        document.documentElement.classList.add('loading-lazy');
+      }
+      
+      // Preload critical images
+      const preloadImages = ['/eggpic.webp', '/tee.webp'];
+      preloadImages.forEach(src => {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = src;
+        link.type = 'image/webp';
+        document.head.appendChild(link);
+      });
+
+      // Load CSS asynchronously
+      const loadCSS = href => {
+        const preload = document.createElement('link');
+        const style = document.createElement('link');
+        
+        preload.rel = 'preload';
+        preload.as = 'style';
+        preload.href = href;
+        
+        style.rel = 'stylesheet';
+        style.href = href;
+        style.media = 'print';
+        
+        style.onload = () => style.media = 'all';
+        
+        document.head.appendChild(preload);
+        document.head.appendChild(style);
+      };
+
+      // Register performance observer
+      if ('PerformanceObserver' in window) {
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) {
+            if (entry.hadRecentInput) continue;
+            if (entry.value > 0.1) {
+              console.warn('Layout shift detected:', entry);
+            }
+          }
+        });
+        observer.observe({ entryTypes: ['layout-shift'] });
       }
     </script>
 
