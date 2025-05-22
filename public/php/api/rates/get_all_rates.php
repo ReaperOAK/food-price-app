@@ -8,9 +8,36 @@ header("Access-Control-Allow-Headers: Content-Type");
 header('Content-Type: application/json');
 
 require_once dirname(dirname(dirname(__FILE__))) . '/config/db.php';
+require_once dirname(dirname(dirname(__FILE__))) . '/config/CacheManager.php';
+
+$cacheConfig = require dirname(dirname(dirname(__FILE__))) . '/config/cache_config.php';
+$cacheManager = new CacheManager($cacheConfig['cache_path']);
 
 // Get the date parameter from the query string
 $date = isset($_GET['date']) ? $conn->real_escape_string($_GET['date']) : null;
+
+// Check if cache should be skipped
+$skipCache = false;
+foreach ($cacheConfig['no_cache_params'] as $param) {
+    if (isset($_GET[$param])) {
+        $skipCache = true;
+        break;
+    }
+}
+
+// Try to get from cache first
+if (!$skipCache && $cacheConfig['cache_enabled']) {
+    $cacheKey = $cacheManager->getCacheKey([
+        'endpoint' => 'get_all_rates',
+        'date' => $date
+    ]);
+
+    $cachedData = $cacheManager->get($cacheKey);
+    if ($cachedData !== null) {
+        echo json_encode($cachedData);
+        exit;
+    }
+}
 
 // Try normalized tables first
 $useNormalizedTables = true;
@@ -84,6 +111,11 @@ if (!$useNormalizedTables) {
             $rates[] = $row;
         }
     }
+}
+
+// Cache the response if caching is enabled
+if ($cacheConfig['cache_enabled'] && !$skipCache) {
+    $cacheManager->set($cacheKey, $rates, $cacheConfig['cache_ttl']);
 }
 
 // Return the rates as JSON
