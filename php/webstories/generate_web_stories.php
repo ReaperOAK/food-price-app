@@ -4,6 +4,12 @@ ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', dirname(dirname(__FILE__)) . '/error.log');
 
+// Set up server paths - this is where we'll find our assets in production
+$serverRoot = $_SERVER['DOCUMENT_ROOT'];
+$webstoriesPath = $serverRoot . '/webstories';
+$webstoriesImagesPath = $serverRoot . '/images/webstories';
+$templatePath = $serverRoot . '/templates/webstory_template.html';
+
 // Helper function for structured debugging
 function debug_log($step, $message, $data = null) {
     $log = date('Y-m-d H:i:s') . " [WEB STORIES] " . $step . ": " . $message;
@@ -98,44 +104,54 @@ try {
             }
             debug_log("DIRS", "Made directory writable: {$dir}");
         }
-    }
-
-    // Handle template file with multiple fallback locations
+    }    // Configuration - use server paths where the files will be served from
+    $storiesDir = $webstoriesPath;
+    $imageDir = $webstoriesImagesPath;
+      // Template file locations to try, prioritizing server path
     $templateLocations = [
-        $basePath . '/templates/webstory_template.html',
-        $basePath . '/public/templates/webstory_template.html',
-        dirname(dirname(__FILE__)) . '/templates/webstory_template.html',
+        $templatePath,  // Try server path first
+        $serverRoot . '/templates/webstory_template.html',
+        dirname(__DIR__) . '/templates/webstory_template.html',
         __DIR__ . '/templates/webstory_template.html'
     ];
-
+    
+    debug_log("CONFIG", "Looking for template file in multiple locations");
+    
     $template = null;
-    $templateFound = false;
-
-    foreach ($templateLocations as $templateFile) {
-        debug_log("TEMPLATE", "Checking template at: {$templateFile}");
-        if (file_exists($templateFile)) {
-            debug_log("TEMPLATE", "Found template file at: {$templateFile}");
-            $template = file_get_contents($templateFile);
+    $templateFile = null;
+    
+    foreach ($templateLocations as $location) {
+        debug_log("TEMPLATE", "Checking location: {$location}");
+        if (file_exists($location)) {
+            debug_log("TEMPLATE", "Found template at: {$location}");
+            $template = file_get_contents($location);
             if ($template !== false) {
+                $templateFile = $location;
                 debug_log("TEMPLATE", "Successfully read template file");
-                $templateFound = true;
                 break;
             }
         }
     }
-
-    if (!$templateFound) {
+    
+    if (!$template) {
         debug_log("ERROR", "Could not find or read template file in any location");
         throw new Exception("Web story template file not found in any location");
     }
-
-    // Verify template structure
+    
+    // Verify template has required elements
     if (!strpos($template, '<amp-story') || !strpos($template, '{{CITY_NAME}}')) {
         debug_log("ERROR", "Template file is invalid - missing required elements");
         throw new Exception("Web story template file is invalid - missing required elements");
     }
-
+    
     debug_log("TEMPLATE", "Template file validated successfully");
+    
+    debug_log("CONFIG", "Paths configured", [
+        "basePath" => $basePath,
+        "storiesDir" => $storiesDir,
+        "imageDir" => $imageDir,
+        "templateFile" => $templateFile
+    ]);
 
     // Function to generate web story index
     if (!function_exists('generateWebStoryIndex')) {
@@ -213,40 +229,37 @@ try {
     debug_log("INCLUDES", "Including delete_old_webstories.php");
     require_once __DIR__ . '/delete_old_webstories.php';
 
-    // Configuration - use absolute paths to avoid permission issues
-    $basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
-    $storiesDir = $basePath . '/webstories';
-    $imageDir = $basePath . '/images/webstories';
-    $templateFile = $basePath . '/templates/webstory_template.html';
-    
-    debug_log("CONFIG", "Paths configured", [
-        "basePath" => $basePath,
-        "storiesDir" => $storiesDir,
-        "imageDir" => $imageDir,
-        "templateFile" => $templateFile
-    ]);
-
     // Create the necessary directories if they don't exist
-    foreach ([$storiesDir, $imageDir] as $dir) {
+    foreach ([$buildWebstoriesPath, $buildImagesPath] as $dir) {
         if (!file_exists($dir)) {
             debug_log("DIRS", "Creating directory: {$dir}");
-            if (!mkdir($dir, 0777, true)) {
-                $error = error_get_last();
-                debug_log("DIRS", "Failed to create directory: {$dir}", $error);
-                throw new Exception("Failed to create directory: {$dir}. Error: " . ($error['message'] ?? 'Unknown error'));
+            try {
+                if (!mkdir($dir, 0777, true)) {
+                    $error = error_get_last();
+                    debug_log("ERROR", "Failed to create directory: {$dir}", $error);
+                    throw new Exception("Failed to create directory: {$dir}. Error: " . ($error['message'] ?? 'Unknown error'));
+                }
+                chmod($dir, 0777);
+                debug_log("DIRS", "Directory created successfully: {$dir}");
+            } catch (Exception $e) {
+                debug_log("ERROR", "Exception creating directory: " . $e->getMessage(), ["trace" => $e->getTraceAsString()]);
+                throw new Exception("Error creating directory: " . $e->getMessage());
             }
-            // After creation, ensure it's writable
-            chmod($dir, 0777);
-            debug_log("DIRS", "Directory created successfully: {$dir}");
-        } elseif (!is_writable($dir)) {
-            debug_log("DIRS", "Directory not writable: {$dir}");
-            // Try to make it writable
+        }
+        
+        if (!is_dir($dir)) {
+            debug_log("ERROR", "Path exists but is not a directory: {$dir}");
+            throw new Exception("Path exists but is not a directory: {$dir}");
+        }
+        
+        if (!is_writable($dir)) {
+            debug_log("DIRS", "Directory not writable, attempting to fix permissions: {$dir}");
             chmod($dir, 0777);
             if (!is_writable($dir)) {
-                throw new Exception("Directory not writable: {$dir}. Please check permissions.");
+                debug_log("ERROR", "Directory not writable and could not fix permissions: {$dir}");
+                throw new Exception("Directory not writable and could not fix permissions: {$dir}");
             }
-        } else {
-            debug_log("DIRS", "Directory exists and is writable: {$dir}");
+            debug_log("DIRS", "Fixed directory permissions: {$dir}");
         }
     }
 
@@ -356,79 +369,96 @@ try {
     deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, false);
 
     // After template validation code
-    // Try normalized tables first with better error handling
-    try {
-        debug_log("DATA", "Querying normalized tables for egg rates");
-        
-        // Test connection before query
-        if (!$conn->ping()) {
-            debug_log("DB", "Database connection lost, attempting to reconnect");
-            $conn->close();
-            $conn = new mysqli($servername, $username, $password, $dbname);
-            if ($conn->connect_error) {
-                throw new Exception("Failed to reconnect to database: " . $conn->connect_error);
+    // Try normalized tables first with better error handling and retry logic
+    $maxRetries = 3;
+    $retryDelay = 1; // seconds
+    $attempt = 0;
+    
+    while ($attempt < $maxRetries) {
+        try {
+            $attempt++;
+            debug_log("DATA", "Querying normalized tables for egg rates (attempt {$attempt})");
+            
+            // Test connection before query
+            if (!$conn->ping()) {
+                debug_log("DB", "Database connection lost, attempting to reconnect");
+                $conn->close();
+                $conn = new mysqli($servername, $username, $password, $dbname);
+                if ($conn->connect_error) {
+                    throw new Exception("Failed to reconnect to database: " . $conn->connect_error);
+                }
+                debug_log("DB", "Successfully reconnected to database");
             }
-            debug_log("DB", "Successfully reconnected to database");
-        }
 
-        $sql = "
-            SELECT c.name as city, s.name as state, ern.rate, ern.date 
-            FROM egg_rates_normalized ern
-            JOIN cities c ON ern.city_id = c.id
-            JOIN states s ON c.state_id = s.id
-            WHERE (ern.city_id, ern.date) IN (
-                SELECT city_id, MAX(date)
-                FROM egg_rates_normalized
-                WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
-                GROUP BY city_id
-            )
-            ORDER BY c.name
-        ";
+            // Try normalized tables first
+            $sql = "
+                SELECT c.name as city, s.name as state, ern.rate, ern.date 
+                FROM egg_rates_normalized ern
+                JOIN cities c ON ern.city_id = c.id
+                JOIN states s ON c.state_id = s.id
+                WHERE (ern.city_id, ern.date) IN (
+                    SELECT city_id, MAX(date)
+                    FROM egg_rates_normalized
+                    WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+                    GROUP BY city_id
+                )
+                ORDER BY c.name
+            ";
 
-        debug_log("SQL", "Executing query on normalized tables");
-        $result = $conn->query($sql);
-        
-        if (!$result) {
-            debug_log("DB", "Query failed: " . $conn->error);
-            throw new Exception("Database query failed: " . $conn->error);
-        }
+            debug_log("SQL", "Executing query on normalized tables");
+            $result = $conn->query($sql);
+            
+            if (!$result) {
+                throw new Exception("Database query failed: " . $conn->error);
+            }
 
-        if ($result->num_rows === 0) {
-            debug_log("DATA", "No results from normalized tables, falling back to original table");
-            throw new Exception("No results from normalized tables");
-        }
+            if ($result->num_rows === 0) {
+                debug_log("DATA", "No results from normalized tables, will try original table");
+                throw new Exception("No results from normalized tables");
+            }
 
-        debug_log("DATA", "Successfully retrieved " . $result->num_rows . " rows from normalized tables");
-    } catch (Exception $e) {
-        // Fall back to original table with better error handling
-        debug_log("DATA", "Using original table: " . $e->getMessage());
-        
-        $sql = "
-            SELECT city, state, rate, date 
-            FROM egg_rates 
-            WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
-            AND (city, date) IN (
-                SELECT city, MAX(date) 
-                FROM egg_rates 
-                WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
-                GROUP BY city
-            )
-            ORDER BY city
-        ";
-        
-        $result = $conn->query($sql);
-        
-        if (!$result) {
-            debug_log("ERROR", "Both normalized and original table queries failed");
-            throw new Exception("Database queries failed for both tables: " . $conn->error);
-        }
+            debug_log("DATA", "Successfully retrieved " . $result->num_rows . " rows from normalized tables");
+            break; // Success, exit retry loop
 
-        if ($result->num_rows === 0) {
-            debug_log("ERROR", "No egg rates found in either table");
-            throw new Exception("No egg rates found in the database within the last 3 days");
+        } catch (Exception $e) {
+            debug_log("ERROR", "Attempt {$attempt} failed: " . $e->getMessage());
+            
+            if ($attempt === $maxRetries) {
+                // On last attempt, try the original table as fallback
+                debug_log("DATA", "All normalized table attempts failed, trying original table");
+                
+                $sql = "
+                    SELECT city, state, rate, date 
+                    FROM egg_rates 
+                    WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+                    AND (city, date) IN (
+                        SELECT city, MAX(date) 
+                        FROM egg_rates 
+                        WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+                        GROUP BY city
+                    )
+                    ORDER BY city
+                ";
+                
+                $result = $conn->query($sql);
+                
+                if (!$result) {
+                    debug_log("ERROR", "Both normalized and original table queries failed");
+                    throw new Exception("Database queries failed for both tables: " . $conn->error);
+                }
+
+                if ($result->num_rows === 0) {
+                    debug_log("ERROR", "No egg rates found in either table");
+                    throw new Exception("No egg rates found in the database within the last 3 days");
+                }
+                
+                debug_log("DATA", "Successfully retrieved " . $result->num_rows . " rows from original table");
+                break;
+            }
+            
+            // Wait before retrying
+            sleep($retryDelay);
         }
-        
-        debug_log("DATA", "Successfully retrieved " . $result->num_rows . " rows from original table");
     }
 
     if ($result && $result->num_rows > 0) {
