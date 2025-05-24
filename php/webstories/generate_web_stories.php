@@ -5,10 +5,25 @@ ini_set('log_errors', 1);
 ini_set('error_log', dirname(dirname(__FILE__)) . '/error.log');
 
 // Set up server paths - this is where we'll find our assets in production
-$serverRoot = $_SERVER['DOCUMENT_ROOT'];
+$serverRoot = dirname(dirname(dirname(__FILE__))); // Go up to the public folder
 $webstoriesPath = $serverRoot . '/webstories';
 $webstoriesImagesPath = $serverRoot . '/images/webstories';
 $templatePath = $serverRoot . '/templates/webstory_template.html';
+
+// Create directories if they don't exist
+$dirsToCreate = [$webstoriesPath, $webstoriesImagesPath, dirname($templatePath)];
+foreach ($dirsToCreate as $dir) {
+    if (!file_exists($dir)) {
+        debug_log("DIRS", "Creating directory: {$dir}");
+        if (!mkdir($dir, 0777, true)) {
+            $error = error_get_last();
+            debug_log("ERROR", "Failed to create directory: {$dir}", $error);
+            throw new Exception("Failed to create directory {$dir}: " . ($error['message'] ?? 'Unknown error'));
+        }
+        chmod($dir, 0777);
+        debug_log("DIRS", "Successfully created directory: {$dir}");
+    }
+}
 
 // Helper function for structured debugging
 function debug_log($step, $message, $data = null) {

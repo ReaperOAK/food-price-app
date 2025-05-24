@@ -24,7 +24,7 @@ if (!extension_loaded('gd')) {
 }
 
 // Configuration with absolute paths - use appropriate path discovery methods
-$serverRoot = $_SERVER['DOCUMENT_ROOT'];  // Match the path used in generate_web_stories.php
+$serverRoot = dirname(dirname(dirname(__FILE__))); // Go up to the public folder
 $basePath = $serverRoot;
 $imageDir = $basePath . '/images/webstories';
 $webstoriesDir = $basePath . '/webstories';
