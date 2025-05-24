@@ -24,7 +24,8 @@ if (!extension_loaded('gd')) {
 }
 
 // Configuration with absolute paths - use appropriate path discovery methods
-$basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
+$serverRoot = $_SERVER['DOCUMENT_ROOT'];  // Match the path used in generate_web_stories.php
+$basePath = $serverRoot;
 $imageDir = $basePath . '/images/webstories';
 $webstoriesDir = $basePath . '/webstories';
 
@@ -36,6 +37,7 @@ $thumbnailWidth = 640;  // Updated for better quality
 $thumbnailHeight = 853; // Updated for 3:4 portrait aspect ratio (Google recommended)
 
 debug_log("CONFIG", "Paths configured", [
+    "serverRoot" => $serverRoot,
     "basePath" => $basePath,
     "imageDir" => $imageDir,
     "webstoriesDir" => $webstoriesDir,
