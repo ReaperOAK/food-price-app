@@ -559,58 +559,6 @@ if ($result && $result->num_rows > 0) {
     echo "No cities found in the database.";
 }
 
-// Cleanup unused thumbnails
-debug_log("CLEANUP", "Cleaning up unused thumbnails");
-$unusedCount = 0;
-
-if (is_dir($imageDir)) {
-    $files = scandir($imageDir);
-    if ($files === false) {
-        debug_log("ERROR", "Failed to scan image directory for cleanup");
-    } else {
-        foreach ($files as $file) {
-            // Check if file is a thumbnail
-            if (strpos($file, 'thumbnail-') === 0) {
-                $citySlug = substr($file, 10, -4); // Remove 'thumbnail-' prefix and '.webp' suffix
-                
-                // Check all possible webstory patterns
-                $webstoryFound = false;
-                $possiblePatterns = [
-                    $webstoriesDir . '/' . $citySlug . '-egg-rate.html',
-                    $webstoriesDir . '/' . $citySlug . '_egg_rate.html',
-                    $webstoriesDir . '/' . $citySlug . '.html',
-                    $webstoriesDir . '/egg-rate-' . $citySlug . '.html'
-                ];
-
-                foreach ($possiblePatterns as $pattern) {
-                    if (file_exists($pattern)) {
-                        $webstoryFound = true;
-                        debug_log("CLEANUP", "Found matching webstory for thumbnail: {$pattern}");
-                        break;
-                    }
-                }
-
-                // If no webstory exists with any pattern, remove the thumbnail
-                if (!$webstoryFound) {
-                    debug_log("CLEANUP", "No matching webstory found for thumbnail: {$file}");
-                    if (unlink($imageDir . '/' . $file)) {
-                        echo "Removed unused thumbnail: $file<br>";
-                        $unusedCount++;
-                    } else {
-                        debug_log("ERROR", "Failed to remove unused thumbnail: {$file}");
-                        echo "Failed to remove unused thumbnail: $file<br>";
-                    }
-                } else {
-                    debug_log("CLEANUP", "Keeping thumbnail {$file} as matching webstory exists");
-                }
-            }
-        }
-    }
-}
-
-debug_log("CLEANUP", "Removed {$unusedCount} unused thumbnails");
-echo "Removed " . $unusedCount . " unused thumbnails.<br>";
-
 debug_log("END", "Thumbnail update process completed");
 
 // Only close the connection if it wasn't passed from another script
