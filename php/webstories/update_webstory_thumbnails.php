@@ -27,14 +27,15 @@ if (!extension_loaded('gd')) {
 $basePath = dirname(dirname(dirname(__FILE__))); // Go up two levels from webstories dir
 $imageDir = $basePath . '/images/webstories';
 $webstoriesDir = $basePath . '/webstories';
-// Update thumbnail dimensions to match Google's Web Story requirements (proper aspect ratio)
-$thumbnailWidth = 640;  // Updated for better quality
-$thumbnailHeight = 853; // Updated for 3:4 portrait aspect ratio (Google recommended)
+
+// Also check build directory for webstories
+$buildWebstoriesDir = $basePath . '/build/webstories';
 
 debug_log("CONFIG", "Paths configured", [
     "basePath" => $basePath,
     "imageDir" => $imageDir,
-    "webstoriesDir" => $webstoriesDir
+    "webstoriesDir" => $webstoriesDir,
+    "buildWebstoriesDir" => $buildWebstoriesDir
 ]);
 
 // Create the images directory if it doesn't exist with better error handling
@@ -62,23 +63,33 @@ if (!file_exists($imageDir)) {
     }
 }
 
-// Create the webstories directory if it doesn't exist
-if (!file_exists($webstoriesDir)) {
-    debug_log("DIRS", "Creating webstories directory: {$webstoriesDir}");
-    try {
-        if (!mkdir($webstoriesDir, 0777, true)) {
-            $error = error_get_last();
-            debug_log("ERROR", "Failed to create directory: {$webstoriesDir}", $error);
-            die("Failed to create directory: {$webstoriesDir}. Error: " . ($error['message'] ?? 'Unknown error'));
-        }
-        // After creation, ensure it's writable
-        chmod($webstoriesDir, 0777);
-        debug_log("DIRS", "Webstories directory created successfully");
-    } catch (Exception $e) {
-        debug_log("ERROR", "Exception creating directory: " . $e->getMessage(), ["trace" => $e->getTraceAsString()]);
-        die("Error creating directory: " . $e->getMessage());
-    }
+// Check webstories directories
+$webstoriesDirExists = false;
+
+// Check main webstories directory
+if (file_exists($webstoriesDir) && is_dir($webstoriesDir)) {
+    $webstoriesDirExists = true;
+    debug_log("DIRS", "Found main webstories directory: {$webstoriesDir}");
+} 
+
+// Check build webstories directory
+if (file_exists($buildWebstoriesDir) && is_dir($buildWebstoriesDir)) {
+    $webstoriesDirExists = true;
+    $webstoriesDir = $buildWebstoriesDir; // Use build directory instead
+    debug_log("DIRS", "Found build webstories directory: {$buildWebstoriesDir}");
 }
+
+if (!$webstoriesDirExists) {
+    debug_log("ERROR", "No webstories directory found. Creating at {$webstoriesDir}");
+    if (!mkdir($webstoriesDir, 0777, true)) {
+        $error = error_get_last();
+        debug_log("ERROR", "Failed to create webstories directory", $error);
+        die("Failed to create webstories directory. Error: " . ($error['message'] ?? 'Unknown error'));
+    }
+    chmod($webstoriesDir, 0777);
+}
+
+debug_log("DIRS", "Directory checks complete");
 
 // Get all available background images
 $backgroundImages = [];
@@ -223,7 +234,29 @@ if ($result && $result->num_rows > 0) {
         debug_log("CITY", "Processing city: {$city}, {$state}", ["slug" => $citySlug]);
         
         // Check if we need to update the thumbnail
-        $webstoryFile = $webstoriesDir . '/' . $citySlug . '-egg-rate.html';  // FIXED: Correct filename format
+        // Try multiple possible webstory file patterns
+        $webstoryFile = null;
+        $possiblePatterns = [
+            $webstoriesDir . '/' . $citySlug . '-egg-rate.html',
+            $webstoriesDir . '/' . $citySlug . '_egg_rate.html',
+            $webstoriesDir . '/' . $citySlug . '.html',
+            $webstoriesDir . '/egg-rate-' . $citySlug . '.html'
+        ];
+
+        foreach ($possiblePatterns as $pattern) {
+            if (file_exists($pattern)) {
+                $webstoryFile = $pattern;
+                debug_log("FILES", "Found webstory file: {$pattern}");
+                break;
+            }
+        }
+
+        if (!$webstoryFile) {
+            debug_log("SKIP", "No webstory file found for {$city} using any known pattern");
+            $skippedCities++;
+            continue;
+        }
+
         $thumbnailFile = $imageDir . '/thumbnail-' . $citySlug . '.webp';
         
         debug_log("FILES", "Checking files", [
@@ -529,11 +562,27 @@ if (is_dir($imageDir)) {
             // Check if file is a thumbnail
             if (strpos($file, 'thumbnail-') === 0) {
                 $citySlug = substr($file, 10, -4); // Remove 'thumbnail-' prefix and '.webp' suffix
-                $webstoryFile = $webstoriesDir . '/' . $citySlug . '-egg-rate.html'; // FIXED: Correct filename format
                 
-                // If webstory doesn't exist, remove the thumbnail
-                if (!file_exists($webstoryFile)) {
-                    debug_log("CLEANUP", "Removing unused thumbnail: {$file}");
+                // Check all possible webstory patterns
+                $webstoryFound = false;
+                $possiblePatterns = [
+                    $webstoriesDir . '/' . $citySlug . '-egg-rate.html',
+                    $webstoriesDir . '/' . $citySlug . '_egg_rate.html',
+                    $webstoriesDir . '/' . $citySlug . '.html',
+                    $webstoriesDir . '/egg-rate-' . $citySlug . '.html'
+                ];
+
+                foreach ($possiblePatterns as $pattern) {
+                    if (file_exists($pattern)) {
+                        $webstoryFound = true;
+                        debug_log("CLEANUP", "Found matching webstory for thumbnail: {$pattern}");
+                        break;
+                    }
+                }
+
+                // If no webstory exists with any pattern, remove the thumbnail
+                if (!$webstoryFound) {
+                    debug_log("CLEANUP", "No matching webstory found for thumbnail: {$file}");
                     if (unlink($imageDir . '/' . $file)) {
                         echo "Removed unused thumbnail: $file<br>";
                         $unusedCount++;
@@ -541,6 +590,8 @@ if (is_dir($imageDir)) {
                         debug_log("ERROR", "Failed to remove unused thumbnail: {$file}");
                         echo "Failed to remove unused thumbnail: $file<br>";
                     }
+                } else {
+                    debug_log("CLEANUP", "Keeping thumbnail {$file} as matching webstory exists");
                 }
             }
         }
