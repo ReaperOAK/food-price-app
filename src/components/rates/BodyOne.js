@@ -10,14 +10,16 @@ const BodyOne = ({ selectedCity, selectedState }) => {
   });
   
   const [featuredWebStories, setFeaturedWebStories] = useState([]);
-  const [isWebStoriesExpanded, setIsWebStoriesExpanded] = useState(false);
+  const [showWebStories, setShowWebStories] = useState(false);
   
   useEffect(() => {
-    // Fetch top 3 web stories to feature
-    fetch('/php/get_web_stories.php?limit=3')
+    // Fetch web stories and randomly select 3
+    fetch('/php/get_web_stories.php')
       .then(response => response.json())
       .then(data => {
-        setFeaturedWebStories(data);
+        // Shuffle array and take first 3
+        const shuffled = [...data].sort(() => 0.5 - Math.random());
+        setFeaturedWebStories(shuffled.slice(0, 3));
       })
       .catch(error => console.error('Error fetching web stories:', error));
   }, []);
@@ -53,11 +55,20 @@ const BodyOne = ({ selectedCity, selectedState }) => {
       </div>
 
       {/* Web Stories Section */}
-      {featuredWebStories.length > 0 && (
+      <div className="mt-6 text-center">
+        <button
+          onClick={() => setShowWebStories(!showWebStories)}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+        >
+          {showWebStories ? 'Hide Web Stories' : 'Show Web Stories'}
+        </button>
+      </div>
+
+      {showWebStories && featuredWebStories.length > 0 && (
         <div className="mt-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Latest Updates</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {featuredWebStories.slice(0, isWebStoriesExpanded ? undefined : 3).map(story => (
+            {featuredWebStories.map(story => (
               <Link
                 key={story.id}
                 to={`/webstories/${story.slug}`}
@@ -76,15 +87,7 @@ const BodyOne = ({ selectedCity, selectedState }) => {
                 <p className="text-gray-600 text-sm">{story.date}</p>
               </Link>
             ))}
-          </div>
-          {featuredWebStories.length > 3 && (
-            <button
-              onClick={() => setIsWebStoriesExpanded(!isWebStoriesExpanded)}
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              {isWebStoriesExpanded ? 'Show Less' : 'Show More'}
-            </button>
-          )}
+          </div>          
         </div>
       )}
     </div>
