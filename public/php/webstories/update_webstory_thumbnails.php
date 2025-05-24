@@ -31,11 +31,19 @@ $webstoriesDir = $basePath . '/webstories';
 // Also check build directory for webstories
 $buildWebstoriesDir = $basePath . '/build/webstories';
 
+// Set thumbnail dimensions to match Google's Web Story requirements (proper aspect ratio)
+$thumbnailWidth = 640;  // Updated for better quality
+$thumbnailHeight = 853; // Updated for 3:4 portrait aspect ratio (Google recommended)
+
 debug_log("CONFIG", "Paths configured", [
     "basePath" => $basePath,
     "imageDir" => $imageDir,
     "webstoriesDir" => $webstoriesDir,
-    "buildWebstoriesDir" => $buildWebstoriesDir
+    "buildWebstoriesDir" => $buildWebstoriesDir,
+    "thumbnailDimensions" => [
+        "width" => $thumbnailWidth,
+        "height" => $thumbnailHeight
+    ]
 ]);
 
 // Create the images directory if it doesn't exist with better error handling
