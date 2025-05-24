@@ -40,10 +40,9 @@ const BodyTwo = ({ selectedCity, selectedState }) => {
               Eggs are a fantastic addition to any meal, whether it's breakfast, lunch, or dinner! You can enjoy them scrambled or boiled, and they work wonderfully in dishes like Anda Bhurji or even Anda Ka Halwa. Just like us Indians, eggs can fit into a variety of recipes while keeping their special charm. If you're curious about egg prices in India, they change daily, as shared by the NECC (National Egg Coordination Committee). We make it easy for you to stay updated with the latest egg rates so you can continue enjoying your favorite egg dishes!
             </p> 
           </div>
-      </div>
-      <h1 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
-      Today Egg Rates
-      </h1>
+      </div>      <h2 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
+        Today's NECC Egg Rate Analysis
+      </h2>
       <div className="grid lg:grid-cols-2 gap-5"> 
         <div>
           <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
@@ -51,10 +50,9 @@ const BodyTwo = ({ selectedCity, selectedState }) => {
           </p> 
         </div>
         <OptimizedImage src="/desiegg.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate in india" width={600} height={400} />
-      </div>
-      <h1 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
+      </div>      <h2 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
         Egg Consumption in India
-      </h1>
+      </h2>
       <div className="grid lg:grid-cols-2 gap-5"> 
           <OptimizedImage src="/eggrate3.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate in mumbai" width={600} height={400} />
           <div>

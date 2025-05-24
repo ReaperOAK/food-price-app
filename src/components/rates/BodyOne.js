@@ -22,71 +22,71 @@ const BodyOne = ({ selectedCity, selectedState }) => {
       .catch(error => console.error('Error fetching web stories:', error));
   }, []);
 
-  return (
-    <div className="p-6 mt-6 bg-gray-100 rounded-lg shadow-lg">
-      <h1 className="text-center font-bold text-3xl text-gray-800">Today Egg Rate in {displayName} (Daily NECC Egg Price)</h1>
-      <p className="text-center text-lg text-gray-600 mt-4">
-        {selectedCity ? 
-          `Get the latest egg rates in ${displayName}, ${selectedState}. Daily updated NECC egg prices in ${displayName} for April ${new Date().getDate()}, ${new Date().getFullYear()}.` :
-          selectedState ? 
-          `Find today's egg rates across different cities in ${displayName}. Updated NECC egg prices for all cities in ${displayName} state.` :
-          `Find today's egg rates across different cities and states in India. Updated NECC egg prices from Barwala, Namakkal, Mumbai, Delhi, Hyderabad, and more.`
-        }
-      </p>
+  const getUniqueH1 = () => {
+    if (selectedCity) {
+      return `Egg Rate in ${selectedCity}, ${selectedState} (${today})`;
+    } else if (selectedState) {
+      return `${selectedState} Egg Rate: Latest NECC Prices (${today})`;
+    } else {
+      return `Today's Egg Rate in India: NECC Price List (${today})`;
+    }
+  };
 
+  return (
+    <div className="max-w-4xl mx-auto mb-8">
+      {/* Hero Section with Unique H1 and Display Name */}
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">
+          {getUniqueH1()}
+        </h1>
+        <p className="text-center text-lg font-semibold text-gray-700 mb-2">
+          Current Rates for {displayName}
+        </p>
+        <p className="text-center text-gray-600 mb-4">
+          {selectedCity 
+            ? `Get the latest egg rates for ${selectedCity}. Updated daily with wholesale and retail prices.`
+            : selectedState
+              ? `Check current egg prices across ${selectedState}. Compare rates from different cities.`
+              : 'Track egg prices across India with our daily updated NECC rates from major cities.'
+          }
+        </p>
+      </div>
+
+      {/* Web Stories Section */}
       {featuredWebStories.length > 0 && (
         <div className="mt-6">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Featured Egg Rate Stories</h2>
-            <button 
-              onClick={() => setIsWebStoriesExpanded(!isWebStoriesExpanded)}
-              className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm"
-            >
-              {isWebStoriesExpanded ? 'Collapse' : 'Expand'}
-            </button>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Latest Updates</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {featuredWebStories.slice(0, isWebStoriesExpanded ? undefined : 3).map(story => (
+              <Link
+                key={story.id}
+                to={`/webstories/${story.slug}`}
+                className="block bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+                <div className="aspect-w-9 aspect-h-16 mb-2">
+                  <img 
+                    src={story.thumbnail} 
+                    alt={`Egg Rate in ${story.city}, ${story.state}`} 
+                    className="object-cover w-full h-48 rounded-lg"
+                    loading="lazy"
+                  />
+                </div>
+                <h3 className="font-bold text-lg mb-1">{story.title}</h3>
+                <p className="text-red-600 font-bold mb-1">₹{story.rate} per egg</p>
+                <p className="text-gray-600 text-sm">{story.date}</p>
+              </Link>
+            ))}
           </div>
-          
-          {isWebStoriesExpanded && (
-            <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {featuredWebStories.map((story, index) => (
-                  <Link 
-                    key={index}
-                    to={`/webstory/${story.slug}`}
-                    className="block bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <div className="aspect-w-9 aspect-h-16 mb-2">
-                      <img 
-                        src={story.thumbnail} 
-                        alt={`Egg Rate in ${story.city}, ${story.state}`} 
-                        className="object-cover w-full h-48 rounded-lg"
-                        loading="lazy"
-                      />
-                    </div>
-                    <h3 className="font-bold text-lg mb-1">{story.title}</h3>
-                    <p className="text-red-600 font-bold mb-1">₹{story.rate} per egg</p>
-                    <p className="text-gray-600 text-sm">{story.date}</p>
-                  </Link>
-                ))}
-              </div>
-              <div className="text-center mt-4">
-                <Link to="/webstories" className="text-blue-600 hover:text-blue-800 font-semibold">
-                  View All Web Stories
-                </Link>
-              </div>
-            </>
+          {featuredWebStories.length > 3 && (
+            <button
+              onClick={() => setIsWebStoriesExpanded(!isWebStoriesExpanded)}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              {isWebStoriesExpanded ? 'Show Less' : 'Show More'}
+            </button>
           )}
         </div>
       )}
-
-      <div className="bg-gray-200 rounded-lg w-full p-6 mt-6">
-        <h2 className="text-center text-2xl font-semibold text-gray-800">Egg Rate Today ({today})</h2>
-        <p className="text-left text-gray-700 mt-4">
-          Here is the live NECC egg rate today list across some of the popular {selectedCity ? 'areas of' : 'cities in'} {displayName}.
-          {selectedCity && ` These prices are collected directly from reliable sources in ${displayName} and updated daily.`}
-          {selectedState && !selectedCity && ` These prices reflect the current market trends in ${displayName} state and are updated regularly.`}
-        </p>
-      </div>
     </div>
   );
 };

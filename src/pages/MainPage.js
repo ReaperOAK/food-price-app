@@ -194,41 +194,43 @@ const MainPage = () => {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `Eggs in ${displayName}`,
-    "description": `Latest egg rates in ${displayName}. Check today's egg prices updated on ${formattedDate}.`,
+    "description": `Latest egg rates in ${displayName}. Check today's egg prices updated on ${formattedDate}. Single egg price: ₹${currentRate}, Tray (30 eggs) price: ₹${trayPrice}`,
     "offers": {
-      "@type": "Offer",
+      "@type": "AggregateOffer",
       "priceCurrency": "INR",
-      "price": currentRate,
+      "lowPrice": currentRate,
+      "highPrice": trayPrice,
       "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
       "availability": "https://schema.org/InStock"
     }
   };
     // We'll get FAQ data from the FAQ component instead of duplicating it here
   
-  // Create SEO title and description based on location
+  // Create SEO title and description based on location  
   const getSeoTitle = () => {
     if (selectedCity) {
       return `${selectedCity} Egg Rate Today - ₹${currentRate} (${formattedDate}) | NECC Egg Price`;
     } else if (selectedState) {
-      return `${selectedState} Egg Rates Today - NECC Egg Prices in ${selectedState} (${formattedDate})`;
+      return `${selectedState} Egg Rates Today: State-wide NECC Price List (${formattedDate})`;
     } else {
-      return 'Today Egg Rate - Check Latest NECC Egg Price Across India';
+      return `Today's Egg Rate: Check NECC Egg Prices Across India (${formattedDate})`;
     }
   };
-  
+
   const getSeoDescription = () => {
     if (selectedCity) {
-      return `Today's egg rate in ${selectedCity}, ${selectedState}: ₹${currentRate}/egg, ₹${trayPrice}/tray (30 eggs). Check latest NECC egg price in ${selectedCity} updated on ${formattedDate}. Daily updated wholesale and retail rates.`;
+      const trayPrice = currentRate !== 'N/A' ? (currentRate * 30).toFixed(2) : 'N/A';
+      return `Current egg rate in ${selectedCity}, ${selectedState}: ₹${currentRate}/egg, ₹${trayPrice}/tray (30 eggs). Check latest NECC egg price in ${selectedCity} updated on ${formattedDate}. Live updates and market analysis.`;
     } else if (selectedState) {
-      return `Today's egg rates in all cities of ${selectedState}. Check latest NECC egg prices in ${selectedState} updated on ${formattedDate}. Compare egg prices across all major markets in ${selectedState}.`;
+      return `Today's egg rate in ${selectedState}: Get latest NECC egg prices and daily market updates from all major cities in ${selectedState}. Compare wholesale and retail egg rates updated on ${formattedDate}.`;
     } else {
-      return `Today's egg rate: Check latest NECC egg price across India. Daily updated egg rates for Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare wholesale & retail egg prices across India (${formattedDate}).`;
+      return `Check today's egg rates across India. Daily updated NECC egg prices from Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare wholesale & retail egg prices (${formattedDate}).`;
     }
   };
-  
+
   const getSeoKeywords = () => {
     if (selectedCity) {
-      return `egg rate today, ${selectedCity.toLowerCase()} egg rate, ${selectedCity.toLowerCase()} egg price today, necc egg rate ${selectedCity.toLowerCase()}, ${selectedCity.toLowerCase()} today egg rate, egg price in ${selectedCity.toLowerCase()}, egg rate in ${selectedCity.toLowerCase()} today`;
+      return `${selectedCity.toLowerCase()} egg rate today, ${selectedState.toLowerCase()} egg price, egg rate in ${selectedCity.toLowerCase()}, ${selectedCity.toLowerCase()} egg price today, necc egg rate in ${selectedCity.toLowerCase()}`;
     } else if (selectedState) {
       return `${selectedState.toLowerCase()} egg rate, egg price in ${selectedState.toLowerCase()}, today egg rate in ${selectedState.toLowerCase()}, ${selectedState.toLowerCase()} egg price today, necc egg rate in ${selectedState.toLowerCase()}`;
     } else {
@@ -241,8 +243,19 @@ const MainPage = () => {
       <Helmet>
         <title>{getSeoTitle()}</title>
         <meta name="description" content={getSeoDescription()} />
-        <link rel="canonical" href={`https://todayeggrates.com${location.pathname}`} />
         <meta name="keywords" content={getSeoKeywords()} />
+        
+        {/* Canonical URL with proper handling */}
+        <link 
+          rel="canonical" 
+          href={`https://todayeggrates.com${
+            location.pathname === '/' 
+              ? '' 
+              : location.pathname.endsWith('/') 
+                ? location.pathname.slice(0, -1) 
+                : location.pathname
+          }`} 
+        />
         
         {/* Add structured data for rich snippets */}
         <script type="application/ld+json">
