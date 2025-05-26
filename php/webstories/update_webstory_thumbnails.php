@@ -310,8 +310,8 @@ if ($result && $result->num_rows > 0) {
             // Get image type
             $imageInfo = getimagesize($sourceImagePath);
             if ($imageInfo === false) {
-                debug_log("ERROR", "Cannot determine image type for {$sourceImagePath}");
-                throw new Exception("Cannot determine image type for {$sourceImagePath}");
+                debug_log("ERROR", "Could not determine image type for: {$sourceImagePath}");
+                throw new Exception("Could not determine image type for: {$sourceImagePath}");
             }
             
             $sourceType = $imageInfo[2];
@@ -327,6 +327,9 @@ if ($result && $result->num_rows > 0) {
                     break;
                 case IMAGETYPE_GIF:
                     $sourceImage = imagecreatefromgif($sourceImagePath);
+                    break;
+                case IMAGETYPE_WEBP:
+                    $sourceImage = imagecreatefromwebp($sourceImagePath);
                     break;
                 default:
                     debug_log("ERROR", "Unsupported image type: {$sourceType}");

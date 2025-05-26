@@ -384,16 +384,11 @@ try {
 
             // Try normalized tables first
             $sql = "
-                SELECT c.name as city, s.name as state, ern.rate, ern.date 
-                FROM egg_rates_normalized ern
-                JOIN cities c ON ern.city_id = c.id
+                SELECT DISTINCT c.name as city, s.name as state, er.rate, er.date
+                FROM cities c
                 JOIN states s ON c.state_id = s.id
-                WHERE (ern.city_id, ern.date) IN (
-                    SELECT city_id, MAX(date)
-                    FROM egg_rates_normalized
-                    WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
-                    GROUP BY city_id
-                )
+                JOIN egg_rates er ON er.city_id = c.id AND er.state_id = s.id
+                WHERE er.date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
                 ORDER BY c.name
             ";
 
@@ -401,12 +396,23 @@ try {
             $result = $conn->query($sql);
             
             if (!$result) {
-                throw new Exception("Database query failed: " . $conn->error);
+                throw new Exception("Query failed: " . $conn->error);
             }
 
             if ($result->num_rows === 0) {
-                debug_log("DATA", "No results from normalized tables, will try original table");
-                throw new Exception("No results from normalized tables");
+                debug_log("DATA", "No results from normalized tables, falling back to original table");
+                // Fallback to original table
+                $sql = "
+                    SELECT DISTINCT city, state, rate, date 
+                    FROM egg_rates 
+                    WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAY)
+                    ORDER BY city
+                ";
+                $result = $conn->query($sql);
+                
+                if (!$result) {
+                    throw new Exception("Fallback query failed: " . $conn->error);
+                }
             }
 
             debug_log("DATA", "Successfully retrieved " . $result->num_rows . " rows from normalized tables");
@@ -467,102 +473,37 @@ try {
             
             // Skip if the rate is from more than 3 days ago
             if (strtotime($date) < strtotime('-3 days')) {
-                debug_log("STORY", "Skipping {$city} - rate from {$date} is too old");
+                debug_log("SKIP", "Skipping {$city} - rate is too old");
                 continue;
             }
             
-            // Create a URL-friendly city name
-            $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-            
-            // Randomly select different images for different pages
-            shuffle($backgroundImages);
-            
-            // For each page in the web story, construct the proper path to the image
-            // We'll use full absolute URLs to ensure they're accessible
-            $coverImage = $backgroundImages[0];  // Remove the /images/webstories/ prefix 
-            $trayPriceImage = isset($backgroundImages[1]) ? $backgroundImages[1] : $backgroundImages[0];
-            $ctaImage = isset($backgroundImages[2]) ? $backgroundImages[2] : $backgroundImages[0];
-            
-            // Format date for display
-            $displayDate = date('F j, Y', strtotime($date));
-            
-            // Format ISO date for Schema.org
-            $isoDate = date('c', strtotime($date));
-            
-            // Replace placeholders in the template
+            // Replace template variables
             $story = $template;
             $story = str_replace('{{CITY_NAME}}', $city, $story);
             $story = str_replace('{{STATE_NAME}}', $state, $story);
-            $story = str_replace('{{EGG_RATE}}', $rate, $story);
-            $story = str_replace('{{ISO_DATE}}', $isoDate, $story);
+            $story = str_replace('{{RATE}}', number_format($rate, 2), $story);
+            $story = str_replace('{{DATE}}', date('F j, Y', strtotime($date)), $story);
             
-            // Calculate the tray price properly instead of literal string replacement
-            $trayPrice = number_format($rate * 30, 1);
-            $story = str_replace('{{EGG_RATE * 30}}', $trayPrice, $story);
-            $story = str_replace('{{DATE}}', $displayDate, $story);
+            // Format image paths for each page
+            $coverImagePath = formatImagePath($coverImage);
+            $trayPriceImagePath = formatImagePath($trayPriceImage);
+            $ctaImagePath = formatImagePath($ctaImage);
             
-            // Format image paths properly with the correct path prefix
-            $formattedCoverImage = formatImagePath($coverImage);
-            $formattedTrayImage = formatImagePath($trayPriceImage);
-            $formattedCtaImage = formatImagePath($ctaImage);
+            $story = str_replace('{{COVER_IMAGE}}', $coverImagePath, $story);
+            $story = str_replace('{{TRAY_PRICE_IMAGE}}', $trayPriceImagePath, $story);
+            $story = str_replace('{{CTA_IMAGE}}', $ctaImagePath, $story);
             
-            debug_log("IMAGES", "Formatted image paths", [
-                "Original cover" => $coverImage,
-                "Formatted cover" => $formattedCoverImage,
-                "Original tray" => $trayPriceImage,
-                "Formatted tray" => $formattedTrayImage,
-                "Original CTA" => $ctaImage,
-                "Formatted CTA" => $formattedCtaImage
-            ]);
+            // Save web story
+            $storyPath = $storiesDir . '/' . $citySlug . '-egg-rate.html';
+            debug_log("SAVE", "Saving web story to {$storyPath}");
             
-            // Replace different background images for different pages with correctly formatted paths
-            $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $formattedCoverImage, $story);
-            $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $formattedTrayImage, $story);
-            $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $formattedCtaImage, $story);
-            
-            $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
-            
-            // Check all img tags to ensure no duplicate paths
-            $story = preg_replace('#src="[/]?images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
-            $story = preg_replace('#src="/+images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
-            $story = preg_replace('#src="/images/webstories//images/webstories/([^"]+)"#', 'src="/images/webstories/$1"', $story);
-            
-            // Fix duplicate paths in meta tags
-            $story = preg_replace('#content="https://todayeggrates.com/images/webstories//images/webstories/([^"]+)"#', 'content="https://todayeggrates.com/images/webstories/$1"', $story);
-            
-            // Properly handle amp-story attributes by finding the main amp-story tag and ensuring it has all required attributes
-            // First, check if the standalone attribute exists in the amp-story tag
-            $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.webp';
-            $ampStoryPattern = '/<amp-story[^>]*>/';
-            
-            if (preg_match($ampStoryPattern, $story, $matches)) {
-                $originalTag = $matches[0];
-                debug_log("STORY", "Found amp-story tag: {$originalTag}");
-                
-                // Create a new amp-story tag with all required attributes
-                $newTag = '<amp-story standalone title="Egg Rate in ' . $city . ', ' . $state . ' - ₹' . $rate . '" ' .
-                         'publisher="Today Egg Rates" publisher-logo-src="/tee.webp" ' . 
-                         'poster-portrait-src="' . $thumbnailUrl . '">';
-                
-                // Replace the original tag with our complete one
-                $story = str_replace($originalTag, $newTag, $story);
-                debug_log("STORY", "Updated amp-story tag with all required attributes");
-            } else {
-                debug_log("ERROR", "Could not find amp-story tag in template");
+            if (file_put_contents($storyPath, $story) === false) {
+                debug_log("ERROR", "Failed to save web story for {$city}");
+                continue;
             }
             
-            // Save the web story
-            $filename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
-            debug_log("STORY", "Saving web story for {$city} to {$filename}");
-            $writeResult = file_put_contents($filename, $story);
-            
-            if ($writeResult !== false) {
-                $storiesGenerated++;
-                debug_log("STORY", "Web story saved successfully for {$city}");
-            } else {
-                debug_log("STORY", "Failed to write web story file for {$city} to {$filename}");
-                throw new Exception("Could not write to file {$filename}");
-            }
+            $storiesGenerated++;
+            debug_log("SUCCESS", "Generated web story for {$city}");
         }
         
         // Generate an index file for all web stories
