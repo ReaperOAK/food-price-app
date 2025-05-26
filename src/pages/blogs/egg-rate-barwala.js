@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import 'tailwindcss/tailwind.css'; // Ensure Tailwind CSS is imported
+import 'tailwindcss/tailwind.css';
 import RateTable from '../../components/rates/RateTable';
+import RateChart from '../../components/rates/RateChart';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -42,7 +43,22 @@ const EggRates = () => {
 
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Egg Rates in the Last 7 Days</h2>
-        <RateTable eggRates={last7DaysRates} selectedCity="Barwala" selectedState="Haryana" />
+        <RateTable 
+          eggRates={last7DaysRates} 
+          selectedCity="Barwala" 
+          selectedState="Haryana"
+          showDate={true}
+          itemsPerPage={7}
+          showPriceColumns={true}
+        />
+        <RateChart 
+          data={last7DaysRates}
+          title="Barwala Egg Rates - Last 7 Days"
+          chartType="line"
+          xAxisKey="date"
+          yAxisKey="rate"
+          showLine={true}
+        />
       </section>
       
       <section className="mb-8">

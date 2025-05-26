@@ -2,12 +2,20 @@
 
 ## 📋 Project Overview
 
-The Food Price App provides real-time egg price information across different cities and states in India. It offers comprehensive features including:
+The Food Price App provides comprehensive egg price information across different cities and states in India. It offers a rich set of features including:
 
-- 📊 Real-time price tracking
-- 📈 Historical data analysis
-- 📝 Educational blogs about egg markets
+- 📊 Real-time price tracking with daily NECC updates
+- 📈 Interactive price visualization with charts and graphs
+- 💰 Multi-format pricing (per piece, tray, bulk packages)
+- 📊 Historical trend analysis and price comparisons
+- 📱 Mobile-responsive design for all devices
+- 🔍 SEO-optimized with structured data (Schema.org)
+- 📝 Educational blogs about egg markets and trends
 - 📱 Visual web stories for enhanced engagement
+- 🏢 Special wholesale rates for bulk buyers
+- 🔄 Dynamic content updates with pagination
+- 📊 Sortable and filterable data tables
+- 🔍 City and state-wise price navigation
 
 ## 🗂️ Directory Structure
 
@@ -110,10 +118,33 @@ The Food Price App provides real-time egg price information across different cit
 - **FAQ.js**: Dynamic FAQ section with location-tailored questions
 
 #### Data Display
-- **RateTable.js**: Interactive table showing egg rates with visualization charts
+- **RateTable.js**: Interactive table showing egg rates with rich features:
+  - Price visualization using configurable charts (bar/line)
+  - Pagination support
+  - Sortable columns (city, state, date, rate)
+  - Special rates display for wholesale/bulk buyers
+  - Price calculations (per piece, tray of 30, pack of 100, peti of 210)
+  - SEO-optimized with structured data (Schema.org)
+  - Admin mode for CRUD operations
+  - Responsive design with horizontal scrolling
+  - Price change indicators with percentage calculations
+
+- **RateChart.js**: Chart component for visualizing egg rates with features:
+  - Support for both bar and line charts
+  - Customizable data points and hover states
+  - Currency formatting for price values
+  - Automatic date formatting for x-axis
+  - Responsive layout with maintainable aspect ratio
+  - Custom tooltips with price information
+
+- **StateList.js**: Interactive grid of states and cities with:
+  - Direct navigation links to city/state specific pages
+  - Last updated timestamps
+  - Organized display of market locations
+  - Hierarchical data presentation
+
 - **DefaultTable.js**: Generic table for displaying egg rates without specific location
-- **SpecialRatesTable.js**: Highlights featured or promoted egg rates from specific markets
-- **StateList.js**: Interactive grid of states and cities with direct navigation links
+- **SpecialRatesTable.js**: Highlights featured or promoted egg rates from special markets
 - **EggRatesTable.js**: Admin-facing table for managing egg rate entries
 
 #### Forms & Inputs
@@ -166,13 +197,31 @@ The Food Price App provides real-time egg price information across different cit
 
 ## 🛠️ Technical Implementation
 
-- **Frontend Framework**: React.js for component-based UI
-- **Routing**: React Router for navigation and dynamic routing
-- **Data Visualization**: Chart.js for interactive graphs and charts
-- **Styling**: Tailwind CSS for responsive design
-- **Backend**: PHP API endpoints for data retrieval and management
-- **SEO**: React Helmet for metadata management
-- **Authentication**: JWT-based auth system for admin access
+### Frontend
+- **Core Framework**: React.js for component-based architecture
+- **Routing**: React Router v6 for dynamic routing and navigation
+- **Data Visualization**: Chart.js with React-Chartjs-2 for interactive visualizations
+- **Styling**: Tailwind CSS for responsive, utility-first design
+- **SEO**: React Helmet for dynamic metadata management
+- **Data Management**: Custom hooks for data fetching and state management
+- **Form Handling**: Controlled components with validation
+- **Responsive Design**: Mobile-first approach with Tailwind breakpoints
+
+### Backend
+- **API Layer**: PHP REST API endpoints
+- **Database**: MySQL with optimized queries and indexing
+- **Caching**: Server-side caching for performance optimization
+- **Authentication**: JWT-based secure authentication system
+- **Rate Limiting**: API request throttling for stability
+- **Error Handling**: Centralized error handling and logging
+
+### SEO & Performance
+- **Structured Data**: Schema.org implementation for rich snippets
+- **Meta Tags**: Dynamic meta tags for better search visibility
+- **Performance**: Lazy loading and code splitting
+- **Accessibility**: ARIA attributes and semantic HTML
+- **Analytics**: Built-in performance monitoring
+- **Caching**: Client and server-side caching strategies
 
 ## 👨‍💻 Development Best Practices
 
