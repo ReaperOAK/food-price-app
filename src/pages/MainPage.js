@@ -11,16 +11,25 @@ import FAQ, { generateFaqSchema } from '../components/common/FAQ';
 // Add loading skeleton component at the top
 const LoadingSkeleton = () => (
   <div className="animate-pulse">
-    <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
-    <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
-    <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto mb-4"></div>
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto">
-      {[...Array(4)].map((_, i) => (
-        <div key={i} className="bg-gray-100 rounded-lg p-4">
-          <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
-          <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+    <div className="max-w-4xl mx-auto mb-8">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 min-h-[200px]">
+          <div className="h-12 bg-white/20 rounded w-3/4 mx-auto mb-4"></div>
+          <div className="h-8 bg-white/20 rounded w-1/2 mx-auto mb-2"></div>
+          <div className="h-12 bg-white/20 rounded w-2/3 mx-auto"></div>
         </div>
-      ))}
+
+        <div className="p-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-gray-100 rounded-lg p-4">
+                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-6 bg-gray-200 rounded w-2/3"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 );
@@ -365,21 +374,23 @@ const MainPage = () => {
               {/* Hero Section with improved design */}
               <div className="max-w-4xl mx-auto mb-8">
                 <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
-                    <h1 className="text-3xl font-bold text-white text-center mb-4">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 min-h-[200px] flex flex-col justify-center">
+                    <h1 className="text-3xl font-bold text-white text-center mb-4 min-h-[48px] leading-tight">
                       {getUniqueH1()}
                     </h1>
-                    <p className="text-center text-white text-xl font-semibold mb-2">
-                      Current Rates for {displayName}
-                    </p>
-                    <p className="text-center text-blue-100">
-                      {selectedCity 
-                        ? `Get the latest egg rates for ${selectedCity}. Updated daily with wholesale and retail prices.`
-                        : selectedState
-                          ? `Check current egg prices across ${selectedState}. Compare rates from different cities.`
-                          : 'Track egg prices across India with our daily updated NECC rates from major cities.'
-                      }
-                    </p>
+                    <div className="space-y-2">
+                      <p className="text-center text-white text-xl font-semibold mb-2 min-h-[32px]">
+                        Current Rates for {displayName}
+                      </p>
+                      <p className="text-center text-blue-100 min-h-[48px]">
+                        {selectedCity 
+                          ? `Get the latest egg rates for ${selectedCity}. Updated daily with wholesale and retail prices.`
+                          : selectedState
+                            ? `Check current egg prices across ${selectedState}. Compare rates from different cities.`
+                            : 'Track egg prices across India with our daily updated NECC rates from major cities.'
+                        }
+                      </p>
+                    </div>
                   </div>
                   <div className="p-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
