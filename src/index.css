@@ -4,6 +4,32 @@
 @import 'tailwindcss/tailwind.css';
 @tailwind utilities;
 
+/* Font optimization for CLS */
+@layer base {
+  @font-face {
+    font-family: system-ui;
+    font-display: swap;
+    size-adjust: 100%;
+    ascent-override: 90%;
+    descent-override: 20%;
+    line-gap-override: 0%;
+  }
+}
+
+/* Content height reservations */
+.min-content-height {
+  min-height: calc(100vh - 64px - 80px); /* Navbar and footer heights */
+}
+
+/* Prevent layout shifts during transitions */
+.content-transition {
+  transition: none;
+}
+
+/* Font classes */
+.font-display {
+  font-display: swap;
+}
 
 body {
   margin: 0;

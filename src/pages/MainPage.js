@@ -13,18 +13,21 @@ const LoadingSkeleton = () => (
   <div className="animate-pulse">
     <div className="max-w-4xl mx-auto mb-8">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 min-h-[200px]">
-          <div className="h-12 bg-white/20 rounded w-3/4 mx-auto mb-4"></div>
-          <div className="h-8 bg-white/20 rounded w-1/2 mx-auto mb-2"></div>
-          <div className="h-12 bg-white/20 rounded w-2/3 mx-auto"></div>
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6" style={{ minHeight: '200px', height: '100%' }}>
+          {/* Fixed height for title placeholder */}
+          <div className="h-12 bg-white/20 rounded w-3/4 mx-auto mb-4" style={{ minHeight: '48px' }}></div>
+          {/* Fixed height for subtitle placeholder */}
+          <div className="h-8 bg-white/20 rounded w-1/2 mx-auto mb-2" style={{ minHeight: '32px' }}></div>
+          {/* Fixed height for description placeholder */}
+          <div className="h-12 bg-white/20 rounded w-2/3 mx-auto" style={{ minHeight: '48px' }}></div>
         </div>
 
         <div className="p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gray-100 rounded-lg p-4">
-                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-                <div className="h-6 bg-gray-200 rounded w-2/3"></div>
+              <div key={i} className="text-center" style={{ minHeight: '80px' }}>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-2/3 mx-auto"></div>
               </div>
             ))}
           </div>
@@ -365,7 +368,7 @@ const MainPage = () => {
         selectedCity={selectedCity}
         setSelectedCity={setSelectedCity}
       />
-      <div className="container mx-auto px-4 w-full max-w-7xl transition-none">
+      <div className="container mx-auto px-4 w-full max-w-7xl min-h-[500px]">
         <div id="home" className="py-8">
           {loading ? (
             <LoadingSkeleton />
@@ -406,6 +409,7 @@ const MainPage = () => {
                         <p className="text-sm text-gray-500">Weekly Change</p>
                         <p className={`text-2xl font-bold ${weeklyChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
                           {weeklyChange !== 'N/A' ? `${weeklyChange > 0 ? '+' : ''}${weeklyChange}` : 'N/A'}
+                          <span className="text-sm ml-1">({weeklyChangePercent}%)</span>
                         </p>
                       </div>
                       <div className="text-center">
@@ -416,8 +420,7 @@ const MainPage = () => {
                   </div>
                 </div>
               </div>
-              
-              {/* Rest of the content */}
+
               {/* Rate Table and Chart */}
               {selectedCity || selectedState ? (
                 <RateTable
@@ -558,46 +561,6 @@ const MainPage = () => {
                       </span>
                     </div>
                     <p className="text-2xl font-bold text-gray-900 mt-2">₹{formatPrice(rate7DaysAgo)}</p>
-                    <p className="text-sm text-gray-600 mt-1">Per egg</p>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105">
-                    <h3 className="text-md font-semibold text-gray-800 mb-2">Weekly Change</h3>
-                    <p className="text-2xl font-bold mt-2">
-                      {weeklyChange > 0 ? (
-                        <span className="flex items-center text-green-500">
-                          <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                          </svg>
-                          +₹{formatPrice(weeklyChange)}
-                          <span className="text-sm ml-1">({weeklyChangePercent}%)</span>
-                        </span>
-                      ) : weeklyChange < 0 ? (
-                        <span className="flex items-center text-red-500">
-                          <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
-                          </svg>
-                          -₹{formatPrice(-weeklyChange)}
-                          <span className="text-sm ml-1">({weeklyChangePercent}%)</span>
-                        </span>
-                      ) : (
-                        <span className="flex items-center text-gray-500">
-                          <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                          </svg>
-                          No change
-                        </span>
-                      )}
-                    </p>
-                    <p className="text-sm text-gray-600 mt-1">From last week</p>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105">
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-md font-semibold text-gray-800">Average Price</h3>
-                      <span className="text-xs text-gray-500">30 days</span>
-                    </div>
-                    <p className="text-2xl font-bold text-gray-900 mt-2">₹{formatPrice(averagePrice)}</p>
                     <p className="text-sm text-gray-600 mt-1">Per egg</p>
                   </div>
                 </div>
