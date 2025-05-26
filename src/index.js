@@ -9,7 +9,7 @@ const LoadingFallback = () => (
     <div className="text-center animate-fade-in">
       <div className="w-16 h-16 mb-4 mx-auto">
         <img 
-          src="/tee.webp"
+          src="/logo.png"
           alt="Loading..."
           className="w-full h-full object-contain"
           fetchpriority="high"
@@ -41,7 +41,7 @@ const setupProgressiveEnhancement = async () => {
 
   // Preload critical assets
   const preloadAssets = () => {
-    const criticalImages = ['/eggpic.webp', '/tee.webp'];
+    const criticalImages = ['/eggpic.webp', '/logo.png'];
     criticalImages.forEach(src => {
       const img = new Image();
       img.src = src;

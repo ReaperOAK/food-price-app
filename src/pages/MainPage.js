@@ -355,13 +355,13 @@ const MainPage = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {featuredWebStories.map((story, index) => (
                         <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
-                          <Link to={story.url} target="_blank" rel="noopener noreferrer">
+                          <a href={story.url} target="_blank" rel="noopener noreferrer">
                             <img src={story.image} alt={story.title} className="w-full h-32 object-cover" />
                             <div className="p-4">
                               <h3 className="text-lg font-semibold text-gray-800 mb-2">{story.title}</h3>
                               <p className="text-sm text-gray-600">{story.excerpt}</p>
                             </div>
-                          </Link>
+                          </a>
                         </div>
                       ))}
                     </div>

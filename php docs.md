@@ -85,8 +85,8 @@
     └── manifest.json
     └── robots.txt
     └── sitemap.txt
-    └── tee.avif
-    └── tee.webp
+    └── logo.png
+    └── logo.png
 ```
 
 ## Database Utilities
