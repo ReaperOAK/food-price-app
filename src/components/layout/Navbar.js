@@ -182,8 +182,8 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
     };
 
     return (
-      <div className="logo-container" style={{position: 'relative' }}>
-        {logoLoading && (
+      <div className="logo-container" style={{ width: '6rem', height: '2rem', position: 'relative' }}>
+         {logoLoading && (
           <div className="logo-loading-skeleton" 
             style={{ 
               position: 'absolute',
