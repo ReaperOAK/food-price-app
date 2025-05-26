@@ -309,6 +309,9 @@ const MainPage = () => {
                     showPriceColumns={true}
                     showChart={true}
                     showDate={true}
+                    showState={false}
+                    showAdmin={false}
+                    showMarket={false}
                   />
                 ) : (                  <RateTable
                     key="default-table"
