@@ -255,37 +255,6 @@ const handleLocalSort = (key) => {
         </Helmet>
       )}
       
-      {/* Chart section */}
-      {showChart && rates.length > 1 && (
-        <div className="mb-6">
-          <div className="p-4 bg-white rounded-lg shadow-lg">
-            <div className="mb-4">
-              <p className="text-sm text-gray-600">Last Updated: {latestRateDate}</p>
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-gray-600">
-                  Price Change: 
-                  <span className={`ml-1 ${rateChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                    {rateChange >= 0 ? '+' : ''}{rateChange.toFixed(2)} ({percentageChange.toFixed(1)}%)
-                  </span>
-                </p>
-                {showPriceColumns && (
-                  <p className="text-sm text-gray-600">
-                    Tray Price (30 eggs): ₹{trayPrice.toFixed(2)}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <RateChart 
-              data={chartData} 
-              chartType={selectedCity ? 'line' : 'bar'} 
-              xAxisKey={selectedCity ? 'date' : 'city'}
-              title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
-              showLine={selectedCity}
-            />
-          </div>
-        </div>
-      )}
       
       {/* Table section */}
       <div className={showSpecialRates ? "bg-white rounded-lg shadow-lg overflow-x-auto" : "bg-gray-100 rounded-lg shadow-lg overflow-x-auto"}>
