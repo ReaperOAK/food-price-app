@@ -25,7 +25,7 @@
     />
     <link 
       rel="preload" 
-      href="%PUBLIC_URL%/logo.png" 
+      href="%PUBLIC_URL%/logo.webp" 
       as="image" 
       type="image/webp" 
       fetchpriority="high" 
@@ -61,7 +61,7 @@
     
     <!-- Preload critical assets -->
     <link rel="preload" href="%PUBLIC_URL%/eggpic.webp" as="image" fetchpriority="high" />
-    <link rel="preload" href="%PUBLIC_URL%/logo.png" as="image" fetchpriority="high" />
+    <link rel="preload" href="%PUBLIC_URL%/logo.webp" as="image" fetchpriority="high" />
     <link rel="preload" href="%PUBLIC_URL%/static/css/main.2099c5e4.css" as="style" />
     <link rel="preload" href="%PUBLIC_URL%/static/js/main.js" as="script" />
     
@@ -130,7 +130,7 @@
       }
       
       // Preload critical images
-      const preloadImages = ['/eggpic.webp', '/logo.png'];
+      const preloadImages = ['/eggpic.webp', '/logo.webp'];
       preloadImages.forEach(src => {
         const link = document.createElement('link');
         link.rel = 'preload';

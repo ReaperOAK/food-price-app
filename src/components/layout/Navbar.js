@@ -163,7 +163,7 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   const handleLogoError = (e) => {
     console.error('Error loading logo:', e.nativeEvent);
     console.error('Error target:', e.target);
-    e.target.src = '/logo.png'; // Fallback image
+    e.target.src = '/logo.webp'; // Fallback image
   };
 
   return (
@@ -171,11 +171,9 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
       <div className="container mx-auto px-4 w-full max-w-7xl flex flex-col md:flex-row justify-between items-center transition-none">
         <div className="flex justify-between items-center w-full md:w-auto">          <Link to="/" onClick={handleHomeClick} className="mb-4 md:mb-0">
             <OptimizedImage
-              src="/logo.png"
+              src="/logo.webp"
               alt="Today Egg Rates Logo"
               className="h-10"
-              width={200}
-              height={40}
               onError={handleLogoError}
             />
           </Link>

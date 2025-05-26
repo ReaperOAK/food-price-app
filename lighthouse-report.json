@@ -737,7 +737,7 @@
             "entity": "todayeggrates.com"
           },
           {
-            "url": "https://todayeggrates.com/logo.png",
+            "url": "https://todayeggrates.com/logo.webp",
             "sessionTargetType": "page",
             "protocol": "h2",
             "rendererStartTime": 186.73999989032745,
@@ -6863,7 +6863,7 @@
             "wastedBytes": 2308.3999999999996
           },
           {
-            "url": "https://todayeggrates.com/logo.png",
+            "url": "https://todayeggrates.com/logo.webp",
             "debugData": {
               "type": "debugdata",
               "public": true,
@@ -7100,7 +7100,7 @@
             "totalBytes": 23084
           },
           {
-            "url": "https://todayeggrates.com/logo.png",
+            "url": "https://todayeggrates.com/logo.webp",
             "totalBytes": 21981
           },
           {
@@ -7560,10 +7560,10 @@
                 "width": 200,
                 "height": 40
               },
-              "snippet": "<img src=\"/logo.png\" alt=\"Today Egg Rates Logo\" width=\"200\" height=\"40\" class=\"absolute top-0 left-0 w-full h-full object-cover h-10 opacity-100 transiti…\" loading=\"lazy\" decoding=\"async\" fetchpriority=\"auto\">",
+              "snippet": "<img src=\"/logo.webp\" alt=\"Today Egg Rates Logo\" width=\"200\" height=\"40\" class=\"absolute top-0 left-0 w-full h-full object-cover h-10 opacity-100 transiti…\" loading=\"lazy\" decoding=\"async\" fetchpriority=\"auto\">",
               "nodeLabel": "Today Egg Rates Logo"
             },
-            "url": "https://todayeggrates.com/logo.png",
+            "url": "https://todayeggrates.com/logo.webp",
             "totalBytes": 21908,
             "wastedBytes": 12149,
             "wastedPercent": 55.45616523035526
@@ -8288,7 +8288,7 @@
             "wastedBytes": 2308.3999999999996
           },
           {
-            "url": "https://todayeggrates.com/logo.png",
+            "url": "https://todayeggrates.com/logo.webp",
             "cacheLifetimeMs": 604800000,
             "wastedBytes": 2198.0999999999995
           },
@@ -8806,7 +8806,7 @@
             }
           },
           {
-            "url": "https://todayeggrates.com/logo.png",
+            "url": "https://todayeggrates.com/logo.webp",
             "totalBytes": 21908,
             "wastedBytes": 20056,
             "subItems": {

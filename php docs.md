@@ -85,8 +85,8 @@
     └── manifest.json
     └── robots.txt
     └── sitemap.txt
-    └── logo.png
-    └── logo.png
+    └── logo.webp
+    └── logo.webp
 ```
 
 ## Database Utilities

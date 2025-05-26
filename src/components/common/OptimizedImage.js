@@ -95,7 +95,7 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
           onError={(e) => {
             setError(true);
             e.target.onerror = null;
-            e.target.src = '/logo.png';
+            e.target.src = '/logo.webp';
           }}
           style={{
             contain: 'layout paint style',
