@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import RateTable from '../components/rates/RateTable';
 import StateList from '../components/rates/StateList';
-import ContentSection from '../components/rates/ContentSection';
 import BlogList from '../components/blog/BlogList';
 import Footer from '../components/layout/Footer';
-import { generateFaqSchema } from '../components/common/FAQ';
+import FAQ, { generateFaqSchema } from '../components/common/FAQ';
 
 const MainPage = () => {
+  // Original MainPage state
   const [eggRates, setEggRates] = useState([]);
   const [specialRates, setSpecialRates] = useState([]);
   const [selectedState, setSelectedState] = useState('');
@@ -19,23 +19,43 @@ const MainPage = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Get the state and city from URL parameters
-  const { state: stateParam, city: cityParam } = useParams();
+  // ContentSection state
+  const [featuredWebStories, setFeaturedWebStories] = useState([]);
+  const [showWebStories, setShowWebStories] = useState(false);
 
-  // Get location object for routing
+  // URL and location parameters
+  const { state: stateParam, city: cityParam } = useParams();
   const location = useLocation();
 
-  // Get display name based on selected location
+  // Display and formatting helpers
   const displayName = selectedCity ? `${selectedCity}, ${selectedState}` : (selectedState || 'India');
+  const today = new Date().toLocaleDateString('en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
 
-  // Define handleFetchSpecialRates function
+  // Calculate price metrics
+  const todayRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
+  const rate7DaysAgo = eggRates.length > 7 ? eggRates[6].rate : 'N/A';
+  const weeklyChange = eggRates.length > 7 ? (eggRates[0].rate - eggRates[6].rate).toFixed(2) : 'N/A';
+  const weeklyChangePercent = eggRates.length > 7 ? ((eggRates[0].rate - eggRates[6].rate) / eggRates[6].rate * 100).toFixed(2) : 'N/A';
+  const averagePrice = eggRates.length > 0 ? (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates.length).toFixed(2) : 'N/A';
+  const trayPrice = todayRate !== 'N/A' ? (todayRate * 30).toFixed(2) : 'N/A';
+
+  // Format price helper
+  const formatPrice = (price) => {
+    return typeof price === 'number' ? price.toFixed(2) : price;
+  };
+
+  // Data fetching functions
   const handleFetchSpecialRates = useCallback(() => {
     return fetch('/php/api/rates/get_special_rates.php')
       .then(res => res.json())
       .then(data => {
         const convertedData = data.map(item => ({
           ...item,
-          rate: parseFloat(item.rate), // Convert rate to a number
+          rate: parseFloat(item.rate),
         }));
         setSpecialRates(convertedData);
       })
@@ -45,7 +65,6 @@ const MainPage = () => {
       });
   }, []);
 
-  // Define handleFetchRates function
   const handleFetchRates = useCallback(() => {
     const fetchPromise = selectedCity && selectedState
       ? fetch(`/php/api/rates/get_rates.php?city=${selectedCity}&state=${selectedState}`)
@@ -56,7 +75,7 @@ const MainPage = () => {
       .then(data => {
         const convertedData = data.map(item => ({
           ...item,
-          rate: parseFloat(item.rate), // Convert rate to a number
+          rate: parseFloat(item.rate),
         }));
         setEggRates(convertedData);
       })
@@ -64,13 +83,24 @@ const MainPage = () => {
         console.error('Error fetching rates:', error);
         setEggRates([]);
       });
-  }, [selectedCity, selectedState]);  // Fetch rates when component mounts or when city/state changes
+  }, [selectedCity, selectedState]);
+
+  // Fetch web stories
+  useEffect(() => {
+    fetch('/php/get_web_stories.php')
+      .then(response => response.json())
+      .then(data => {
+        const shuffled = [...data].sort(() => 0.5 - Math.random());
+        setFeaturedWebStories(shuffled.slice(0, 3));
+      })
+      .catch(error => console.error('Error fetching web stories:', error));
+  }, []);
+
+  // Initial data loading
   useEffect(() => {
     setLoading(true);
     Promise.all([handleFetchRates(), handleFetchSpecialRates()])
       .finally(() => setLoading(false));
-    // Disabling exhaustive deps warning as we only want to run this when these specific props change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleFetchRates, handleFetchSpecialRates, selectedState, selectedCity]);
 
   // Fetch states on mount
@@ -137,53 +167,36 @@ const MainPage = () => {
     }
   }, [stateParam, cityParam, selectedState, selectedCity]);
   
-  // Get formatted date for SEO
-  const formattedDate = new Date().toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
-  });
-  
-  // Get current rate and tray price
-  const currentRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
-  const trayPrice = currentRate !== 'N/A' ? (currentRate * 30).toFixed(2) : 'N/A';
-  
-  // Prepare structured data for search engines
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": `Eggs in ${displayName}`,
-    "description": `Latest egg rates in ${displayName}. Check today's egg prices updated on ${formattedDate}. Single egg price: ₹${currentRate}, Tray (30 eggs) price: ₹${trayPrice}`,
-    "offers": {
-      "@type": "AggregateOffer",
-      "priceCurrency": "INR",
-      "lowPrice": currentRate,
-      "highPrice": trayPrice,
-      "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
-      "availability": "https://schema.org/InStock"
+  // SEO helpers
+  const getUniqueH1 = () => {
+    if (selectedCity) {
+      return `Egg Rate in ${selectedCity}, ${selectedState} (${today})`;
+    } else if (selectedState) {
+      return `${selectedState} Egg Rate: Latest NECC Prices (${today})`;
+    } else {
+      return `Today's Egg Rate in India: NECC Price List (${today})`;
     }
   };
-    // We'll get FAQ data from the FAQ component instead of duplicating it here
-  
+
   // Create SEO title and description based on location  
   const getSeoTitle = () => {
     if (selectedCity) {
-      return `${selectedCity} Egg Rate Today - ₹${currentRate} (${formattedDate}) | NECC Egg Price`;
+      return `${selectedCity} Egg Rate Today - ₹${todayRate} (${today}) | NECC Egg Price`;
     } else if (selectedState) {
-      return `${selectedState} Egg Rates Today: State-wide NECC Price List (${formattedDate})`;
+      return `${selectedState} Egg Rates Today: State-wide NECC Price List (${today})`;
     } else {
-      return `Today's Egg Rate: Check NECC Egg Prices Across India (${formattedDate})`;
+      return `Today's Egg Rate: Check NECC Egg Prices Across India (${today})`;
     }
   };
 
   const getSeoDescription = () => {
     if (selectedCity) {
-      const trayPrice = currentRate !== 'N/A' ? (currentRate * 30).toFixed(2) : 'N/A';
-      return `Current egg rate in ${selectedCity}, ${selectedState}: ₹${currentRate}/egg, ₹${trayPrice}/tray (30 eggs). Check latest NECC egg price in ${selectedCity} updated on ${formattedDate}. Live updates and market analysis.`;
+      const trayPrice = todayRate !== 'N/A' ? (todayRate * 30).toFixed(2) : 'N/A';
+      return `Current egg rate in ${selectedCity}, ${selectedState}: ₹${todayRate}/egg, ₹${trayPrice}/tray (30 eggs). Check latest NECC egg price in ${selectedCity} updated on ${today}. Live updates and market analysis.`;
     } else if (selectedState) {
-      return `Today's egg rate in ${selectedState}: Get latest NECC egg prices and daily market updates from all major cities in ${selectedState}. Compare wholesale and retail egg rates updated on ${formattedDate}.`;
+      return `Today's egg rate in ${selectedState}: Get latest NECC egg prices and daily market updates from all major cities in ${selectedState}. Compare wholesale and retail egg rates updated on ${today}.`;
     } else {
-      return `Check today's egg rates across India. Daily updated NECC egg prices from Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare wholesale & retail egg prices (${formattedDate}).`;
+      return `Check today's egg rates across India. Daily updated NECC egg prices from Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare wholesale & retail egg prices (${today}).`;
     }
   };
 
@@ -194,6 +207,22 @@ const MainPage = () => {
       return `${selectedState.toLowerCase()} egg rate, egg price in ${selectedState.toLowerCase()}, today egg rate in ${selectedState.toLowerCase()}, ${selectedState.toLowerCase()} egg price today, necc egg rate in ${selectedState.toLowerCase()}`;
     } else {
       return 'egg rate today, necc egg rate today, today egg rate, egg rate, national egg rate, all india egg rate, today egg rate in mumbai, today egg rate in chennai, today egg rate kolkata, barwala egg rate today';
+    }
+  };
+
+  // Structured data for search engines
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": `Eggs in ${displayName}`,
+    "description": `Latest egg rates in ${displayName}. Check today's egg prices updated on ${today}. Single egg price: ₹${todayRate}, Tray (30 eggs) price: ₹${trayPrice}`,
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "INR",
+      "lowPrice": todayRate,
+      "highPrice": trayPrice,
+      "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
+      "availability": "https://schema.org/InStock"
     }
   };
 
@@ -210,6 +239,7 @@ const MainPage = () => {
     }
   }, []);
 
+  // Render method
   return (
     <div className="bg-gray-50">
       <Helmet>
@@ -266,35 +296,145 @@ const MainPage = () => {
             <div className="text-center p-4">Loading...</div>
           ) : (
             <>
-              <ContentSection 
-                selectedCity={selectedCity} 
-                selectedState={selectedState}
-                eggRates={eggRates}
-              />
-              
-              {selectedCity || selectedState ? (
-                <RateTable
-                  key={`${selectedCity}-${selectedState}`}
-                  selectedCity={selectedCity}
-                  selectedState={selectedState}
-                  rates={eggRates}
-                  showPriceColumns={true}
-                  showChart={true}
-                  showDate={true}
-                  showState={false}
-                  showAdmin={false}
-                  showMarket={false}
-                />
-              ) : (
-                <RateTable
-                  key="default-table"
-                  rates={eggRates}
-                  showPriceColumns={true}
-                  showChart={true}
-                  chartType="bar"
-                />
-              )}
-              
+              {/* Hero Section */}
+              <div className="max-w-4xl mx-auto mb-8">
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">
+                    {getUniqueH1()}
+                  </h1>
+                  <p className="text-center text-lg font-semibold text-gray-700 mb-2">
+                    Current Rates for {displayName}
+                  </p>
+                  <p className="text-center text-gray-600 mb-4">
+                    {selectedCity 
+                      ? `Get the latest egg rates for ${selectedCity}. Updated daily with wholesale and retail prices.`
+                      : selectedState
+                        ? `Check current egg prices across ${selectedState}. Compare rates from different cities.`
+                        : 'Track egg prices across India with our daily updated NECC rates from major cities.'
+                    }
+                  </p>
+                </div>
+
+                {/* Rate Table and Chart */}
+                {selectedCity || selectedState ? (
+                  <RateTable
+                    key={`${selectedCity}-${selectedState}`}
+                    selectedCity={selectedCity}
+                    selectedState={selectedState}
+                    rates={eggRates}
+                    showPriceColumns={true}
+                    showChart={true}
+                    showDate={true}
+                    showState={false}
+                    showAdmin={false}
+                    showMarket={false}
+                  />
+                ) : (
+                  <RateTable
+                    key="default-table"
+                    rates={eggRates}
+                    showPriceColumns={true}
+                    showChart={true}
+                    chartType="bar"
+                  />
+                )}
+
+                {/* Detailed Price Table */}
+                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+                  <h2 className="text-2xl font-semibold text-gray-700 mb-4">Today's Egg Rate in {displayName}</h2>
+                  <table className="min-w-full bg-white divide-y divide-gray-200 mb-4">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rate (₹)</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Change (7d)</th>
+                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Price (₹)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {eggRates.map((rate, index) => (
+                        <tr key={index}>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{rate.city}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{rate.state}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">₹{formatPrice(rate.rate)}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
+                            {rate.change_7d > 0 ? (
+                              <span className="text-green-500 font-semibold">{rate.change_7d}%</span>
+                            ) : rate.change_7d < 0 ? (
+                              <span className="text-red-500 font-semibold">{rate.change_7d}%</span>
+                            ) : (
+                              <span className="text-gray-500">-</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">₹{formatPrice(rate.avg_price)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Web Stories Section */}
+                <div className="mt-6 text-center">
+                  <button
+                    onClick={() => setShowWebStories(!showWebStories)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                  >
+                    {showWebStories ? 'Hide Web Stories' : 'Show Web Stories'}
+                  </button>
+                </div>
+
+                {showWebStories && featuredWebStories.length > 0 && (
+                  <div className="mt-6">
+                    <h2 className="text-2xl font-semibold text-gray-700 mb-4">Featured Web Stories</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {featuredWebStories.map((story, index) => (
+                        <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
+                          <Link to={story.url} target="_blank" rel="noopener noreferrer">
+                            <img src={story.image} alt={story.title} className="w-full h-32 object-cover" />
+                            <div className="p-4">
+                              <h3 className="text-lg font-semibold text-gray-800 mb-2">{story.title}</h3>
+                              <p className="text-sm text-gray-600">{story.excerpt}</p>
+                            </div>
+                          </Link>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Price Trends Section */}
+                <div className="p-6 mt-6 bg-white shadow-lg rounded-lg">
+                  <h2 className="text-2xl font-semibold text-gray-700 mb-4">Price Trends</h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="bg-gray-100 rounded-lg p-4">
+                      <h3 className="text-md font-semibold text-gray-800 mb-2">Today's Rate</h3>
+                      <p className="text-xl font-bold text-gray-900">₹{formatPrice(todayRate)}</p>
+                    </div>
+                    <div className="bg-gray-100 rounded-lg p-4">
+                      <h3 className="text-md font-semibold text-gray-800 mb-2">Rate 7 Days Ago</h3>
+                      <p className="text-xl font-bold text-gray-900">₹{formatPrice(rate7DaysAgo)}</p>
+                    </div>
+                    <div className="bg-gray-100 rounded-lg p-4">
+                      <h3 className="text-md font-semibold text-gray-800 mb-2">Weekly Change</h3>
+                      <p className="text-xl font-bold text-gray-900">
+                        {weeklyChange > 0 ? (
+                          <span className="text-green-500">+₹{formatPrice(weeklyChange)} ({weeklyChangePercent}%)</span>
+                        ) : weeklyChange < 0 ? (
+                          <span className="text-red-500">-₹{formatPrice(-weeklyChange)} ({weeklyChangePercent}%)</span>
+                        ) : (
+                          <span className="text-gray-500">No change</span>
+                        )}
+                      </p>
+                    </div>
+                    <div className="bg-gray-100 rounded-lg p-4">
+                      <h3 className="text-md font-semibold text-gray-800 mb-2">Average Price (30 days)</h3>
+                      <p className="text-xl font-bold text-gray-900">₹{formatPrice(averagePrice)}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <StateList states={states} cities={cities} />
               
               {/* Special rates table */}
@@ -311,8 +451,14 @@ const MainPage = () => {
                   itemsPerPage={5}
                 />
               )}
+                <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />
               
-              <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />
+              {/* FAQ Section */}
+              <FAQ
+                selectedCity={selectedCity}
+                selectedState={selectedState}
+                eggRates={eggRates}
+              />
             </>
           )}
         </div>
