@@ -26,7 +26,7 @@ const RateTable = ({
 
   if (!rates || rates.length === 0) {
     return (
-      <div className="p-6 mt-6 bg-gray-100 rounded-lg shadow-lg text-center">
+      <div className={showSpecialRates ? "p-6 mt-6 bg-white rounded-lg shadow-lg text-center" : "p-6 mt-6 bg-gray-100 rounded-lg shadow-lg text-center"}>
         {showSpecialRates ? 'No special rates available' : 'No rates available at the moment.'}
       </div>
     );
@@ -207,54 +207,23 @@ const RateTable = ({
       )}
       
       <div className={showSpecialRates ? "p-6 mt-6 bg-white rounded-lg shadow-lg" : "dynamic-body p-4"}>
-        {showSpecialRates && <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Special Rates</h2>}
-        {selectedCity && (
-          <div className="p-6 bg-gray-50 rounded-lg shadow-md mb-6">
-            <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
-              Today's Egg Rate in {selectedCity}, {selectedState}
-            </h2>
-            
-            <div className="flex flex-wrap justify-between mb-8">
-              <div className="w-full md:w-1/2 p-4">
-                <div className="bg-white p-6 rounded-lg shadow-sm">
-                  <h3 className="text-xl font-medium text-gray-700">Latest Price Details</h3>
-                  <div className="mt-4 space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Current Rate:</span>
-                      <span className="font-bold text-2xl text-red-600">₹{latestRate} per egg</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Tray Price (30 eggs):</span>
-                      <span className="font-semibold text-xl text-blue-600">₹{trayPrice.toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600">Updated on:</span>
-                      <span className="text-gray-800">{latestRateDate}</span>
-                    </div>
-                    {rateChange !== 0 && (
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Price Change:</span>
-                        <span className={rateChange > 0 ? 'text-green-600' : rateChange < 0 ? 'text-red-600' : 'text-gray-600'}>
-                          {rateChange > 0 ? '+' : ''}{rateChange.toFixed(2)} ({percentageChange > 0 ? '+' : ''}{percentageChange.toFixed(2)}%)
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
+        {showSpecialRates && (
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-center text-gray-800 mb-4">Special Rates</h2>
+            <p className="text-center text-gray-600 mb-6">Today's wholesale egg rates for special markets and bulk buyers</p>
           </div>
         )}
-        
+
         <div className="overflow-x-auto">
           <table className="min-w-full border border-gray-300 mt-4">
-            <thead>                <tr style={{ backgroundColor: '#F9BE0C' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#F9BE0C' }}>
                 {(!selectedCity && showMarket) && (
                   <th
                     className="border border-gray-300 p-2 cursor-pointer"
                     onClick={() => requestSort('city')}
                   >
-                    Market
+                    {showSpecialRates ? 'Market Location' : 'Market'}
                   </th>
                 )}
                 {showState && (
@@ -277,13 +246,17 @@ const RateTable = ({
                   className="border border-gray-300 p-2 cursor-pointer"
                   onClick={() => requestSort('rate')}
                 >
-                  Piece
+                  Rate Per Piece
                 </th>
                 {showPriceColumns && (
                   <>
-                    <th className="border border-gray-300 p-2">Tray</th>
-                    <th className="border border-gray-300 p-2">100 Pcs</th>
-                    <th className="border border-gray-300 p-2">Peti</th>
+                    <th className="border border-gray-300 p-2">Tray Price (30)</th>
+                    {!showSpecialRates && (
+                      <>
+                        <th className="border border-gray-300 p-2">Price (100 Pcs)</th>
+                        <th className="border border-gray-300 p-2">Peti (210)</th>
+                      </>
+                    )}
                   </>
                 )}
                 {showAdmin && (
@@ -292,7 +265,8 @@ const RateTable = ({
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((rate, index) => (                <tr
+              {currentItems.map((rate, index) => (
+                <tr
                   key={`${rate.city}-${rate.date}-${index}`}
                   className={`${index % 2 === 0 ? 'bg-[#fffcdf]' : 'bg-[#fff1c8]'} hover:bg-[#ddfafe]`}
                 >
@@ -339,8 +313,12 @@ const RateTable = ({
                   {showPriceColumns && (
                     <>
                       <td className="border border-gray-300 p-2">₹{(rate.rate * 30).toFixed(2)}</td>
-                      <td className="border border-gray-300 p-2">₹{(rate.rate * 100).toFixed(2)}</td>
-                      <td className="border border-gray-300 p-2">₹{(rate.rate * 210).toFixed(2)}</td>
+                      {!showSpecialRates && (
+                        <>
+                          <td className="border border-gray-300 p-2">₹{(rate.rate * 100).toFixed(2)}</td>
+                          <td className="border border-gray-300 p-2">₹{(rate.rate * 210).toFixed(2)}</td>
+                        </>
+                      )}
                     </>
                   )}
                   {showAdmin && (

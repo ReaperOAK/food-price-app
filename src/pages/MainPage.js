@@ -1,31 +1,41 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useLocation, matchPath } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-
-import Navbar from '../components/layout/Navbar';
+import { useParams } from 'react-router-dom';
+import MainNavbar from '../components/navigation/MainNavbar';
 import RateTable from '../components/rates/RateTable';
-import Footer from '../components/layout/Footer';
+import StateList from '../components/rates/StateList';
 import BodyOne from '../components/rates/BodyOne';
 import BodyTwo from '../components/rates/BodyTwo';
 import BodyThree from '../components/rates/BodyThree';
-import StatePage from '../components/rates/StatePage';
-import StateList from '../components/rates/StateList';
 import BlogList from '../components/blog/BlogList';
-import FAQ, { generateFaqSchema } from '../components/common/FAQ';
-import Breadcrumb from '../components/layout/Breadcrumb';
-import blogs from '../data/blogs';
+import Footer from '../components/navigation/Footer';
 
 const MainPage = () => {
-  const { city: cityParam, state: stateParam } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [eggRates, setEggRates] = useState([]);
+  const [specialRates, setSpecialRates] = useState([]);
+  const [selectedState, setSelectedState] = useState('');
+  const [selectedCity, setSelectedCity] = useState('');
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
-  const [selectedState, setSelectedState] = useState(stateParam ? stateParam.replace('-egg-rate', '') : '');
-  const [selectedCity, setSelectedCity] = useState(cityParam ? cityParam.replace('-egg-rate', '') : '');
-  const [eggRates, setEggRates] = useState([]);
-  const displayName = selectedCity ? selectedCity : selectedState ? selectedState : 'India';
-  
+  const [blogs, setBlogs] = useState([]);
+
+  // Get the state and city from URL parameters
+  const { state: stateParam, city: cityParam } = useParams();
+
+  // Define handleFetchSpecialRates function
+  const handleFetchSpecialRates = useCallback(() => {
+    fetch('/php/api/rates/get_special_rates.php')
+      .then(res => res.json())
+      .then(data => {
+        const convertedData = data.map(item => ({
+          ...item,
+          rate: parseFloat(item.rate), // Convert rate to a number
+        }));
+        setSpecialRates(convertedData);
+      })
+      .catch(error => console.error('Error fetching special rates:', error));
+  }, []);
+
   // Fetch states on mount
   useEffect(() => {
     fetch('/php/api/location/get_states.php')
@@ -104,56 +114,6 @@ const MainPage = () => {
     // Disabling exhaustive deps warning as we only want to run this when these specific props change
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedState, selectedCity]);
-
-  // Check if the current URL matches /state/:state
-  const stateMatch = matchPath(
-    { path: '/state/:state' },
-    location.pathname
-  );
-
-  // This memoized function will be used to update URLs based on state changes
-  // but with navigation safeguards to prevent history errors
-  const updateURL = useCallback(() => {
-    // Current path without trailing slash for consistent comparison
-    const currentPath = location.pathname.endsWith('/') 
-      ? location.pathname.slice(0, -1) 
-      : location.pathname;
-    
-    // Only update URL when necessary to avoid redundant history entries
-    if (selectedCity && !currentPath.includes(`-egg-rate`)) {
-      const newPath = `/${selectedCity.toLowerCase()}-egg-rate`;
-      if (currentPath !== newPath) {
-        // Using replace: true to avoid stacking history entries
-        navigate(newPath, { replace: true });
-      }
-    } else if (selectedState && !selectedCity && !currentPath.includes(`-egg-rate`)) {
-      const newPath = `/state/${selectedState.toLowerCase()}-egg-rate`;
-      if (currentPath !== newPath) {
-        navigate(newPath, { replace: true });
-      }
-    }
-  }, [selectedCity, selectedState, navigate, location.pathname]);
-  
-  // Use a ref to track if we're currently processing a URL update
-  // to prevent competing updates
-  const isUpdatingRef = React.useRef(false);
-  
-  // Update URL with proper debouncing to prevent rapid changes
-  useEffect(() => {
-    // Skip if we're already processing an update
-    if (isUpdatingRef.current) return;
-    
-    isUpdatingRef.current = true;
-    const timeoutId = setTimeout(() => {
-      updateURL();
-      isUpdatingRef.current = false;
-    }, 50); // Slightly longer timeout for better batching
-    
-    return () => {
-      clearTimeout(timeoutId);
-      isUpdatingRef.current = false;
-    };
-  }, [updateURL]);
 
   // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {
@@ -237,7 +197,7 @@ const MainPage = () => {
   };
 
   return (
-    <>
+    <div className="bg-gray-50">
       <Helmet>
         <title>{getSeoTitle()}</title>
         <meta name="description" content={getSeoDescription()} />
@@ -280,65 +240,64 @@ const MainPage = () => {
         <meta name="twitter:description" content={getSeoDescription()} />
         <meta name="twitter:image" content="https://todayeggrates.com/eggpic.webp" />
       </Helmet>
-      <div className="bg-gray-50 min-h-screen flex flex-col">
-        <Navbar
-          selectedState={selectedState}
-          setSelectedState={setSelectedState}
-          setSelectedCity={setSelectedCity}
-          selectedCity={selectedCity}
-          states={states}
-          cities={cities}
-        />
-        <div className="flex-grow p-4 md:p-8 lg:p-12">
-          {/* Breadcrumb component */}
-          <div className="max-w-4xl mx-auto mb-4">
-            <Breadcrumb />
-          </div>
-          
-          <BodyOne selectedCity={selectedCity} selectedState={selectedState} />
-          <div className="bg-white rounded-lg shadow-md p-6">
-            {stateMatch ? (
-              <StatePage />
-            ) : (
-              <>                {selectedCity && selectedState ? (
-                  <RateTable
-                    key={`${selectedCity}-${selectedState}`}
-                    selectedCity={selectedCity}
-                    selectedState={selectedState}
-                    rates={eggRates}
-                    showPriceColumns={true}
-                    showChart={true}
-                    showDate={true}
-                    showState={false}
-                    showAdmin={false}
-                    showMarket={false}
-                  />
-                ) : (                  <RateTable
-                    key="default-table"
-                    rates={eggRates}
-                    showPriceColumns={true}
-                    showChart={true}
-                    chartType="bar"
-                  />
-                )}
-              </>
-            )}
-            <StateList states={states} cities={cities} />
-            <RateTable
-              rates={eggRates}
-              showSpecialRates={true}
-              showPriceColumns={false}
-              showChart={false}
-            />
-          </div>
-          <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
-          <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />
-          <BodyThree selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
-          <FAQ selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
+      <MainNavbar />
+      <div className="container mx-auto px-4">
+        <BodyOne selectedCity={selectedCity} selectedState={selectedState} />
+
+        <div id="home" className="py-8">
+          {loading ? (
+            <div className="text-center p-4">Loading...</div>
+          ) : (
+            <>
+              {selectedCity || selectedState ? (
+                <RateTable
+                  key={`${selectedCity}-${selectedState}`}
+                  selectedCity={selectedCity}
+                  selectedState={selectedState}
+                  rates={eggRates}
+                  showPriceColumns={true}
+                  showChart={true}
+                  showDate={true}
+                  showState={false}
+                  showAdmin={false}
+                  showMarket={false}
+                />
+              ) : (
+                <RateTable
+                  key="default-table"
+                  rates={eggRates}
+                  showPriceColumns={true}
+                  showChart={true}
+                  chartType="bar"
+                />
+              )}
+              
+              <StateList states={states} cities={cities} />
+              
+              {/* Special rates table */}
+              {specialRates.length > 0 && (
+                <RateTable
+                  key="special-rates"
+                  rates={specialRates}
+                  showSpecialRates={true}
+                  showPriceColumns={true}
+                  showChart={false}
+                  showDate={false}
+                  showState={false}
+                  showMarket={true}
+                  itemsPerPage={5}
+                />
+              )}
+              
+              <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
+              <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />
+              <BodyThree selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
+            </>
+          )}
         </div>
-        <Footer />
       </div>
-    </>
+      <Footer />
+    </div>
   );
 };
 
