@@ -339,41 +339,6 @@ const MainPage = () => {
                   />
                 )}
 
-                {/* Detailed Price Table */}
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                  <h2 className="text-2xl font-semibold text-gray-700 mb-4">Today's Egg Rate in {displayName}</h2>
-                  <table className="min-w-full bg-white divide-y divide-gray-200 mb-4">
-                    <thead>
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">City</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">State</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rate (₹)</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Change (7d)</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg. Price (₹)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {eggRates.map((rate, index) => (
-                        <tr key={index}>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{rate.city}</td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">{rate.state}</td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm font-medium text-gray-900">₹{formatPrice(rate.rate)}</td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">
-                            {rate.change_7d > 0 ? (
-                              <span className="text-green-500 font-semibold">{rate.change_7d}%</span>
-                            ) : rate.change_7d < 0 ? (
-                              <span className="text-red-500 font-semibold">{rate.change_7d}%</span>
-                            ) : (
-                              <span className="text-gray-500">-</span>
-                            )}
-                          </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-700">₹{formatPrice(rate.avg_price)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-
                 {/* Web Stories Section */}
                 <div className="mt-6 text-center">
                   <button
