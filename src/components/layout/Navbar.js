@@ -1,18 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import { FaBars, FaTimes } from 'react-icons/fa';
-import OptimizedImage from '../common/OptimizedImage';
 
 const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState }) => {
   const [options, setOptions] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+  const [logoLoading, setLogoLoading] = useState(true);
+  const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
+  const logoPaths = [
+    '/logo.webp',
+  ];
+
   // Track navigation lock to prevent redundant navigations
   const navigationLock = React.useRef(false);
-
+  
   useEffect(() => {
     fetch('/php/api/location/get_states_and_cities.php')
       .then(response => response.json())
@@ -160,22 +166,99 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
     setMenuOpen(!menuOpen);
   };
 
-  const handleLogoError = (e) => {
-    console.error('Error loading logo:', e.nativeEvent);
-    console.error('Error target:', e.target);
-    e.target.src = '/logo.webp'; // Fallback image
+  // Logo component with loading and fallback handling
+  const Logo = () => {
+    const handleLogoError = () => {
+      setLogoLoading(false);
+      setLogoError(true);
+      if (currentLogoIndex < logoPaths.length - 1) {
+        setCurrentLogoIndex(prev => prev + 1);
+      }
+    };
+
+    const handleLogoLoad = () => {
+      setLogoLoading(false);
+      setLogoError(false);
+    };
+
+    return (
+      <div className="logo-container" style={{ width: '40px', height: '40px', position: 'relative' }}>
+        {logoLoading && (
+          <div className="logo-loading-skeleton" 
+            style={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: '#e0e0e0',
+              borderRadius: '4px',
+              animation: 'pulse 1.5s infinite'
+            }} 
+          />
+        )}
+        <img
+          src={logoPaths[currentLogoIndex]}
+          alt="Food Price App Logo"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            opacity: logoLoading ? 0 : 1,
+            transition: 'opacity 0.3s ease'
+          }}
+          onError={handleLogoError}
+          onLoad={handleLogoLoad}
+        />
+        {logoError && currentLogoIndex === logoPaths.length - 1 && (
+          <div 
+            style={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              backgroundColor: '#f5f5f5',
+              borderRadius: '4px',
+              fontSize: '20px'
+            }}
+          >
+            🥚
+          </div>
+        )}
+      </div>
+    );
   };
+  // Memoize the animation style element creation
+  const animationStyle = useMemo(() => {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = `
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+      }
+    `;
+    return styleElement;
+  }, []);
+
+  useEffect(() => {
+    document.head.appendChild(animationStyle);
+    return () => {
+      if (document.head.contains(animationStyle)) {
+        document.head.removeChild(animationStyle);
+      }
+    };
+  }, [animationStyle]);
 
   return (
-    <nav className="bg-white p-4 shadow-lg">
+    <nav className="bg-white p-4 shadow-lg" style={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: 'white', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
       <div className="container mx-auto px-4 w-full max-w-7xl flex flex-col md:flex-row justify-between items-center transition-none">
         <div className="flex justify-between items-center w-full md:w-auto">          <Link to="/" onClick={handleHomeClick} className="mb-4 md:mb-0">
-            <OptimizedImage
-              src="/logo.webp"
-              alt="Today Egg Rates Logo"
-              className="h-10"
-              onError={handleLogoError}
-            />
+            <Logo />
           </Link>
           <button
             className="md:hidden text-gray-800 focus:outline-none"

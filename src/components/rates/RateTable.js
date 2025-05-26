@@ -21,7 +21,7 @@ const RateTable = ({
   isLoading = false
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortConfig, setSortConfig] = useState({ key: 'city', direction: 'ascending' });
+  const [sortConfig, setSortConfig] = useState({ key: selectedCity ? 'date' : 'city', direction: 'ascending' });
   const [editingRate, setEditingRate] = useState(null);
   const [editedRate, setEditedRate] = useState({});
   const [hoveredRow, setHoveredRow] = useState(null);
@@ -62,10 +62,12 @@ const RateTable = ({
     </div>
   );
 
+  // Show loading skeleton
   if (isLoading) {
     return renderLoadingSkeleton();
   }
 
+  // Handle empty data
   if (!rates || rates.length === 0) {
     return (
       <div style={tableStyle} className="flex items-center justify-center text-gray-500">
@@ -74,7 +76,7 @@ const RateTable = ({
     );
   }
 
-  // Sort rates by date (newest first)
+  // Sort rates
   const sortedRates = externalHandleSort ? rates : [...rates].sort((a, b) => {
     if (a[sortConfig.key] < b[sortConfig.key]) {
       return sortConfig.direction === 'ascending' ? -1 : 1;
@@ -85,15 +87,12 @@ const RateTable = ({
     return 0;
   });
 
+  // Calculate pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedRates.slice(indexOfFirstItem, indexOfLastItem);
-  const pages = [];
-  for (let i = 1; i <= Math.ceil(rates.length / itemsPerPage); i++) {
-    pages.push(i);
-  }
-
-  const handleLocalSort = (key) => {
+  const pages = Array.from({ length: Math.ceil(rates.length / itemsPerPage) }, (_, i) => i + 1);
+const handleLocalSort = (key) => {
     let direction = 'ascending';
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
       direction = 'descending';
@@ -133,22 +132,35 @@ const RateTable = ({
       [name]: value,
     }));
   };
+  // Prepare chart data
+  const chartData = selectedCity ? 
+    // For city view, use all data sorted by date
+    [...sortedRates].sort((a, b) => new Date(b.date) - new Date(a.date)) :
+    // For overview, use the latest rate for each city
+    Object.values(sortedRates.reduce((acc, curr) => {
+      if (!acc[curr.city] || new Date(curr.date) > new Date(acc[curr.city].date)) {
+        acc[curr.city] = curr;
+      }
+      return acc;
+    }, {}));
 
-  // Format dates for chart and calculate changes
+  // Calculate metrics for the header
   const latestRate = sortedRates[0]?.rate || 0;
   const previousRate = sortedRates[1]?.rate || latestRate;
   const rateChange = latestRate - previousRate;
   const percentageChange = previousRate ? (rateChange / previousRate) * 100 : 0;
   const trayPrice = latestRate * 30;
-  const latestRateDate = sortedRates[0]?.date ? new Date(sortedRates[0].date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }) : new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+  const latestRateDate = sortedRates[0]?.date ? 
+    new Date(sortedRates[0].date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    }) : 
+    new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
 
   // Schema data
   const localBusinessSchema = selectedCity ? {
@@ -243,6 +255,7 @@ const RateTable = ({
         </Helmet>
       )}
       
+      {/* Chart section */}
       {showChart && rates.length > 1 && (
         <div className="mb-6">
           <div className="p-4 bg-white rounded-lg shadow-lg">
@@ -262,11 +275,19 @@ const RateTable = ({
                 )}
               </div>
             </div>
-            <RateChart rates={rates} chartType={chartType} />
+
+            <RateChart 
+              data={chartData} 
+              chartType={selectedCity ? 'line' : 'bar'} 
+              xAxisKey={selectedCity ? 'date' : 'city'}
+              title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
+              showLine={selectedCity}
+            />
           </div>
         </div>
       )}
-
+      
+      {/* Table section */}
       <div className={showSpecialRates ? "bg-white rounded-lg shadow-lg overflow-x-auto" : "bg-gray-100 rounded-lg shadow-lg overflow-x-auto"}>
         {showSpecialRates && (
           <div className="mb-6">
