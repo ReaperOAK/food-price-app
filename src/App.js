@@ -19,12 +19,10 @@ const preloadComponent = (importFn) => {
 };
 
 // Main pages with smarter prefetching
-const MainPage = preloadComponent(() => {
-  const component = import(/* webpackChunkName: "main-page" */ './pages/MainPage');
+const MainPage = preloadComponent(() => {  const component = import(/* webpackChunkName: "main-page" */ './pages/MainPage');
   component.then(() => {
     // Prefetch critical components
     import(/* webpackPrefetch: true, webpackChunkName: "rate-table" */ './components/rates/RateTable');
-    import(/* webpackPrefetch: true, webpackChunkName: "default-table" */ './components/rates/DefaultTable');
     import(/* webpackPrefetch: true, webpackChunkName: "state-list" */ './components/rates/StateList');
   });
   return component;

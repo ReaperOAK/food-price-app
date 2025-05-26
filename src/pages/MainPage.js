@@ -4,14 +4,12 @@ import { Helmet } from 'react-helmet';
 
 import Navbar from '../components/layout/Navbar';
 import RateTable from '../components/rates/RateTable';
-import DefaultTable from '../components/rates/DefaultTable';
 import Footer from '../components/layout/Footer';
 import BodyOne from '../components/rates/BodyOne';
 import BodyTwo from '../components/rates/BodyTwo';
 import BodyThree from '../components/rates/BodyThree';
 import StatePage from '../components/rates/StatePage';
 import StateList from '../components/rates/StateList';
-import SpecialRatesTable from '../components/rates/SpecialRatesTable';
 import BlogList from '../components/blog/BlogList';
 import FAQ, { generateFaqSchema } from '../components/common/FAQ';
 import Breadcrumb from '../components/layout/Breadcrumb';
@@ -310,13 +308,23 @@ const MainPage = () => {
                     selectedState={selectedState}
                     eggRates={eggRates}
                   />
-                ) : (
-                  <DefaultTable key="default-table" eggRates={eggRates} />
+                ) : (                  <RateTable
+                    key="default-table"
+                    rates={eggRates}
+                    showPriceColumns={true}
+                    showChart={true}
+                    chartType="bar"
+                  />
                 )}
               </>
             )}
             <StateList states={states} cities={cities} />
-            <SpecialRatesTable />
+            <RateTable
+              rates={eggRates}
+              showSpecialRates={true}
+              showPriceColumns={false}
+              showChart={false}
+            />
           </div>
           <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
           <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />

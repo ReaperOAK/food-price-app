@@ -6,7 +6,7 @@ import CitySelect from '../components/common/CitySelect';
 import RateForm from '../components/admin/RateForm';
 import AddStateForm from '../components/admin/AddStateForm';
 import AddCityForm from '../components/admin/AddCityForm';
-import EggRatesTable from '../components/rates/EggRatesTable';
+import RateTable from '../components/rates/RateTable';
 
 const AdminPage = ({ setIsAuthenticated }) => {
   const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
@@ -408,13 +408,16 @@ const AdminPage = ({ setIsAuthenticated }) => {
               onChange={(e) => setSelectedDate(e.target.value)}
               className="border border-gray-300 p-3 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
             />
-          </div>
-          <EggRatesTable
-            sortedEggRates={sortedEggRates}
+          </div>          <RateTable 
+            rates={sortedEggRates}
+            showAdmin={true}
+            showState={true}
+            showDate={true}
+            showChart={false}
+            showPriceColumns={false}
             handleSort={handleSort}
-            setEggRate={setEggRate}
-            handleDelete={handleDelete}
-            handleEditRate={handleEditRate}
+            onEdit={handleEditRate}
+            onDelete={handleDelete}
           />
         </div>
       </div>
