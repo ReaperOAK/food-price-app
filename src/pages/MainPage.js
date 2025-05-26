@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
-import { useParams } from 'react-router-dom';
-import MainNavbar from '../components/navigation/MainNavbar';
+import { useParams, useLocation } from 'react-router-dom';
+import Navbar from '../components/layout/Navbar';
 import RateTable from '../components/rates/RateTable';
 import StateList from '../components/rates/StateList';
 import BodyOne from '../components/rates/BodyOne';
 import BodyTwo from '../components/rates/BodyTwo';
 import BodyThree from '../components/rates/BodyThree';
 import BlogList from '../components/blog/BlogList';
-import Footer from '../components/navigation/Footer';
+import Footer from '../components/layout/Footer';
+import { generateFaqSchema } from '../components/common/FAQ';
 
 const MainPage = () => {
   const [eggRates, setEggRates] = useState([]);
@@ -18,13 +19,20 @@ const MainPage = () => {
   const [states, setStates] = useState([]);
   const [cities, setCities] = useState([]);
   const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Get the state and city from URL parameters
   const { state: stateParam, city: cityParam } = useParams();
 
+  // Get location object for routing
+  const location = useLocation();
+
+  // Get display name based on selected location
+  const displayName = selectedCity ? `${selectedCity}, ${selectedState}` : (selectedState || 'India');
+
   // Define handleFetchSpecialRates function
   const handleFetchSpecialRates = useCallback(() => {
-    fetch('/php/api/rates/get_special_rates.php')
+    return fetch('/php/api/rates/get_special_rates.php')
       .then(res => res.json())
       .then(data => {
         const convertedData = data.map(item => ({
@@ -33,8 +41,39 @@ const MainPage = () => {
         }));
         setSpecialRates(convertedData);
       })
-      .catch(error => console.error('Error fetching special rates:', error));
+      .catch(error => {
+        console.error('Error fetching special rates:', error);
+        setSpecialRates([]);
+      });
   }, []);
+
+  // Define handleFetchRates function
+  const handleFetchRates = useCallback(() => {
+    const fetchPromise = selectedCity && selectedState
+      ? fetch(`/php/api/rates/get_rates.php?city=${selectedCity}&state=${selectedState}`)
+      : fetch(`/php/api/rates/get_latest_rates.php`);
+
+    return fetchPromise
+      .then(res => res.json())
+      .then(data => {
+        const convertedData = data.map(item => ({
+          ...item,
+          rate: parseFloat(item.rate), // Convert rate to a number
+        }));
+        setEggRates(convertedData);
+      })
+      .catch(error => {
+        console.error('Error fetching rates:', error);
+        setEggRates([]);
+      });
+  }, [selectedCity, selectedState]);  // Fetch rates when component mounts or when city/state changes
+  useEffect(() => {
+    setLoading(true);
+    Promise.all([handleFetchRates(), handleFetchSpecialRates()])
+      .finally(() => setLoading(false));
+    // Disabling exhaustive deps warning as we only want to run this when these specific props change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleFetchRates, handleFetchSpecialRates, selectedState, selectedCity]);
 
   // Fetch states on mount
   useEffect(() => {
@@ -78,42 +117,6 @@ const MainPage = () => {
         .catch(error => console.error('Error fetching state for city:', error));
     }
   }, [cityParam]);
-
-  // Define handleFetchRates function
-  const handleFetchRates = useCallback(() => {
-    if (selectedCity && selectedState) {
-      // Fetch rates for selected city and state
-      fetch(`/php/api/rates/get_rates.php?city=${selectedCity}&state=${selectedState}`)
-        .then(res => res.json())
-        .then(data => {
-          const convertedData = data.map(item => ({
-            ...item,
-            rate: parseFloat(item.rate), // Convert rate to a number
-          }));
-          setEggRates(convertedData);
-        })
-        .catch(error => console.error('Error fetching rates:', error));
-    } else {
-      // Fetch latest rates when no city/state is selected
-      fetch(`/php/api/rates/get_latest_rates.php`)
-        .then(res => res.json())
-        .then(data => {
-          const convertedData = data.map(item => ({
-            ...item,
-            rate: parseFloat(item.rate), // Convert rate to a number
-          }));
-          setEggRates(convertedData);
-        })
-        .catch(error => console.error('Error fetching latest rates:', error));
-    }
-  }, [selectedCity, selectedState]);
-
-  // Fetch rates when component mounts or when city/state changes
-  useEffect(() => {
-    handleFetchRates();
-    // Disabling exhaustive deps warning as we only want to run this when these specific props change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedState, selectedCity]);
 
   // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {
@@ -196,6 +199,19 @@ const MainPage = () => {
     }
   };
 
+  // Define handleFetchBlogs function
+  useEffect(() => {
+    // Import blogs from data file
+    try {
+      import('../data/blogs').then(module => {
+        setBlogs(module.default);
+      });
+    } catch (error) {
+      console.error('Error fetching blogs:', error);
+      setBlogs([]);
+    }
+  }, []);
+
   return (
     <div className="bg-gray-50">
       <Helmet>
@@ -239,10 +255,14 @@ const MainPage = () => {
         <meta name="twitter:title" content={getSeoTitle()} />
         <meta name="twitter:description" content={getSeoDescription()} />
         <meta name="twitter:image" content="https://todayeggrates.com/eggpic.webp" />
-      </Helmet>
-      <MainNavbar />
+      </Helmet>      <Navbar
+        selectedState={selectedState}
+        setSelectedState={setSelectedState}
+        selectedCity={selectedCity}
+        setSelectedCity={setSelectedCity}
+      />
       <div className="container mx-auto px-4">
-        <BodyOne selectedCity={selectedCity} selectedState={selectedState} />
+        <BodyOne selectedCity={selectedCity}selectedState={selectedState} />
 
         <div id="home" className="py-8">
           {loading ? (
