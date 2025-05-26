@@ -300,13 +300,14 @@ const MainPage = () => {
             {stateMatch ? (
               <StatePage />
             ) : (
-              <>
-                {selectedCity && selectedState ? (
+              <>                {selectedCity && selectedState ? (
                   <RateTable
                     key={`${selectedCity}-${selectedState}`}
                     selectedCity={selectedCity}
                     selectedState={selectedState}
-                    eggRates={eggRates}
+                    rates={eggRates}
+                    showPriceColumns={true}
+                    showChart={true}
                   />
                 ) : (                  <RateTable
                     key="default-table"
