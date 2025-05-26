@@ -308,6 +308,7 @@ const MainPage = () => {
                     rates={eggRates}
                     showPriceColumns={true}
                     showChart={true}
+                    showDate={true}
                   />
                 ) : (                  <RateTable
                     key="default-table"
