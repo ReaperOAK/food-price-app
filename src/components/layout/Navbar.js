@@ -168,7 +168,7 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
 
   return (
     <nav className="bg-white p-4 shadow-lg">
-      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
+      <div className="container mx-auto px-4 w-full max-w-7xl flex flex-col md:flex-row justify-between items-center transition-none">
         <div className="flex justify-between items-center w-full md:w-auto">          <Link to="/" onClick={handleHomeClick} className="mb-4 md:mb-0">
             <OptimizedImage
               src="/logo.png"

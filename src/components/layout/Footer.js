@@ -3,7 +3,7 @@ import React from "react";
 const Footer = () => {
   return (
     <footer className="bg-[#422C18] text-white p-6 mt-8">
-      <div className="container mx-auto flex flex-col md:flex-row justify-between items-center">
+      <div className="container mx-auto px-4 w-full max-w-7xl flex flex-col md:flex-row justify-between items-center transition-none">
         <div className="mb-4 md:mb-0">
           <p className="text-center md:text-left">
             © {new Date().getFullYear()} todayEggRates. All Rights Reserved.

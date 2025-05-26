@@ -11,7 +11,7 @@ const AdminNavbar = ({setIsAuthenticated}) => {
 
   return (
     <nav className="bg-gray-800 p-4 shadow-lg">
-      <div className="container mx-auto flex justify-between items-center">
+      <div className="container mx-auto px-4 w-full max-w-7xl flex justify-between items-center transition-none">
         <div>
           <Link to="/admin" className="text-white text-2xl font-bold">Admin Dashboard</Link>
         </div>

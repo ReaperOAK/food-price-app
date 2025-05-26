@@ -356,7 +356,7 @@ const MainPage = () => {
         selectedCity={selectedCity}
         setSelectedCity={setSelectedCity}
       />
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-4 w-full max-w-7xl transition-none">
         <div id="home" className="py-8">
           {loading ? (
             <LoadingSkeleton />
