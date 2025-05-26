@@ -4,9 +4,7 @@ import { useParams, useLocation } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import RateTable from '../components/rates/RateTable';
 import StateList from '../components/rates/StateList';
-import BodyOne from '../components/rates/BodyOne';
-import BodyTwo from '../components/rates/BodyTwo';
-import BodyThree from '../components/rates/BodyThree';
+import ContentSection from '../components/rates/ContentSection';
 import BlogList from '../components/blog/BlogList';
 import Footer from '../components/layout/Footer';
 import { generateFaqSchema } from '../components/common/FAQ';
@@ -255,20 +253,25 @@ const MainPage = () => {
         <meta name="twitter:title" content={getSeoTitle()} />
         <meta name="twitter:description" content={getSeoDescription()} />
         <meta name="twitter:image" content="https://todayeggrates.com/eggpic.webp" />
-      </Helmet>      <Navbar
+      </Helmet>
+      <Navbar
         selectedState={selectedState}
         setSelectedState={setSelectedState}
         selectedCity={selectedCity}
         setSelectedCity={setSelectedCity}
       />
       <div className="container mx-auto px-4">
-        <BodyOne selectedCity={selectedCity}selectedState={selectedState} />
-
         <div id="home" className="py-8">
           {loading ? (
             <div className="text-center p-4">Loading...</div>
           ) : (
             <>
+              <ContentSection 
+                selectedCity={selectedCity} 
+                selectedState={selectedState}
+                eggRates={eggRates}
+              />
+              
               {selectedCity || selectedState ? (
                 <RateTable
                   key={`${selectedCity}-${selectedState}`}
@@ -309,9 +312,7 @@ const MainPage = () => {
                 />
               )}
               
-              <BodyTwo selectedCity={selectedCity} selectedState={selectedState} />
               <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />
-              <BodyThree selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
             </>
           )}
         </div>
