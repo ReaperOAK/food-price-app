@@ -424,25 +424,23 @@ const MainPage = () => {
           {!loading && (
             <>
               {/* Rate Table and Chart */}
-              {selectedCity || selectedState ? (
-                <RateTable
+              {selectedCity || selectedState ? (                <RateTable
                   key={`${selectedCity}-${selectedState}`}
                   selectedCity={selectedCity}
                   selectedState={selectedState}
                   rates={eggRates}
                   showPriceColumns={true}
-                  showChart={true}
+                  showChart={false}
                   showDate={true}
                   showState={false}
                   showAdmin={false}
                   showMarket={false}
                 />
-              ) : (
-                <RateTable
+              ) : (                <RateTable
                   key="default-table"
                   rates={eggRates}
                   showPriceColumns={true}
-                  showChart={true}
+                  showChart={false}
                   chartType="bar"
                 />
               )}
