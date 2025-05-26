@@ -383,8 +383,7 @@ const RateTable = ({
             </tbody>
           </table>
         </div>
-        
-        <div className="pagination mt-4 flex flex-wrap justify-center">
+          <div className="pagination mt-4 flex flex-wrap justify-center">
           {pages.map(number => (
             <button
               key={number}
@@ -397,7 +396,15 @@ const RateTable = ({
           ))}
         </div>
 
-        {showChart && <RateChart data={currentItems} chartType={chartType} />}
+        {showChart && (
+          <RateChart 
+            data={currentItems} 
+            chartType={selectedCity ? 'line' : 'bar'} 
+            xAxisKey={selectedCity ? 'date' : 'city'}
+            title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
+            showLine={selectedCity}
+          />
+        )}
 
         {selectedCity && (
           <div className="mt-8 bg-blue-50 p-4 rounded-lg">

@@ -9,8 +9,14 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
     return null;
   }
 
+  const formatDate = (dateStr) => {
+    if (!dateStr || xAxisKey !== 'date') return dateStr;
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  };
+
   const chartData = {
-    labels: data.map(item => item[xAxisKey]),
+    labels: data.map(item => formatDate(item[xAxisKey])),
     datasets: [
       {
         label: title,
