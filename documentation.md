@@ -35,6 +35,7 @@ The Food Price App provides comprehensive egg price information across different
             └── CitySelect.js
             └── Disclaimer.js
             └── FAQ.js
+            └── OptimizedImage.js
             └── PrivacyPolicy.js
             └── StateSelect.js
             └── TOS.js
@@ -45,13 +46,8 @@ The Food Price App provides comprehensive egg price information across different
             └── Navbar.js
             └── RootLayout.js
         └── 📁rates
-            └── BodyOne.js
-            └── BodyThree.js
-            └── BodyTwo.js
-            └── DefaultTable.js
-            └── EggRatesTable.js
+            └── RateChart.js
             └── RateTable.js
-            └── SpecialRatesTable.js
             └── StateList.js
             └── StatePage.js
         └── 📁webstories
@@ -101,6 +97,7 @@ The Food Price App provides comprehensive egg price information across different
 | **WebStoryViewer.js** | Full-screen immersive viewer for individual web stories |
 | **LoginPage.js** | Authentication form with validation for admin access |
 | **AdminPage.js** | Dashboard for administrators to manage egg rates, locations, and content |
+| **OptimizedImage.js** | Optimized image component with lazy loading, WebP support, and placeholder handling |
 
 ### 🧱 UI Components
 
@@ -112,14 +109,10 @@ The Food Price App provides comprehensive egg price information across different
 - **RootLayout.js**: Main layout component for wrapping pages with common elements
 
 #### Content Sections
-- **BodyOne.js**: Hero section with location-specific heading and featured stories
-- **BodyTwo.js**: Informational section about egg pricing, NECC, and market factors
-- **BodyThree.js**: Data-driven analysis section with price trends and comparisons
 - **FAQ.js**: Dynamic FAQ section with location-tailored questions
 
 #### Data Display
 - **RateTable.js**: Interactive table showing egg rates with rich features:
-  - Price visualization using configurable charts (bar/line)
   - Pagination support
   - Sortable columns (city, state, date, rate)
   - Special rates display for wholesale/bulk buyers
@@ -128,6 +121,15 @@ The Food Price App provides comprehensive egg price information across different
   - Admin mode for CRUD operations
   - Responsive design with horizontal scrolling
   - Price change indicators with percentage calculations
+
+- **RateChart.js**: Interactive price visualization component with features:
+  - Support for both bar and line charts
+  - Historical trend visualization
+  - Price comparison across locations
+  - Customizable time ranges
+  - Responsive design with adaptive layout
+  - Dynamic tooltips with detailed price information
+  - Color-coded price change indicators
 
 - **RateChart.js**: Chart component for visualizing egg rates with features:
   - Support for both bar and line charts

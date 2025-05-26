@@ -3644,3 +3644,10 @@ Normalized table: 2025 records
 [22-May-2025 13:26:52 UTC] Sitemap generation completed at 2025-05-22 13:26:52 - Added 81 cities, 27 states, 3 blogs
 [22-May-2025 13:26:52 UTC] CRON SUCCESS: Generate main sitemap completed in 0.03s
 [22-May-2025 13:27:02 UTC] PHP Fatal error:  Cannot redeclare generateWebStoriesSitemap() (previously declared in /home/u901337298/domains/todayeggrates.com/public_html/php/webstories/generate_webstories_sitemap.php:10) in /home/u901337298/domains/todayeggrates.com/public_html/php/webstories/generate_webstories_sitemap.php on line 10
+[26-May-2025 13:45:44 UTC] 2025-05-26 13:45:44 [WEB STORIES] START: Beginning web stories generation
+[26-May-2025 13:45:44 UTC] 2025-05-26 13:45:44 [WEB STORIES] DB: Including database configuration
+[26-May-2025 13:45:44 UTC] PHP Fatal error:  Uncaught Error: Class "mysqli" not found in C:\Owais\food-price-app\public\php\config\db.php:11
+Stack trace:
+#0 C:\Owais\food-price-app\public\php\webstories\generate_web_stories.php(72): require_once()
+#1 {main}
+  thrown in C:\Owais\food-price-app\public\php\config\db.php on line 11
