@@ -430,7 +430,7 @@ const MainPage = () => {
                   selectedState={selectedState}
                   rates={eggRates}
                   showPriceColumns={true}
-                  showChart={false}
+                  showChart={true}
                   showDate={true}
                   showState={false}
                   showAdmin={false}
@@ -440,7 +440,7 @@ const MainPage = () => {
                   key="default-table"
                   rates={eggRates}
                   showPriceColumns={true}
-                  showChart={false}
+                  showChart={true}
                   chartType="bar"
                 />
               )}
