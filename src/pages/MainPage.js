@@ -22,6 +22,7 @@ const MainPage = () => {
   // ContentSection state
   const [featuredWebStories, setFeaturedWebStories] = useState([]);
   const [showWebStories, setShowWebStories] = useState(false);
+  const [webStoriesLoading, setWebStoriesLoading] = useState(false); // New loading state
 
   // URL and location parameters
   const { state: stateParam, city: cityParam } = useParams();
@@ -87,14 +88,34 @@ const MainPage = () => {
 
   // Fetch web stories
   useEffect(() => {
-    fetch('/php/get_web_stories.php')
-      .then(response => response.json())
-      .then(data => {
-        const shuffled = [...data].sort(() => 0.5 - Math.random());
+    const handleFetchWebStories = async () => {
+      if (!showWebStories) return; // Only fetch when stories are shown
+      try {
+        setWebStoriesLoading(true);
+        const response = await fetch('/php/get_web_stories.php');
+        if (!response.ok) {
+          throw new Error('Failed to fetch web stories');
+        }
+        const data = await response.json();
+        // Map the PHP response to the expected format
+        const formattedStories = data.map(story => ({
+          title: story.title,
+          url: `/webstories/${story.slug}.html`,
+          image: story.thumbnail,
+          excerpt: `Current egg rate in ${story.city}, ${story.state}: ₹${story.rate} (Updated: ${story.date})`
+        }));
+        const shuffled = [...formattedStories].sort(() => 0.5 - Math.random());
         setFeaturedWebStories(shuffled.slice(0, 3));
-      })
-      .catch(error => console.error('Error fetching web stories:', error));
-  }, []);
+      } catch (error) {
+        console.error('Error fetching web stories:', error);
+        setFeaturedWebStories([]);
+      } finally {
+        setWebStoriesLoading(false);
+      }
+    };
+
+    handleFetchWebStories();
+  }, [showWebStories]); // Only re-run when showWebStories changes
 
   // Initial data loading
   useEffect(() => {
@@ -344,27 +365,63 @@ const MainPage = () => {
                   <button
                     onClick={() => setShowWebStories(!showWebStories)}
                     className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                    disabled={webStoriesLoading}
                   >
-                    {showWebStories ? 'Hide Web Stories' : 'Show Web Stories'}
+                    {webStoriesLoading ? 'Loading Stories...' : (showWebStories ? 'Hide Web Stories' : 'Show Web Stories')}
                   </button>
                 </div>
 
-                {showWebStories && featuredWebStories.length > 0 && (
+                {showWebStories && (
                   <div className="mt-6">
                     <h2 className="text-2xl font-semibold text-gray-700 mb-4">Featured Web Stories</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {featuredWebStories.map((story, index) => (
-                        <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden">
-                          <a href={story.url} target="_blank" rel="noopener noreferrer">
-                            <img src={story.image} alt={story.title} className="w-full h-32 object-cover" />
-                            <div className="p-4">
-                              <h3 className="text-lg font-semibold text-gray-800 mb-2">{story.title}</h3>
-                              <p className="text-sm text-gray-600">{story.excerpt}</p>
-                            </div>
-                          </a>
-                        </div>
-                      ))}
-                    </div>
+                    {webStoriesLoading ? (
+                      <div className="text-center p-4">Loading web stories...</div>
+                    ) : featuredWebStories.length > 0 ? (
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {featuredWebStories.map((story, index) => (
+                          <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                            <a 
+                              href={story.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="block h-full"
+                              onClick={(e) => {
+                                // Log any issues with the URL
+                                if (!story.url) {
+                                  console.error('Missing URL for story:', story);
+                                  e.preventDefault();
+                                }
+                              }}
+                            >
+                              <div className="relative">
+                                <img 
+                                  src={story.image || '/eggpic.webp'}
+                                  alt={story.title || 'Egg price update'}
+                                  className="w-full h-48 object-cover"
+                                  onError={(e) => {
+                                    console.log('Image failed to load:', e.target.src);
+                                    e.target.onerror = null;
+                                    e.target.src = '/eggpic.webp';
+                                  }}
+                                />
+                              </div>
+                              <div className="p-4">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
+                                  {story.title || 'Egg Price Update'}
+                                </h3>
+                                <p className="text-sm text-gray-600 line-clamp-3">
+                                  {story.excerpt || 'Click to view latest egg rates'}
+                                </p>
+                              </div>
+                            </a>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center p-4 text-gray-600">
+                        No web stories available at the moment. Please check back later.
+                      </div>
+                    )}
                   </div>
                 )}
 
