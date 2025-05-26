@@ -248,14 +248,15 @@ const RateTable = ({
         
         <div className="overflow-x-auto">
           <table className="min-w-full border border-gray-300 mt-4">
-            <thead>
-              <tr style={{ backgroundColor: '#F9BE0C' }}>
-                <th
-                  className="border border-gray-300 p-2 cursor-pointer"
-                  onClick={() => requestSort('city')}
-                >
-                  Market
-                </th>
+            <thead>                <tr style={{ backgroundColor: '#F9BE0C' }}>
+                {(!selectedCity && showMarket) && (
+                  <th
+                    className="border border-gray-300 p-2 cursor-pointer"
+                    onClick={() => requestSort('city')}
+                  >
+                    Market
+                  </th>
+                )}
                 {showState && (
                   <th
                     className="border border-gray-300 p-2 cursor-pointer"
@@ -291,18 +292,19 @@ const RateTable = ({
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((rate, index) => (
-                <tr
+              {currentItems.map((rate, index) => (                <tr
                   key={`${rate.city}-${rate.date}-${index}`}
                   className={`${index % 2 === 0 ? 'bg-[#fffcdf]' : 'bg-[#fff1c8]'} hover:bg-[#ddfafe]`}
                 >
-                  <td className="border border-gray-300 p-2">
-                    {rate.city ? (
-                      <a href={`/${rate.city.toLowerCase()}-egg-rate`}>{rate.city}</a>
-                    ) : (
-                      'N/A'
-                    )}
-                  </td>
+                  {(!selectedCity && showMarket) && (
+                    <td className="border border-gray-300 p-2">
+                      {rate.city ? (
+                        <a href={`/${rate.city.toLowerCase()}-egg-rate`}>{rate.city}</a>
+                      ) : (
+                        'N/A'
+                      )}
+                    </td>
+                  )}
                   {showState && (
                     <td className="border border-gray-300 p-2">{rate.state}</td>
                   )}
