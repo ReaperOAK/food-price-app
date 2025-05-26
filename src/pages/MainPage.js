@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import RateTable from '../components/rates/RateTable';
 import StateList from '../components/rates/StateList';
@@ -97,15 +97,13 @@ const MainPage = () => {
           throw new Error('Failed to fetch web stories');
         }
         const data = await response.json();
-        // Map the PHP response to the expected format
-        const formattedStories = data.map(story => ({
-          title: story.title,
-          url: `/webstories/${story.slug}.html`,
-          image: story.thumbnail,
-          excerpt: `Current egg rate in ${story.city}, ${story.state}: ₹${story.rate} (Updated: ${story.date})`
-        }));
-        const shuffled = [...formattedStories].sort(() => 0.5 - Math.random());
-        setFeaturedWebStories(shuffled.slice(0, 3));
+        // Handle empty array response
+        if (!Array.isArray(data) || data.length === 0) {
+          setFeaturedWebStories([]);
+          return;
+        }
+        // Use data directly without shuffling since PHP already orders by date DESC
+        setFeaturedWebStories(data.slice(0, 3));
       } catch (error) {
         console.error('Error fetching web stories:', error);
         setFeaturedWebStories([]);
@@ -379,24 +377,15 @@ const MainPage = () => {
                     ) : featuredWebStories.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {featuredWebStories.map((story, index) => (
-                          <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                            <a 
-                              href={story.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
+                          <div key={story.slug} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                            <Link 
+                              to={`/webstory/${story.slug}`}
                               className="block h-full"
-                              onClick={(e) => {
-                                // Log any issues with the URL
-                                if (!story.url) {
-                                  console.error('Missing URL for story:', story);
-                                  e.preventDefault();
-                                }
-                              }}
                             >
                               <div className="relative">
                                 <img 
-                                  src={story.image || '/eggpic.webp'}
-                                  alt={story.title || 'Egg price update'}
+                                  src={story.thumbnail} 
+                                  alt={`Egg Rate in ${story.city}, ${story.state}`}
                                   className="w-full h-48 object-cover"
                                   onError={(e) => {
                                     console.log('Image failed to load:', e.target.src);
@@ -404,16 +393,22 @@ const MainPage = () => {
                                     e.target.src = '/eggpic.webp';
                                   }}
                                 />
+                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
+                                  <p className="text-white text-sm font-medium">
+                                    {story.date}
+                                  </p>
+                                </div>
                               </div>
                               <div className="p-4">
                                 <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
-                                  {story.title || 'Egg Price Update'}
+                                  {story.title}
                                 </h3>
-                                <p className="text-sm text-gray-600 line-clamp-3">
-                                  {story.excerpt || 'Click to view latest egg rates'}
+                                <p className="text-red-600 font-bold mt-2">₹{story.rate} per egg</p>
+                                <p className="text-sm text-gray-600 mt-1">
+                                  {story.city}, {story.state}
                                 </p>
                               </div>
-                            </a>
+                            </Link>
                           </div>
                         ))}
                       </div>

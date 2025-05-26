@@ -13,22 +13,26 @@ const WebStoriesList = () => {
   const [selectedCity, setSelectedCity] = useState('');
 
   useEffect(() => {
-    fetch('/php/get_web_stories.php')
-      .then(response => {
+    const fetchStories = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('/php/get_web_stories.php');
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('Failed to fetch web stories');
         }
-        return response.json();
-      })
-      .then(data => {
+        const data = await response.json();
+        // Data comes sorted by date DESC from the PHP endpoint
         setWebStories(data);
-        setLoading(false);
-      })
-      .catch(error => {
+      } catch (error) {
         console.error('Error fetching web stories:', error);
-        setError(error.toString());
+        setError(error.message);
+        setWebStories([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchStories();
   }, []);
 
   if (loading) {
@@ -60,6 +64,12 @@ const WebStoriesList = () => {
         <div className="container mx-auto p-6 flex-grow">
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             <p>Error loading web stories: {error}</p>
+            <button 
+              onClick={() => window.location.reload()}
+              className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Try Again
+            </button>
           </div>
         </div>
         <Footer />
@@ -95,17 +105,22 @@ const WebStoriesList = () => {
               {webStories.map((story, index) => (
                 <Link 
                   to={`/webstory/${story.slug}`} 
-                  key={index}
+                  key={story.slug}
                   className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300"
                   aria-label={`Web story about egg rates in ${story.city}, ${story.state}`}
                 >
-                  <div className="relative">                    <OptimizedImage
+                  <div className="relative">
+                    <OptimizedImage
                       src={story.thumbnail}
                       alt={`Egg Rate in ${story.city}, ${story.state}`}
                       className="w-full h-48 object-cover"
                       width={400}
                       height={300}
                       loading={index < 8 ? 'eager' : 'lazy'}
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = '/eggpic.webp';
+                      }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
                       <p className="text-white text-sm font-medium">
@@ -115,8 +130,8 @@ const WebStoriesList = () => {
                   </div>
                   <div className="p-4">
                     <h2 className="font-bold text-xl mb-2">{story.title}</h2>
-                    <p className="text-gray-600">{story.date}</p>
                     <p className="text-red-600 font-bold mt-2">₹{story.rate} per egg</p>
+                    <p className="text-gray-600 mt-1">{story.city}, {story.state}</p>
                   </div>
                 </Link>
               ))}
