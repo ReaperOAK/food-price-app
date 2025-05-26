@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import RateTable from '../components/rates/RateTable';
 import StateList from '../components/rates/StateList';
