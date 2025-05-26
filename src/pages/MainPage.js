@@ -8,6 +8,58 @@ import BlogList from '../components/blog/BlogList';
 import Footer from '../components/layout/Footer';
 import FAQ, { generateFaqSchema } from '../components/common/FAQ';
 
+// Add loading skeleton component at the top
+const LoadingSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+    <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
+    <div className="h-4 bg-gray-200 rounded w-2/3 mx-auto mb-4"></div>
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-4xl mx-auto">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="bg-gray-100 rounded-lg p-4">
+          <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// Add the QuickInfo component at the top
+const QuickInfo = ({ todayRate, trayPrice, weeklyChange, weeklyChangePercent }) => (
+  <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4 max-w-xs w-full transform transition-transform duration-300 hover:scale-105 z-50">
+    <div className="flex justify-between items-center mb-2">
+      <h4 className="text-sm font-semibold text-gray-700">Quick Price Info</h4>
+      <span className="text-xs text-gray-500">Today</span>
+    </div>
+    <div className="space-y-2">
+      <div className="flex justify-between">
+        <span className="text-sm text-gray-600">Single Egg:</span>
+        <span className="font-bold">₹{formatPrice(todayRate)}</span>
+      </div>
+      <div className="flex justify-between">
+        <span className="text-sm text-gray-600">Tray (30):</span>
+        <span className="font-bold">₹{formatPrice(trayPrice)}</span>
+      </div>
+      <div className="flex justify-between items-center">
+        <span className="text-sm text-gray-600">Weekly Change:</span>
+        <span className={`font-bold ${weeklyChange > 0 ? 'text-green-500' : weeklyChange < 0 ? 'text-red-500' : 'text-gray-500'}`}>
+          {weeklyChange !== 'N/A' && (weeklyChange > 0 ? '+' : '')}{weeklyChange}
+          <span className="text-xs ml-1">({weeklyChangePercent}%)</span>
+        </span>
+      </div>
+    </div>
+  </div>
+);
+
+// Format price helper
+const formatPrice = (price) => {
+  if (price === 'N/A' || price === null || price === undefined) {
+    return 'N/A';
+  }
+  return typeof price === 'number' ? price.toFixed(2) : price;
+};
+
 const MainPage = () => {
   // Original MainPage state
   const [eggRates, setEggRates] = useState([]);
@@ -43,11 +95,6 @@ const MainPage = () => {
   const weeklyChangePercent = eggRates.length > 7 ? ((eggRates[0].rate - eggRates[6].rate) / eggRates[6].rate * 100).toFixed(2) : 'N/A';
   const averagePrice = eggRates.length > 0 ? (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates.length).toFixed(2) : 'N/A';
   const trayPrice = todayRate !== 'N/A' ? (todayRate * 30).toFixed(2) : 'N/A';
-
-  // Format price helper
-  const formatPrice = (price) => {
-    return typeof price === 'number' ? price.toFixed(2) : price;
-  };
 
   // Data fetching functions
   const handleFetchSpecialRates = useCallback(() => {
@@ -260,7 +307,7 @@ const MainPage = () => {
 
   // Render method
   return (
-    <div className="bg-gray-50">
+    <div className="bg-gray-50 min-h-screen">
       <Helmet>
         <title>{getSeoTitle()}</title>
         <meta name="description" content={getSeoDescription()} />
@@ -312,147 +359,253 @@ const MainPage = () => {
       <div className="container mx-auto px-4">
         <div id="home" className="py-8">
           {loading ? (
-            <div className="text-center p-4">Loading...</div>
+            <LoadingSkeleton />
           ) : (
             <>
-              {/* Hero Section */}
+              {/* Hero Section with improved design */}
               <div className="max-w-4xl mx-auto mb-8">
-                <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-                  <h1 className="text-3xl font-bold text-gray-800 text-center mb-4">
-                    {getUniqueH1()}
-                  </h1>
-                  <p className="text-center text-lg font-semibold text-gray-700 mb-2">
-                    Current Rates for {displayName}
-                  </p>
-                  <p className="text-center text-gray-600 mb-4">
-                    {selectedCity 
-                      ? `Get the latest egg rates for ${selectedCity}. Updated daily with wholesale and retail prices.`
-                      : selectedState
-                        ? `Check current egg prices across ${selectedState}. Compare rates from different cities.`
-                        : 'Track egg prices across India with our daily updated NECC rates from major cities.'
-                    }
-                  </p>
-                </div>
-
-                {/* Rate Table and Chart */}
-                {selectedCity || selectedState ? (
-                  <RateTable
-                    key={`${selectedCity}-${selectedState}`}
-                    selectedCity={selectedCity}
-                    selectedState={selectedState}
-                    rates={eggRates}
-                    showPriceColumns={true}
-                    showChart={true}
-                    showDate={true}
-                    showState={false}
-                    showAdmin={false}
-                    showMarket={false}
-                  />
-                ) : (
-                  <RateTable
-                    key="default-table"
-                    rates={eggRates}
-                    showPriceColumns={true}
-                    showChart={true}
-                    chartType="bar"
-                  />
-                )}
-
-                {/* Web Stories Section */}
-                <div className="mt-6 text-center">
-                  <button
-                    onClick={() => setShowWebStories(!showWebStories)}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-                    disabled={webStoriesLoading}
-                  >
-                    {webStoriesLoading ? 'Loading Stories...' : (showWebStories ? 'Hide Web Stories' : 'Show Web Stories')}
-                  </button>
-                </div>
-
-                {showWebStories && (
-                  <div className="mt-6">
-                    <h2 className="text-2xl font-semibold text-gray-700 mb-4">Featured Web Stories</h2>
-                    {webStoriesLoading ? (
-                      <div className="text-center p-4">Loading web stories...</div>
-                    ) : featuredWebStories.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {featuredWebStories.map((story, index) => (
-                          <div key={story.slug} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                            <Link 
-                              to={`/webstory/${story.slug}`}
-                              className="block h-full"
-                            >
-                              <div className="relative">
-                                <img 
-                                  src={story.thumbnail} 
-                                  alt={`Egg Rate in ${story.city}, ${story.state}`}
-                                  className="w-full h-48 object-cover"
-                                  onError={(e) => {
-                                    console.log('Image failed to load:', e.target.src);
-                                    e.target.onerror = null;
-                                    e.target.src = '/eggpic.webp';
-                                  }}
-                                />
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                                  <p className="text-white text-sm font-medium">
-                                    {story.date}
-                                  </p>
-                                </div>
-                              </div>
-                              <div className="p-4">
-                                <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2">
-                                  {story.title}
-                                </h3>
-                                <p className="text-red-600 font-bold mt-2">₹{story.rate} per egg</p>
-                                <p className="text-sm text-gray-600 mt-1">
-                                  {story.city}, {story.state}
-                                </p>
-                              </div>
-                            </Link>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center p-4 text-gray-600">
-                        No web stories available at the moment. Please check back later.
-                      </div>
-                    )}
+                <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                  <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
+                    <h1 className="text-3xl font-bold text-white text-center mb-4">
+                      {getUniqueH1()}
+                    </h1>
+                    <p className="text-center text-white text-xl font-semibold mb-2">
+                      Current Rates for {displayName}
+                    </p>
+                    <p className="text-center text-blue-100">
+                      {selectedCity 
+                        ? `Get the latest egg rates for ${selectedCity}. Updated daily with wholesale and retail prices.`
+                        : selectedState
+                          ? `Check current egg prices across ${selectedState}. Compare rates from different cities.`
+                          : 'Track egg prices across India with our daily updated NECC rates from major cities.'
+                      }
+                    </p>
                   </div>
-                )}
-
-                {/* Price Trends Section */}
-                <div className="p-6 mt-6 bg-white shadow-lg rounded-lg">
-                  <h2 className="text-2xl font-semibold text-gray-700 mb-4">Price Trends</h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="bg-gray-100 rounded-lg p-4">
-                      <h3 className="text-md font-semibold text-gray-800 mb-2">Today's Rate</h3>
-                      <p className="text-xl font-bold text-gray-900">₹{formatPrice(todayRate)}</p>
-                    </div>
-                    <div className="bg-gray-100 rounded-lg p-4">
-                      <h3 className="text-md font-semibold text-gray-800 mb-2">Rate 7 Days Ago</h3>
-                      <p className="text-xl font-bold text-gray-900">₹{formatPrice(rate7DaysAgo)}</p>
-                    </div>
-                    <div className="bg-gray-100 rounded-lg p-4">
-                      <h3 className="text-md font-semibold text-gray-800 mb-2">Weekly Change</h3>
-                      <p className="text-xl font-bold text-gray-900">
-                        {weeklyChange > 0 ? (
-                          <span className="text-green-500">+₹{formatPrice(weeklyChange)} ({weeklyChangePercent}%)</span>
-                        ) : weeklyChange < 0 ? (
-                          <span className="text-red-500">-₹{formatPrice(-weeklyChange)} ({weeklyChangePercent}%)</span>
-                        ) : (
-                          <span className="text-gray-500">No change</span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="bg-gray-100 rounded-lg p-4">
-                      <h3 className="text-md font-semibold text-gray-800 mb-2">Average Price (30 days)</h3>
-                      <p className="text-xl font-bold text-gray-900">₹{formatPrice(averagePrice)}</p>
+                  <div className="p-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-500">Today's Rate</p>
+                        <p className="text-2xl font-bold text-blue-600">₹{formatPrice(todayRate)}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-500">Tray Price</p>
+                        <p className="text-2xl font-bold text-blue-600">₹{formatPrice(trayPrice)}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-500">Weekly Change</p>
+                        <p className={`text-2xl font-bold ${weeklyChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                          {weeklyChange !== 'N/A' ? `${weeklyChange > 0 ? '+' : ''}${weeklyChange}` : 'N/A'}
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-500">30-Day Avg</p>
+                        <p className="text-2xl font-bold text-blue-600">₹{formatPrice(averagePrice)}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              
+              {/* Rest of the content */}
+              {/* Rate Table and Chart */}
+              {selectedCity || selectedState ? (
+                <RateTable
+                  key={`${selectedCity}-${selectedState}`}
+                  selectedCity={selectedCity}
+                  selectedState={selectedState}
+                  rates={eggRates}
+                  showPriceColumns={true}
+                  showChart={true}
+                  showDate={true}
+                  showState={false}
+                  showAdmin={false}
+                  showMarket={false}
+                />
+              ) : (
+                <RateTable
+                  key="default-table"
+                  rates={eggRates}
+                  showPriceColumns={true}
+                  showChart={true}
+                  chartType="bar"
+                />
+              )}
 
-              <StateList states={states} cities={cities} />
+              {/* Web Stories Section */}
+              <div className="mt-10">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-semibold text-gray-700">Featured Web Stories</h2>
+                  <button
+                    onClick={() => setShowWebStories(!showWebStories)}
+                    className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-300 flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    disabled={webStoriesLoading}
+                  >
+                    {webStoriesLoading ? (
+                      <>
+                        <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Loading Stories...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>{showWebStories ? 'Hide Stories' : 'Show Stories'}</span>
+                        <svg className={`w-5 h-5 transform transition-transform duration-300 ${showWebStories ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className={`transition-all duration-500 ease-in-out ${showWebStories ? 'opacity-100 max-h-[2000px]' : 'opacity-0 max-h-0 overflow-hidden'}`}>
+                  {webStoriesLoading ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {[...Array(6)].map((_, index) => (
+                        <div key={index} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                          <div className="h-48 bg-gray-200"></div>
+                          <div className="p-4">
+                            <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : featuredWebStories.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {featuredWebStories.map((story, index) => (
+                        <Link 
+                          key={story.slug}
+                          to={`/webstory/${story.slug}`}
+                          className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                        >
+                          <div className="relative">
+                            <img 
+                              src={story.thumbnail} 
+                              alt={`Egg Rate in ${story.city}, ${story.state}`}
+                              className="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-105"
+                              onError={(e) => {
+                                e.target.onerror = null;
+                                e.target.src = '/eggpic.webp';
+                              }}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"></div>
+                            <div className="absolute bottom-0 left-0 right-0 p-4">
+                              <p className="text-white text-sm font-medium">
+                                {story.date}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300">
+                              {story.title}
+                            </h3>
+                            <div className="flex justify-between items-center mt-2">
+                              <p className="text-red-600 font-bold">₹{story.rate} per egg</p>
+                              <p className="text-sm text-gray-600">
+                                {story.city}, {story.state}
+                              </p>
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center p-8 bg-white rounded-lg shadow-md">
+                      <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                      </svg>
+                      <p className="text-xl font-semibold text-gray-700 mb-2">No Stories Available</p>
+                      <p className="text-gray-500">Check back later for updates on egg prices and market trends.</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Price Trends Section */}
+              <div className="p-6 mt-6 bg-white shadow-lg rounded-lg transform transition-all duration-300 hover:shadow-xl">
+                <h2 className="text-2xl font-semibold text-gray-700 mb-4 flex items-center">
+                  <span className="mr-2">Price Trends</span>
+                  <span className="text-sm font-normal text-gray-500">Last 30 days</span>
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-md font-semibold text-gray-800">Today's Rate</h3>
+                      <span className="text-xs text-gray-500">{today}</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900 mt-2">₹{formatPrice(todayRate)}</p>
+                    <p className="text-sm text-gray-600 mt-1">Per egg</p>
+                  </div>
+                  
+                  <div className="bg-gray-50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-md font-semibold text-gray-800">7 Days Ago</h3>
+                      <span className="text-xs text-gray-500">
+                        {new Date(new Date().setDate(new Date().getDate() - 7)).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900 mt-2">₹{formatPrice(rate7DaysAgo)}</p>
+                    <p className="text-sm text-gray-600 mt-1">Per egg</p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105">
+                    <h3 className="text-md font-semibold text-gray-800 mb-2">Weekly Change</h3>
+                    <p className="text-2xl font-bold mt-2">
+                      {weeklyChange > 0 ? (
+                        <span className="flex items-center text-green-500">
+                          <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                          </svg>
+                          +₹{formatPrice(weeklyChange)}
+                          <span className="text-sm ml-1">({weeklyChangePercent}%)</span>
+                        </span>
+                      ) : weeklyChange < 0 ? (
+                        <span className="flex items-center text-red-500">
+                          <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
+                          </svg>
+                          -₹{formatPrice(-weeklyChange)}
+                          <span className="text-sm ml-1">({weeklyChangePercent}%)</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center text-gray-500">
+                          <svg className="w-6 h-6 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                          </svg>
+                          No change
+                        </span>
+                      )}
+                    </p>
+                    <p className="text-sm text-gray-600 mt-1">From last week</p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-lg p-4 transform transition-all duration-300 hover:scale-105">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-md font-semibold text-gray-800">Average Price</h3>
+                      <span className="text-xs text-gray-500">30 days</span>
+                    </div>
+                    <p className="text-2xl font-bold text-gray-900 mt-2">₹{formatPrice(averagePrice)}</p>
+                    <p className="text-sm text-gray-600 mt-1">Per egg</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Add QuickInfo component only if we have rate data */}
+              {todayRate !== 'N/A' && (
+                <QuickInfo 
+                  todayRate={todayRate}
+                  trayPrice={trayPrice}
+                  weeklyChange={weeklyChange}
+                  weeklyChangePercent={weeklyChangePercent}
+                />
+              )}
+
+              {/* Only render StateList if we have states data */}
+              {states.length > 0 && (
+                <StateList states={states} cities={cities} />
+              )}
               
               {/* Special rates table */}
               {specialRates.length > 0 && (
@@ -468,7 +621,11 @@ const MainPage = () => {
                   itemsPerPage={5}
                 />
               )}
+
+              {/* Only render BlogList if we have blogs data */}
+              {blogs.length > 0 && (
                 <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />
+              )}
               
               {/* FAQ Section */}
               <FAQ

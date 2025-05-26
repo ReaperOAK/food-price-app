@@ -5,28 +5,6 @@ module.exports = {
     "./public/index.html",
     "./public/templates/**/*.html"
   ],
-  safelist: [
-    {
-      pattern: /^w-/,
-      variants: ['hover', 'focus']
-    },
-    {
-      pattern: /^h-/,
-      variants: ['hover', 'focus']
-    },
-    {
-      pattern: /^bg-/,
-      variants: ['hover', 'focus']
-    },
-    {
-      pattern: /^text-/,
-      variants: ['hover', 'focus']
-    },
-    {
-      pattern: /^grid-cols-/,
-      variants: ['hover', 'focus']
-    }
-  ],
   theme: {
     extend: {
       animation: {
@@ -44,40 +22,22 @@ module.exports = {
         }
       }
     },
-  },
-  variants: {
-    extend: {
-      opacity: ['group-hover'],
-      scale: ['group-hover'],
-      transform: ['group-hover'],
-    }
   },  plugins: [],
   safelist: [
-    // Pattern-based classes
-    {
-      pattern: /^w-/,
-      variants: ['hover', 'focus']
-    },
-    {
-      pattern: /^h-/,
-      variants: ['hover', 'focus']
-    },
-    {
-      pattern: /^bg-/,
-      variants: ['hover', 'focus']
-    },
-    {
-      pattern: /^text-/,
-      variants: ['hover', 'focus']
-    },
-    {
-      pattern: /^grid-cols-/,
-      variants: ['hover', 'focus']
-    },
-    // Simple strings
+    // Only include specific classes that are dynamically used
+    'animate-fade-in',
+    'animate-slide-up',
     'lazy',
     'loaded',
-    'animate-fade-in',
-    'animate-slide-up'
+    // Specific utility classes that are dynamically used
+    'grid-cols-1',
+    'grid-cols-2',
+    'grid-cols-3',
+    'grid-cols-4',
+    'md:grid-cols-2',
+    'lg:grid-cols-3',
+    'text-green-500',
+    'text-red-500',
+    'text-gray-500'
   ]
 }
