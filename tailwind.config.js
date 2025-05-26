@@ -5,6 +5,28 @@ module.exports = {
     "./public/index.html",
     "./public/templates/**/*.html"
   ],
+  safelist: [
+    {
+      pattern: /^w-/,
+      variants: ['hover', 'focus']
+    },
+    {
+      pattern: /^h-/,
+      variants: ['hover', 'focus']
+    },
+    {
+      pattern: /^bg-/,
+      variants: ['hover', 'focus']
+    },
+    {
+      pattern: /^text-/,
+      variants: ['hover', 'focus']
+    },
+    {
+      pattern: /^grid-cols-/,
+      variants: ['hover', 'focus']
+    }
+  ],
   theme: {
     extend: {
       animation: {
@@ -23,37 +45,39 @@ module.exports = {
       }
     },
   },
-  future: {
-    removeDeprecatedGapUtilities: true,
-    purgeLayersByDefault: true,
-  },
   variants: {
     extend: {
       opacity: ['group-hover'],
       scale: ['group-hover'],
       transform: ['group-hover'],
     }
-  },
-  plugins: [],
-  purge: {
-    enabled: process.env.NODE_ENV === 'production',
-    content: [
-      './src/**/*.{js,jsx,ts,tsx}',
-      './public/index.html',
-      './public/templates/**/*.html'
-    ],
-    options: {
-      safelist: [
-        /^w-/,
-        /^h-/,
-        /^bg-/,
-        /^text-/,
-        /^grid-cols-/,
-        'lazy',
-        'loaded',
-        'animate-fade-in',
-        'animate-slide-up'
-      ],
+  },  plugins: [],
+  safelist: [
+    // Pattern-based classes
+    {
+      pattern: /^w-/,
+      variants: ['hover', 'focus']
     },
-  }
+    {
+      pattern: /^h-/,
+      variants: ['hover', 'focus']
+    },
+    {
+      pattern: /^bg-/,
+      variants: ['hover', 'focus']
+    },
+    {
+      pattern: /^text-/,
+      variants: ['hover', 'focus']
+    },
+    {
+      pattern: /^grid-cols-/,
+      variants: ['hover', 'focus']
+    },
+    // Simple strings
+    'lazy',
+    'loaded',
+    'animate-fade-in',
+    'animate-slide-up'
+  ]
 }
