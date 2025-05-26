@@ -26,33 +26,50 @@ const RateTable = ({
   const [editedRate, setEditedRate] = useState({});
   const [hoveredRow, setHoveredRow] = useState(null);
 
+  const tableStyle = {
+    minHeight: '400px',
+    width: '100%',
+    backgroundColor: '#ffffff',
+  };
+
+  const headerStyle = {
+    height: '48px',
+    backgroundColor: '#f3f4f6',
+  };
+
+  const cellStyle = {
+    height: '48px',
+    padding: '12px 16px',
+  };
+
   const getSortIcon = (columnKey) => {
     if (sortConfig.key !== columnKey) return '↕️';
     return sortConfig.direction === 'ascending' ? '↑' : '↓';
   };
 
-  if (isLoading) {
-    return (
+  const renderLoadingSkeleton = () => (
+    <div style={tableStyle} className="overflow-hidden rounded-lg shadow">
       <div className="animate-pulse">
-        <div className="h-8 bg-gray-200 rounded w-full mb-4"></div>
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-16 bg-gray-100 rounded w-full mb-2"></div>
+        <div style={headerStyle} className="bg-gray-200"></div>
+        {[...Array(5)].map((_, index) => (
+          <div key={index} style={cellStyle} className="flex items-center border-t border-gray-200">
+            <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
+            <div className="w-1/4 h-4 ml-4 bg-gray-200 rounded"></div>
+            <div className="w-1/4 h-4 ml-4 bg-gray-200 rounded"></div>
+          </div>
         ))}
       </div>
-    );
+    </div>
+  );
+
+  if (isLoading) {
+    return renderLoadingSkeleton();
   }
 
   if (!rates || rates.length === 0) {
     return (
-      <div className={showSpecialRates ? "p-6 mt-6 bg-white rounded-lg shadow-lg text-center" : "p-6 mt-6 bg-gray-100 rounded-lg shadow-lg text-center"}>
-        <div className="flex flex-col items-center justify-center space-y-4">
-          <svg className="w-16 h-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M12 20h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="text-gray-600 text-lg">
-            {showSpecialRates ? 'No special rates available at the moment' : 'No rates available at the moment'}
-          </p>
-        </div>
+      <div style={tableStyle} className="flex items-center justify-center text-gray-500">
+        <p>No data available</p>
       </div>
     );
   }
@@ -361,20 +378,20 @@ const RateTable = ({
                   key={`${rate.city}-${rate.date}-${index}`}
                   className={`
                     ${index % 2 === 0 ? 'bg-[#fffcdf]' : 'bg-[#fff1c8]'}
-                    transform transition-all duration-200
-                    ${hoveredRow === index ? 'scale-[1.01] shadow-lg bg-[#ddfafe]' : ''}
-                    hover:bg-[#ddfafe] hover:shadow-md
+                    hover:bg-[#ddfafe]
+                    ${hoveredRow === index ? 'bg-[#ddfafe]' : ''}
                   `}
+                  style={{ minHeight: '48px', height: '48px' }}
                   onMouseEnter={() => setHoveredRow(index)}
                   onMouseLeave={() => setHoveredRow(null)}
                   role="row"
                 >
                   {(!selectedCity && showMarket) && (
-                    <td className="border border-gray-300 p-2" role="cell">
+                    <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
                       {rate.city ? (
                         <a 
                           href={`/${rate.city.toLowerCase()}-egg-rate`}
-                          className="text-blue-600 hover:text-blue-800 transition-colors duration-200 hover:underline"
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
                         >
                           {rate.city}
                         </a>
@@ -384,10 +401,12 @@ const RateTable = ({
                     </td>
                   )}
                   {showState && (
-                    <td className="border border-gray-300 p-2" role="cell">{rate.state}</td>
+                    <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
+                      {rate.state}
+                    </td>
                   )}
                   {showDate && (
-                    <td className="border border-gray-300 p-2" role="cell">
+                    <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
                       {editingRate === rate.id ? (
                         <input
                           type="date"
@@ -402,7 +421,7 @@ const RateTable = ({
                       )}
                     </td>
                   )}
-                  <td className="border border-gray-300 p-2" role="cell">
+                  <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
                     {editingRate === rate.id ? (
                       <input
                         type="number"
@@ -419,15 +438,15 @@ const RateTable = ({
                   </td>
                   {showPriceColumns && (
                     <>
-                      <td className="border border-gray-300 p-2 text-gray-700" role="cell">
+                      <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
                         <span title="Price for 30 eggs">₹{(rate.rate * 30).toFixed(2)}</span>
                       </td>
                       {!showSpecialRates && (
                         <>
-                          <td className="border border-gray-300 p-2 text-gray-700" role="cell">
+                          <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
                             <span title="Price for 100 eggs">₹{(rate.rate * 100).toFixed(2)}</span>
                           </td>
-                          <td className="border border-gray-300 p-2 text-gray-700" role="cell">
+                          <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
                             <span title="Price for 210 eggs">₹{(rate.rate * 210).toFixed(2)}</span>
                           </td>
                         </>

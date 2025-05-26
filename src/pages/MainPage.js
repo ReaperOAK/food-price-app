@@ -13,21 +13,21 @@ const LoadingSkeleton = () => (
   <div className="animate-pulse">
     <div className="max-w-4xl mx-auto mb-8">
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6" style={{ minHeight: '200px', height: '100%' }}>
-          {/* Fixed height for title placeholder */}
-          <div className="h-12 bg-white/20 rounded w-3/4 mx-auto mb-4" style={{ minHeight: '48px' }}></div>
-          {/* Fixed height for subtitle placeholder */}
-          <div className="h-8 bg-white/20 rounded w-1/2 mx-auto mb-2" style={{ minHeight: '32px' }}></div>
-          {/* Fixed height for description placeholder */}
-          <div className="h-12 bg-white/20 rounded w-2/3 mx-auto" style={{ minHeight: '48px' }}></div>
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 min-h-[200px] flex flex-col justify-center">
+          {/* Title placeholder with exact dimensions */}
+          <div className="h-12 bg-white/20 rounded w-3/4 mx-auto mb-4 text-center" style={{ minHeight: '48px', height: '48px' }}></div>
+          {/* Subtitle placeholder with exact dimensions */}
+          <div className="h-8 bg-white/20 rounded w-1/2 mx-auto mb-2" style={{ minHeight: '32px', height: '32px' }}></div>
+          {/* Description placeholder with exact dimensions */}
+          <div className="h-12 bg-white/20 rounded w-2/3 mx-auto" style={{ minHeight: '48px', height: '48px' }}></div>
         </div>
 
         <div className="p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="text-center" style={{ minHeight: '80px' }}>
-                <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded w-2/3 mx-auto"></div>
+              <div key={i} className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto mb-2" style={{ minHeight: '16px', height: '16px' }}></div>
+                <div className="h-8 bg-gray-200 rounded w-2/3 mx-auto" style={{ height: '32px' }}></div>
               </div>
             ))}
           </div>
@@ -368,59 +368,61 @@ const MainPage = () => {
         selectedCity={selectedCity}
         setSelectedCity={setSelectedCity}
       />
-      <div className="container mx-auto px-4 w-full max-w-7xl min-h-[500px]">
+      <div className="container mx-auto px-4 w-full max-w-7xl">
         <div id="home" className="py-8">
-          {loading ? (
-            <LoadingSkeleton />
-          ) : (
-            <>
-              {/* Hero Section with improved design */}
+          <div className="min-h-[500px]">
+            {loading ? (
+              <LoadingSkeleton />
+            ) : (
               <div className="max-w-4xl mx-auto mb-8">
                 <div className="bg-white rounded-lg shadow-lg overflow-hidden">
                   <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6 min-h-[200px] flex flex-col justify-center">
-                    <h1 className="text-3xl font-bold text-white text-center mb-4 min-h-[48px] leading-tight">
+                    <h1 className="text-3xl font-bold text-white text-center mb-4" style={{ minHeight: '48px', height: '48px' }}>
                       {getUniqueH1()}
                     </h1>
-                    <div className="space-y-2">
-                      <p className="text-center text-white text-xl font-semibold mb-2 min-h-[32px]">
-                        Current Rates for {displayName}
-                      </p>
-                      <p className="text-center text-blue-100 min-h-[48px]">
-                        {selectedCity 
-                          ? `Get the latest egg rates for ${selectedCity}. Updated daily with wholesale and retail prices.`
-                          : selectedState
-                            ? `Check current egg prices across ${selectedState}. Compare rates from different cities.`
-                            : 'Track egg prices across India with our daily updated NECC rates from major cities.'
-                        }
-                      </p>
-                    </div>
+                    <p className="text-center text-white text-xl font-semibold mb-2" style={{ minHeight: '32px', height: '32px' }}>
+                      Current Rates for {displayName}
+                    </p>
+                    <p className="text-center text-blue-100" style={{ minHeight: '48px', height: '48px' }}>
+                      {selectedCity 
+                        ? `Get the latest egg rates for ${selectedCity}. Updated daily with wholesale and retail prices.`
+                        : selectedState
+                          ? `Check current egg prices across ${selectedState}. Compare rates from different cities.`
+                          : 'Track egg prices across India with our daily updated NECC rates from major cities.'
+                      }
+                    </p>
                   </div>
+
                   <div className="p-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-500">Today's Rate</p>
-                        <p className="text-2xl font-bold text-blue-600">₹{formatPrice(todayRate)}</p>
+                      <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
+                        <h3 className="text-sm text-gray-600 mb-2" style={{ minHeight: '16px', height: '16px' }}>Today's Rate</h3>
+                        <p className="text-xl font-semibold text-gray-900" style={{ height: '32px' }}>₹{formatPrice(todayRate)}</p>
                       </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-500">Tray Price</p>
-                        <p className="text-2xl font-bold text-blue-600">₹{formatPrice(trayPrice)}</p>
+                      <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
+                        <h3 className="text-sm text-gray-600 mb-2" style={{ minHeight: '16px', height: '16px' }}>Tray Price</h3>
+                        <p className="text-xl font-semibold text-gray-900" style={{ height: '32px' }}>₹{formatPrice(trayPrice)}</p>
                       </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-500">Weekly Change</p>
-                        <p className={`text-2xl font-bold ${weeklyChange > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                      <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
+                        <h3 className="text-sm text-gray-600 mb-2" style={{ minHeight: '16px', height: '16px' }}>Weekly Change</h3>
+                        <p className={`text-xl font-semibold ${weeklyChange > 0 ? 'text-green-500' : 'text-red-500'}`} style={{ height: '32px' }}>
                           {weeklyChange !== 'N/A' ? `${weeklyChange > 0 ? '+' : ''}${weeklyChange}` : 'N/A'}
-                          <span className="text-sm ml-1">({weeklyChangePercent}%)</span>
                         </p>
                       </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-500">30-Day Avg</p>
-                        <p className="text-2xl font-bold text-blue-600">₹{formatPrice(averagePrice)}</p>
+                      <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
+                        <h3 className="text-sm text-gray-600 mb-2" style={{ minHeight: '16px', height: '16px' }}>30-Day Avg</h3>
+                        <p className="text-xl font-semibold text-gray-900" style={{ height: '32px' }}>₹{formatPrice(averagePrice)}</p>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-
+            )}
+          </div>
+          
+          {/* Rest of the content */}
+          {!loading && (
+            <>
               {/* Rate Table and Chart */}
               {selectedCity || selectedState ? (
                 <RateTable

@@ -4,9 +4,34 @@ import { Bar, Line } from 'react-chartjs-2';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
 
-const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey = 'city', yAxisKey = 'rate', showLine = false }) => {
+const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey = 'city', yAxisKey = 'rate', showLine = false, isLoading = false }) => {
+  const containerStyle = {
+    position: 'relative',
+    minHeight: '400px',
+    height: '400px',
+    width: '100%',
+    backgroundColor: '#ffffff',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center'
+  };
+
+  if (isLoading) {
+    return (
+      <div style={containerStyle} className="mt-8">
+        <div className="animate-pulse w-full h-full bg-gray-100 rounded"></div>
+      </div>
+    );
+  }
+
   if (!data || data.length === 0) {
-    return null;
+    return (
+      <div style={containerStyle} className="mt-8">
+        <div className="text-gray-500 text-center">
+          <p>No data available</p>
+        </div>
+      </div>
+    );
   }
 
   const formatDate = (dateStr) => {
@@ -38,10 +63,21 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
     plugins: {
       legend: {
         position: 'top',
+        labels: {
+          font: {
+            family: "'Inter', system-ui, -apple-system, sans-serif",
+            size: 12
+          }
+        }
       },
       title: {
         display: true,
         text: title,
+        font: {
+          family: "'Inter', system-ui, -apple-system, sans-serif",
+          size: 14,
+          weight: '600'
+        }
       },
       tooltip: {
         callbacks: {
@@ -57,6 +93,18 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
         ticks: {
           callback: function(value) {
             return '₹' + value.toFixed(2);
+          },
+          font: {
+            family: "'Inter', system-ui, -apple-system, sans-serif",
+            size: 12
+          }
+        }
+      },
+      x: {
+        ticks: {
+          font: {
+            family: "'Inter', system-ui, -apple-system, sans-serif",
+            size: 12
           }
         }
       }
@@ -66,7 +114,7 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
   const ChartComponent = chartType === 'line' ? Line : Bar;
 
   return (
-    <div className="mt-8" style={{ position: 'relative', height: '400px', width: '100%' }}>
+    <div className="mt-8" style={containerStyle}>
       <ChartComponent data={chartData} options={options} />
     </div>
   );
