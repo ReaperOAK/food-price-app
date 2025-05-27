@@ -166,9 +166,11 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
           src="/logo.webp"
           alt="Food Price App Logo"
           className="w-full h-full object-contain"
-          width={192} // 12rem = 192px
-          height={64} // 4rem = 64px
-          loading="eager" // Logo should load eagerly as it's above the fold
+          width={192}
+          height={64}
+          loading="eager"
+          priority={true}
+          sizes="192px"
         />
       </div>
     );

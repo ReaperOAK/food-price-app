@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-const OptimizedImage = ({ src, alt, className = '', width, height }) => {
+const OptimizedImage = ({ src, alt, className = '', width, height, priority = false, sizes }) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -16,8 +16,8 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
       const img = new Image();
       img.src = src;
       
-      // Use native browser lazy loading hint
-      if ('loading' in HTMLImageElement.prototype) {
+      // Use native browser lazy loading hint unless priority
+      if ('loading' in HTMLImageElement.prototype && !priority) {
         img.loading = 'lazy';
       }
       
@@ -37,13 +37,15 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
       setDimensions({ width, height });
       setImageLoaded(true);
     }
-  }, [src, width, height]);
+  }, [src, width, height, priority]);
 
   // Extract Tailwind dimensions
   const hasTailwindDimensions = /w-\d+|h-\d+/.test(className);
   const aspectRatio = imageLoaded ? (dimensions.height / dimensions.width) * 100 : 56.25;
-  // Calculate sizes attribute based on responsive classes and viewport
+  
+  // Calculate sizes attribute based on provided sizes or responsive classes
   const getSizes = () => {
+    if (sizes) return sizes;
     if (className.includes('w-full')) {
       return '(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px';
     }
@@ -52,7 +54,6 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
       const percentage = (num / den) * 100;
       return `(max-width: 768px) ${percentage}vw, (max-width: 1200px) ${percentage * 0.8}vw, ${percentage * 0.6}vw`;
     }
-    // Default responsive sizes
     return '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw';
   };
 
@@ -83,9 +84,10 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
           className={`absolute top-0 left-0 w-full h-full object-cover ${className} ${
             !loaded ? 'opacity-0' : 'opacity-100'
           } transition-opacity duration-300 will-change-transform`}
-          loading="lazy"
-          decoding="async"
-          sizes={getSizes()}          srcSet={`${src.includes('/webstories/') 
+          loading={priority ? 'eager' : 'lazy'}
+          decoding={priority ? 'sync' : 'async'}
+          sizes={getSizes()}
+          srcSet={`${src.includes('/webstories/') 
             ? src.replace('.webp', '-300.webp').replace('/webstories/', '/webstories/optimized/') 
             : src.replace('.webp', '-300.webp').replace('/', '/optimized/')} 300w,
                    ${src.includes('/webstories/') 
@@ -95,7 +97,7 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
             ? src.replace('.webp', '-900.webp').replace('/', '/optimized/') 
             : src} 900w,
                    ${src} 1200w`}
-          fetchpriority={/hero|logo|banner/.test(className.toLowerCase()) ? 'high' : 'auto'}
+          fetchpriority={priority ? 'high' : /hero|banner/.test(className.toLowerCase()) ? 'high' : 'auto'}
           onLoad={() => {
             setLoaded(true);
             // Force layout recalculation
