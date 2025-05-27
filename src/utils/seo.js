@@ -1,4 +1,14 @@
-export const getUniqueH1 = (selectedCity, selectedState, today) => {
+// Helper function to get formatted date
+const getFormattedDate = () => {
+  const date = new Date();
+  return date.toLocaleDateString('en-IN', { 
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+};
+
+export const getUniqueH1 = (selectedCity, selectedState, today = getFormattedDate()) => {
   if (selectedCity) {
     return `Egg Rate in ${selectedCity}, ${selectedState} (${today})`;
   } else if (selectedState) {
@@ -8,7 +18,7 @@ export const getUniqueH1 = (selectedCity, selectedState, today) => {
   }
 };
 
-export const getSeoTitle = (selectedCity, selectedState, todayRate, today) => {
+export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   if (selectedCity) {
     return `${selectedCity} Egg Rate Today - ₹${todayRate} (${today}) | NECC Egg Price`;
   } else if (selectedState) {
@@ -18,7 +28,7 @@ export const getSeoTitle = (selectedCity, selectedState, todayRate, today) => {
   }
 };
 
-export const getSeoDescription = (selectedCity, selectedState, todayRate, today) => {
+export const getSeoDescription = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   if (selectedCity) {
     const trayPrice = todayRate !== 'N/A' ? (todayRate * 30).toFixed(2) : 'N/A';
     return `Current egg rate in ${selectedCity}, ${selectedState}: ₹${todayRate}/egg, ₹${trayPrice}/tray (30 eggs). Check latest NECC egg price in ${selectedCity} updated on ${today}. Live updates and market analysis.`;
