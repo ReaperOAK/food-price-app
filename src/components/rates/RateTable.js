@@ -67,25 +67,28 @@ const RateTable = ({
     return sortConfig.direction === 'ascending' ? '↑' : '↓';
   };
 
+  // Enhanced loading skeleton with fixed heights
   const renderLoadingSkeleton = () => (
     <div style={containerStyle} className="overflow-hidden rounded-lg shadow" role="status" aria-label="Loading egg rates">
-      {/* Header skeleton */}
-      <div className="animate-pulse">
+      <div className="animate-pulse" style={{ minHeight: TABLE_MIN_HEIGHT }}>
         <div style={headerStyle} className="bg-gray-200 mb-2"></div>
-        {/* Row skeletons */}
         {[...Array(LOADING_ROWS)].map((_, index) => (
-          <div key={index} style={cellStyle} className="flex items-center border-t border-gray-100">
+          <div 
+            key={index} 
+            style={{ ...cellStyle, height: ROW_HEIGHT }} 
+            className="flex items-center border-t border-gray-100 space-x-4"
+          >
             <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
-            <div className="w-1/4 h-4 ml-4 bg-gray-200 rounded"></div>
-            <div className="w-1/4 h-4 ml-4 bg-gray-200 rounded"></div>
-            <div className="w-1/4 h-4 ml-4 bg-gray-200 rounded"></div>
+            <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
+            <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
+            <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
           </div>
         ))}
       </div>
     </div>
   );
 
-  // Show loading skeleton
+  // Show loading skeleton with fixed dimensions
   if (isLoading) {
     return renderLoadingSkeleton();
   }

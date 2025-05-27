@@ -95,6 +95,40 @@ const MainPage = () => {
     }
   }, [stateParam, cityParam, loadStateForCity, loadCities, selectedState, selectedCity]);
   
+  // Early return with loading state that matches final layout
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="container mx-auto px-4 w-full max-w-7xl" style={{ minHeight: '600px' }}>
+          <div className="animate-pulse space-y-4 py-8">
+            {/* Header placeholder with fixed height */}
+            <div className="h-12 bg-gray-200 rounded-lg w-3/4"></div>
+            
+            {/* Price info cards with fixed dimensions */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white p-6 rounded-lg shadow-sm" style={{ height: '160px' }}>
+                  <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
+                  <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Table placeholder with fixed height */}
+            <div className="mt-8 bg-white rounded-lg shadow-sm" style={{ height: '400px' }}>
+              <div className="h-12 bg-gray-200 rounded-t-lg"></div>
+              <div className="p-4 space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-10 bg-gray-200 rounded"></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Render method
   return (
     <div className="bg-gray-50 min-h-screen">
