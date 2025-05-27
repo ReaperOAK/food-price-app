@@ -1,7 +1,29 @@
-import React, { Suspense, lazy, useEffect } from 'react';
+import React, { Suspense, lazy } from 'react';
 
-// Dynamically import Chart.js
-import Chart from 'chart.js/auto';
+// Only import necessary Chart.js components
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+
+// Register only the components we need
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const LoadingChart = () => (
   <div className="animate-pulse w-full h-[350px] flex flex-col items-center justify-center bg-white rounded-lg">
@@ -10,7 +32,29 @@ const LoadingChart = () => (
   </div>
 );
 
-const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey = 'city', yAxisKey = 'rate', showLine = false, isLoading = false }) => {
+// Lazy load chart components
+const BarChart = lazy(() => 
+  import('react-chartjs-2').then(module => ({ 
+    default: module.Bar 
+  }))
+);
+
+const LineChart = lazy(() => 
+  import('react-chartjs-2').then(module => ({ 
+    default: module.Line 
+  }))
+);
+
+const RateChart = ({ 
+  data = [], 
+  title = 'Egg Rates', 
+  chartType = 'bar', 
+  xAxisKey = 'city', 
+  yAxisKey = 'rate', 
+  showLine = false, 
+  isLoading = false 
+}) => {
+  // Move styles to a constant to prevent recreation
   const containerStyle = {
     position: 'relative',
     height: '350px',
@@ -20,20 +64,6 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
     boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
     overflow: 'hidden'
   };
-
-  // Initialize Chart.js on mount
-  useEffect(() => {
-    const initChart = async () => {
-      const { CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } = await import('chart.js');
-      Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
-    };
-    initChart();
-  }, []);
-
-  // Use React.lazy for chart components
-  const Bar = lazy(() => import('react-chartjs-2').then(module => ({ default: module.Bar })));
-  const Line = lazy(() => import('react-chartjs-2').then(module => ({ default: module.Line })));
-
 
   if (isLoading) {
     return <LoadingChart />;
@@ -167,7 +197,7 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
     }
   };
 
-  const ChartComponent = chartType === 'line' ? Line : Bar;
+  const ChartComponent = chartType === 'line' ? LineChart : BarChart;
 
   return (
     <div className="mt-4 bg-white" style={containerStyle}>
@@ -178,4 +208,4 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
   );
 };
 
-export default RateChart;
+export default React.memo(RateChart);
