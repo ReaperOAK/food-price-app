@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[8398],{1881:(t,h,o)=>{o.d(h,{B1:()=>c,Jx:()=>n,LI:()=>p,RI:()=>a,T9:()=>i,jk:()=>e});const e=Math.min,i=Math.max,p=Math.round,a=Math.floor,n=t=>({x:t,y:t});function c(t){const{x:h,y:o,width:e,height:i}=t;return{width:e,height:i,top:o,left:h,right:h+e,bottom:o+i,x:h,y:o}}}}]);
