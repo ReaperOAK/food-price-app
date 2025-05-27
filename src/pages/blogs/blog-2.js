@@ -6,7 +6,7 @@ const EggRates = () => {
   return (
     <div>
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Understanding Egg Rates in India</h1>
-      <OptimizedImage src="/desiegg.webp" alt="Egg Rates Banner" className="w-full mb-8 rounded-lg shadow-md" width={800} height={400} />
+      <OptimizedImage src="/desiegg.webp" alt="Egg Rates Banner" className="w-full mb-8 rounded-lg shadow-md" width={600} height={300} />
       
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Introduction</h2>
@@ -35,7 +35,7 @@ const EggRates = () => {
         <p className="text-lg text-gray-600 mb-4">
           Recently, egg prices have been on the rise due to increased production costs and higher demand during festive seasons. The following chart shows the trend in egg prices over the past year:
         </p>
-        <OptimizedImage src="/eggpic.webp" alt="Egg Price Chart" className="w-full mb-8 rounded-lg shadow-md" width={800} height={400} />
+        <OptimizedImage src="/eggpic.webp" alt="Egg Price Chart" className="w-full mb-8 rounded-lg shadow-md" width={400} height={300} />
       </section>
       
       <section className="mb-8">

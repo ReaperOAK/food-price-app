@@ -2,16 +2,18 @@ import React, { Suspense, lazy } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
+import OptimizedImage from './components/common/OptimizedImage';
 
 // Enhanced loading component
 const LoadingFallback = () => (
   <div className="min-h-screen bg-gray-50 flex items-center justify-center">
     <div className="text-center animate-fade-in">
-      <div className="w-16 h-16 mb-4 mx-auto">
-        <img 
+      <div className="w-16 h-16 mb-4 mx-auto">        <OptimizedImage 
           src="/logo.webp"
           alt="Loading..."
           className="w-full h-full object-contain"
+          width={64}
+          height={64}
           fetchpriority="high"
         />
       </div>

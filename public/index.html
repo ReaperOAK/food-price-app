@@ -59,9 +59,22 @@
     <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
     <link rel="preconnect" href="https://analytics.ahrefs.com" crossorigin />
     
-    <!-- Preload critical assets -->
-    <link rel="preload" href="%PUBLIC_URL%/eggpic.webp" as="image" fetchpriority="high" />
-    <link rel="preload" href="%PUBLIC_URL%/logo.webp" as="image" fetchpriority="high" />
+    <!-- Preload critical assets -->    <link 
+      rel="preload" 
+      href="%PUBLIC_URL%/eggpic.webp" 
+      as="image" 
+      fetchpriority="high"
+      imagesizes="300px"
+      imagesrcset="%PUBLIC_URL%/eggpic.webp 300w"
+    />
+    <link 
+      rel="preload" 
+      href="%PUBLIC_URL%/logo.webp" 
+      as="image" 
+      fetchpriority="high"
+      imagesizes="64px"
+      imagesrcset="%PUBLIC_URL%/logo.webp 64w"
+    />
     <link rel="preload" href="%PUBLIC_URL%/static/css/main.2099c5e4.css" as="style" />
     <link rel="preload" href="%PUBLIC_URL%/static/js/main.js" as="script" />
     
@@ -177,14 +190,13 @@
     <meta property="og:title" content="Egg Rate Today - Check Today's NECC Egg Price in India"/>
     <meta property="og:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025."/>
     <meta property="og:type" content="website"/>
-    <meta property="og:url" content="https://todayeggrates.com/"/>
-    <meta property="og:image" content="%PUBLIC_URL%/eggpic.webp"/>
+    <meta property="og:url" content="https://todayeggrates.com/"/>    <meta property="og:image" content="%PUBLIC_URL%/eggpic.webp" width="300" height="200"/>
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image"/>
     <meta name="twitter:title" content="Egg Rate Today - Check Today's NECC Egg Price in India"/>
     <meta name="twitter:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025."/>
-    <meta name="twitter:image" content="%PUBLIC_URL%/eggpic.webp"/>
+    <meta name="twitter:image" content="%PUBLIC_URL%/eggpic.webp" width="300" height="200"/>
     
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -206,7 +218,12 @@
       "@type": "Organization",
       "name": "Today Egg Rates",
       "url": "https://todayeggrates.com",
-      "logo": "https://todayeggrates.com/eggpic.webp",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://todayeggrates.com/logo.webp",
+        "width": "64",
+        "height": "64"
+      },
       "sameAs": [
         "https://www.facebook.com/todayeggrates",
         "https://twitter.com/todayeggrates"

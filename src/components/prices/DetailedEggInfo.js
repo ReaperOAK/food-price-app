@@ -33,7 +33,7 @@ const DetailedEggInfo = ({ selectedCity, selectedState }) => {
         NECC-National Egg Coordination Committee
       </h1>
       <div className="grid lg:grid-cols-2 gap-5"> 
-          <OptimizedImage src="/eggrate2.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate" width={600} height={400} />
+          <OptimizedImage src="/eggrate2.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate" width={400} height={300} />
           <div>
             <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
               Eggs are a fantastic addition to any meal, whether it's breakfast, lunch, or dinner! You can enjoy them scrambled or boiled, and they work wonderfully in dishes like Anda Bhurji or even Anda Ka Halwa. Just like us Indians, eggs can fit into a variety of recipes while keeping their special charm. If you're curious about egg prices in India, they change daily, as shared by the NECC (National Egg Coordination Committee). We make it easy for you to stay updated with the latest egg rates so you can continue enjoying your favorite egg dishes!
@@ -50,14 +50,14 @@ const DetailedEggInfo = ({ selectedCity, selectedState }) => {
           The National Egg Coordination Committee (NECC) considers purchasing trends and the efforts of egg farmers when recommending current egg prices. This organization provides price suggestions for over 50 cities and states across the country. By disseminating today's egg prices, we ensure that users remain informed about NECC's recommendations, thereby enabling them to make more informed purchasing decisions.
           </p> 
         </div>
-        <OptimizedImage src="/desiegg.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate in india" width={600} height={400} />
+        <OptimizedImage src="/desiegg.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate in india" width={300} height={200} />
       </div>
 
       <h2 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
         Egg Consumption in India
       </h2>
       <div className="grid lg:grid-cols-2 gap-5"> 
-          <OptimizedImage src="/eggrate3.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate in mumbai" width={600} height={400} />
+          <OptimizedImage src="/eggrate3.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate in mumbai" width={400} height={300} />
           <div>
             <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
             India is a major player in the global egg production industry, generating approximately 129.6 billion eggs each year. This production figure is experiencing a steady growth rate of 7% annually, reflecting the increasing demand for eggs among the population. According to data published by Agrospectrum, the average egg consumption per person in India is estimated to be 95 eggs per year. This indicates not only a high level of consumption but also a cultural acceptance of eggs as a staple food source. Furthermore, India holds the position of third largest egg producer globally, trailing only behind China and the United States. This prominent ranking underscores the significant role eggs play in the Indian diet, as well as the growing awareness among consumers regarding the nutritional benefits of eggs, including their high protein content and essential vitamins.

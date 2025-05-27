@@ -56,12 +56,13 @@ const WebStoriesSection = ({
                 to={`/webstory/${story.slug}`}
                 className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
               >
-                <div className="relative">
-                  <OptimizedImage 
+                <div className="relative">                  <OptimizedImage 
                     src={story.thumbnail} 
                     alt={`Egg Rate in ${story.city}, ${story.state}`}
                     className="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => { e.target.src = '/eggpic.webp' }}
+                    width={300}
+                    height={200}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-4">
