@@ -1,28 +1,26 @@
 import React, { Suspense, lazy } from 'react';
 
-// Only import necessary Chart.js components
+// Only import the absolute minimum required Chart.js components
 import {
-  Chart,
+  Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
   PointElement,
   LineElement,
+  BarElement,
   Title,
-  Tooltip,
-  Legend
+  Tooltip
 } from 'chart.js';
 
-// Register only the components we need
-Chart.register(
+// Register only the components we actually use
+ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
   PointElement,
   LineElement,
+  BarElement,
   Title,
-  Tooltip,
-  Legend
+  Tooltip
 );
 
 const LoadingChart = () => (
@@ -95,55 +93,32 @@ const RateChart = ({
       label: title,
       data: data.map(item => item[yAxisKey]),
       backgroundColor: 'rgba(59, 130, 246, 0.5)',
-      borderColor: 'rgb(59, 130, 246)',
+      borderColor: showLine ? 'rgb(59, 130, 246)' : undefined,
       borderWidth: showLine ? 2 : 1,
-      fill: showLine ? 'start' : undefined,
-      tension: showLine ? 0.3 : undefined,
-      pointRadius: showLine ? 4 : undefined,
-      pointHoverRadius: showLine ? 6 : undefined,
-      pointBackgroundColor: '#ffffff',
-      pointBorderColor: 'rgb(59, 130, 246)',
-      pointBorderWidth: 2
+      tension: showLine ? 0.3 : 0,
+      pointRadius: showLine ? 4 : 0
     }]
   };
 
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    animation: {
-      duration: 600
-    },
     plugins: {
-      legend: {
-        display: false
-      },
       title: {
         display: true,
         text: title,
         color: '#1f2937',
         font: {
           size: 14,
-          weight: '600',
-          family: "'Inter', system-ui, sans-serif"
+          weight: '600'
         },
-        padding: {
-          top: 10,
-          bottom: 20
-        }
+        padding: 20
       },
       tooltip: {
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        backgroundColor: '#fff',
         titleColor: '#1f2937',
         bodyColor: '#1f2937',
-        titleFont: {
-          weight: '600',
-          family: "'Inter', system-ui, sans-serif"
-        },
-        bodyFont: {
-          family: "'Inter', system-ui, sans-serif"
-        },
         padding: 12,
-        boxPadding: 6,
         borderColor: 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         callbacks: {
@@ -157,42 +132,18 @@ const RateChart = ({
         grid: {
           color: 'rgba(0, 0, 0, 0.05)'
         },
-        border: {
-          display: false
-        },
         ticks: {
           callback: (value) => `₹${value.toFixed(2)}`,
-          font: {
-            family: "'Inter', system-ui, sans-serif",
-            size: 11
-          },
-          padding: 8
+          font: { size: 11 }
         }
       },
       x: {
-        grid: {
-          display: false
-        },
-        border: {
-          display: false
-        },
+        grid: { display: false },
         ticks: {
-          font: {
-            family: "'Inter', system-ui, sans-serif",
-            size: 11
-          },
-          padding: 8,
           maxRotation: 45,
-          minRotation: 45
+          minRotation: 45,
+          font: { size: 11 }
         }
-      }
-    },
-    layout: {
-      padding: {
-        top: 10,
-        right: 20,
-        bottom: 10,
-        left: 10
       }
     }
   };
