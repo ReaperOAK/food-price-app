@@ -18,8 +18,15 @@ const TableRow = ({
   handleSaveClick,
   handleCancelClick,
   onDelete,
-  setHoveredRow
+  setHoveredRow,
+  rowHeight = '48px'
 }) => {
+  const cellStyle = {
+    height: rowHeight,
+    minHeight: rowHeight,
+    transition: 'background-color 0.2s ease-in-out'
+  };
+
   return (
     <tr
       className={`
@@ -27,13 +34,13 @@ const TableRow = ({
         hover:bg-[#ddfafe]
         ${hoveredRow === index ? 'bg-[#ddfafe]' : ''}
       `}
-      style={{ minHeight: '48px', height: '48px' }}
+      style={cellStyle}
       onMouseEnter={() => setHoveredRow(index)}
       onMouseLeave={() => setHoveredRow(null)}
       role="row"
     >
       {(!selectedCity && showMarket) && (
-        <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
+        <td className="border border-gray-300 p-2" style={cellStyle} role="cell">
           {rate.city ? (
             <a 
               href={`/${rate.city.toLowerCase()}-egg-rate`}
@@ -47,12 +54,12 @@ const TableRow = ({
         </td>
       )}
       {showState && (
-        <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
+        <td className="border border-gray-300 p-2" style={cellStyle} role="cell">
           {rate.state}
         </td>
       )}
       {showDate && (
-        <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
+        <td className="border border-gray-300 p-2" style={cellStyle} role="cell">
           {editingRate === rate.id ? (
             <input
               type="date"
@@ -60,6 +67,7 @@ const TableRow = ({
               value={editedRate.date}
               onChange={handleChange}
               className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              style={{ height: '32px' }}
               aria-label="Edit date"
             />
           ) : (
@@ -67,7 +75,7 @@ const TableRow = ({
           )}
         </td>
       )}
-      <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
+      <td className="border border-gray-300 p-2" style={cellStyle} role="cell">
         {editingRate === rate.id ? (
           <input
             type="number"
@@ -75,6 +83,7 @@ const TableRow = ({
             value={editedRate.rate}
             onChange={handleChange}
             className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            style={{ height: '32px' }}
             aria-label="Edit rate"
             step="0.01"
           />
@@ -84,15 +93,15 @@ const TableRow = ({
       </td>
       {showPriceColumns && (
         <>
-          <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
+          <td className="border border-gray-300 p-2" style={cellStyle} role="cell">
             <span title="Price for 30 eggs">₹{(rate.rate * 30).toFixed(2)}</span>
           </td>
           {!showSpecialRates && (
             <>
-              <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
+              <td className="border border-gray-300 p-2" style={cellStyle} role="cell">
                 <span title="Price for 100 eggs">₹{(rate.rate * 100).toFixed(2)}</span>
               </td>
-              <td className="border border-gray-300 p-2 w-1/4" style={{ minHeight: '48px' }} role="cell">
+              <td className="border border-gray-300 p-2" style={cellStyle} role="cell">
                 <span title="Price for 210 eggs">₹{(rate.rate * 210).toFixed(2)}</span>
               </td>
             </>
@@ -100,7 +109,7 @@ const TableRow = ({
         </>
       )}
       {showAdmin && (
-        <td className="border border-gray-300 p-2 space-x-2" role="cell">
+        <td className="border border-gray-300 p-2 space-x-2" style={cellStyle} role="cell">
           {editingRate === rate.id ? (
             <>
               <button

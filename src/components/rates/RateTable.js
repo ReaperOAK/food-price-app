@@ -31,19 +31,34 @@ const RateTable = ({
   const [editedRate, setEditedRate] = useState({});
   const [hoveredRow, setHoveredRow] = useState(null);
 
+  // Constants for fixed dimensions to prevent CLS
+  const TABLE_MIN_HEIGHT = '400px';
+  const ROW_HEIGHT = '48px';
+  const TABLE_WRAPPER_MIN_HEIGHT = '600px';
+  const LOADING_ROWS = 5;
+
+  const containerStyle = {
+    minHeight: TABLE_WRAPPER_MIN_HEIGHT,
+    backgroundColor: '#ffffff',
+    transition: 'all 0.2s ease-in-out'
+  };
+
   const tableStyle = {
-    minHeight: '400px',
+    minHeight: TABLE_MIN_HEIGHT,
     width: '100%',
     backgroundColor: '#ffffff',
   };
 
   const headerStyle = {
-    height: '48px',
-    backgroundColor: '#f3f4f6',
+    height: ROW_HEIGHT,
+    backgroundColor: '#F9BE0C',
+    position: 'sticky',
+    top: 0,
+    zIndex: 10,
   };
 
   const cellStyle = {
-    height: '48px',
+    height: ROW_HEIGHT,
     padding: '12px 16px',
   };
 
@@ -53,12 +68,15 @@ const RateTable = ({
   };
 
   const renderLoadingSkeleton = () => (
-    <div style={tableStyle} className="overflow-hidden rounded-lg shadow">
+    <div style={containerStyle} className="overflow-hidden rounded-lg shadow" role="status" aria-label="Loading egg rates">
+      {/* Header skeleton */}
       <div className="animate-pulse">
-        <div style={headerStyle} className="bg-gray-200"></div>
-        {[...Array(5)].map((_, index) => (
-          <div key={index} style={cellStyle} className="flex items-center border-t border-gray-200">
+        <div style={headerStyle} className="bg-gray-200 mb-2"></div>
+        {/* Row skeletons */}
+        {[...Array(LOADING_ROWS)].map((_, index) => (
+          <div key={index} style={cellStyle} className="flex items-center border-t border-gray-100">
             <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
+            <div className="w-1/4 h-4 ml-4 bg-gray-200 rounded"></div>
             <div className="w-1/4 h-4 ml-4 bg-gray-200 rounded"></div>
             <div className="w-1/4 h-4 ml-4 bg-gray-200 rounded"></div>
           </div>
@@ -245,6 +263,7 @@ const handleLocalSort = (key) => {
 
   return (
     <>
+      {/* Schema data handling */}
       {selectedCity && (
         <Helmet>
           {localBusinessSchema && (
@@ -259,30 +278,34 @@ const handleLocalSort = (key) => {
           )}
         </Helmet>
       )}
-      
-        {/* Table section */}
-      <div className={showSpecialRates ? "bg-white rounded-lg shadow-lg overflow-x-auto" : "bg-gray-100 rounded-lg shadow-lg overflow-x-auto"}>
+
+      {/* Main table container with fixed dimensions */}
+      <div style={containerStyle} className="bg-gray-100 rounded-lg shadow-lg">
+        {/* Special rates header */}
         {showSpecialRates && (
-          <div className="mb-6">
-            <h2 className="text-3xl font-bold text-center text-gray-800 mb-4">Special Rates</h2>
-            <p className="text-center text-gray-600 mb-6">Today's wholesale egg rates for special markets and bulk buyers</p>
+          <div className="p-6 bg-white rounded-t-lg">
+            <h2 className="text-3xl font-bold text-center text-gray-800">Special Rates</h2>
+            <p className="text-center text-gray-600 mt-2">Today's wholesale egg rates for special markets and bulk buyers</p>
           </div>
         )}
 
         {/* Rate Summary Section */}
         {!showSpecialRates && chartData.length > 0 && (
-          <RateSummary 
-            latestRate={latestRate}
-            latestRateDate={latestRateDate}
-            rateChange={rateChange}
-            percentageChange={percentageChange}
-            trayPrice={trayPrice}
-          />
+          <div className="bg-white rounded-t-lg">
+            <RateSummary 
+              latestRate={latestRate}
+              latestRateDate={latestRateDate}
+              rateChange={rateChange}
+              percentageChange={percentageChange}
+              trayPrice={trayPrice}
+            />
+          </div>
         )}
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full border border-gray-300 mt-4" role="table" aria-label="Egg Rates Table">
-            <thead className="sticky top-0 z-10">
+        {/* Table Section with fixed height */}
+        <div className="overflow-x-auto bg-white rounded-lg" style={tableStyle}>
+          <table className="min-w-full border border-gray-300" role="table" aria-label="Egg Rates Table">
+            <thead className="sticky top-0 z-10" style={headerStyle}>
               <TableHeader 
                 selectedCity={selectedCity}
                 showMarket={showMarket}
@@ -318,6 +341,7 @@ const handleLocalSort = (key) => {
                   handleCancelClick={handleCancelClick}
                   onDelete={onDelete}
                   setHoveredRow={setHoveredRow}
+                  rowHeight={ROW_HEIGHT}
                 />
               ))}
             </tbody>
@@ -325,29 +349,35 @@ const handleLocalSort = (key) => {
         </div>
 
         {/* Pagination */}
-        <Pagination
-          currentPage={currentPage}
-          setCurrentPage={setCurrentPage}
-          pages={pages}
-        />
-
-        {/* Chart */}
-        {showChart && (
-          <RateChart 
-            data={currentItems} 
-            chartType={selectedCity ? 'line' : 'bar'} 
-            xAxisKey={selectedCity ? 'date' : 'city'}
-            title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
-            showLine={selectedCity}
+        <div className="bg-white rounded-b-lg">
+          <Pagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            pages={pages}
           />
+        </div>
+
+        {/* Chart Section */}
+        {showChart && (
+          <div className="mt-6 bg-white rounded-lg p-4">
+            <RateChart 
+              data={currentItems} 
+              chartType={selectedCity ? 'line' : 'bar'} 
+              xAxisKey={selectedCity ? 'date' : 'city'}
+              title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
+              showLine={selectedCity}
+            />
+          </div>
         )}
 
         {/* Market Info */}
         {selectedCity && (
-          <MarketInfo
-            selectedCity={selectedCity}
-            selectedState={selectedState}
-          />
+          <div className="mt-6">
+            <MarketInfo
+              selectedCity={selectedCity}
+              selectedState={selectedState}
+            />
+          </div>
         )}
       </div>
     </>

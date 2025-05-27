@@ -12,14 +12,23 @@ const TableHeader = ({
   requestSort,
   getSortIcon
 }) => {
+  const headerCellStyle = {
+    height: '48px',
+    minHeight: '48px',
+    padding: '12px 16px',
+    backgroundColor: '#F9BE0C',
+    transition: 'background-color 0.2s ease-in-out'
+  };
+
   return (
-    <tr style={{ backgroundColor: '#F9BE0C' }}>
+    <tr>
       {(!selectedCity && showMarket) && (
         <th
-          className="border border-gray-300 p-2 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
+          className="border border-gray-300 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
           onClick={() => requestSort('city')}
           role="columnheader"
           aria-sort={sortConfig.key === 'city' ? sortConfig.direction : 'none'}
+          style={headerCellStyle}
         >
           <div className="flex items-center justify-between">
             <span>{showSpecialRates ? 'Market Location' : 'Market'}</span>
@@ -29,10 +38,11 @@ const TableHeader = ({
       )}
       {showState && (
         <th
-          className="border border-gray-300 p-2 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
+          className="border border-gray-300 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
           onClick={() => requestSort('state')}
           role="columnheader"
           aria-sort={sortConfig.key === 'state' ? sortConfig.direction : 'none'}
+          style={headerCellStyle}
         >
           <div className="flex items-center justify-between">
             <span>State</span>
@@ -42,10 +52,11 @@ const TableHeader = ({
       )}
       {showDate && (
         <th
-          className="border border-gray-300 p-2 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
+          className="border border-gray-300 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
           onClick={() => requestSort('date')}
           role="columnheader"
           aria-sort={sortConfig.key === 'date' ? sortConfig.direction : 'none'}
+          style={headerCellStyle}
         >
           <div className="flex items-center justify-between">
             <span>Date</span>
@@ -54,10 +65,11 @@ const TableHeader = ({
         </th>
       )}
       <th
-        className="border border-gray-300 p-2 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
+        className="border border-gray-300 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
         onClick={() => requestSort('rate')}
         role="columnheader"
         aria-sort={sortConfig.key === 'rate' ? sortConfig.direction : 'none'}
+        style={headerCellStyle}
       >
         <div className="flex items-center justify-between">
           <span>Rate Per Piece</span>
@@ -67,8 +79,9 @@ const TableHeader = ({
       {showPriceColumns && (
         <>
           <th 
-            className="border border-gray-300 p-2"
+            className="border border-gray-300"
             role="columnheader"
+            style={headerCellStyle}
           >
             <div className="flex items-center justify-between">
               <span>Tray Price (30)</span>
@@ -78,8 +91,9 @@ const TableHeader = ({
           {!showSpecialRates && (
             <>
               <th 
-                className="border border-gray-300 p-2"
+                className="border border-gray-300"
                 role="columnheader"
+                style={headerCellStyle}
               >
                 <div className="flex items-center justify-between">
                   <span>Price (100 Pcs)</span>
@@ -87,8 +101,9 @@ const TableHeader = ({
                 </div>
               </th>
               <th 
-                className="border border-gray-300 p-2"
+                className="border border-gray-300"
                 role="columnheader"
+                style={headerCellStyle}
               >
                 <div className="flex items-center justify-between">
                   <span>Peti (210)</span>
@@ -101,9 +116,12 @@ const TableHeader = ({
       )}
       {showAdmin && (
         <th 
-          className="border border-gray-300 p-2"
+          className="border border-gray-300"
           role="columnheader"
-        >Actions</th>
+          style={headerCellStyle}
+        >
+          Actions
+        </th>
       )}
     </tr>
   );
