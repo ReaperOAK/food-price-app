@@ -193,7 +193,6 @@ const MainPage = () => {
                 />
               )}
 
-              <DetailedEggInfo selectedCity={selectedCity} selectedState={selectedState} />
               <PriceTrends selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
 
               <WebStoriesSection 
@@ -235,6 +234,7 @@ const MainPage = () => {
                   itemsPerPage={5}
                 />
               )}
+              <DetailedEggInfo selectedCity={selectedCity} selectedState={selectedState} />
 
               {blogs.length > 0 && (
                 <BlogList blogs={blogs} selectedCity={selectedCity} selectedState={selectedState} />
