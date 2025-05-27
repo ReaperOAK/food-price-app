@@ -9,7 +9,6 @@
     "@types/jquery": "^3.5.32",
     "@types/slick-carousel": "^1.6.40",
     "chart.js": "^4.4.7",
-    "core-js": "^3.42.0",
     "intersection-observer": "^0.12.2",
     "jquery": "^3.7.1",
     "react": "^18.3.1",
@@ -27,7 +26,8 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
+    "build": "cross-env GENERATE_SOURCEMAP=false react-app-rewired build",
+    "build:analyze": "cross-env GENERATE_SOURCEMAP=false ANALYZE=true react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
@@ -51,11 +51,17 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-env": "^7.27.2",
+    "@babel/preset-react": "^7.27.1",
     "@craco/craco": "^7.1.0",
     "ajv": "^8.8.2",
     "autoprefixer": "^10.4.20",
+    "babel-plugin-transform-imports": "^2.0.0",
+    "babel-plugin-transform-react-remove-prop-types": "^0.4.24",
     "compression-webpack-plugin": "^11.1.0",
+    "core-js": "^3.42.0",
     "craco-esbuild": "^0.6.1",
+    "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "customize-cra": "^1.0.0",
     "imagemin": "^9.0.1",
@@ -69,6 +75,7 @@
     "tailwindcss": "^3.4.17",
     "terser-webpack-plugin": "^5.3.14",
     "webp-converter": "^2.3.3",
-    "webpack": "^5.99.9"
+    "webpack": "^5.99.9",
+    "webpack-bundle-analyzer": "^4.10.2"
   }
 }

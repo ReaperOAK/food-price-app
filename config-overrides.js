@@ -1,5 +1,11 @@
 const path = require('path');
-const { addWebpackPlugin } = require('customize-cra');
+const { 
+  override,
+  addWebpackPlugin,
+  addBabelPlugin,
+  addBundleVisualizer,
+  setWebpackOptimizationSplitChunks
+} = require('customize-cra');
 const CompressionPlugin = require('compression-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
@@ -13,7 +19,6 @@ module.exports = function override(config, env) {
       })
     );
   }
-
   // Configure optimization
   config.optimization = {
     ...config.optimization,
@@ -22,31 +27,51 @@ module.exports = function override(config, env) {
     splitChunks: {
       chunks: 'all',
       maxInitialRequests: Infinity,
-      minSize: 20000,
+      minSize: 15000,
+      maxSize: 40000,
       cacheGroups: {
         reactVendor: {
-          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+          test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
           name: 'react-vendor',
           chunks: 'all',
           priority: 40,
+          enforce: true,
         },
         chartVendor: {
           test: /[\\/]node_modules[\\/](chart\.js|react-chartjs-2)[\\/]/,
           name: 'chart-vendor',
           chunks: 'async',
           priority: 30,
+          enforce: true,
         },
-        utilityVendor: {
-          test: /[\\/]node_modules[\\/](@remix-run|memoize-one|intersection-observer)[\\/]/,
-          name: 'utility-vendor',
+        helmetVendor: {
+          test: /[\\/]node_modules[\\/](react-helmet|prop-types)[\\/]/,
+          name: 'helmet-vendor',
+          chunks: 'async',
+          priority: 25,
+          enforce: true,
+        },
+        routerVendor: {
+          test: /[\\/]node_modules[\\/](react-router|react-router-dom|@remix-run)[\\/]/,
+          name: 'router-vendor',
           chunks: 'async',
           priority: 20,
+          enforce: true,
+        },
+        utilityVendor: {
+          test: /[\\/]node_modules[\\/](intersection-observer|memoize-one|@babel\/runtime)[\\/]/,
+          name: 'utility-vendor',
+          chunks: 'async',
+          priority: 15,
+          enforce: true,
         },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
           chunks: 'all',
           priority: 10,
+          enforce: true,
+          reuseExistingChunk: true,
         },
         common: {
           name: 'common',
@@ -55,8 +80,7 @@ module.exports = function override(config, env) {
           reuseExistingChunk: true,
         },
       },
-    },
-    minimize: true,
+    },    minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
@@ -69,9 +93,17 @@ module.exports = function override(config, env) {
             comparisons: false,
             inline: 2,
             drop_console: true,
+            drop_debugger: true,
+            pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
+            pure_getters: true,
+            keep_infinity: true,
+            passes: 3,
           },
           mangle: {
             safari10: true,
+            toplevel: true,
+            keep_classnames: false,
+            keep_fnames: false,
           },
           output: {
             ecma: 5,
@@ -80,6 +112,7 @@ module.exports = function override(config, env) {
           },
         },
         parallel: true,
+        extractComments: false,
       }),
     ],
   };
