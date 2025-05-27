@@ -42,15 +42,18 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
   // Extract Tailwind dimensions
   const hasTailwindDimensions = /w-\d+|h-\d+/.test(className);
   const aspectRatio = imageLoaded ? (dimensions.height / dimensions.width) * 100 : 56.25;
-
-  // Calculate sizes attribute based on responsive classes
+  // Calculate sizes attribute based on responsive classes and viewport
   const getSizes = () => {
-    if (className.includes('w-full')) return '100vw';
+    if (className.includes('w-full')) {
+      return '(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px';
+    }
     if (className.match(/w-(\d+)\/(\d+)/)) {
       const [, num, den] = className.match(/w-(\d+)\/(\d+)/);
-      return `${(num / den) * 100}vw`;
+      const percentage = (num / den) * 100;
+      return `(max-width: 768px) ${percentage}vw, (max-width: 1200px) ${percentage * 0.8}vw, ${percentage * 0.6}vw`;
     }
-    return '100vw';
+    // Default responsive sizes
+    return '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw';
   };
 
   return (
@@ -70,8 +73,7 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
         }}
         className={`${error ? 'bg-gray-200' : 'bg-gray-100'}`}
         aria-hidden="true"
-      />
-      {!error && imageLoaded && (
+      />      {!error && imageLoaded && (
         <img
           ref={imgRef}
           src={src}
@@ -83,7 +85,16 @@ const OptimizedImage = ({ src, alt, className = '', width, height }) => {
           } transition-opacity duration-300 will-change-transform`}
           loading="lazy"
           decoding="async"
-          sizes={getSizes()}
+          sizes={getSizes()}          srcSet={`${src.includes('/webstories/') 
+            ? src.replace('.webp', '-300.webp').replace('/webstories/', '/webstories/optimized/') 
+            : src.replace('.webp', '-300.webp').replace('/', '/optimized/')} 300w,
+                   ${src.includes('/webstories/') 
+            ? src.replace('.webp', '-600.webp').replace('/webstories/', '/webstories/optimized/')
+            : src.replace('.webp', '-600.webp').replace('/', '/optimized/')} 600w,
+                   ${!src.includes('/webstories/') 
+            ? src.replace('.webp', '-900.webp').replace('/', '/optimized/') 
+            : src} 900w,
+                   ${src} 1200w`}
           fetchpriority={/hero|logo|banner/.test(className.toLowerCase()) ? 'high' : 'auto'}
           onLoad={() => {
             setLoaded(true);
