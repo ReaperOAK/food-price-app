@@ -2,19 +2,12 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import { FaBars, FaTimes } from 'react-icons/fa';
+import OptimizedImage from '../common/OptimizedImage';
 
 const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState }) => {
   const [options, setOptions] = useState([]);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [logoError, setLogoError] = useState(false);
-  const [logoLoading, setLogoLoading] = useState(true);
-  const [currentLogoIndex, setCurrentLogoIndex] = useState(0);
-  const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);  const navigate = useNavigate();
   const location = useLocation();
-
-  const logoPaths = [
-    '/logo.webp',
-  ];
 
   // Track navigation lock to prevent redundant navigations
   const navigationLock = React.useRef(false);
@@ -165,70 +158,18 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
-
-  // Logo component with loading and fallback handling
+  // Logo component with optimized image
   const Logo = () => {
-    const handleLogoError = () => {
-      setLogoLoading(false);
-      setLogoError(true);
-      if (currentLogoIndex < logoPaths.length - 1) {
-        setCurrentLogoIndex(prev => prev + 1);
-      }
-    };
-
-    const handleLogoLoad = () => {
-      setLogoLoading(false);
-      setLogoError(false);
-    };
-
     return (
       <div className="logo-container" style={{ width: '12rem', height: '4rem', position: 'relative' }}>
-         {logoLoading && (
-          <div className="logo-loading-skeleton" 
-            style={{ 
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              backgroundColor: '#e0e0e0',
-              borderRadius: '4px',
-              animation: 'pulse 1.5s infinite'
-            }} 
-          />
-        )}
-        <img
-          src={logoPaths[currentLogoIndex]}
+        <OptimizedImage
+          src="/logo.webp"
           alt="Food Price App Logo"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'contain',
-            opacity: logoLoading ? 0 : 1,
-            transition: 'opacity 0.3s ease'
-          }}
-          onError={handleLogoError}
-          onLoad={handleLogoLoad}
+          className="w-full h-full object-contain"
+          width={192} // 12rem = 192px
+          height={64} // 4rem = 64px
+          loading="eager" // Logo should load eagerly as it's above the fold
         />
-        {logoError && currentLogoIndex === logoPaths.length - 1 && (
-          <div 
-            style={{ 
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#f5f5f5',
-              borderRadius: '4px',
-              fontSize: '20px'
-            }}
-          >
-            🥚
-          </div>
-        )}
       </div>
     );
   };

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import OptimizedImage from '../common/OptimizedImage';
 
 const BlogList = ({ blogs, selectedCity, selectedState }) => {
   // Sort blogs by upload date (newest first)
@@ -49,12 +50,13 @@ const BlogList = ({ blogs, selectedCity, selectedState }) => {
         {sortedBlogs.map((blog, index) => (
           <div key={index} className="bg-gray-50 rounded-lg overflow-hidden shadow transition-transform hover:scale-105">
             <Link to={`/blog/${blog.link}`} className="block">
-              <img 
-                src={blog.image} 
-                alt={blog.title} 
-                className="w-full h-48 object-cover"                loading={index < 3 ? "eager" : "lazy"}
+              <OptimizedImage 
+                src={blog.image}
+                alt={blog.title}
+                className="w-full h-48 object-cover"
                 width={400}
                 height={300}
+                loading={index < 3 ? "eager" : "lazy"}
               />
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-800 mb-2">{blog.title}</h3>
