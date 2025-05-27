@@ -50,14 +50,8 @@
     </noscript>
     
     <!-- Optimized Third-party Connections -->
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
     <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
-    <link rel="preconnect" href="https://analytics.ahrefs.com" crossorigin />
-    
-    <!-- Preconnect to critical third-party origins -->
-    <link rel="preconnect" href="https://www.googletagmanager.com" crossorigin />
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
-    <link rel="preconnect" href="https://analytics.ahrefs.com" crossorigin />
     
     <!-- Preload critical assets -->    <link 
       rel="preload" 
@@ -78,156 +72,26 @@
     <link rel="preload" href="%PUBLIC_URL%/static/css/main.2099c5e4.css" as="style" />
     <link rel="preload" href="%PUBLIC_URL%/static/js/main.js" as="script" />
     
-    <!-- Meta tags -->    <meta
-      name="description"
-      content="Compare today's egg rates across India. Find NECC egg prices in Mumbai, Delhi, Chennai, Bangalore & major cities. ₹7-8 per egg. Updated daily with current market rates."
-    />
-    <meta name="keywords" content="egg rate today, NECC egg rate today, today egg rate, egg rate, national egg rate, all india egg rate, today egg price, egg prices india, egg price in india, daily egg rate, egg rate in chennai, egg rate in bangalore"/>
-    <meta name="author" content="Today Egg Rates"/>
-    <meta name="robots" content="index, follow"/>
-    <link rel="canonical" href="https://todayeggrates.com/"/>
-    <meta name="google-adsense-account" content="ca-pub-2664225874856394">    <!-- Progressive Performance Loading -->
-    <script>
-      // Initialize dataLayer early
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-
-      // Performance-focused analytics loading
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(function() {
-          loadAnalytics();
-        }, { timeout: 5000 });
-      } else {
-        window.addEventListener('load', function() {
-          setTimeout(loadAnalytics, 2000);
-        });
-      }
-
-      function loadAnalytics() {
-        // Google Analytics
-        const gtagScript = document.createElement('script');
-        gtagScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N';
-        gtagScript.async = true;
-        document.head.appendChild(gtagScript);
-
-        gtagScript.onload = function() {
-          gtag('js', new Date());
-          gtag('config', 'G-PK6FMNGL4N', { 
-            'send_page_view': false,
-            'transport_type': 'beacon'
-          });
-          // Send optimized pageview
-          gtag('event', 'page_view', {
-            'send_to': 'G-PK6FMNGL4N',
-            'transport_type': 'beacon'
-          });
-        };
-
-        // Ahrefs Analytics
-        const ahrefsScript = document.createElement('script');
-        ahrefsScript.src = 'https://analytics.ahrefs.com/analytics.js';
-        ahrefsScript.dataset.key = 'dRNDN8C4Qb89EJnMutTHlQ';
-        ahrefsScript.async = true;
-        document.head.appendChild(ahrefsScript);
-      }
-    </script>
-
-    <!-- Optimized GTM Loading -->
-    <script type="text/javascript">
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      
-      // Load GTM after critical content
-      function loadGTM() {
-        const script = document.createElement('script');
-        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N';
-        script.async = true;
-        document.head.appendChild(script);
-        script.onload = function() {
-          gtag('js', new Date());
-          gtag('config', 'G-PK6FMNGL4N', {
-            'send_page_view': false, // Disable automatic page views
-            'transport_type': 'beacon',
-            'custom_map': {
-              'dimension1': 'client_id'
-            }
-          });
-        };
-      }
-
-      // Defer GTM loading
-      if (window.addEventListener) {
-        window.addEventListener("load", function() {
-          setTimeout(loadGTM, 3000);
-        });
-      }
-    </script>
-
-    <!-- Early Performance Optimizations -->
-    <script>
-      // Optimize resource loading
-      document.documentElement.classList.remove('no-js');
-      
-      // Detect modern image loading capabilities
-      if ('loading' in HTMLImageElement.prototype) {
-        document.documentElement.classList.add('loading-lazy');
-      }
-      
-      // Preload critical images
-      const preloadImages = ['/eggpic.webp', '/logo.webp'];
-      preloadImages.forEach(src => {
-        const link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'image';
-        link.href = src;
-        link.type = 'image/webp';
-        document.head.appendChild(link);
-      });
-
-      // Load CSS asynchronously
-      const loadCSS = href => {
-        const preload = document.createElement('link');
-        const style = document.createElement('link');
-        
-        preload.rel = 'preload';
-        preload.as = 'style';
-        preload.href = href;
-        
-        style.rel = 'stylesheet';
-        style.href = href;
-        style.media = 'print';
-        
-        style.onload = () => style.media = 'all';
-        
-        document.head.appendChild(preload);
-        document.head.appendChild(style);
-      };
-
-      // Register performance observer
-      if ('PerformanceObserver' in window) {
-        const observer = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            if (entry.hadRecentInput) continue;
-            if (entry.value > 0.1) {
-              console.warn('Layout shift detected:', entry);
-            }
-          }
-        });
-        observer.observe({ entryTypes: ['layout-shift'] });
-      }
-    </script>
-
+    <!-- Meta tags -->    
+    <meta name="description" content="Compare today's egg rates across India. Find NECC egg prices in Mumbai, Delhi, Chennai, Bangalore & major cities. ₹7-8 per egg. Updated daily with current market rates." />
+    <meta name="keywords" content="egg rate today, NECC egg rate today, today egg rate, egg rate, national egg rate, all india egg rate, today egg price, egg prices india, egg price in india, daily egg rate, egg rate in chennai, egg rate in bangalore" />
+    <meta name="author" content="Today Egg Rates" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://todayeggrates.com/" />
+    <meta name="google-adsense-account" content="ca-pub-2664225874856394" />
+    
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Egg Rate Today - Check Today's NECC Egg Price in India"/>
-    <meta property="og:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025."/>
-    <meta property="og:type" content="website"/>
-    <meta property="og:url" content="https://todayeggrates.com/"/>    <meta property="og:image" content="%PUBLIC_URL%/eggpic.webp" width="300" height="200"/>
+    <meta property="og:title" content="Egg Rate Today - Check Today's NECC Egg Price in India" />
+    <meta property="og:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://todayeggrates.com/" />    
+    <meta property="og:image" content="%PUBLIC_URL%/eggpic.webp" width="300" height="200" />
     
     <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:title" content="Egg Rate Today - Check Today's NECC Egg Price in India"/>
-    <meta name="twitter:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025."/>
-    <meta name="twitter:image" content="%PUBLIC_URL%/eggpic.webp" width="300" height="200"/>
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Egg Rate Today - Check Today's NECC Egg Price in India" />
+    <meta name="twitter:description" content="Today's egg rate: Check NECC egg rate today across India. Daily updated egg prices for Mumbai, Chennai, Bangalore & all major cities. Official egg rates May 2025." />
+    <meta name="twitter:image" content="%PUBLIC_URL%/eggpic.webp" width="300" height="200" />
     
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -263,67 +127,56 @@
     </script>
 
     <!-- PWA Support -->
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/eggpic.webp">
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/eggpic.webp" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <meta name="apple-mobile-web-app-title" content="Egg Rates">
-    <meta name="application-name" content="Egg Rates">
+    <meta name="apple-mobile-web-app-title" content="Egg Rates" />
+    <meta name="application-name" content="Egg Rates" />
     <title>Egg Rate Today - Check Today's NECC Egg Price in India (May 2025) | Updated Daily</title>
+
+    <!-- Minimal Analytics Setup -->
+    <script type="module">
+      // Only load analytics in production
+      if (location.hostname !== 'localhost' && location.protocol === 'https:') {
+        // Defer analytics loading
+        const loadAnalytics = () => {
+          const script = document.createElement('script');
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N';
+          script.async = true;
+          document.head.appendChild(script);
+          
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-PK6FMNGL4N', {
+            send_page_view: false,
+            transport_url: 'https://www.google-analytics.com'
+          });
+          
+          // Send initial pageview after paint
+          if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+              gtag('event', 'page_view');
+            }, { timeout: 5000 });
+          } else {
+            setTimeout(() => {
+              gtag('event', 'page_view');
+            }, 5000);
+          }
+        };
+
+        // Load analytics after main content
+        if (document.readyState === 'complete') {
+          loadAnalytics();
+        } else {
+          window.addEventListener('load', () => {
+            requestIdleCallback(loadAnalytics, { timeout: 5000 });
+          });
+        }
+      }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
-    
-    <!-- Ad script loaded with defer to not block rendering -->    <!-- Load critical scripts first -->
-    <script src="%PUBLIC_URL%/static/js/main.js"></script>
-    
-    <!-- Load non-critical scripts -->
-    <script src="%PUBLIC_URL%/ads.js" defer data-ad="true"></script>
-
-    <!-- Script loading optimization -->
-    <script>
-      // Optimize script loading
-      document.addEventListener('DOMContentLoaded', function() {
-        // Function to load deferred scripts
-        function loadDeferredScripts() {
-          document.querySelectorAll('script[defer]').forEach(script => {
-            if (!script.dataset.loaded) {
-              const newScript = document.createElement('script');
-              Array.from(script.attributes).forEach(attr => {
-                if (attr.name !== 'defer') {
-                  newScript.setAttribute(attr.name, attr.value);
-                }
-              });
-              newScript.dataset.loaded = true;
-              script.parentNode.replaceChild(newScript, script);
-            }
-          });
-        }
-
-        // Load deferred scripts when browser is idle
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(loadDeferredScripts, { timeout: 2000 });
-        } else {
-          setTimeout(loadDeferredScripts, 2000);
-        }
-      });
-
-      // Add intersection observer for lazy loading
-      if ('IntersectionObserver' in window) {
-        const lazyImageObserver = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              const img = entry.target;
-              img.src = img.dataset.src;
-              img.classList.remove('lazy');
-              lazyImageObserver.unobserve(img);
-            }
-          });
-        });
-
-        document.addEventListener('DOMContentLoaded', () => {
-          document.querySelectorAll('img.lazy').forEach(img => lazyImageObserver.observe(img));
-        });
-      }
-    </script>
   </body>
 </html>
