@@ -1,8 +1,14 @@
-import React from 'react';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } from 'chart.js';
-import { Bar, Line } from 'react-chartjs-2';
+import React, { Suspense, lazy, useEffect } from 'react';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
+// Dynamically import Chart.js
+import Chart from 'chart.js/auto';
+
+const LoadingChart = () => (
+  <div className="animate-pulse w-full h-[350px] flex flex-col items-center justify-center bg-white rounded-lg">
+    <div className="w-3/4 h-4 bg-gray-200 rounded mb-4"></div>
+    <div className="w-full h-[250px] bg-gray-100 rounded"></div>
+  </div>
+);
 
 const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey = 'city', yAxisKey = 'rate', showLine = false, isLoading = false }) => {
   const containerStyle = {
@@ -15,15 +21,22 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
     overflow: 'hidden'
   };
 
+  // Initialize Chart.js on mount
+  useEffect(() => {
+    const initChart = async () => {
+      const { CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement } = await import('chart.js');
+      Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LineElement, PointElement);
+    };
+    initChart();
+  }, []);
+
+  // Use React.lazy for chart components
+  const Bar = lazy(() => import('react-chartjs-2').then(module => ({ default: module.Bar })));
+  const Line = lazy(() => import('react-chartjs-2').then(module => ({ default: module.Line })));
+
+
   if (isLoading) {
-    return (
-      <div style={containerStyle} className="mt-4">
-        <div className="animate-pulse w-full h-full flex flex-col items-center justify-center">
-          <div className="w-3/4 h-4 bg-gray-200 rounded mb-4"></div>
-          <div className="w-full h-[250px] bg-gray-100 rounded"></div>
-        </div>
-      </div>
-    );
+    return <LoadingChart />;
   }
 
   if (!data || data.length === 0) {
@@ -158,7 +171,9 @@ const RateChart = ({ data = [], title = 'Egg Rates', chartType = 'bar', xAxisKey
 
   return (
     <div className="mt-4 bg-white" style={containerStyle}>
-      <ChartComponent data={chartData} options={options} />
+      <Suspense fallback={<LoadingChart />}>
+        <ChartComponent data={chartData} options={options} />
+      </Suspense>
     </div>
   );
 };

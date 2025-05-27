@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 import { 
   RouterProvider,
   createBrowserRouter,
@@ -11,22 +11,17 @@ import {
 import RootLayout from './components/layout/RootLayout';
 import blogs from './data/blogs';
 
+// Lazy load page components
+const MainPage = lazy(() => import('./pages/MainPage'));
+const BlogPage = lazy(() => import('./pages/BlogPage'));
+const AdminPage = lazy(() => import('./pages/AdminPage'));
+
 // Reusable component preloader
 const preloadComponent = (importFn) => {
   const Component = lazy(importFn);
   Component.preload = importFn;
   return Component;
 };
-
-// Main pages with smarter prefetching
-const MainPage = preloadComponent(() => {  const component = import(/* webpackChunkName: "main-page" */ './pages/MainPage');
-  component.then(() => {
-    // Prefetch critical components
-    import(/* webpackPrefetch: true, webpackChunkName: "rate-table" */ './components/rates/RateTable');
-    import(/* webpackPrefetch: true, webpackChunkName: "state-list" */ './components/rates/StateList');
-  });
-  return component;
-});
 
 // Legal pages bundle
 const LegalPages = {
@@ -35,26 +30,7 @@ const LegalPages = {
   Disclaimer: preloadComponent(() => import(/* webpackChunkName: "legal-disclaimer" */ './components/common/Disclaimer'))
 };
 
-// Admin pages with auth prefetch
-const AdminPage = preloadComponent(() => {
-  const component = import(/* webpackChunkName: "admin-page" */ './pages/AdminPage');
-  component.then(() => {
-    import(/* webpackPrefetch: true, webpackChunkName: "admin-forms" */ './components/admin/RateForm');
-  });
-  return component;
-});
-
 const LoginPage = preloadComponent(() => import(/* webpackChunkName: "login-page" */ './components/admin/LoginPage'));
-
-// Blog system with content prefetch
-const BlogPage = preloadComponent(() => {
-  const component = import(/* webpackChunkName: "blog-page" */ './pages/BlogPage');
-  component.then(() => {
-    import(/* webpackPrefetch: true, webpackChunkName: "blog-components" */ './components/blog/BlogList');
-    import(/* webpackPrefetch: true, webpackChunkName: "blog-toc" */ './components/blog/TableOfContents');
-  });
-  return component;
-});
 
 // Web Stories with optimized loading
 const WebStoriesList = preloadComponent(() => 
