@@ -6,6 +6,28 @@ A comprehensive platform for tracking egg prices across cities and states in Ind
 
 ![Today Egg Rates](./public/eggpic.webp)
 
+## 📚 Documentation
+
+This project is thoroughly documented in two main files:
+
+- [Frontend Documentation](./documentation.md) - Covers:
+  - React components and architecture
+  - UI/UX implementation details
+  - Performance optimizations
+  - State management
+  - Data visualization components
+  - SEO implementation
+  - Responsive design patterns
+
+- [PHP API Documentation](./php%20docs.md) - Details:
+  - API endpoints and usage
+  - Database schema and utilities 
+  - Cache management system
+  - Automated data updates
+  - Web story generation
+  - Image optimization
+  - SEO tools and sitemaps
+
 ## 🌟 Features
 
 - Real-time egg price tracking across Indian cities
@@ -34,10 +56,6 @@ food-price-app/
 ├── build/                # Production build output
 └── reports/              # Analytics and performance reports
 ```
-
-For detailed documentation:
-- [Frontend Documentation](./documentation.md)
-- [PHP API Documentation](./php%20docs.md)
 
 ## 🚀 Getting Started
 

@@ -5,6 +5,24 @@
 ```
 └── 📁public
     └── 📁images
+        └── 📁optimized
+            └── desiegg-300.webp
+            └── desiegg-600.webp
+            └── desiegg-900.webp
+            └── eggchicken-300.webp
+            └── eggchicken-600.webp
+            └── eggchicken-900.webp
+            └── eggpic-300.webp
+            └── eggrate2-300.webp
+            └── eggrate2-600.webp
+            └── eggrate2-900.webp
+            └── eggrate3-300.webp
+            └── eggrate3-600.webp
+            └── eggrate3-900.webp
+            └── logo-1200.webp
+            └── logo-300.webp
+            └── logo-600.webp
+            └── logo-900.webp
         └── 📁webstories
             └── 1.webp
             └── 10.webp
@@ -90,6 +108,28 @@
 ```
 
 ## Database Utilities
+
+## Cache Management
+
+### 🔄 `CacheManager.php` - Cache Management Service
+
+- **Purpose**: Provides application-wide caching functionality
+- **Features**:
+  - JSON-based file caching system
+  - Configurable TTL (Time To Live) for cache entries
+  - Automatic cache invalidation
+  - Cache key generation using MD5 hashing
+  - Support for cache clearing and invalidation
+- **Configuration**: Controlled via `cache_config.php`
+
+### ⚡ `CacheService.php` - Cache Implementation
+
+- **Purpose**: Service class for handling cache operations
+- **Features**:
+  - File-based caching system
+  - 24-hour default cache duration
+  - Methods for getting, setting, and clearing cache
+  - Automatic timestamp-based cache validation
 
 ### 🔄 `db.php` - Core Database Connection and Helper Functions
 
@@ -299,3 +339,45 @@
 - **Error Handling**: Logs all successes and failures with execution times
 - **Usage**: Set up as a daily cron job on the server (recommended to run at off-peak hours)
 - **Command**: `php /path/to/php/cron/cronjob.php`
+
+## Image Management
+
+### 🖼️ `image.php` - Image Handler
+
+- **Purpose**: Handles image delivery with caching and optimization
+- **Features**:
+  - WebP support detection and delivery
+  - Automatic MIME type detection
+  - Cache control headers
+  - Fallback for non-WebP browsers
+- **Performance**: Uses immutable caching for static assets
+
+### 📸 Optimized Images Structure
+
+- Multiple resolution variants (300px, 600px, 900px, 1200px)
+- WebP format for better compression
+- Organized by image type (webstories, general)
+- Automatic resizing and optimization
+
+## Cache Control
+
+### 🗑️ `clear_cache.php` - Cache Management API
+
+- **Purpose**: Provides API endpoint for cache management
+- **Features**:
+  - POST endpoint for clearing cache
+  - CORS support
+  - Security validation
+  - Full or selective cache clearing
+  - JSON response format
+  - Error handling and logging
+
+### ⚙️ Cache Configuration
+
+- **Location**: `config/cache_config.php`
+- **Settings**:
+  - Cache enable/disable toggle
+  - TTL configuration (default 24 hours)
+  - Cache directory path
+  - No-cache parameter list
+  - Security settings
