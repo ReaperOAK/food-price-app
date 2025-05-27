@@ -82,9 +82,30 @@ The Food Price App provides comprehensive egg price information across different
 
 | File | Purpose |
 |------|---------|
-| **App.js** | Main application component handling routing configuration, authentication logic, and maintenance mode |
-| **index.js** | Entry point that renders the React application to the DOM |
-| **ScrollToTop.js** | Utility that scrolls to the top of the page on route changes |
+| **App.js** | Main application component with smart code splitting, lazy loading, and enhanced performance optimizations |
+| **index.js** | Entry point with router configuration and suspense handling |
+| **useData.js** | Custom data fetching hooks for real-time state management |
+| **api.js** | Centralized API services for consistent data access |
+| **formatters.js** | Utility functions for data formatting and presentation |
+| **seo.js** | SEO utilities for metadata and structured data |
+
+### 🆕 Enhanced Components
+
+#### Performance Components
+- **LoadingSkeleton.js**: Optimized loading states with CLS prevention
+- **HeadSection.js**: Centralized meta tag and SEO management
+- **QuickInfo.js**: Fast-loading summary information
+- **WebStoriesSection.js**: Optimized web stories grid with lazy loading
+
+#### Price Display Components
+- **DetailedEggInfo.js**: Comprehensive price information display
+- **PriceOverview.js**: Summarized price dashboard
+- **PriceTrends.js**: Advanced trend analysis
+- **PriceTrendsWidget.js**: Embeddable price trend widget
+- **MarketInfo.js**: Market-specific information display
+- **RateSummary.js**: Quick price summary component
+- **TableHeader.js**: Reusable sortable table header
+- **TableRow.js**: Optimized table row component with memoization
 
 ### 📄 Page Components
 
@@ -200,37 +221,108 @@ The Food Price App provides comprehensive egg price information across different
 ## 🛠️ Technical Implementation
 
 ### Frontend
-- **Core Framework**: React.js for component-based architecture
-- **Routing**: React Router v6 for dynamic routing and navigation
-- **Data Visualization**: Chart.js with React-Chartjs-2 for interactive visualizations
-- **Styling**: Tailwind CSS for responsive, utility-first design
-- **SEO**: React Helmet for dynamic metadata management
-- **Data Management**: Custom hooks for data fetching and state management
-- **Form Handling**: Controlled components with validation
-- **Responsive Design**: Mobile-first approach with Tailwind breakpoints
+- **Core Framework**: React.js with smart code splitting and lazy loading
+- **Routing**: React Router v6 with suspense and error boundaries
+- **Data Visualization**: Chart.js with React-Chartjs-2 and custom hooks
+- **Styling**: Tailwind CSS with custom animations and transitions
+- **SEO**: React Helmet with structured data and meta tag optimization
+- **Data Management**: Custom hooks with optimized re-rendering
+- **Form Handling**: Controlled components with advanced validation
+- **Loading States**: CLS-optimized loading skeletons
+- **Image Handling**: WebP support with fallbacks and lazy loading
+- **Web Stories**: AMP-compliant web stories with image optimization
 
 ### Backend
-- **API Layer**: PHP REST API endpoints
-- **Database**: MySQL with optimized queries and indexing
-- **Caching**: Server-side caching for performance optimization
-- **Authentication**: JWT-based secure authentication system
-- **Rate Limiting**: API request throttling for stability
-- **Error Handling**: Centralized error handling and logging
+- **API Layer**: PHP REST API with rate limiting and caching
+- **Database**: MySQL with optimized indexing and query caching
+- **Caching**: Multi-level caching with Redis support
+- **Authentication**: JWT with refresh tokens and secure storage
+- **Image Processing**: Automated image optimization and WebP conversion
+- **Web Stories**: Automated generation and thumbnail creation
+- **Error Handling**: Centralized logging with detailed tracing
 
-### SEO & Performance
-- **Structured Data**: Schema.org implementation for rich snippets
-- **Meta Tags**: Dynamic meta tags for better search visibility
-- **Performance**: Lazy loading and code splitting
-- **Accessibility**: ARIA attributes and semantic HTML
-- **Analytics**: Built-in performance monitoring
-- **Caching**: Client and server-side caching strategies
+### Performance Optimization
+- **Code Splitting**: Route-based and component-based splitting
+- **Lazy Loading**: Image, component, and route lazy loading
+- **Caching Strategy**: 
+  - In-memory caching for API responses
+  - Service worker for offline support
+  - Browser caching with proper headers
+- **Bundling**: Webpack optimization with tree shaking
+- **Image Pipeline**: 
+  - WebP conversion
+  - Responsive images
+  - Thumbnail generation
+  - Lazy loading with blur placeholders
+  
+### SEO & Analytics
+- **Structured Data**: 
+  - Product schema for egg rates
+  - Article schema for blogs
+  - WebStory schema for AMP stories
+  - BreadcrumbList schema for navigation
+- **Meta Tags**: 
+  - Dynamic meta description and titles
+  - Open Graph protocol support
+  - Twitter Card integration
+  - Canonical URL management
+- **Performance Monitoring**:
+  - Core Web Vitals tracking
+  - User behavior analytics
+  - Error tracking and reporting
+  - Load time optimization
 
 ## 👨‍💻 Development Best Practices
 
-- Component composition for maximum reusability
-- Controlled forms for reliable user input handling
-- Dynamic content loading based on URL parameters
-- Structured data implementation for improved SEO
-- Mobile-first responsive design patterns
-- Fallback states for loading and error conditions
-- Comprehensive prop validation with PropTypes
+### Code Organization
+- Component composition with clear separation of concerns
+- Custom hooks for reusable logic and state management
+- Centralized API service layer
+- Consistent file and folder structure
+- Clear naming conventions and documentation
+
+### Performance
+- Code splitting for optimal bundle sizes
+- Image optimization pipeline
+- Caching strategies at multiple levels
+- Lazy loading of non-critical resources
+- Minimizing re-renders with React.memo and useMemo
+- CLS prevention with loading skeletons
+
+### Data Management
+- Centralized data fetching through custom hooks
+- Error boundary implementation for resilience
+- Optimistic UI updates for better UX
+- Proper loading and error state handling
+- Data validation and sanitization
+
+### SEO & Accessibility
+- Semantic HTML structure
+- ARIA attributes and roles
+- Structured data implementation
+- Meta tag optimization
+- Mobile-first responsive design
+- Keyboard navigation support
+
+### Security
+- Input validation and sanitization
+- Secure authentication flow
+- XSS prevention
+- CSRF protection
+- Secure cookie handling
+- Rate limiting implementation
+
+### Testing & Quality
+- Component unit testing
+- Integration testing with real API calls
+- Performance monitoring
+- Error tracking and logging
+- Code quality checks and linting
+- Accessibility testing
+
+### Deployment
+- Automated build and deployment pipeline
+- Environment-specific configuration
+- Error monitoring and logging
+- Backup and recovery procedures
+- SSL/TLS implementation
