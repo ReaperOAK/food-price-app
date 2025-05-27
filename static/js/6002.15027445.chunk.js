@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[6002],{6002:()=>{}}]);
