@@ -6,11 +6,11 @@ import {
   LineElement,
   BarElement,
   Title,
-  Tooltip,
+  Tooltip
 } from 'chart.js';
 
-export default function initChart() {
-
+export default async function initChart() {
+  // Register Chart.js components
   ChartJS.register(
     CategoryScale,
     LinearScale,
@@ -20,4 +20,5 @@ export default function initChart() {
     Title,
     Tooltip
   );
+  return ChartJS;
 }

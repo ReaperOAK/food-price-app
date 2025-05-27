@@ -1,13 +1,16 @@
 import React, { Suspense, lazy, useState, useEffect } from 'react';
 
-const initChart = lazy(() => 
-  import(
-    /* webpackChunkName: "chart-init" */
-    './chartInit'
-  ).then(module => {
-    module.default();
-    return { default: () => null };
-  })
+// Lazy load Chart.js initialization
+const chartPromise = import('./chartInit').then(module => module.default());
+
+// Lazy load the chart components
+const Chart = lazy(() => 
+  import('react-chartjs-2').then(module => ({
+    default: props => {
+      const { type, ...rest } = props;
+      return type === 'line' ? <module.Line {...rest} /> : <module.Bar {...rest} />;
+    }
+  }))
 );
 
 const LoadingChart = () => (
@@ -15,19 +18,6 @@ const LoadingChart = () => (
     <div className="w-3/4 h-4 bg-gray-200 rounded mb-4"></div>
     <div className="w-full h-[250px] bg-gray-100 rounded"></div>
   </div>
-);
-
-// Lazy load chart components with unique chunk names
-const ChartComponent = lazy(() => 
-  import(
-    /* webpackChunkName: "chartjs-components" */
-    'react-chartjs-2'
-  ).then(module => ({
-    default: props => {
-      const Component = props.type === 'line' ? module.Line : module.Bar;
-      return <Component {...props} />;
-    }
-  }))
 );
 
 const RateChart = ({ 
@@ -42,7 +32,7 @@ const RateChart = ({
   const [isChartReady, setChartReady] = useState(false);
 
   useEffect(() => {
-    initChart().then(() => setChartReady(true));
+    chartPromise.then(() => setChartReady(true));
   }, []);
 
   const containerStyle = {
@@ -143,11 +133,13 @@ const RateChart = ({
   return (
     <div className="mt-4 bg-white" style={containerStyle}>
       <Suspense fallback={<LoadingChart />}>
-        <ChartComponent 
-          type={chartType}
-          data={chartData} 
-          options={options} 
-        />
+        {isChartReady && (
+          <Chart 
+            type={chartType}
+            data={chartData} 
+            options={options} 
+          />
+        )}
       </Suspense>
     </div>
   );
