@@ -8,18 +8,29 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 
 const EggRates = () => {
   const [eggRates, setEggRates] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     fetch('/php/api/rates/get_rates.php?city=Barwala&state=Haryana&days=7')
       .then(response => response.json())
       .then(data => {
-        setEggRates(data);
+        // Ensure rates are numbers and add default values
+        const parsedData = data.map(rate => ({
+          id: rate.id || String(Math.random()),
+          city: rate.city || 'Barwala',
+          state: rate.state || 'Haryana',
+          date: rate.date || new Date().toISOString().split('T')[0],
+          rate: typeof rate.rate === 'number' ? rate.rate : parseFloat(rate.rate) || 0
+        }));
+        setEggRates(parsedData);
+        setIsLoading(false);
       })
       .catch(error => {
         console.error('Error fetching egg rates:', error);
+        setIsLoading(false);
       });
   }, []);
-  const todayRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
+  const todayRate = eggRates.length > 0 ? parseFloat(eggRates[0].rate).toFixed(2) : 'N/A';
 
   return (
     <div>
@@ -36,8 +47,7 @@ const EggRates = () => {
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Today's Egg Rate</h2>
         <p className="text-lg text-gray-600 mb-4">The egg rate in Barwala today is ₹{todayRate} per egg.</p>
-        
-        <div className="bg-white rounded-lg shadow-lg p-4 mb-8">
+          <div className="bg-white rounded-lg shadow-lg p-4 mb-8">
           <h3 className="text-2xl font-semibold text-gray-700 mb-4">Last 7 Days Price Trend</h3>
           <RateTable 
             rates={eggRates}
@@ -47,6 +57,7 @@ const EggRates = () => {
             showState={false}
             showDate={true}
             itemsPerPage={7}
+            isLoading={isLoading}
           />
         </div>
       </section>
