@@ -2,8 +2,7 @@ const path = require('path');
 const { 
   override,
   addWebpackPlugin,
-  addBabelPlugin,
-  setWebpackOptimizationSplitChunks
+  addBabelPlugin
 } = require('customize-cra');
 const CompressionPlugin = require('compression-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -15,7 +14,7 @@ module.exports = function override(config, env) {
       new CompressionPlugin({
         test: /\.(js|css|html|svg)$/,
         algorithm: 'gzip',
-        deleteOriginalAssets: false,
+        deleteOriginalAssets: false
       })
     );
   }
@@ -28,35 +27,29 @@ module.exports = function override(config, env) {
     splitChunks: {
       chunks: 'all',
       maxInitialRequests: Infinity,
-      minSize: 5000, // Reduced from 20000
-      maxSize: 15000, // Reduced from 40000
+      minSize: 3000,
+      maxSize: 10000,
       cacheGroups: {
         core: {
-          test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|@remix-run|scheduler)[\\/]/,
+          test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
           name: 'core',
           priority: 40,
-          enforce: true,
-        },
-        chartjs: {
-          test: /[\\/]node_modules[\\/]chart\.js[\\/]/,
-          name: 'chartjs',
-          chunks: 'async',
-          priority: 30,
-          enforce: true,
-        },
-        charts: {
-          test: /[\\/]node_modules[\\/]react-chartjs-2[\\/]/,
-          name: 'charts',
-          chunks: 'async',
-          priority: 29,
-          enforce: true,
+          enforce: true
         },
         routing: {
           test: /[\\/]node_modules[\\/](@remix-run|react-router|react-router-dom)[\\/]/,
           name: 'routing',
           chunks: 'async',
-          priority: 20,
+          priority: 30,
+          enforce: true
+        },
+        charts: {
+          test: /[\\/]node_modules[\\/](chart\.js|react-chartjs-2)[\\/]/,
+          name: 'charts',
+          chunks: 'async',
+          priority: 25,
           enforce: true,
+          reuseExistingChunk: true
         },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
@@ -67,17 +60,17 @@ module.exports = function override(config, env) {
           chunks: 'async',
           priority: 10,
           reuseExistingChunk: true,
-          minSize: 5000,
-          maxSize: 15000,
-        },
-      },
+          minSize: 3000,
+          maxSize: 10000
+        }
+      }
     },
     minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
           parse: {
-            ecma: 8,
+            ecma: 8
           },
           compress: {
             ecma: 5,
@@ -89,22 +82,22 @@ module.exports = function override(config, env) {
             pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
             pure_getters: true,
             keep_infinity: true,
-            passes: 3,
+            passes: 3
           },
           mangle: {
             safari10: true,
-            toplevel: true,
+            toplevel: true
           },
           output: {
             ecma: 5,
             comments: false,
-            ascii_only: true,
-          },
+            ascii_only: true
+          }
         },
         parallel: true,
-        extractComments: false,
-      }),
-    ],
+        extractComments: false
+      })
+    ]
   };
   
   return config;

@@ -131,48 +131,39 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <meta name="apple-mobile-web-app-title" content="Egg Rates" />
     <meta name="application-name" content="Egg Rates" />
-    <title>Egg Rate Today - Check Today's NECC Egg Price in India (May 2025) | Updated Daily</title>
-
-    <!-- Minimal Analytics Setup -->
+    <title>Egg Rate Today - Check Today's NECC Egg Price in India (May 2025) | Updated Daily</title>    <!-- Minimal Analytics Setup -->
     <script type="module">
-      // Only load analytics in production
-      if (location.hostname !== 'localhost' && location.protocol === 'https:') {
-        // Defer analytics loading
-        const loadAnalytics = () => {
+      function initGTM() {
+        if (location.hostname === 'localhost' || location.protocol !== 'https:') return;
+        
+        const loadGTM = () => {
           const script = document.createElement('script');
-          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N';
+          script.src = `https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N&l=dataLayer`;
           script.async = true;
+          script.fetchPriority = "low";
           document.head.appendChild(script);
-          
+
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('consent', 'default', {
+            'analytics_storage': 'denied',
+            'ad_storage': 'denied'
+          });
           gtag('js', new Date());
           gtag('config', 'G-PK6FMNGL4N', {
-            send_page_view: false,
-            transport_url: 'https://www.google-analytics.com'
+            transport_url: 'https://www.google-analytics.com',
+            send_page_view: false
           });
-          
-          // Send initial pageview after paint
-          if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => {
-              gtag('event', 'page_view');
-            }, { timeout: 5000 });
-          } else {
-            setTimeout(() => {
-              gtag('event', 'page_view');
-            }, 5000);
-          }
         };
 
-        // Load analytics after main content
-        if (document.readyState === 'complete') {
-          loadAnalytics();
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(loadGTM, { timeout: 5000 });
         } else {
-          window.addEventListener('load', () => {
-            requestIdleCallback(loadAnalytics, { timeout: 5000 });
-          });
+          window.addEventListener('load', () => setTimeout(loadGTM, 5000));
         }
       }
+      initGTM();
     </script>
   </head>
   <body>

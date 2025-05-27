@@ -1,26 +1,13 @@
-import React, { Suspense, lazy } from 'react';
+import React, { Suspense, lazy, useState, useEffect } from 'react';
 
-// Only import the absolute minimum required Chart.js components
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip
-} from 'chart.js';
-
-// Register only the components we actually use
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  Title,
-  Tooltip
+const initChart = lazy(() => 
+  import(
+    /* webpackChunkName: "chart-init" */
+    './chartInit'
+  ).then(module => {
+    module.default();
+    return { default: () => null };
+  })
 );
 
 const LoadingChart = () => (
@@ -30,16 +17,16 @@ const LoadingChart = () => (
   </div>
 );
 
-// Lazy load chart components with chunks
-const BarChart = lazy(() => 
-  import(/* webpackChunkName: "chart-bar" */ 'react-chartjs-2').then(module => ({
-    default: module.Bar
-  }))
-);
-
-const LineChart = lazy(() => 
-  import(/* webpackChunkName: "chart-line" */ 'react-chartjs-2').then(module => ({
-    default: module.Line
+// Lazy load chart components with unique chunk names
+const ChartComponent = lazy(() => 
+  import(
+    /* webpackChunkName: "chartjs-components" */
+    'react-chartjs-2'
+  ).then(module => ({
+    default: props => {
+      const Component = props.type === 'line' ? module.Line : module.Bar;
+      return <Component {...props} />;
+    }
   }))
 );
 
@@ -52,7 +39,12 @@ const RateChart = ({
   showLine = false, 
   isLoading = false 
 }) => {
-  // Move styles to a constant to prevent recreation
+  const [isChartReady, setChartReady] = useState(false);
+
+  useEffect(() => {
+    initChart().then(() => setChartReady(true));
+  }, []);
+
   const containerStyle = {
     position: 'relative',
     height: '350px',
@@ -63,7 +55,7 @@ const RateChart = ({
     overflow: 'hidden'
   };
 
-  if (isLoading) {
+  if (isLoading || !isChartReady) {
     return <LoadingChart />;
   }
 
@@ -148,12 +140,14 @@ const RateChart = ({
     }
   };
 
-  const ChartComponent = chartType === 'line' ? LineChart : BarChart;
-
   return (
     <div className="mt-4 bg-white" style={containerStyle}>
       <Suspense fallback={<LoadingChart />}>
-        <ChartComponent data={chartData} options={options} />
+        <ChartComponent 
+          type={chartType}
+          data={chartData} 
+          options={options} 
+        />
       </Suspense>
     </div>
   );
