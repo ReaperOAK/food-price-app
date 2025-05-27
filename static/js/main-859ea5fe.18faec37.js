@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[779],{},p=>{p.O(0,[757,752,101,160,69,423,696,513,786,184,34,428],(()=>p(p.s=9051))),p.O()}]);
