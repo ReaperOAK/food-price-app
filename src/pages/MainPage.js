@@ -7,6 +7,7 @@ import StateList from '../components/rates/StateList';
 import BlogList from '../components/blog/BlogList';
 import Footer from '../components/layout/Footer';
 import FAQ, { generateFaqSchema } from '../components/common/FAQ';
+import OptimizedImage from '../components/common/OptimizedImage';
 
 // Add loading skeleton component at the top
 const LoadingSkeleton = () => (
@@ -267,6 +268,7 @@ const MainPage = () => {
     }
   };
 
+  // Create SEO description based on location  
   const getSeoDescription = () => {
     if (selectedCity) {
       const trayPrice = todayRate !== 'N/A' ? (todayRate * 30).toFixed(2) : 'N/A';
@@ -286,6 +288,207 @@ const MainPage = () => {
     } else {
       return 'egg rate today, necc egg rate today, today egg rate, egg rate, national egg rate, all india egg rate, today egg rate in mumbai, today egg rate in chennai, today egg rate kolkata, barwala egg rate today';
     }
+  };
+
+  // Add the DetailedEggInfo section
+  const DetailedEggInfo = ({ selectedCity, selectedState, eggRates }) => {
+    return (
+      <div className="p-6 mt-6 bg-cover bg-center rounded-lg shadow-lg">
+        <h1 className="text-center bg-gray-200 bg-opacity-75 rounded-lg w-full p-4 mt-4 text-2xl font-bold text-gray-800">
+          Egg Daily and Monthly Prices
+        </h1>
+        <p className="text-left text-gray-700 mt-4 leading-relaxed bg-white bg-opacity-75 p-2 rounded">
+          Our platform Today Egg rates provides the daily and monthly prices of egg throughout the different cities, states and areas of India. This Egg rate indicator is beneficial for both consumers and sellers in the Indian egg market. The daily or today's egg rate refers to the current price rates of the eggs. Users can scroll up to the previous day's price rates as well, limited to the current month. The egg rates depend on several factors such as production cost, transportation, egg quality, etc.
+        </p>
+
+        <h1 className="text-center bg-gray-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
+          Wholesale Egg Prices Today
+        </h1>
+        <p className="text-left text-gray-700 mt-4 leading-relaxed bg-white bg-opacity-75 p-2 rounded">
+          The wholesale egg prices represent the rates that retailers and distributors pay when purchasing eggs in bulk quantities. In India, these prices have been experiencing a notable upward trend in recent years, influenced by a variety of factors.
+        </p>
+        <p className="text-left text-gray-700 mt-4 leading-relaxed bg-white bg-opacity-75 p-2 rounded">
+          One of the primary contributors to this increase is the rise in chicken feeding costs. Corn and soybeans, which are the main ingredients in chicken feed, have seen substantial price hikes. This surge in feed prices has a direct impact on the overall costs incurred by egg producers or poultry farms, as feed constitutes a significant portion of their operational expenses.
+        </p>
+        <p className="text-left text-gray-700 mt-4 leading-relaxed bg-white bg-opacity-75 p-2 rounded">
+          Additionally, other factors such as fluctuations in demand and supply, changes in production levels, and economic conditions can also play a role in influencing wholesale egg prices. For instance, periods of high demand—such as during festivals or holidays—can lead to further increases in prices, while production challenges, such as disease outbreaks among poultry, can also restrict supply and drive prices higher.
+        </p>
+        <p className="text-left text-gray-700 mt-4 leading-relaxed bg-white bg-opacity-75 p-2 rounded">
+          The egg market is a dynamic landscape that is ever-evolving, making it essential for consumers to remain well-informed about current egg prices and wholesale egg rates. This knowledge empowers them to make thoughtful and informed purchasing choices. For farmers and egg producers, staying attuned to daily and monthly fluctuations in egg prices is equally vital. By closely monitoring these trends, they can optimize their production strategies and pricing decisions, ensuring sustainability and profitability in their operations. In this intricate dance of supply and demand, awareness becomes a key advantage for all stakeholders involved.
+        </p>
+        <p className="text-left text-gray-700 mt-4 leading-relaxed bg-white bg-opacity-75 p-2 rounded">
+          At TodayEggRates.com, we offer a comprehensive overview of daily and monthly NECC egg rates throughout the different areas/cities and states of India, allowing you to effortlessly compare rates and make informed decisions. Whether you're a farmer eager to sell your eggs or a consumer searching for the best prices, our platform serves as your trusted resource for the latest egg rate information. Discover today's price for a tray of eggs or explore the current cost of a peti of eggs. Stay updated with live NECC rates through our detailed pricing data, ensuring you always have access to the most accurate market insights.
+        </p>
+
+        <h1 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
+          NECC-National Egg Coordination Committee
+        </h1>
+        <div className="grid lg:grid-cols-2 gap-5"> 
+            <OptimizedImage src="/eggrate2.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate" width={600} height={400} />
+            <div>
+              <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
+                Eggs are a fantastic addition to any meal, whether it's breakfast, lunch, or dinner! You can enjoy them scrambled or boiled, and they work wonderfully in dishes like Anda Bhurji or even Anda Ka Halwa. Just like us Indians, eggs can fit into a variety of recipes while keeping their special charm. If you're curious about egg prices in India, they change daily, as shared by the NECC (National Egg Coordination Committee). We make it easy for you to stay updated with the latest egg rates so you can continue enjoying your favorite egg dishes!
+              </p> 
+            </div>
+        </div>
+
+        <h2 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
+          Today's NECC Egg Rate Analysis
+        </h2>
+        <div className="grid lg:grid-cols-2 gap-5"> 
+          <div>
+            <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
+            The National Egg Coordination Committee (NECC) considers purchasing trends and the efforts of egg farmers when recommending current egg prices. This organization provides price suggestions for over 50 cities and states across the country. By disseminating today's egg prices, we ensure that users remain informed about NECC's recommendations, thereby enabling them to make more informed purchasing decisions.
+            </p> 
+          </div>
+          <OptimizedImage src="/desiegg.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate in india" width={600} height={400} />
+        </div>
+
+        <h2 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
+          Egg Consumption in India
+        </h2>
+        <div className="grid lg:grid-cols-2 gap-5"> 
+            <OptimizedImage src="/eggrate3.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate in mumbai" width={600} height={400} />
+            <div>
+              <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
+              India is a major player in the global egg production industry, generating approximately 129.6 billion eggs each year. This production figure is experiencing a steady growth rate of 7% annually, reflecting the increasing demand for eggs among the population. According to data published by Agrospectrum, the average egg consumption per person in India is estimated to be 95 eggs per year. This indicates not only a high level of consumption but also a cultural acceptance of eggs as a staple food source. Furthermore, India holds the position of third largest egg producer globally, trailing only behind China and the United States. This prominent ranking underscores the significant role eggs play in the Indian diet, as well as the growing awareness among consumers regarding the nutritional benefits of eggs, including their high protein content and essential vitamins.
+              </p> 
+            </div>
+        </div>
+
+        <h1 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
+        Factors Affecting Egg Prices in India
+        </h1>
+        <div className="grid lg:grid-cols-2 gap-5"> 
+          <div>
+            <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
+            Egg prices in India are influenced by a multitude of factors that can fluctuate over time. One of the primary determinants is the balance between demand and supply; when demand for eggs rises, prices tend to increase, whereas a surplus can lead to lower prices. The cost of production plays a crucial role as well, particularly the price of essential inputs such as bird feed, which can vary based on agricultural conditions and market trends.
+Disease outbreaks, especially recurring incidents of bird flu, can have a profound effect on the egg market. Such outbreaks often lead to a decrease in egg production and concerns about food safety, causing prices to spike. Furthermore, the impact of seasonal changes should not be overlooked; egg production typically sees a slight increase during the warmer months of summer due to improved laying conditions, while it often diminishes in the colder winter months when laying can be less consistent. These dynamics create a complex landscape that shapes the pricing of eggs across the country.
+            </p> 
+          </div>
+          <OptimizedImage src="/eggchicken.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate barwala" width={600} height={400} />
+        </div>
+
+        <h1 className="text bg-green-200 bg-opacity-75 rounded-lg w-full p-4 mt-6 text-2xl font-bold text-gray-800">
+        How NECC Sets Egg Prices
+        </h1>
+        <div className="grid lg:grid-cols-2 gap-5"> 
+            <OptimizedImage src="/eggrate3.webp" className="col-span-1 object-contain shadow rounded border-none" alt="egg rate namakkal" width={600} height={400} />
+            <div>
+              <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
+              NECC (National Egg Coordination Committee) does not set egg prices directly. Instead, it provides a platform for stakeholders to work together and share information. Prices are determined daily by NECC after careful consideration and are updated every day at midnight. Key players in setting these prices include market forces, traders, distributors, and sometimes retailers.
+              </p>
+              <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
+                <b>Market Forces: </b>
+                Egg prices are influenced by several factors, including demand and supply, inflation, and weather. Seasonal events, like festivals, can also affect egg prices.
+                </p>
+              <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
+              <b>Traders and Distributors: </b>
+                Traders and distributors play a major role in deciding egg prices in India. They have control over pricing and can negotiate prices, which they then suggest to NECC. They act as middlemen between consumers and egg farmers.
+                </p>
+              <p className="text-left text-gray-700 leading-relaxed bg-white bg-opacity-75 p-4 rounded">
+              <b>Consumers and Consumer Behavior: </b>
+                Consumers do not directly affect prices, but their preferences can have a significant impact. Demand can change due to dietary choices, cultural habits, seasonal factors, and economic conditions. Tracking daily egg prices can be unpredictable, requiring careful attention to get the best results.
+              </p> 
+            </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Create price trends section
+  const PriceTrends = ({ selectedCity, selectedState, eggRates }) => {
+    const location = selectedCity || selectedState || 'your area';
+    const todayRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
+    const rate7DaysAgo = eggRates.length > 7 ? eggRates[6].rate : 'N/A';
+    const weeklyChange = eggRates.length > 7 ? (eggRates[0].rate - eggRates[6].rate).toFixed(2) : 'N/A';
+    const weeklyChangePercent = eggRates.length > 7 ? ((eggRates[0].rate - eggRates[6].rate) / eggRates[6].rate * 100).toFixed(2) : 'N/A';
+    const averagePrice = eggRates.length > 0 ? (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates.length).toFixed(2) : 'N/A';
+
+    return (
+      <div className="p-6 mt-6 bg-white shadow-lg rounded-lg">
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Egg Price Trends in {location}</h2>
+        
+        <section className="mb-8">
+          <h3 className="text-2xl font-semibold text-gray-700 mb-4">{location}</h3>
+          <p className="text-lg text-gray-600 mb-4">
+            As per the latest report, the egg rate in {location} has reached ₹{formatPrice(todayRate)} per piece. But this is not the highest price for eggs in the city in the last one year. The price of eggs has been on the rise in the city for the last few months. The rise in the price of eggs is due to the increase in the cost of chicken feed. The cost of chicken feed has gone up by 10% in the last few months. This has led to an increase in the price of eggs in {location}.
+          </p>
+          <p className="text-lg text-gray-600 mb-4">
+            Egg prices in {location} have been on the rise in recent months, due to a variety of factors. The cost of feed, transportation, and labor have all increased, leading to higher prices at the farm gate. Consumers are now paying more for eggs, with the average price of a tray of eggs now exceeding ₹{formatPrice(todayRate * 30)}. This is a significant increase from just a few years ago, when a tray of eggs could be purchased for as little as ₹{formatPrice(todayRate * 30 - 20)}. The higher prices are having an impact on egg consumption in {location}, as many families are cutting back on their consumption of this staple food. While the current situation is difficult for consumers, it is important to remember that egg prices are still relatively low compared to other staples such as rice and wheat.
+          </p>
+          <p className="text-lg text-gray-600 mb-4">
+            The current egg price situation in {location} is not likely to change in the near future, as the cost of production is still high. However, as the industry adjusts to the new reality of higher prices, egg production is likely to increase, which could help to bring prices down over time. In the meantime, consumers will need to continue to pay more for their eggs.
+          </p>
+          <p className="text-lg text-gray-600 mb-4">
+            Poultry farmers in {location} said they are incurring losses as the cost of chicken feed accounts for around 60 percent of the total cost of production.
+          </p>
+          <p className="text-lg text-gray-600 mb-4">
+            <b>Note:</b> This is not NECC official website. We collect the prices from the NECC site to present the prices in a simple and graphical manner for the convenience of the user. The suggested prices are published solely for the reference and information of the trade and industry. NECC and EggRate.in does not by itself or through any person enforce compliance or adherence with such suggested egg prices in any manner whatsoever.
+          </p>
+        </section>
+
+        <section className="mb-8">
+          <h3 className="text-2xl font-semibold text-gray-700 mb-4">Today's Egg Rate in {location}</h3>
+          <p className="text-lg text-gray-600 mb-4">
+            Today's date is {new Date().toDateString()} and we can see that the egg rate in {location} today is ₹{formatPrice(todayRate)}. But if we compare today's date with yesterday's date, we can see that yesterday the price of eggs in {location} was ₹{formatPrice(todayRate)}.
+          </p>
+          <table className="min-w-full bg-white divide-y divide-gray-200 mb-4">
+            <thead>
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Egg rate details</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">Today's Egg rate</td>
+                <td className="px-6 py-4 whitespace-nowrap">₹{formatPrice(todayRate)}</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">Egg rate 7 days ago</td>
+                <td className="px-6 py-4 whitespace-nowrap">₹{formatPrice(rate7DaysAgo)}</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">Weekly Change in Egg rate (₹)</td>
+                <td className="px-6 py-4 whitespace-nowrap">{formatPrice(weeklyChange)}</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">% Weekly Change in Egg Rate</td>
+                <td className="px-6 py-4 whitespace-nowrap">{formatPrice(weeklyChangePercent)}%</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">NECC Egg Price (₹)</td>
+                <td className="px-6 py-4 whitespace-nowrap">₹{formatPrice(todayRate)}</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">Wholesale Price (₹)</td>
+                <td className="px-6 py-4 whitespace-nowrap">₹{formatPrice(todayRate)}</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">Retail Price (₹)</td>
+                <td className="px-6 py-4 whitespace-nowrap">₹{formatPrice(todayRate + 0.35)}</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">Supermarket Price (₹)</td>
+                <td className="px-6 py-4 whitespace-nowrap">₹{formatPrice(todayRate + 0.45)}</td>
+              </tr>
+              <tr>
+                <td className="px-6 py-4 whitespace-nowrap">Average Price till today</td>
+                <td className="px-6 py-4 whitespace-nowrap">₹{formatPrice(averagePrice)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section className="mb-8">
+          <h3 className="text-2xl font-semibold text-gray-700 mb-4">Egg Rate of a Tray in {location}</h3>
+          <p className="text-lg text-gray-600 mb-4">
+            If you are looking to buy eggs in bulk then you can consider buying an egg tray. The egg tray which usually holds 30 eggs in a tray costs ₹{formatPrice(todayRate * 30)}. Looking at the graph above you can see how the egg rate has fluctuated on a daily basis. In the above graph you can also see the weekly change of egg prices. There has been a change in the price of eggs by {formatPrice(weeklyChange)} compared to last week. The weekly percentage change in the price of eggs is {formatPrice(weeklyChangePercent)}%.
+          </p>
+        </section>
+      </div>
+    );
   };
 
   // Structured data for search engines
@@ -424,7 +627,8 @@ const MainPage = () => {
           {!loading && (
             <>
               {/* Rate Table and Chart */}
-              {selectedCity || selectedState ? (                <RateTable
+              {selectedCity || selectedState ? (
+                <RateTable
                   key={`${selectedCity}-${selectedState}`}
                   selectedCity={selectedCity}
                   selectedState={selectedState}
@@ -436,7 +640,8 @@ const MainPage = () => {
                   showAdmin={false}
                   showMarket={false}
                 />
-              ) : (                <RateTable
+              ) : (
+                <RateTable
                   key="default-table"
                   rates={eggRates}
                   showPriceColumns={true}
@@ -444,6 +649,12 @@ const MainPage = () => {
                   chartType="bar"
                 />
               )}
+
+              {/* Add Detailed Egg Info Section */}
+              <DetailedEggInfo selectedCity={selectedCity} selectedState={selectedState} />
+
+              {/* Add Price Trends Section */}
+              <PriceTrends selectedCity={selectedCity} selectedState={selectedState} eggRates={eggRates} />
 
               {/* Web Stories Section */}
               <div className="mt-10">
@@ -495,7 +706,7 @@ const MainPage = () => {
                           className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                         >
                           <div className="relative">
-                            <img 
+                            <OptimizedImage 
                               src={story.thumbnail} 
                               alt={`Egg Rate in ${story.city}, ${story.state}`}
                               className="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-105"
