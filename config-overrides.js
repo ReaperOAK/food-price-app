@@ -3,7 +3,6 @@ const {
   override,
   addWebpackPlugin,
   addBabelPlugin,
-  addBundleVisualizer,
   setWebpackOptimizationSplitChunks
 } = require('customize-cra');
 const CompressionPlugin = require('compression-webpack-plugin');
@@ -16,9 +15,11 @@ module.exports = function override(config, env) {
       new CompressionPlugin({
         test: /\.(js|css|html|svg)$/,
         algorithm: 'gzip',
+        deleteOriginalAssets: false,
       })
     );
   }
+
   // Configure optimization
   config.optimization = {
     ...config.optimization,
@@ -27,60 +28,51 @@ module.exports = function override(config, env) {
     splitChunks: {
       chunks: 'all',
       maxInitialRequests: Infinity,
-      minSize: 15000,
-      maxSize: 40000,
+      minSize: 5000, // Reduced from 20000
+      maxSize: 15000, // Reduced from 40000
       cacheGroups: {
-        reactVendor: {
-          test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
-          name: 'react-vendor',
-          chunks: 'all',
+        core: {
+          test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom|@remix-run|scheduler)[\\/]/,
+          name: 'core',
           priority: 40,
           enforce: true,
         },
-        chartVendor: {
-          test: /[\\/]node_modules[\\/](chart\.js|react-chartjs-2)[\\/]/,
-          name: 'chart-vendor',
+        chartjs: {
+          test: /[\\/]node_modules[\\/]chart\.js[\\/]/,
+          name: 'chartjs',
           chunks: 'async',
           priority: 30,
           enforce: true,
         },
-        helmetVendor: {
-          test: /[\\/]node_modules[\\/](react-helmet|prop-types)[\\/]/,
-          name: 'helmet-vendor',
+        charts: {
+          test: /[\\/]node_modules[\\/]react-chartjs-2[\\/]/,
+          name: 'charts',
           chunks: 'async',
-          priority: 25,
+          priority: 29,
           enforce: true,
         },
-        routerVendor: {
-          test: /[\\/]node_modules[\\/](react-router|react-router-dom|@remix-run)[\\/]/,
-          name: 'router-vendor',
+        routing: {
+          test: /[\\/]node_modules[\\/](@remix-run|react-router|react-router-dom)[\\/]/,
+          name: 'routing',
           chunks: 'async',
           priority: 20,
           enforce: true,
         },
-        utilityVendor: {
-          test: /[\\/]node_modules[\\/](intersection-observer|memoize-one|@babel\/runtime)[\\/]/,
-          name: 'utility-vendor',
-          chunks: 'async',
-          priority: 15,
-          enforce: true,
-        },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
-          name: 'vendor',
-          chunks: 'all',
+          name(module) {
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
+            return `npm.${packageName.replace('@', '')}`;
+          },
+          chunks: 'async',
           priority: 10,
-          enforce: true,
           reuseExistingChunk: true,
-        },
-        common: {
-          name: 'common',
-          minChunks: 2,
-          priority: 5,
-          reuseExistingChunk: true,
+          minSize: 5000,
+          maxSize: 15000,
         },
       },
-    },    minimize: true,
+    },
+    minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
@@ -102,8 +94,6 @@ module.exports = function override(config, env) {
           mangle: {
             safari10: true,
             toplevel: true,
-            keep_classnames: false,
-            keep_fnames: false,
           },
           output: {
             ecma: 5,

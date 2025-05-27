@@ -30,16 +30,16 @@ const LoadingChart = () => (
   </div>
 );
 
-// Lazy load chart components
+// Lazy load chart components with chunks
 const BarChart = lazy(() => 
-  import('react-chartjs-2').then(module => ({ 
-    default: module.Bar 
+  import(/* webpackChunkName: "chart-bar" */ 'react-chartjs-2').then(module => ({
+    default: module.Bar
   }))
 );
 
 const LineChart = lazy(() => 
-  import('react-chartjs-2').then(module => ({ 
-    default: module.Line 
+  import(/* webpackChunkName: "chart-line" */ 'react-chartjs-2').then(module => ({
+    default: module.Line
   }))
 );
 

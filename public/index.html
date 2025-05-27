@@ -132,6 +132,37 @@
       }
     </script>
 
+    <!-- Optimized GTM Loading -->
+    <script type="text/javascript">
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      
+      // Load GTM after critical content
+      function loadGTM() {
+        const script = document.createElement('script');
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-PK6FMNGL4N';
+        script.async = true;
+        document.head.appendChild(script);
+        script.onload = function() {
+          gtag('js', new Date());
+          gtag('config', 'G-PK6FMNGL4N', {
+            'send_page_view': false, // Disable automatic page views
+            'transport_type': 'beacon',
+            'custom_map': {
+              'dimension1': 'client_id'
+            }
+          });
+        };
+      }
+
+      // Defer GTM loading
+      if (window.addEventListener) {
+        window.addEventListener("load", function() {
+          setTimeout(loadGTM, 3000);
+        });
+      }
+    </script>
+
     <!-- Early Performance Optimizations -->
     <script>
       // Optimize resource loading
