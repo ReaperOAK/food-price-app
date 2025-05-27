@@ -23,12 +23,11 @@ module.exports = function override(config, env) {
   config.optimization = {
     ...config.optimization,
     moduleIds: 'deterministic',
-    runtimeChunk: 'single',
-    splitChunks: {
+    runtimeChunk: 'single',    splitChunks: {
       chunks: 'all',
       maxInitialRequests: Infinity,
-      minSize: 3000,
-      maxSize: 10000,
+      minSize: 2000, // Reduced minSize
+      maxSize: 8000,  // Reduced maxSize
       cacheGroups: {
         core: {
           test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
@@ -43,13 +42,40 @@ module.exports = function override(config, env) {
           priority: 30,
           enforce: true
         },
-        charts: {
-          test: /[\\/]node_modules[\\/](chart\.js|react-chartjs-2)[\\/]/,
-          name: 'charts',
+        chartCore: {
+          test: /[\\/]node_modules[\\/]chart\.js[\\/]dist[\\/]chart\.js$/,
+          name: 'chart-core',
           chunks: 'async',
           priority: 25,
-          enforce: true,
-          reuseExistingChunk: true
+          enforce: true
+        },
+        chartScales: {
+          test: /[\\/]node_modules[\\/]chart\.js[\\/]dist[\\/]scales/,
+          name: 'chart-scales',
+          chunks: 'async',
+          priority: 24,
+          enforce: true
+        },
+        chartPlugins: {
+          test: /[\\/]node_modules[\\/]chart\.js[\\/]dist[\\/]plugins/,
+          name: 'chart-plugins',
+          chunks: 'async',
+          priority: 23,
+          enforce: true
+        },
+        chartElements: {
+          test: /[\\/]node_modules[\\/]chart\.js[\\/]dist[\\/]elements/,
+          name: 'chart-elements',
+          chunks: 'async',
+          priority: 22,
+          enforce: true
+        },
+        reactChartjs: {
+          test: /[\\/]node_modules[\\/]react-chartjs-2[\\/]/,
+          name: 'react-chartjs',
+          chunks: 'async',
+          priority: 21,
+          enforce: true
         },
         vendor: {
           test: /[\\/]node_modules[\\/]/,

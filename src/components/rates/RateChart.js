@@ -1,17 +1,37 @@
-import React, { Suspense, lazy, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-// Lazy load Chart.js initialization
-const chartPromise = import('./chartInit').then(module => module.default());
+// Minimal chart initialization
+const loadChart = async (type) => {
+  const { Chart: ChartJS } = await import(/* webpackChunkName: "chart-core-min" */ 'chart.js');
+  const { 
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip
+  } = await import(/* webpackChunkName: "chart-components" */ 'chart.js');
 
-// Lazy load the chart components
-const Chart = lazy(() => 
-  import('react-chartjs-2').then(module => ({
-    default: props => {
-      const { type, ...rest } = props;
-      return type === 'line' ? <module.Line {...rest} /> : <module.Bar {...rest} />;
-    }
-  }))
-);
+  ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip
+  );
+
+  // Only load the required chart type
+  if (type === 'line') {
+    const { Line } = await import(/* webpackChunkName: "chart-line" */ 'react-chartjs-2');
+    return Line;
+  } else {
+    const { Bar } = await import(/* webpackChunkName: "chart-bar" */ 'react-chartjs-2');
+    return Bar;
+  }
+};
 
 const LoadingChart = () => (
   <div className="animate-pulse w-full h-[350px] flex flex-col items-center justify-center bg-white rounded-lg">
@@ -29,11 +49,13 @@ const RateChart = ({
   showLine = false, 
   isLoading = false 
 }) => {
-  const [isChartReady, setChartReady] = useState(false);
+  const [ChartComponent, setChartComponent] = useState(null);
 
   useEffect(() => {
-    chartPromise.then(() => setChartReady(true));
-  }, []);
+    if (!isLoading && data?.length > 0) {
+      loadChart(chartType).then(setChartComponent);
+    }
+  }, [chartType, isLoading, data]);
 
   const containerStyle = {
     position: 'relative',
@@ -45,7 +67,7 @@ const RateChart = ({
     overflow: 'hidden'
   };
 
-  if (isLoading || !isChartReady) {
+  if (isLoading || !ChartComponent) {
     return <LoadingChart />;
   }
 
@@ -132,15 +154,12 @@ const RateChart = ({
 
   return (
     <div className="mt-4 bg-white" style={containerStyle}>
-      <Suspense fallback={<LoadingChart />}>
-        {isChartReady && (
-          <Chart 
-            type={chartType}
-            data={chartData} 
-            options={options} 
-          />
-        )}
-      </Suspense>
+      {ChartComponent && (
+        <ChartComponent 
+          data={chartData} 
+          options={options} 
+        />
+      )}
     </div>
   );
 };
