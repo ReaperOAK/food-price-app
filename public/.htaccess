@@ -39,8 +39,21 @@
   AddType application/json .json
   AddType application/manifest+json .webmanifest
 
-  # Fallback for static files if direct serving fails
+  # Force the correct MIME type for static files
+  <FilesMatch "\.css$">
+    ForceType text/css
+    Header set Content-Type "text/css; charset=utf-8"
+  </FilesMatch>
+  
+  # Use PHP handler for static files if Apache fails
   RewriteCond %{REQUEST_FILENAME} -f
+  RewriteCond %{REQUEST_URI} \.(css|js|webp|ico|json|webmanifest)$
+  RewriteCond %{HTTP:Accept-Encoding} gzip
+  RewriteCond %{REQUEST_FILENAME}.gz -f
+  RewriteRule ^(.+)\.(css|js|webp|ico|json|webmanifest)$ $1.$2.gz [L]
+  
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteCond %{QUERY_STRING} !^[A-Za-z0-9]+$
   RewriteRule \.(css|js|webp|ico|json|webmanifest)$ static.php [L]
   
   # Force MIME types
