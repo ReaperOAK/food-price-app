@@ -1,36 +1,33 @@
 import React, { useState, useEffect } from 'react';
 
-// Minimal chart initialization
+// Minimal chart initialization with only required components
 const loadChart = async (type) => {
-  const { Chart: ChartJS } = await import(/* webpackChunkName: "chart-core-min" */ 'chart.js');
-  const { 
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip
-  } = await import(/* webpackChunkName: "chart-components" */ 'chart.js');
-
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    BarElement,
-    Title,
-    Tooltip
-  );
+  const { Chart: ChartJS } = await import(/* webpackChunkName: "chart-core-min" */ 'chart.js/auto');
+  
+  // Configure defaults globally to reduce bundle size
+  ChartJS.defaults.responsive = true;
+  ChartJS.defaults.maintainAspectRatio = false;
+  ChartJS.defaults.plugins.tooltip = {
+    backgroundColor: '#fff',
+    titleColor: '#1f2937',
+    bodyColor: '#1f2937',
+    padding: 12,
+    borderColor: 'rgba(0, 0, 0, 0.1)',
+    borderWidth: 1
+  };
+  ChartJS.defaults.scale = {
+    grid: {
+      color: 'rgba(0, 0, 0, 0.05)'
+    }
+  };
 
   // Only load the required chart type
   if (type === 'line') {
     const { Line } = await import(/* webpackChunkName: "chart-line" */ 'react-chartjs-2');
     return Line;
-  } else {
-    const { Bar } = await import(/* webpackChunkName: "chart-bar" */ 'react-chartjs-2');
-    return Bar;
   }
+  const { Bar } = await import(/* webpackChunkName: "chart-bar" */ 'react-chartjs-2');
+  return Bar;
 };
 
 const LoadingChart = () => (
@@ -105,8 +102,6 @@ const RateChart = ({
   };
 
   const options = {
-    responsive: true,
-    maintainAspectRatio: false,
     plugins: {
       title: {
         display: true,
@@ -119,12 +114,6 @@ const RateChart = ({
         padding: 20
       },
       tooltip: {
-        backgroundColor: '#fff',
-        titleColor: '#1f2937',
-        bodyColor: '#1f2937',
-        padding: 12,
-        borderColor: 'rgba(0, 0, 0, 0.1)',
-        borderWidth: 1,
         callbacks: {
           label: (context) => `₹${context.raw.toFixed(2)}`
         }
@@ -133,9 +122,6 @@ const RateChart = ({
     scales: {
       y: {
         beginAtZero: false,
-        grid: {
-          color: 'rgba(0, 0, 0, 0.05)'
-        },
         ticks: {
           callback: (value) => `₹${value.toFixed(2)}`,
           font: { size: 11 }

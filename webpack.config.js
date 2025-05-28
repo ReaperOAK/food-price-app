@@ -64,9 +64,13 @@ module.exports = {
         },
         chart: {
           test: /[\\/]node_modules[\\/](chart\.js|react-chartjs-2)[\\/]/,
-          name: 'chart',
+          name: (module) => {
+            const match = module.context.match(/[\\/]node_modules[\\/](chart\.js|react-chartjs-2)[\\/](.*?)[\\/]/);
+            return match ? `chart.${match[2].replace('@', '')}` : 'chart.vendor';
+          },
           chunks: 'async',
           priority: 30,
+          enforceSizeThreshold: 50000
         },
         router: {
           test: /[\\/]node_modules[\\/](react-router|react-router-dom|@remix-run)[\\/]/,
