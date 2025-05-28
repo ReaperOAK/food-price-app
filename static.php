@@ -1,55 +1,38 @@
 <?php
-// Force output buffering off to prevent any unwanted output
+// Force output buffering off
 while (ob_get_level()) ob_end_clean();
 
-// Set proper MIME types for static files
-$file = $_SERVER['REQUEST_URI'];
-$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+// Get file info
+$request_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$ext = strtolower(pathinfo($request_path, PATHINFO_EXTENSION));
 
-// Set default content type
-header('Content-Type: text/plain');
-
-// Define MIME types with charset for text-based files
+// Define MIME types
 $mime_types = [
     'css' => 'text/css; charset=utf-8',
     'js' => 'application/javascript; charset=utf-8',
     'webp' => 'image/webp',
     'ico' => 'image/x-icon',
     'json' => 'application/json; charset=utf-8',
-    'webmanifest' => 'application/manifest+json; charset=utf-8',
-    'gz' => null // Will be set based on original file type
+    'webmanifest' => 'application/manifest+json; charset=utf-8'
 ];
 
-// If the file extension is in our MIME types array, set the correct header
+// Set content type header
 if (isset($mime_types[$ext])) {
-    header("Content-Type: " . $mime_types[$ext]);
+    header('Content-Type: ' . $mime_types[$ext]);
 }
 
-// Get the file path relative to this script
-$file_path = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Handle gzipped files
-$is_gzip = false;
-if (substr($file_path, -3) === '.gz') {
-    $is_gzip = true;
-    $original_ext = strtolower(pathinfo(substr($file_path, 0, -3), PATHINFO_EXTENSION));
-    if (isset($mime_types[$original_ext])) {
-        header('Content-Encoding: gzip');
-        $mime_types['gz'] = $mime_types[$original_ext];
-    }
-}
-
-// Clean the path to prevent directory traversal
+// Get file path and validate
+$file_path = __DIR__ . $request_path;
 $real_file_path = realpath($file_path);
 $real_base_path = realpath(__DIR__);
 
-// Security check - ensure the file is within the allowed directory
+// Security check
 if ($real_file_path === false || strpos($real_file_path, $real_base_path) !== 0) {
     header("HTTP/1.1 403 Forbidden");
     exit("403 Forbidden");
 }
 
-// If file exists, serve it
+// Serve the file if it exists
 if (file_exists($real_file_path)) {
     // Enable caching
     $etag = md5_file($real_file_path);
@@ -57,25 +40,17 @@ if (file_exists($real_file_path)) {
     header('Cache-Control: public, max-age=31536000');
     header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 31536000) . ' GMT');
     
-    // Check if browser cache is still valid
+    // Check browser cache
     if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) == "\"$etag\"") {
         header("HTTP/1.1 304 Not Modified");
         exit;
     }
-      // Set Content-Type header before sending file
-    if (isset($mime_types[$ext])) {
-        header('Content-Type: ' . $mime_types[$ext]);
-    }
-    
-    // Send file contents with error checking
-    if (readfile($real_file_path) === false) {
-        error_log("Failed to read file: " . $real_file_path);
-        header("HTTP/1.1 500 Internal Server Error");
-        exit("500 Internal Server Error");
-    }
+
+    // Serve file
+    readfile($real_file_path);
     exit;
 }
 
-// If file doesn't exist, return 404
+// 404 if file not found
 header("HTTP/1.1 404 Not Found");
 exit("404 Not Found");
