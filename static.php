@@ -17,12 +17,10 @@ $ext = strtolower(pathinfo($request_uri, PATHINFO_EXTENSION));
 $mime_types = [
     'css' => 'text/css; charset=utf-8',
     'js' => 'application/javascript; charset=utf-8',
-    'chunk.js' => 'application/javascript; charset=utf-8',
-    'chunk.css' => 'text/css; charset=utf-8'
 ];
 
-// Security check - only allow css and js files from static directory
-if (!preg_match('/^\/static\/(css|js)\/[^\/]+\.[a-f0-9]+\.(css|js)(\.gz)?$/', $request_uri)) {
+// Security check - allow all valid chunk patterns
+if (!preg_match('/^\/static\/(css|js)\/(?:[^\/]+\.)?(?:[a-f0-9]{8}\.)?(?:chunk\.)?[^\/]+\.(js|css)(\.gz)?$/', $request_uri)) {
     error_log("Invalid file request: " . $request_uri);
     error_log("Request URI was: " . $request_uri);
     error_log("File path would be: " . $file_path);
