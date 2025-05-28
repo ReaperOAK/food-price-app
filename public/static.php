@@ -20,23 +20,43 @@ $mime_types = [
 ];
 
 // Security check - only allow css and js files from static directory
-if (!preg_match('/^\/static\/(css|js)\/[^\/]+\.(css|js)$/', $request_uri)) {
+if (!preg_match('/^\/static\/(css|js)\/.*\.(css|js)(\.gz)?$/', $request_uri)) {
     error_log("Invalid file request: " . $request_uri);
     header('HTTP/1.1 403 Forbidden');
     exit('Access denied');
 }
 
+// Handle gzipped files
+$is_gzipped = substr($request_uri, -3) === '.gz';
+if ($is_gzipped) {
+    $ext = strtolower(pathinfo(substr($request_uri, 0, -3), PATHINFO_EXTENSION));
+    header('Content-Encoding: gzip');
+}
+
 // Verify file exists and is readable
-if (!is_file($file_path) || !is_readable($file_path)) {
-    error_log("File not found or not readable: " . $file_path);
+if (!is_file($file_path)) {
+    error_log("File does not exist: " . $file_path);
+    error_log("Request URI was: " . $request_uri);
+    error_log("__DIR__ is: " . __DIR__);
     header('HTTP/1.1 404 Not Found');
     exit('File not found');
+}
+
+if (!is_readable($file_path)) {
+    error_log("File not readable: " . $file_path);
+    error_log("File permissions: " . decoct(fileperms($file_path)));
+    header('HTTP/1.1 403 Forbidden');
+    exit('File not readable');
 }
 
 // Set the appropriate MIME type
 if (isset($mime_types[$ext])) {
     header('Content-Type: ' . $mime_types[$ext]);
+    // Additional security headers
+    header('X-Content-Type-Options: nosniff');
 } else {
+    error_log("Invalid file type requested: " . $ext);
+    error_log("Full request URI: " . $request_uri);
     header('HTTP/1.1 400 Bad Request');
     exit('Invalid file type');
 }

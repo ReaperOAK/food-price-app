@@ -3,7 +3,8 @@
   RewriteBase /
 
   # Static files handler
-  RewriteRule ^static/(.*)\.(css|js)$ static.php [L]
+  RewriteRule ^static/.*\.(css|js)$ static.php [L]
+  RewriteRule ^static/.*\.(css|js)\.gz$ static.php [L]
 
   # Force HTTPS
   RewriteCond %{HTTPS} off
