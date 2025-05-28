@@ -6,7 +6,8 @@ import {
   LineElement,
   BarElement,
   Title,
-  Tooltip
+  Tooltip,
+  Legend
 } from 'chart.js';
 
 export default async function initChart() {
@@ -18,7 +19,8 @@ export default async function initChart() {
     LineElement,
     BarElement,
     Title,
-    Tooltip
+    Tooltip,
+    Legend
   );
   return ChartJS;
 }

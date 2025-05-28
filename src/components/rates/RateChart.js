@@ -98,20 +98,20 @@ const RateChart = ({
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
-
   const chartData = {
     labels: data.map(item => formatDate(item[xAxisKey])),
     datasets: [{
       label: title,
       data: data.map(item => item[yAxisKey]),
       backgroundColor: 'rgba(59, 130, 246, 0.5)',
-      borderColor: showLine ? 'rgb(59, 130, 246)' : undefined,
+      borderColor: showLine ? 'rgb(59, 130, 246)' : 'rgb(59, 130, 246)',
       borderWidth: showLine ? 2 : 1,
       tension: showLine ? 0.3 : 0,
-      pointRadius: showLine ? 4 : 0
+      pointRadius: showLine ? 4 : 0,
+      fill: !showLine,
+      order: 1
     }]
   };
-
   const options = {
     plugins: {
       title: {
@@ -125,8 +125,26 @@ const RateChart = ({
         padding: 20
       },
       tooltip: {
+        enabled: true,
+        position: 'nearest',
         callbacks: {
           label: (context) => `₹${context.raw.toFixed(2)}`
+        }
+      },
+      legend: {
+        display: true,
+        position: 'top',
+        align: 'center',
+        labels: {
+          boxWidth: 20,
+          padding: 20,
+          color: '#1f2937',
+          font: {
+            size: 12,
+            weight: '500'
+          },
+          usePointStyle: true,
+          pointStyle: 'circle'
         }
       }
     },
