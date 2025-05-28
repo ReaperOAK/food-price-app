@@ -31,17 +31,14 @@ const PriceOverview = ({
         </div>
 
         <div className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
-              <h3 className="text-sm text-gray-700 mb-2" style={{ minHeight: '16px', height: '16px' }}>Today's Rate</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">          <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
+              <h2 className="text-sm text-gray-700 mb-2" style={{ minHeight: '16px', height: '16px' }}>Today's Rate</h2>
               <p className="text-xl font-semibold text-gray-900" style={{ height: '32px' }}>₹{formatPrice(todayRate)}</p>
             </div>
-            <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
-              <h3 className="text-sm text-gray-700 mb-2" style={{ minHeight: '16px', height: '16px' }}>Tray Price</h3>
+            <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>              <h2 className="text-sm text-gray-700 mb-2" style={{ minHeight: '16px', height: '16px' }}>Tray Price</h2>
               <p className="text-xl font-semibold text-gray-900" style={{ height: '32px' }}>₹{formatPrice(trayPrice)}</p>
             </div>
-            <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>
-              <h3 className="text-sm text-gray-700 mb-2" style={{ minHeight: '16px', height: '16px' }}>Weekly Change</h3>
+            <div className="text-center py-4" style={{ minHeight: '80px', height: '80px' }}>              <h2 className="text-sm text-gray-700 mb-2" style={{ minHeight: '16px', height: '16px' }}>Weekly Change</h2>
               <p className={`text-xl font-semibold ${weeklyChange > 0 ? 'text-green-700' : 'text-red-700'}`} style={{ height: '32px' }}>
                 {weeklyChange !== 'N/A' ? `${weeklyChange > 0 ? '+' : ''}${weeklyChange}` : 'N/A'}
               </p>
