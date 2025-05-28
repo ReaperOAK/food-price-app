@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import RateChart from './RateChart';
+import PriceChart from './PriceChart';
 import { Helmet } from 'react-helmet';
 import TableHeader from './TableHeader';
 import RateSummary from './RateSummary';
@@ -362,13 +362,13 @@ const handleLocalSort = (key) => {
 
         {/* Chart Section */}
         {showChart && (
-          <div className="mt-6 bg-white rounded-lg p-4">
-            <RateChart 
-              data={currentItems} 
-              chartType={selectedCity ? 'line' : 'bar'} 
-              xAxisKey={selectedCity ? 'date' : 'city'}
+          <div className="mt-6 bg-white rounded-lg p-4">            <PriceChart 
+              data={currentItems}
+              type={selectedCity ? 'line' : 'bar'}
+              xKey={selectedCity ? 'date' : 'city'}
+              yKey="rate"
               title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
-              showLine={selectedCity}
+              isLoading={isLoading}
             />
           </div>
         )}
