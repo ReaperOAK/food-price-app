@@ -111,12 +111,11 @@ const PriceChart = ({
     },
     scales: {
       y: {
-        beginAtZero: false,
-        grid: {
+        beginAtZero: false,        grid: {
           color: 'rgba(0, 0, 0, 0.05)'
         },
         ticks: {
-          callback: (value) => `₹${value}`,
+          callback: (value) => `₹${Number(value).toFixed(2)}`,
           color: '#6b7280'
         }
       },
