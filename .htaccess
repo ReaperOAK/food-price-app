@@ -1,4 +1,9 @@
-<IfModule mod_rewrite.c>
+<IfM  # Handle build artifacts first
+  RewriteCond %{REQUEST_URI} !^/static/
+  RewriteRule ^(build/)?static/(css|js)/(.+)\.(css|js|chunk\.js)(\.gz)?$ /static/$2/$3.$4$5 [L]
+
+  # Static files handler
+  RewriteRule ^static/(css|js)/[^/]+\.(css|js|chunk\.js)(\.gz)?$ static.php [L]ule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 

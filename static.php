@@ -20,8 +20,10 @@ $mime_types = [
 ];
 
 // Security check - only allow css and js files from static directory
-if (!preg_match('/^\/static\/(css|js)\/.*\.(css|js)(\.gz)?$/', $request_uri)) {
+if (!preg_match('/^\/static\/(css|js)\/[^\/]+\.(css|js|chunk\.js)(\.gz)?$/', $request_uri)) {
     error_log("Invalid file request: " . $request_uri);
+    error_log("Request URI was: " . $request_uri);
+    error_log("File path would be: " . $file_path);
     header('HTTP/1.1 403 Forbidden');
     exit('Access denied');
 }
