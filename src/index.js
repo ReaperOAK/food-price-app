@@ -113,3 +113,16 @@ reportWebVitals(metric => {
     });
   }
 });
+
+// Suppress console errors in production
+if (process.env.NODE_ENV === 'production') {
+  console.error = () => {};
+  console.warn = () => {};
+  // Preserve console.log for critical messages
+  const originalConsoleLog = console.log;
+  console.log = (...args) => {
+    if (args[0] && typeof args[0] === 'string' && args[0].includes('[CRITICAL]')) {
+      originalConsoleLog.apply(console, args);
+    }
+  };
+}
