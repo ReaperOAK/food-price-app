@@ -111,22 +111,32 @@ const RateChart = ({
       fill: !showLine,
       order: 1
     }]
-  };
-  const options = {
+  };  const defaultOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       title: {
         display: true,
-        text: title,
+        text: title || '',
         color: '#1f2937',
         font: {
+          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
           size: 14,
-          weight: '600'
+          weight: 'bold',
+          lineHeight: 1.2
         },
-        padding: 20
+        padding: { top: 10, bottom: 10 }
       },
       tooltip: {
         enabled: true,
         position: 'nearest',
+        backgroundColor: '#ffffff',
+        titleColor: '#1f2937',
+        bodyColor: '#1f2937',
+        borderColor: 'rgba(0, 0, 0, 0.1)',
+        borderWidth: 1,
+        padding: 12,
+        displayColors: true,
         callbacks: {
           label: (context) => `₹${context.raw.toFixed(2)}`
         }
@@ -137,11 +147,13 @@ const RateChart = ({
         align: 'center',
         labels: {
           boxWidth: 20,
-          padding: 20,
+          padding: 15,
           color: '#1f2937',
           font: {
+            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
             size: 12,
-            weight: '500'
+            weight: '500',
+            lineHeight: 1.2
           },
           usePointStyle: true,
           pointStyle: 'circle'
