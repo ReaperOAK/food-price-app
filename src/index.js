@@ -28,17 +28,12 @@ const LoadingFallback = () => (
 );
 
 // Progressive enhancement setup
-const setupProgressiveEnhancement = async () => {
-  // Detect browser capabilities
+const setupProgressiveEnhancement = async () => {  // Detect browser capabilities
   const hasIntersectionObserver = 'IntersectionObserver' in window;
-  const hasIdleCallback = 'requestIdleCallback' in window;
   
   // Load polyfills if needed
   if (!hasIntersectionObserver) {
     await import('intersection-observer');
-  }
-  if (!hasIdleCallback) {
-    await import('requestidlecallback-polyfill');
   }
 
   // Preload critical assets

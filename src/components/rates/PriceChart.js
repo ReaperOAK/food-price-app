@@ -7,12 +7,11 @@ import {
   LineElement,
   BarElement,
   Title,
-  Tooltip,
-  Legend,
+  Tooltip
 } from 'chart.js';
 import { Bar, Line } from 'react-chartjs-2';
 
-// Register ChartJS components
+// Register only needed ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -20,8 +19,7 @@ ChartJS.register(
   LineElement,
   BarElement,
   Title,
-  Tooltip,
-  Legend
+  Tooltip
 );
 
 // Basic chart defaults

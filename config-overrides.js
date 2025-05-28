@@ -1,8 +1,7 @@
 const path = require('path');
 const { 
   override,
-  addWebpackPlugin,
-  addBabelPlugin
+  addWebpackPlugin
 } = require('customize-cra');
 const CompressionPlugin = require('compression-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -23,11 +22,12 @@ module.exports = function override(config, env) {
   config.optimization = {
     ...config.optimization,
     moduleIds: 'deterministic',
-    runtimeChunk: 'single',    splitChunks: {
+    runtimeChunk: 'single',
+    splitChunks: {
       chunks: 'all',
       maxInitialRequests: Infinity,
-      minSize: 2000, // Reduced minSize
-      maxSize: 8000,  // Reduced maxSize
+      minSize: 2000,
+      maxSize: 8000,
       cacheGroups: {
         core: {
           test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
@@ -39,43 +39,16 @@ module.exports = function override(config, env) {
           test: /[\\/]node_modules[\\/](@remix-run|react-router|react-router-dom)[\\/]/,
           name: 'routing',
           chunks: 'async',
-          priority: 30,
-          enforce: true
+          priority: 30
         },
-        chartCore: {
-          test: /[\\/]node_modules[\\/]chart\.js[\\/]dist[\\/]chart\.js$/,
-          name: 'chart-core',
+        chart: {
+          test: /[\\/]node_modules[\\/](chart\.js|react-chartjs-2)[\\/]/,
+          name: 'chart',
           chunks: 'async',
           priority: 25,
-          enforce: true
-        },
-        chartScales: {
-          test: /[\\/]node_modules[\\/]chart\.js[\\/]dist[\\/]scales/,
-          name: 'chart-scales',
-          chunks: 'async',
-          priority: 24,
-          enforce: true
-        },
-        chartPlugins: {
-          test: /[\\/]node_modules[\\/]chart\.js[\\/]dist[\\/]plugins/,
-          name: 'chart-plugins',
-          chunks: 'async',
-          priority: 23,
-          enforce: true
-        },
-        chartElements: {
-          test: /[\\/]node_modules[\\/]chart\.js[\\/]dist[\\/]elements/,
-          name: 'chart-elements',
-          chunks: 'async',
-          priority: 22,
-          enforce: true
-        },
-        reactChartjs: {
-          test: /[\\/]node_modules[\\/]react-chartjs-2[\\/]/,
-          name: 'react-chartjs',
-          chunks: 'async',
-          priority: 21,
-          enforce: true
+          enforce: true,
+          minSize: 1000,
+          maxSize: 10000
         },
         vendor: {
           test: /[\\/]node_modules[\\/]/,
@@ -108,7 +81,8 @@ module.exports = function override(config, env) {
             pure_funcs: ['console.log', 'console.info', 'console.debug', 'console.warn'],
             pure_getters: true,
             keep_infinity: true,
-            passes: 3
+            passes: 3,
+            unused: true
           },
           mangle: {
             safari10: true,
