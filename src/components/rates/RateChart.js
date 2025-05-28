@@ -35,7 +35,19 @@ ChartJS.defaults.plugins.tooltip = {
   bodyColor: '#1f2937',
   padding: 12,
   borderColor: 'rgba(0, 0, 0, 0.1)',
-  borderWidth: 1
+  borderWidth: 1,
+  titleFont: {
+    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    size: 12,
+    style: 'normal',
+    weight: 'bold'
+  },
+  bodyFont: {
+    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    size: 12,
+    style: 'normal',
+    weight: 'normal'
+  }
 };
 ChartJS.defaults.scale = {
   grid: {
@@ -133,21 +145,17 @@ const RateChart = ({
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      title: {
+    plugins: {      title: {
         display: true,
         text: title || '',
         align: 'center',
         color: '#1f2937',
         padding: { top: 10, bottom: 10 },
-        // Ensure font properties are properly initialized with defaults
         font: {
           family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
           size: 14,
-          style: 'normal',
-          weight: 'bold',
-          lineHeight: 1.2
-        },
+          weight: 'bold'
+        }
       },
       tooltip: {
         enabled: true,
