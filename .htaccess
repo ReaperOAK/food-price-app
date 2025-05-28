@@ -38,6 +38,10 @@
   AddType image/x-icon .ico
   AddType application/json .json
   AddType application/manifest+json .webmanifest
+
+  # Fallback for static files if direct serving fails
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule \.(css|js|webp|ico|json|webmanifest)$ static.php [L]
   
   # Force MIME types
   <FilesMatch "\.(css)$">
