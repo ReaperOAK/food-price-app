@@ -184,7 +184,7 @@ const RateChart = ({
       {ChartComponent && (
         <ChartComponent 
           data={chartData} 
-          options={options} 
+          options={defaultOptions} 
         />
       )}
     </div>
