@@ -279,6 +279,10 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
             onChange={handleChange}
             options={options}
             className="w-full"
+            aria-label="Search for city or state"
+            inputId="location-select"
+            aria-describedby="location-select-help"
+            placeholder="Select City, State"
             styles={{
               control: (base) => ({
                 ...base,
@@ -288,8 +292,8 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
                 '&:hover': {
                   borderColor: 'transparent',
                 },
-                padding: '0.5rem', // Add padding for better touch target
-                borderRadius: '0.375rem', // Tailwind rounded
+                padding: '0.5rem',
+                borderRadius: '0.375rem',
               }),
               menu: (base) => ({
                 ...base,
@@ -297,11 +301,13 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
               }),
               placeholder: (base) => ({
                 ...base,
-                color: '#A0AEC0', // Placeholder color for better contrast
+                color: '#A0AEC0',
               }),
             }}
-            placeholder="Select City, State"
           />
+          <span id="location-select-help" className="sr-only">
+            Select a city or state to view egg rates for that location
+          </span>
         </div>
       </div>
     </nav>
