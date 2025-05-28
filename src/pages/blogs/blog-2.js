@@ -27,7 +27,7 @@ const EggRates = () => {
           <li>Seasonal Demand</li>
           <li>Market Supply</li>
         </ul>
-        <img src="/eggchicken.webp" alt="Egg Production" className="w-full mb-8 rounded-lg shadow-md" />
+        <img src="/eggchicken.webp" crossorigin="anonymous" alt="Egg Production" className="w-full mb-8 rounded-lg shadow-md" />
       </section>
       
       <section className="mb-8">

@@ -79,6 +79,7 @@ const OptimizedImage = ({ src, alt, className = '', width, height, priority = fa
           ref={imgRef}
           src={src}
           alt={alt}
+          crossorigin="anonymous" 
           width={dimensions.width || undefined}
           height={dimensions.height || undefined}
           className={`absolute top-0 left-0 w-full h-full object-cover ${className} ${
