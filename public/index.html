@@ -13,51 +13,13 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="format-detection" content="telephone=no" />
-      <!-- Resource Hints - Critical Assets -->
+    <meta name="format-detection" content="telephone=no" />    <!-- Resource Hints - Critical Assets -->
     <link 
       rel="preload" 
       href="%PUBLIC_URL%/eggpic.webp" 
       as="image" 
       type="image/webp" 
       fetchpriority="high" 
-      crossorigin="anonymous"
-    />
-    <link 
-      rel="preload" 
-      href="%PUBLIC_URL%/logo.webp" 
-      as="image" 
-      type="image/webp" 
-      fetchpriority="high" 
-      crossorigin="anonymous"
-    />
-    <link 
-      rel="preload" 
-      href="/static/css/main.2099c5e4.css" 
-      as="style" 
-      onload="this.onload=null;this.rel='stylesheet'"
-    />
-    <link 
-      rel="preload" 
-      href="/static/js/main.js" 
-      as="script" 
-      crossorigin="anonymous"
-    />
-    
-    <!-- Async CSS Loading Fallback -->
-    <noscript>
-      <link rel="stylesheet" href="/static/css/main.2099c5e4.css">
-    </noscript>
-    
-    <!-- Optimized Third-party Connections -->
-    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
-    
-    <!-- Preload critical assets -->    <link 
-      rel="preload" 
-      href="%PUBLIC_URL%/eggpic.webp" 
-      as="image" 
-      fetchpriority="high"
       imagesizes="300px"
       imagesrcset="%PUBLIC_URL%/eggpic.webp 300w"
     />
@@ -65,12 +27,28 @@
       rel="preload" 
       href="%PUBLIC_URL%/logo.webp" 
       as="image" 
-      fetchpriority="high"
+      type="image/webp" 
+      fetchpriority="high" 
       imagesizes="64px"
       imagesrcset="%PUBLIC_URL%/logo.webp 64w"
+    /><!-- Main CSS -->
+    <link 
+      rel="stylesheet"
+      href="%PUBLIC_URL%/static/css/main.css"
     />
-    <link rel="preload"  crossorigin="anonymous" href="%PUBLIC_URL%/static/css/main.2099c5e4.css" as="style" />
-    <link rel="preload"  crossorigin="anonymous" href="%PUBLIC_URL%/static/js/main.js" as="script" />
+    
+    <!-- JavaScript Entry Points -->
+    <script defer src="%PUBLIC_URL%/static/js/runtime.js"></script>
+    <script defer src="%PUBLIC_URL%/static/js/main.js"></script>
+    
+    <!-- Optimized Third-party Connections -->
+    <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+      <!-- Images are already preloaded above, no need to preload them again -->
+    
+    <!-- DNS Prefetch for Performance -->
+    <link rel="dns-prefetch" href="//www.google-analytics.com" />
+    <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
     
     <!-- Meta tags -->    
     <meta name="description" content="Compare today's egg rates across India. Find NECC egg prices in Mumbai, Delhi, Chennai, Bangalore & major cities. ₹7-8 per egg. Updated daily with current market rates." />
