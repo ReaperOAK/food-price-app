@@ -8,6 +8,8 @@ const loadChart = async (type) => {
   ChartJS.defaults.responsive = true;
   ChartJS.defaults.maintainAspectRatio = false;
   ChartJS.defaults.plugins.tooltip = {
+    enabled: true,
+    position: 'nearest',
     backgroundColor: '#fff',
     titleColor: '#1f2937',
     bodyColor: '#1f2937',
@@ -18,6 +20,15 @@ const loadChart = async (type) => {
   ChartJS.defaults.scale = {
     grid: {
       color: 'rgba(0, 0, 0, 0.05)'
+    }
+  };
+  
+  // Ensure proper event handling
+  ChartJS.defaults.plugins.legend = {
+    position: 'top',
+    labels: {
+      boxWidth: 20,
+      padding: 20
     }
   };
 

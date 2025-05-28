@@ -13,20 +13,42 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="format-detection" content="telephone=no" />
-    
-    <!-- Performance API Polyfill -->
+      <!-- Performance API Polyfill -->
     <script>
-    if (!('PerformanceObserver' in window) || !('supportedEntryTypes' in PerformanceObserver)) {
-      window.PerformanceObserver = function() { return { observe: function() {}, disconnect: function() {} }; };
-      PerformanceObserver.supportedEntryTypes = [];
-    }
+    (function() {
+      if (!('PerformanceObserver' in window)) {
+        window.PerformanceObserver = function() { 
+          return { 
+            observe: function() {}, 
+            disconnect: function() {},
+            takeRecords: function() { return []; }
+          }; 
+        };
+      }
+      
+      if (!('supportedEntryTypes' in PerformanceObserver)) {
+        PerformanceObserver.supportedEntryTypes = [
+          'element',
+          'event',
+          'first-input',
+          'largest-contentful-paint',
+          'layout-shift',
+          'longtask',
+          'mark',
+          'measure',
+          'navigation',
+          'paint',
+          'resource'
+        ];
+      }
+    })();
     </script><!-- Resource Hints - Critical Assets -->    <link 
       rel="preload" 
       href="%PUBLIC_URL%/eggpic.webp" 
       as="image" 
       type="image/webp" 
       fetchpriority="high"
-      crossorigin="anonymous"
+      importance="high"
     />
     <link 
       rel="preload" 
@@ -34,7 +56,7 @@
       as="image" 
       type="image/webp" 
       fetchpriority="high"
-      crossorigin="anonymous"
+      importance="high"
     /><!-- CSS Entry Points -->
     <!-- Let CRA handle CSS injection -->
     
