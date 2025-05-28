@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[9719],{1090:(e,p,r)=>{r.d(p,{Chart:()=>a.t1});var a=r(278);a.t1.register(...a.$L)}}]);
