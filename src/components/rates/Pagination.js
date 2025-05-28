@@ -6,7 +6,7 @@ const Pagination = ({ currentPage, setCurrentPage, pages }) => {
       {currentPage > 1 && (
         <button
           onClick={() => setCurrentPage(currentPage - 1)}
-          className="px-4 py-2 border rounded bg-white text-blue-500 hover:bg-blue-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="px-4 py-2 border rounded bg-white text-blue-700 hover:bg-blue-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           aria-label="Previous page"
         >
           ← Previous
@@ -30,8 +30,8 @@ const Pagination = ({ currentPage, setCurrentPage, pages }) => {
             onClick={() => setCurrentPage(number)}
             className={`px-4 py-2 border rounded transition-all duration-200
               ${isCurrentPage 
-                ? 'bg-blue-500 text-white font-medium scale-110' 
-                : 'bg-white text-blue-500 hover:bg-blue-50'}
+                ? 'bg-blue-600 text-white font-medium scale-110' 
+                : 'bg-white text-blue-700 hover:bg-blue-50'}
               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50`
             }
             aria-label={`Page ${number}`}
@@ -45,7 +45,7 @@ const Pagination = ({ currentPage, setCurrentPage, pages }) => {
       {currentPage < pages.length && (
         <button
           onClick={() => setCurrentPage(currentPage + 1)}
-          className="px-4 py-2 border rounded bg-white text-blue-500 hover:bg-blue-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+          className="px-4 py-2 border rounded bg-white text-blue-700 hover:bg-blue-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
           aria-label="Next page"
         >
           Next →
