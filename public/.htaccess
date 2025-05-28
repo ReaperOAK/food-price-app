@@ -2,10 +2,8 @@
   RewriteEngine On
   RewriteBase /
 
-  # Handle static files first
-  RewriteCond %{REQUEST_URI} \.(css|js|webp|ico|json|webmanifest)$
-  RewriteCond %{REQUEST_FILENAME} -f
-  RewriteRule ^(.+)\.(css|js|webp|ico|json|webmanifest)$ static.php [L]
+  # Static files handler
+  RewriteRule ^static/(.*)\.(css|js)$ static.php [L]
 
   # Force HTTPS
   RewriteCond %{HTTPS} off
@@ -36,35 +34,21 @@
 
 # Set MIME types
 <IfModule mod_mime.c>
+  RemoveType .css .js
   AddType text/css .css
   AddType application/javascript .js
-  AddType image/webp .webp
-  AddType image/x-icon .ico
-  AddType application/json .json
-  AddType application/manifest+json .webmanifest
-  
-  # Force MIME types for static files
-  <FilesMatch "\.css$">
-    ForceType text/css
-    Header set Content-Type "text/css; charset=utf-8"
-  </FilesMatch>
-  
-  <FilesMatch "\.js$">
-    ForceType application/javascript
-    Header set Content-Type "application/javascript; charset=utf-8"
-  </FilesMatch>
 </IfModule>
-  
-  RewriteCond %{REQUEST_FILENAME} -f
-  RewriteCond %{QUERY_STRING} !^[A-Za-z0-9]+$
-  RewriteRule \.(css|js|webp|ico|json|webmanifest)$ static.php [L]
-  
-  # Force MIME types
+
+# Set proper headers for static files
+<IfModule mod_headers.c>
   <FilesMatch "\.(css)$">
-    ForceType text/css
+    Header set Content-Type "text/css; charset=utf-8"
+    Header set X-Content-Type-Options "nosniff"
   </FilesMatch>
+  
   <FilesMatch "\.(js)$">
-    ForceType application/javascript
+    Header set Content-Type "application/javascript; charset=utf-8"
+    Header set X-Content-Type-Options "nosniff"
   </FilesMatch>
 </IfModule>
 
