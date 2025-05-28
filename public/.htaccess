@@ -1,11 +1,17 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
-    # Force HTTPS with proper headers and security
+
+  # Handle static files first
+  RewriteCond %{REQUEST_URI} \.(css|js|webp|ico|json|webmanifest)$
+  RewriteCond %{REQUEST_FILENAME} -f
+  RewriteRule ^(.+)\.(css|js|webp|ico|json|webmanifest)$ static.php [L]
+
+  # Force HTTPS
   RewriteCond %{HTTPS} off
   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,QSA]
   
-  # Remove www with proper headers
+  # Remove www
   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
   RewriteRule ^(.*)$ https://%1/$1 [R=301,L,QSA]
   
@@ -17,43 +23,37 @@
   RewriteCond %{REQUEST_URI} !^/webstories/
   RewriteRule ^(.*)/$ /$1 [L,R=301,QSA]
   
-  # Handle 3XX redirects properly
+  # Handle 3XX redirects
   RewriteCond %{HTTP_HOST} ^blogold\.todayeggrates\.com$ [NC]
   RewriteRule ^(.*)$ https://todayeggrates.com/blog/$1 [R=301,L,QSA]
   
-  # React Router handling
+  # React Router handling (after static files)
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.html [L]
 </IfModule>
 
-# Set correct MIME types and force them
+# Set MIME types
 <IfModule mod_mime.c>
-  RemoveType .css .js .webp .ico .json .webmanifest .gz
   AddType text/css .css
-  AddType text/javascript .js
   AddType application/javascript .js
   AddType image/webp .webp
   AddType image/x-icon .ico
   AddType application/json .json
   AddType application/manifest+json .webmanifest
-
-  # Handle gzipped files
-  <FilesMatch "\.css\.gz$">
+  
+  # Force MIME types for static files
+  <FilesMatch "\.css$">
     ForceType text/css
-    Header set Content-Encoding gzip
     Header set Content-Type "text/css; charset=utf-8"
   </FilesMatch>
   
-  <FilesMatch "\.js\.gz$">
+  <FilesMatch "\.js$">
     ForceType application/javascript
-    Header set Content-Encoding gzip
     Header set Content-Type "application/javascript; charset=utf-8"
   </FilesMatch>
-
-  # Force PHP handler for all static assets
-  RewriteRule \.(css|js|webp|ico|json|webmanifest|gz)$ static.php [L]
+</IfModule>
   
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteCond %{QUERY_STRING} !^[A-Za-z0-9]+$
