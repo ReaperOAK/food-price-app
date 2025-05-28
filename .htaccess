@@ -30,7 +30,7 @@
 
 # Set correct MIME types and force them
 <IfModule mod_mime.c>
-  RemoveType .css .js .webp .ico .json .webmanifest
+  RemoveType .css .js .webp .ico .json .webmanifest .gz
   AddType text/css .css
   AddType text/javascript .js
   AddType application/javascript .js
@@ -39,18 +39,21 @@
   AddType application/json .json
   AddType application/manifest+json .webmanifest
 
-  # Force the correct MIME type for static files
-  <FilesMatch "\.css$">
+  # Handle gzipped files
+  <FilesMatch "\.css\.gz$">
     ForceType text/css
+    Header set Content-Encoding gzip
     Header set Content-Type "text/css; charset=utf-8"
   </FilesMatch>
   
-  # Use PHP handler for static files if Apache fails
-  RewriteCond %{REQUEST_FILENAME} -f
-  RewriteCond %{REQUEST_URI} \.(css|js|webp|ico|json|webmanifest)$
-  RewriteCond %{HTTP:Accept-Encoding} gzip
-  RewriteCond %{REQUEST_FILENAME}.gz -f
-  RewriteRule ^(.+)\.(css|js|webp|ico|json|webmanifest)$ $1.$2.gz [L]
+  <FilesMatch "\.js\.gz$">
+    ForceType application/javascript
+    Header set Content-Encoding gzip
+    Header set Content-Type "application/javascript; charset=utf-8"
+  </FilesMatch>
+
+  # Force PHP handler for all static assets
+  RewriteRule \.(css|js|webp|ico|json|webmanifest|gz)$ static.php [L]
   
   RewriteCond %{REQUEST_FILENAME} -f
   RewriteCond %{QUERY_STRING} !^[A-Za-z0-9]+$
@@ -66,9 +69,10 @@
 </IfModule>
 
 # Add CORS headers for assets
-<FilesMatch "\.(css|js|webp|ico|json|webmanifest)$">
+<FilesMatch "\.(css|js|webp|ico|json|webmanifest|gz)$">
   Header set Access-Control-Allow-Origin "*"
   Header set X-Content-Type-Options "nosniff"
+  Header set Vary "Accept-Encoding"
 </FilesMatch>
 
 # Enable compression

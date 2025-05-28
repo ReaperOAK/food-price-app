@@ -16,7 +16,8 @@ $mime_types = [
     'webp' => 'image/webp',
     'ico' => 'image/x-icon',
     'json' => 'application/json; charset=utf-8',
-    'webmanifest' => 'application/manifest+json; charset=utf-8'
+    'webmanifest' => 'application/manifest+json; charset=utf-8',
+    'gz' => null // Will be set based on original file type
 ];
 
 // If the file extension is in our MIME types array, set the correct header
@@ -26,6 +27,17 @@ if (isset($mime_types[$ext])) {
 
 // Get the file path relative to this script
 $file_path = __DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Handle gzipped files
+$is_gzip = false;
+if (substr($file_path, -3) === '.gz') {
+    $is_gzip = true;
+    $original_ext = strtolower(pathinfo(substr($file_path, 0, -3), PATHINFO_EXTENSION));
+    if (isset($mime_types[$original_ext])) {
+        header('Content-Encoding: gzip');
+        $mime_types['gz'] = $mime_types[$original_ext];
+    }
+}
 
 // Clean the path to prevent directory traversal
 $real_file_path = realpath($file_path);
