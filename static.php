@@ -4,16 +4,19 @@ while (ob_get_level()) ob_end_clean();
 
 // Set proper MIME types for static files
 $file = $_SERVER['REQUEST_URI'];
-$ext = pathinfo($file, PATHINFO_EXTENSION);
+$ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
 
-// Define MIME types
+// Set default content type
+header('Content-Type: text/plain');
+
+// Define MIME types with charset for text-based files
 $mime_types = [
-    'css' => 'text/css',
-    'js' => 'application/javascript',
+    'css' => 'text/css; charset=utf-8',
+    'js' => 'application/javascript; charset=utf-8',
     'webp' => 'image/webp',
     'ico' => 'image/x-icon',
-    'json' => 'application/json',
-    'webmanifest' => 'application/manifest+json'
+    'json' => 'application/json; charset=utf-8',
+    'webmanifest' => 'application/manifest+json; charset=utf-8'
 ];
 
 // If the file extension is in our MIME types array, set the correct header
@@ -47,13 +50,17 @@ if (file_exists($real_file_path)) {
         header("HTTP/1.1 304 Not Modified");
         exit;
     }
-    
-    // For CSS files, ensure proper MIME type and UTF-8 encoding
-    if ($ext === 'css') {
-        header('Content-Type: text/css; charset=utf-8');
+      // Set Content-Type header before sending file
+    if (isset($mime_types[$ext])) {
+        header('Content-Type: ' . $mime_types[$ext]);
     }
     
-    readfile($real_file_path);
+    // Send file contents with error checking
+    if (readfile($real_file_path) === false) {
+        error_log("Failed to read file: " . $real_file_path);
+        header("HTTP/1.1 500 Internal Server Error");
+        exit("500 Internal Server Error");
+    }
     exit;
 }
 
