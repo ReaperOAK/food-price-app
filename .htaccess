@@ -28,8 +28,9 @@
   RewriteRule . /index.html [L]
 </IfModule>
 
-# Set correct MIME types
+# Set correct MIME types and force them
 <IfModule mod_mime.c>
+  RemoveType .css .js .webp .ico .json .webmanifest
   AddType text/css .css
   AddType text/javascript .js
   AddType application/javascript .js
@@ -37,11 +38,33 @@
   AddType image/x-icon .ico
   AddType application/json .json
   AddType application/manifest+json .webmanifest
+  
+  # Force MIME types
+  <FilesMatch "\.(css)$">
+    ForceType text/css
+  </FilesMatch>
+  <FilesMatch "\.(js)$">
+    ForceType application/javascript
+  </FilesMatch>
 </IfModule>
+
+# Add CORS headers for assets
+<FilesMatch "\.(css|js|webp|ico|json|webmanifest)$">
+  Header set Access-Control-Allow-Origin "*"
+  Header set X-Content-Type-Options "nosniff"
+</FilesMatch>
 
 # Enable compression
 <IfModule mod_deflate.c>
+  # Force compression for text files
+  SetOutputFilter DEFLATE
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json
+  
+  # Level of compression (0-9)
+  DeflateCompressionLevel 9
+  
+  # Don't compress images
+  SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp)$ no-gzip dont-vary
 </IfModule>
 
 # Browser caching
