@@ -1,15 +1,13 @@
-<IfM  # Handle build artifacts first
-  RewriteCond %{REQUEST_URI} !^/static/
-  RewriteRule ^(build/)?static/(css|js)/(.+)\.(css|js|chunk\.js)(\.gz)?$ /static/$2/$3.$4$5 [L]
-
-  # Static files handler
-  RewriteRule ^static/(css|js)/[^/]+\.(css|js|chunk\.js)(\.gz)?$ static.php [L]ule mod_rewrite.c>
+<IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
 
+  # Handle build artifacts first (map /build/static/ to /static/)
+  RewriteCond %{REQUEST_URI} !^/static/
+  RewriteRule ^(build/)?static/(css|js)/(.+)\.(css|js|chunk\.js|chunk\.css)(\.gz)?$ /static/$2/$3.$4$5 [L]
+
   # Static files handler
-  RewriteRule ^static/.*\.(css|js)$ static.php [L]
-  RewriteRule ^static/.*\.(css|js)\.gz$ static.php [L]
+  RewriteRule ^static/(css|js)/[^/]+\.(css|js|chunk\.js|chunk\.css)(\.gz)?$ static.php [L]
 
   # Force HTTPS
   RewriteCond %{HTTPS} off

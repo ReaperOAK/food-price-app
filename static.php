@@ -16,11 +16,13 @@ $ext = strtolower(pathinfo($request_uri, PATHINFO_EXTENSION));
 // Define allowed MIME types
 $mime_types = [
     'css' => 'text/css; charset=utf-8',
-    'js' => 'application/javascript; charset=utf-8'
+    'js' => 'application/javascript; charset=utf-8',
+    'chunk.js' => 'application/javascript; charset=utf-8',
+    'chunk.css' => 'text/css; charset=utf-8'
 ];
 
 // Security check - only allow css and js files from static directory
-if (!preg_match('/^\/static\/(css|js)\/[^\/]+\.(css|js|chunk\.js)(\.gz)?$/', $request_uri)) {
+if (!preg_match('/^\/static\/(css|js)\/[^\/]+\.(css|js|chunk\.js|chunk\.css)(\.gz)?$/', $request_uri)) {
     error_log("Invalid file request: " . $request_uri);
     error_log("Request URI was: " . $request_uri);
     error_log("File path would be: " . $file_path);
