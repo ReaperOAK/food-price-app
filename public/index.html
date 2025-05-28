@@ -7,13 +7,20 @@
     <link rel="icon" href="%PUBLIC_URL%/icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/eggpic.webp" />
     
-    <!-- Performance and CLS optimizations -->
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <!-- Performance and CLS optimizations -->    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="theme-color" content="#007bff" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="format-detection" content="telephone=no" />    <!-- Resource Hints - Critical Assets -->
+    <meta name="format-detection" content="telephone=no" />
+    
+    <!-- Performance API Polyfill -->
+    <script>
+    if (!('PerformanceObserver' in window) || !('supportedEntryTypes' in PerformanceObserver)) {
+      window.PerformanceObserver = function() { return { observe: function() {}, disconnect: function() {} }; };
+      PerformanceObserver.supportedEntryTypes = [];
+    }
+    </script><!-- Resource Hints - Critical Assets -->
     <link 
       rel="preload" 
       href="%PUBLIC_URL%/eggpic.webp" 
@@ -30,21 +37,15 @@
       type="image/webp" 
       fetchpriority="high" 
       imagesizes="64px"
-      imagesrcset="%PUBLIC_URL%/logo.webp 64w"    />
-    <!-- CSS Entry Points -->
-    <link 
-      rel="preload"
-      href="%PUBLIC_URL%/static/css/main-859ea5fe.33ba56b8.css"
-      as="style"
-    />
+      imagesrcset="%PUBLIC_URL%/logo.webp 64w"    />    <!-- CSS Entry Points -->
     <link 
       rel="stylesheet"
-      href="%PUBLIC_URL%/static/css/main-859ea5fe.33ba56b8.css"
+      href="%PUBLIC_URL%/static/css/main.css"
     />
     
     <!-- JavaScript Entry Points -->
-    <script defer src="%PUBLIC_URL%/static/js/runtime.b24f626a.js"></script>
-    <script defer src="%PUBLIC_URL%/static/js/main-31743c5a.4de505f7.js"></script>
+    <script defer src="%PUBLIC_URL%/static/js/runtime-main.js"></script>
+    <script defer src="%PUBLIC_URL%/static/js/main.js"></script>
     
     <!-- Optimized Third-party Connections -->
     <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
