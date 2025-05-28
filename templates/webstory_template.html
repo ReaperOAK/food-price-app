@@ -2,60 +2,47 @@
 <html amp lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - Today's Rate ₹{{EGG_RATE}} - Today Egg Rates</title>
-    <link rel="canonical" href="https://todayeggrates.com/webstories/{{CITY_SLUG}}-egg-rate.html">
+    <title>{{CITY_NAME}} Egg Rate Today - ₹{{EGG_RATE}} Per Egg | NECC Price {{DATE}}</title>
+    <link rel="canonical" href="https://todayeggrates.com/webstories/{{CITY_SLUG}}-egg-rate">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <script async src="https://cdn.ampproject.org/v0.js"></script>
     <script async custom-element="amp-story" src="https://cdn.ampproject.org/v0/amp-story-1.0.js"></script>
     <script async custom-element="amp-story-auto-ads" src="https://cdn.ampproject.org/v0/amp-story-auto-ads-0.1.js"></script>
     <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-    <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
-    <meta name="google-adsense-account" content="ca-pub-2664225874856394">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2664225874856394"
-     crossorigin="anonymous"></script>
+    <meta name="description" content="[NECC] {{CITY_NAME}} egg rate today: ₹{{EGG_RATE}}/egg. Get latest wholesale prices and market analysis. Updated {{DATE}}.">
     
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg. Get the latest egg prices updated on {{DATE}}.">
-    <meta name="keywords" content="egg rate, {{CITY_NAME}} egg price, egg market price, {{STATE_NAME}} egg rates, today egg price">
-    
-    <!-- Open Graph Meta Tags for Social Media Sharing -->
+    <!-- OpenGraph tags -->
     <meta property="og:type" content="article">
-    <meta property="og:title" content="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - Today's Rate ₹{{EGG_RATE}}">
-    <meta property="og:description" content="Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg. Get the latest egg prices updated on {{DATE}}.">
-    <meta property="og:url" content="https://todayeggrates.com/webstories/{{CITY_SLUG}}-egg-rate.html">
-    <meta property="og:image" content="https://todayeggrates.com/images/webstories/thumbnail-{{CITY_SLUG}}.webp">
-    <meta property="og:site_name" content="Today Egg Rates">
+    <meta property="og:title" content="{{CITY_NAME}} Egg Rate Today - ₹{{EGG_RATE}} Per Egg | NECC Price {{DATE}}">
+    <meta property="og:description" content="[NECC] {{CITY_NAME}} egg rate today: ₹{{EGG_RATE}}/egg. Latest wholesale prices and market analysis. Updated {{DATE}}.">
+    <meta property="og:url" content="https://todayeggrates.com/webstories/{{CITY_SLUG}}-egg-rate">
+    <meta property="og:image" content="https://todayeggrates.com/images/webstories/{{CITY_SLUG}}.webp">
     
-    <!-- Twitter Card Meta Tags -->
+    <!-- Twitter tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - Today's Rate ₹{{EGG_RATE}}">
-    <meta name="twitter:description" content="Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg. Get the latest egg prices updated on {{DATE}}.">
-    <meta name="twitter:image" content="https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}">
+    <meta name="twitter:title" content="{{CITY_NAME}} Egg Rate Today - ₹{{EGG_RATE}} Per Egg | NECC Price {{DATE}}">
+    <meta name="twitter:description" content="[NECC] {{CITY_NAME}} egg rate today: ₹{{EGG_RATE}}/egg. Latest wholesale prices and market analysis. Updated {{DATE}}.">
+    <meta name="twitter:image" content="https://todayeggrates.com/images/webstories/{{CITY_SLUG}}.webp">
     
-    <!-- Schema.org markup for Google -->
+    <!-- Schema.org markup -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Article",
-      "headline": "Egg Rate in {{CITY_NAME}}, {{STATE_NAME}} - Today's Rate ₹{{EGG_RATE}}",
-      "image": "https://todayeggrates.com{{COVER_BACKGROUND_IMAGE}}",
+      "headline": "{{CITY_NAME}} Egg Rate Today - ₹{{EGG_RATE}} Per Egg",
       "datePublished": "{{ISO_DATE}}",
       "dateModified": "{{ISO_DATE}}",
-      "author": {
-        "@type": "Organization",
-        "name": "Today Egg Rates"
-      },
+      "description": "[NECC] {{CITY_NAME}} egg rate today: ₹{{EGG_RATE}}/egg. Latest wholesale prices and market analysis.",
       "publisher": {
         "@type": "Organization",
         "name": "Today Egg Rates",
         "logo": {
           "@type": "ImageObject",
           "url": "https://todayeggrates.com/logo.webp",
-          "width": 600,
-          "height": 60
+          "width": "60",
+          "height": "60"
         }
-      },
-      "description": "Check today's egg rate in {{CITY_NAME}}, {{STATE_NAME}}. Current price: ₹{{EGG_RATE}} per egg."
+      }
     }
     </script>
     
