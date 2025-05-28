@@ -43,14 +43,23 @@ ChartJS.defaults.scale = {
   }
 };
 
+// Set global font defaults
+ChartJS.defaults.font = {
+  family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  size: 12,
+  style: 'normal',
+  weight: 'normal',
+  lineHeight: 1.2
+};
+
 ChartJS.defaults.plugins.legend = {
   position: 'top',
   labels: {
     boxWidth: 20,
     padding: 20,
     font: {
-      family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-      size: 12
+      size: 12,
+      weight: '500'
     }
   }
 };
@@ -128,14 +137,17 @@ const RateChart = ({
       title: {
         display: true,
         text: title || '',
+        align: 'center',
         color: '#1f2937',
+        padding: { top: 10, bottom: 10 },
+        // Ensure font properties are properly initialized with defaults
         font: {
-          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
           size: 14,
+          style: 'normal',
           weight: 'bold',
           lineHeight: 1.2
         },
-        padding: { top: 10, bottom: 10 }
       },
       tooltip: {
         enabled: true,
