@@ -20,32 +20,26 @@
       window.PerformanceObserver = function() { return { observe: function() {}, disconnect: function() {} }; };
       PerformanceObserver.supportedEntryTypes = [];
     }
-    </script><!-- Resource Hints - Critical Assets -->
-    <link 
+    </script><!-- Resource Hints - Critical Assets -->    <link 
       rel="preload" 
       href="%PUBLIC_URL%/eggpic.webp" 
       as="image" 
       type="image/webp" 
-      fetchpriority="high" 
-      imagesizes="300px"
-      imagesrcset="%PUBLIC_URL%/eggpic.webp 300w"
+      fetchpriority="high"
+      crossorigin="anonymous"
     />
     <link 
       rel="preload" 
       href="%PUBLIC_URL%/logo.webp" 
       as="image" 
       type="image/webp" 
-      fetchpriority="high" 
-      imagesizes="64px"
-      imagesrcset="%PUBLIC_URL%/logo.webp 64w"    />    <!-- CSS Entry Points -->
-    <link 
-      rel="stylesheet"
-      href="%PUBLIC_URL%/static/css/main.css"
-    />
+      fetchpriority="high"
+      crossorigin="anonymous"
+    /><!-- CSS Entry Points -->
+    <!-- Let CRA handle CSS injection -->
     
     <!-- JavaScript Entry Points -->
-    <script defer src="%PUBLIC_URL%/static/js/runtime-main.js"></script>
-    <script defer src="%PUBLIC_URL%/static/js/main.js"></script>
+    <!-- Let CRA handle JS injection -->
     
     <!-- Optimized Third-party Connections -->
     <link rel="preconnect" href="https://www.google-analytics.com" crossorigin />
