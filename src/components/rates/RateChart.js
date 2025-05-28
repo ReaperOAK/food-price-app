@@ -1,44 +1,58 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from 'chart.js';
+import { Bar, Line } from 'react-chartjs-2';
 
-// Minimal chart initialization with only required components
-const loadChart = async (type) => {
-  const { Chart: ChartJS } = await import(/* webpackChunkName: "chart-core-min" */ 'chart.js/auto');
-  
-  // Configure defaults globally to reduce bundle size
-  ChartJS.defaults.responsive = true;
-  ChartJS.defaults.maintainAspectRatio = false;
-  ChartJS.defaults.plugins.tooltip = {
-    enabled: true,
-    position: 'nearest',
-    backgroundColor: '#fff',
-    titleColor: '#1f2937',
-    bodyColor: '#1f2937',
-    padding: 12,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
-    borderWidth: 1
-  };
-  ChartJS.defaults.scale = {
-    grid: {
-      color: 'rgba(0, 0, 0, 0.05)'
-    }
-  };
-  
-  // Ensure proper event handling
-  ChartJS.defaults.plugins.legend = {
-    position: 'top',
-    labels: {
-      boxWidth: 20,
-      padding: 20
-    }
-  };
+// Register Chart.js components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-  // Only load the required chart type
-  if (type === 'line') {
-    const { Line } = await import(/* webpackChunkName: "chart-line" */ 'react-chartjs-2');
-    return Line;
+// Configure defaults globally to reduce bundle size
+ChartJS.defaults.responsive = true;
+ChartJS.defaults.maintainAspectRatio = false;
+ChartJS.defaults.plugins.tooltip = {
+  enabled: true,
+  position: 'nearest',
+  backgroundColor: '#fff',
+  titleColor: '#1f2937',
+  bodyColor: '#1f2937',
+  padding: 12,
+  borderColor: 'rgba(0, 0, 0, 0.1)',
+  borderWidth: 1
+};
+ChartJS.defaults.scale = {
+  grid: {
+    color: 'rgba(0, 0, 0, 0.05)'
   }
-  const { Bar } = await import(/* webpackChunkName: "chart-bar" */ 'react-chartjs-2');
-  return Bar;
+};
+
+ChartJS.defaults.plugins.legend = {
+  position: 'top',
+  labels: {
+    boxWidth: 20,
+    padding: 20,
+    font: {
+      family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      size: 12
+    }
+  }
 };
 
 const LoadingChart = () => (
@@ -57,13 +71,7 @@ const RateChart = ({
   showLine = false, 
   isLoading = false 
 }) => {
-  const [ChartComponent, setChartComponent] = useState(null);
-
-  useEffect(() => {
-    if (!isLoading && data?.length > 0) {
-      loadChart(chartType).then(setChartComponent);
-    }
-  }, [chartType, isLoading, data]);
+  const Chart = chartType === 'line' ? Line : Bar;
 
   const containerStyle = {
     position: 'relative',
@@ -75,7 +83,7 @@ const RateChart = ({
     overflow: 'hidden'
   };
 
-  if (isLoading || !ChartComponent) {
+  if (isLoading) {
     return <LoadingChart />;
   }
 
@@ -98,6 +106,7 @@ const RateChart = ({
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
+
   const chartData = {
     labels: data.map(item => formatDate(item[xAxisKey])),
     datasets: [{
@@ -109,9 +118,10 @@ const RateChart = ({
       tension: showLine ? 0.3 : 0,
       pointRadius: showLine ? 4 : 0,
       fill: !showLine,
-      order: 1
-    }]
-  };  const defaultOptions = {
+      order: 1    }]
+  };
+  
+  const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -181,12 +191,10 @@ const RateChart = ({
 
   return (
     <div className="mt-4 bg-white" style={containerStyle}>
-      {ChartComponent && (
-        <ChartComponent 
-          data={chartData} 
-          options={defaultOptions} 
-        />
-      )}
+      <Chart 
+        data={chartData} 
+        options={chartOptions} 
+      />
     </div>
   );
 };
