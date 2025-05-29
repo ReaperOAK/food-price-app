@@ -1,23 +1,40 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback, memo } from 'react';
+import { debounce } from 'lodash';
 
-const TableOfContents = ({ contentId, blogId, isSticky = false }) => {
+const TableOfContents = memo(({ contentId, blogId, isSticky = false }) => {
   const [headings, setHeadings] = useState([]);
   const [activeId, setActiveId] = useState('');
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(window.innerWidth < 768);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const observerRef = useRef(null);
   const mutationObserverRef = useRef(null);
+  const tocRef = useRef(null);
+
+  // Debounced scroll progress calculation
+  const updateScrollProgress = useCallback(
+    debounce(() => {
+      const contentElement = document.getElementById(contentId);
+      if (!contentElement) return;
+      
+      const scrollPosition = window.scrollY;
+      const totalHeight = contentElement.offsetHeight;
+      const windowHeight = window.innerHeight;
+      const scrollableHeight = totalHeight - windowHeight;
+      
+      const progress = Math.min((scrollPosition / scrollableHeight) * 100, 100);
+      setScrollProgress(progress);
+    }, 50),
+    [contentId]
+  );
 
   useEffect(() => {
-    // Function to extract headings from content
     const extractHeadings = () => {
       const contentElement = document.getElementById(contentId);
       if (!contentElement) return;
       
-      // Get all h2 and h3 elements from the content
       const elements = contentElement.querySelectorAll('h2, h3');
       
-      // Add ids to elements that don't have them based on blogId and text
-      elements.forEach((element, index) => {
+      elements.forEach((element) => {
         if (!element.id) {
           const slugifiedText = element.innerText
             .toLowerCase()
@@ -25,6 +42,9 @@ const TableOfContents = ({ contentId, blogId, isSticky = false }) => {
             .replace(/ +/g, '-');
           element.id = `${blogId}-heading-${slugifiedText}`;
         }
+
+        // Add tabindex for keyboard navigation
+        element.setAttribute('tabindex', '0');
       });
       
       const headingElements = Array.from(elements).map(element => ({
@@ -34,96 +54,133 @@ const TableOfContents = ({ contentId, blogId, isSticky = false }) => {
       }));
       
       setHeadings(headingElements);
-      
-      // Clean up any previous intersection observer
+
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
       
-      // Set up new IntersectionObserver to track active heading
       observerRef.current = new IntersectionObserver(
-        entries => {
+        (entries) => {
           entries.forEach(entry => {
             if (entry.isIntersecting) {
               setActiveId(entry.target.id);
             }
           });
         },
-        { rootMargin: '0px 0px -80% 0px' }
+        { 
+          rootMargin: '0px 0px -80% 0px',
+          threshold: [0, 0.25, 0.5, 0.75, 1] 
+        }
       );
       
-      // Observe all heading elements
       elements.forEach(element => observerRef.current.observe(element));
     };
 
-    // Initial extraction of headings
     extractHeadings();
     
-    // Set up a MutationObserver to detect when content changes (like when blog content loads)
+    // Handle content changes
     if (mutationObserverRef.current) {
       mutationObserverRef.current.disconnect();
     }
     
     const contentElement = document.getElementById(contentId);
     if (contentElement) {
-      mutationObserverRef.current = new MutationObserver((mutations) => {
-        // If significant changes to content, re-extract headings
-        const shouldUpdate = mutations.some(mutation => 
-          mutation.type === 'childList' && 
-          (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)
-        );
-        
-        if (shouldUpdate) {
-          // Small timeout to ensure DOM is fully updated
-          setTimeout(extractHeadings, 100);
-        }
-      });
+      mutationObserverRef.current = new MutationObserver(
+        debounce((mutations) => {
+          const shouldUpdate = mutations.some(mutation => 
+            mutation.type === 'childList' && 
+            (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)
+          );
+          
+          if (shouldUpdate) {
+            setTimeout(extractHeadings, 100);
+          }
+        }, 100)
+      );
       
-      // Start observing content changes
       mutationObserverRef.current.observe(contentElement, {
         childList: true,
         subtree: true
       });
     }
+
+    // Add scroll event listener for progress
+    window.addEventListener('scroll', updateScrollProgress);
     
+    // Handle resize for responsiveness
+    const handleResize = debounce(() => {
+      setIsCollapsed(window.innerWidth < 768);
+    }, 150);
+    
+    window.addEventListener('resize', handleResize);
+
     return () => {
-      // Clean up observers when component unmounts or contentId/blogId changes
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
       if (mutationObserverRef.current) {
         mutationObserverRef.current.disconnect();
       }
+      window.removeEventListener('scroll', updateScrollProgress);
+      window.removeEventListener('resize', handleResize);
+      handleResize.cancel();
+      updateScrollProgress.cancel();
     };
-  }, [contentId, blogId]);
+  }, [contentId, blogId, updateScrollProgress]);
 
-  const scrollToHeading = (id) => {
+  const scrollToHeading = useCallback((id) => {
     const element = document.getElementById(id);
     if (element) {
+      element.focus();
       window.scrollTo({
-        top: element.offsetTop - 100,
+        top: element.offsetTop - 80,
         behavior: 'smooth'
       });
     }
-  };
+  }, []);
 
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
+  const toggleCollapse = useCallback(() => {
+    setIsCollapsed(prev => !prev);
+  }, []);
+
+  const handleKeyDown = useCallback((e, id) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      scrollToHeading(id);
+    }
+  }, [scrollToHeading]);
 
   if (headings.length === 0) return null;
 
   return (
-    <div className={`toc-container bg-white p-4 rounded-lg shadow-md mb-6 ${isSticky ? 'sticky top-24' : ''}`}>
-      <div className="flex justify-between items-center cursor-pointer" onClick={toggleCollapse}>
-        <h2 className="text-xl font-bold text-gray-800">Table of Contents</h2>
+    <nav
+      ref={tocRef}
+      className={`toc-container bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg mb-6 transition-all duration-300 ease-in-out
+        ${isSticky ? 'lg:sticky lg:top-24' : ''}
+        ${isCollapsed ? 'max-h-16' : 'max-h-[80vh]'}
+      `}
+      aria-label="Table of contents"
+    >
+      <div
+        className={`flex justify-between items-center cursor-pointer
+          ${!isCollapsed && 'border-b border-gray-200 dark:border-gray-700 pb-3 mb-3'}`}
+        onClick={toggleCollapse}
+        onKeyDown={(e) => e.key === 'Enter' && toggleCollapse()}
+        tabIndex={0}
+        role="button"
+        aria-expanded={!isCollapsed}
+        aria-controls="toc-list"
+      >
+        <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">
+          Table of Contents
+        </h2>
         <button 
-          aria-label={isCollapsed ? "Expand" : "Collapse"} 
-          className="text-gray-600 hover:text-blue-600 focus:outline-none"
+          aria-label={isCollapsed ? "Expand table of contents" : "Collapse table of contents"}
+          className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full p-1"
         >
           <svg 
             xmlns="http://www.w3.org/2000/svg" 
-            className={`h-5 w-5 transform transition-transform ${isCollapsed ? 'rotate-180' : ''}`}
+            className={`h-5 w-5 transform transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`}
             fill="none" 
             viewBox="0 0 24 24" 
             stroke="currentColor"
@@ -132,8 +189,27 @@ const TableOfContents = ({ contentId, blogId, isSticky = false }) => {
           </svg>
         </button>
       </div>
+
+      {/* Progress bar */}
+      <div 
+        className="h-1 bg-gray-200 dark:bg-gray-700 rounded-full mt-2 mb-3"
+        role="progressbar"
+        aria-valuenow={scrollProgress}
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <div 
+          className="h-full bg-blue-600 dark:bg-blue-500 rounded-full transition-all duration-200"
+          style={{ width: `${scrollProgress}%` }}
+        />
+      </div>
       
-      {!isCollapsed && (
+      <div
+        id="toc-list"
+        className={`overflow-y-auto transition-all duration-300 ease-in-out ${
+          isCollapsed ? 'max-h-0 opacity-0' : 'max-h-[calc(80vh-8rem)] opacity-100'
+        }`}
+      >
         <ul className="space-y-2 mt-3">
           {headings.map((heading) => (
             <li 
@@ -146,20 +222,24 @@ const TableOfContents = ({ contentId, blogId, isSticky = false }) => {
                   e.preventDefault();
                   scrollToHeading(heading.id);
                 }}
-                className={`block text-${heading.level === 2 ? 'md' : 'sm'} ${
-                  activeId === heading.id
-                    ? 'text-blue-600 font-semibold'
-                    : 'text-gray-700 hover:text-blue-600'
-                } transition-colors duration-200`}
+                onKeyDown={(e) => handleKeyDown(e, heading.id)}
+                className={`block py-1 px-2 rounded-md text-${heading.level === 2 ? 'md' : 'sm'} 
+                  ${activeId === heading.id
+                    ? 'text-blue-600 dark:text-blue-400 font-semibold bg-blue-50 dark:bg-blue-900/20'
+                    : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400'
+                  } transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                aria-current={activeId === heading.id ? 'location' : undefined}
               >
                 {heading.text}
               </a>
             </li>
           ))}
         </ul>
-      )}
-    </div>
+      </div>
+    </nav>
   );
-};
+});
+
+TableOfContents.displayName = 'TableOfContents';
 
 export default TableOfContents;
