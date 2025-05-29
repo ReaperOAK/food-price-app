@@ -44,7 +44,36 @@ class DataScraper extends BaseAPI {
                     $this->performDailyUpdate();
                     break;
                 default:
-                    $this->sendError('Invalid action');
+                    // When no action is specified (e.g., when run as a cronjob), do both tasks
+                    $results = [
+                        'scrape_results' => null,
+                        'daily_update_results' => null,
+                        'errors' => []
+                    ];
+                    
+                    try {
+                        ob_start();
+                        $this->scrapeFromE2NECC();
+                        $results['scrape_results'] = json_decode(ob_get_clean(), true);
+                    } catch (Exception $e) {
+                        $results['errors'][] = 'Scraping error: ' . $e->getMessage();
+                    }
+                    
+                    try {
+                        ob_start();
+                        $this->performDailyUpdate();
+                        $results['daily_update_results'] = json_decode(ob_get_clean(), true);
+                    } catch (Exception $e) {
+                        $results['errors'][] = 'Daily update error: ' . $e->getMessage();
+                    }
+                    
+                    // If both operations failed, throw an exception
+                    if (empty($results['scrape_results']) && empty($results['daily_update_results'])) {
+                        throw new Exception(implode("\n", $results['errors']));
+                    }
+                    
+                    // Otherwise, send the combined results
+                    $this->sendResponse($results);
             }
         } catch (Exception $e) {
             $this->sendError($e->getMessage());
