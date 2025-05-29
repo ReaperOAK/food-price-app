@@ -357,6 +357,7 @@ const handleLocalSort = (key) => {
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}
             pages={pages}
+            isLoading={isLoading}
           />
         </div>
 
