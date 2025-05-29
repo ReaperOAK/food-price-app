@@ -240,9 +240,9 @@ const Navbar = memo(({
       aria-label="Main navigation"
     >
       <div className="container mx-auto px-4 w-full max-w-7xl">
-        <div className="flex flex-wrap justify-between items-center py-3 md:py-4">
-          {/* Logo and mobile menu button */}
-          <div className="flex justify-between items-center flex-1 md:flex-none">
+        <div className="flex items-center justify-between h-16">
+          {/* Logo */}
+          <div className="flex-shrink-0">
             <Link 
               to="/" 
               onClick={handleHomeClick}
@@ -252,24 +252,10 @@ const Navbar = memo(({
             >
               <Logo />
             </Link>
-            <button
-              className="md:hidden inline-flex items-center justify-center p-2
-                       rounded-lg text-gray-700 hover:text-blue-600 
-                       hover:bg-gray-100 dark:text-gray-300 dark:hover:text-blue-400
-                       dark:hover:bg-gray-800 focus:outline-none focus:ring-2 
-                       focus:ring-blue-500 transition-colors duration-200"
-              onClick={toggleMenu}
-              aria-controls="mobile-menu"
-              aria-expanded={menuOpen}
-              aria-label={menuOpen ? "Close menu" : "Open menu"}
-            >
-              <span className="sr-only">{menuOpen ? "Close menu" : "Open menu"}</span>
-              {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
-            </button>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation - with responsive hiding */}
+          <div className="hidden lg:flex flex-grow justify-center mx-4 overflow-x-hidden space-x-1">
             <NavigationLinks 
               handleHomeClick={handleHomeClick} 
               handleCityClick={handleCityClick} 
@@ -277,13 +263,7 @@ const Navbar = memo(({
           </div>
 
           {/* Search Box */}
-          <div 
-            className={`
-              md:w-64 w-full order-last md:order-none mt-4 md:mt-0
-              ${menuOpen ? 'block' : 'hidden md:block'}
-              transition-all duration-300 ease-in-out
-            `}
-          >
+          <div className="flex-shrink-0 w-64 relative z-10">
             <SearchBox
               options={options}
               selectedCity={selectedCity}
@@ -298,6 +278,24 @@ const Navbar = memo(({
               ref={lastFocusableRef}
             />
           </div>
+
+          {/* Mobile menu button */}
+          <div className="lg:hidden flex items-center ml-4">
+            <button
+              className="inline-flex items-center justify-center p-2
+                       rounded-lg text-gray-700 hover:text-blue-600 
+                       hover:bg-gray-100 dark:text-gray-300 dark:hover:text-blue-400
+                       dark:hover:bg-gray-800 focus:outline-none focus:ring-2 
+                       focus:ring-blue-500 transition-colors duration-200"
+              onClick={toggleMenu}
+              aria-controls="mobile-menu"
+              aria-expanded={menuOpen}
+              aria-label={menuOpen ? "Close menu" : "Open menu"}
+            >
+              <span className="sr-only">{menuOpen ? "Close menu" : "Open menu"}</span>
+              {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Navigation */}
@@ -305,7 +303,7 @@ const Navbar = memo(({
           id="mobile-menu"
           className={`
             ${menuOpen ? 'max-h-[calc(100vh-4rem)] opacity-100' : 'max-h-0 opacity-0'}
-            md:hidden overflow-hidden transition-all duration-300 ease-in-out
+            lg:hidden overflow-hidden transition-all duration-300 ease-in-out
           `}
           aria-hidden={!menuOpen}
         >

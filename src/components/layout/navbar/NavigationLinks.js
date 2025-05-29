@@ -1,7 +1,7 @@
 import React, { memo, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-const NavLink = memo(({ to, onClick, children }) => {
+const NavLink = memo(({ to, onClick, children, className = '' }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
 
@@ -28,6 +28,7 @@ const NavLink = memo(({ to, onClick, children }) => {
         active:scale-95
         md:text-base md:px-4
         transform-gpu hover:scale-102
+        ${className}
       `}
       aria-current={isActive ? 'page' : undefined}
       role="menuitem"
@@ -47,36 +48,36 @@ const NavLink = memo(({ to, onClick, children }) => {
 
 const NavigationLinks = memo(({ handleHomeClick, handleCityClick }) => (
   <nav 
-    className="flex flex-col md:flex-row md:items-center md:space-x-2 space-y-1 md:space-y-0" 
+    className="flex flex-col lg:flex-row lg:items-center" 
     role="navigation"
     aria-label="Main menu"
   >
     <div 
       role="menubar" 
-      className="flex flex-col md:flex-row md:items-center md:space-x-2 space-y-1 md:space-y-0"
+      className="flex flex-col lg:flex-row lg:items-center space-y-1 lg:space-y-0 lg:space-x-1"
     >
-      <NavLink to="/" onClick={handleHomeClick}>
+      <NavLink to="/" onClick={handleHomeClick} className="lg:block">
         Home
       </NavLink>
-      <NavLink to="/mumbai-egg-rate" onClick={(e) => handleCityClick('Mumbai', e)}>
+      <NavLink to="/mumbai-egg-rate" onClick={(e) => handleCityClick('Mumbai', e)} className="lg:block xl:block">
         Mumbai
       </NavLink>
-      <NavLink to="/kolkata-egg-rate" onClick={(e) => handleCityClick('Kolkata', e)}>
+      <NavLink to="/kolkata-egg-rate" onClick={(e) => handleCityClick('Kolkata', e)} className="lg:block xl:block">
         Kolkata
       </NavLink>
-      <NavLink to="/lucknow-egg-rate" onClick={(e) => handleCityClick('Lucknow', e)}>
+      <NavLink to="/lucknow-egg-rate" onClick={(e) => handleCityClick('Lucknow', e)} className="lg:hidden xl:block">
         Lucknow
       </NavLink>
-      <NavLink to="/barwala-egg-rate" onClick={(e) => handleCityClick('Barwala', e)}>
+      <NavLink to="/barwala-egg-rate" onClick={(e) => handleCityClick('Barwala', e)} className="lg:hidden xl:block">
         Barwala
       </NavLink>
-      <NavLink to="/hyderabad-egg-rate" onClick={(e) => handleCityClick('Hyderabad', e)}>
+      <NavLink to="/hyderabad-egg-rate" onClick={(e) => handleCityClick('Hyderabad', e)} className="lg:hidden xl:block">
         Hyderabad
       </NavLink>
-      <NavLink to="/chennai-egg-rate" onClick={(e) => handleCityClick('Chennai', e)}>
+      <NavLink to="/chennai-egg-rate" onClick={(e) => handleCityClick('Chennai', e)} className="lg:hidden xl:block">
         Chennai
       </NavLink>
-      <NavLink to="/webstories">
+      <NavLink to="/webstories" className="lg:block">
         Web Stories
       </NavLink>
     </div>

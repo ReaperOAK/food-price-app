@@ -71,7 +71,7 @@ const SearchBox = memo(forwardRef(({
 
   return (
     <div 
-      className="relative w-full md:w-64 mt-4 md:mt-0 focus-within:z-10"
+      className="relative w-full focus-within:z-10"
       role="search"
     >
       <Select
@@ -112,7 +112,7 @@ const SearchBox = memo(forwardRef(({
       />
       {error && (
         <p 
-          className="mt-1 text-sm text-red-600 dark:text-red-400" 
+          className="mt-1 text-sm text-red-600 dark:text-red-400 absolute" 
           role="alert"
           id="location-select-error"
         >
