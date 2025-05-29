@@ -2,12 +2,13 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-return [
-    'host' => 'localhost',
-    'database' => 'u901337298_test',
-    'username' => 'u901337298_test',
-    'password' => 'A12345678b*'
-];
+$servername = "localhost";
+$username = "u901337298_test";
+$password = "A12345678b*";
+$dbname = "u901337298_test";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
