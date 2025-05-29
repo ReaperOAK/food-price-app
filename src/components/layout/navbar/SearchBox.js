@@ -82,11 +82,21 @@ const SearchBox = memo(forwardRef(({
         isLoading={isLoading}
         isDisabled={isLoading || error}
         className={`
-          react-select-container
+          react-select-container w-full
           ${isSearchFocused ? 'react-select-focused' : ''}
         `}
         classNamePrefix="react-select"
-        styles={selectStyles}
+        styles={{
+          ...selectStyles,
+          container: (base) => ({
+            ...base,
+            width: '100%',
+          }),
+          control: (base, state) => ({
+            ...selectStyles.control(base, state),
+            width: '100%',
+          }),
+        }}
         onFocus={onFocus}
         onBlur={onBlur}
         aria-label="Search for city or state"
@@ -112,7 +122,7 @@ const SearchBox = memo(forwardRef(({
       />
       {error && (
         <p 
-          className="mt-1 text-sm text-red-600 dark:text-red-400 absolute" 
+          className="mt-1 text-sm text-red-600 dark:text-red-400" 
           role="alert"
           id="location-select-error"
         >

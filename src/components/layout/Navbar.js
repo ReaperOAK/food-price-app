@@ -254,33 +254,33 @@ const Navbar = memo(({
             </Link>
           </div>
 
-          {/* Desktop Navigation - with responsive hiding */}
-          <div className="hidden lg:flex flex-grow justify-center mx-4 overflow-x-hidden space-x-1">
-            <NavigationLinks 
-              handleHomeClick={handleHomeClick} 
-              handleCityClick={handleCityClick} 
-            />
-          </div>
-
-          {/* Search Box */}
-          <div className="flex-shrink-0 w-64 relative z-10">
-            <SearchBox
-              options={options}
-              selectedCity={selectedCity}
-              selectedState={selectedState}
-              handleChange={handleChange}
-              isLoading={isLoading}
-              error={error}
-              selectStyles={selectStyles}
-              onFocus={() => setIsSearchFocused(true)}
-              onBlur={() => setIsSearchFocused(false)}
-              isSearchFocused={isSearchFocused}
-              ref={lastFocusableRef}
-            />
+          {/* Desktop Navigation and Search */}
+          <div className="hidden lg:flex flex-1 items-center justify-between ml-8">
+            <div className="flex-grow flex justify-center mx-4">
+              <NavigationLinks 
+                handleHomeClick={handleHomeClick} 
+                handleCityClick={handleCityClick} 
+              />
+            </div>
+            <div className="flex-shrink-0 w-64">
+              <SearchBox
+                options={options}
+                selectedCity={selectedCity}
+                selectedState={selectedState}
+                handleChange={handleChange}
+                isLoading={isLoading}
+                error={error}
+                selectStyles={selectStyles}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                isSearchFocused={isSearchFocused}
+                ref={lastFocusableRef}
+              />
+            </div>
           </div>
 
           {/* Mobile menu button */}
-          <div className="lg:hidden flex items-center ml-4">
+          <div className="lg:hidden flex items-center">
             <button
               className="inline-flex items-center justify-center p-2
                        rounded-lg text-gray-700 hover:text-blue-600 
@@ -307,7 +307,24 @@ const Navbar = memo(({
           `}
           aria-hidden={!menuOpen}
         >
-          <div className="flex flex-col space-y-2 pb-4">
+          {/* Mobile Search Box */}
+          <div className="px-2 pt-4 pb-3">
+            <SearchBox
+              options={options}
+              selectedCity={selectedCity}
+              selectedState={selectedState}
+              handleChange={handleChange}
+              isLoading={isLoading}
+              error={error}
+              selectStyles={selectStyles}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              isSearchFocused={isSearchFocused}
+            />
+          </div>
+
+          {/* Mobile Navigation Links */}
+          <div className="px-2 pb-4">
             <NavigationLinks 
               handleHomeClick={handleHomeClick} 
               handleCityClick={handleCityClick} 
