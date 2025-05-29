@@ -10,8 +10,8 @@ const Logo = memo(() => (
       src="/logo.webp"
       alt="Food Price App Logo"
       className="w-full h-full object-contain"
-      width={192}
-      height={64}
+      width={192/1.5}
+      height={64/1.5}
       loading="eager"
       priority={true}
       sizes="(max-width: 768px) 150px, 192px"

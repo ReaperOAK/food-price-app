@@ -3,52 +3,72 @@ import { useState, useCallback, useEffect } from 'react';
 const useLocationData = () => {
   const [options, setOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  const processLocationData = useCallback((data) => {
+  const [error, setError] = useState(null);  const processLocationData = useCallback((data) => {
     if (typeof data !== 'object' || data === null) {
       console.error('Expected object with state/city data, got:', typeof data);
-      return { combinedOptions: [] };
+      return [];
     }
 
     try {
-      // Create options for both states and cities
       const combinedOptions = [];
-
-      // Process each state and its cities
+      const processedCities = new Set(); // Track processed cities
+      
+      // First process normal states and their cities
       Object.entries(data).forEach(([state, cities]) => {
-        if (state !== 'Unknown' && state !== 'special') { // Skip Unknown and special categories
-          // Add state as a group header
-          combinedOptions.push({
-            label: state,
-            options: cities.map(city => ({
+        if (state !== 'Unknown' && state !== 'special') {
+          const cityOptions = cities.map(city => {
+            processedCities.add(city.toLowerCase());
+            return {
               value: city,
               label: city,
               type: 'city',
               state: state
-            }))
+            };
           });
+
+          if (cityOptions.length > 0) {
+            combinedOptions.push({
+              label: state,
+              options: cityOptions
+            });
+          }
         }
       });
 
-      // If there are cities in the Unknown category, add them directly
-      if (data['Unknown']) {
-        data['Unknown'].forEach(city => {
-          // Only add if not already present
-          if (!combinedOptions.some(group => 
-            group.options.some(option => option.value.toLowerCase() === city.toLowerCase())
-          )) {
-            combinedOptions.push({
-              value: city,
-              label: city,
-              type: 'city'
-            });
-          }
+      // Process special category
+      if (data.special?.length > 0) {
+        const specialOptions = data.special.map(item => ({
+          value: item,
+          label: item,
+          type: 'special'
+        }));
+        
+        combinedOptions.push({
+          label: 'Special',
+          options: specialOptions
         });
       }
 
+      // Process Unknown cities that haven't been included yet
+      if (data.Unknown?.length > 0) {
+        const unknownCities = data.Unknown
+          .filter(city => !processedCities.has(city.toLowerCase()))
+          .map(city => ({
+            value: city,
+            label: city,
+            type: 'city'
+          }));
+
+        if (unknownCities.length > 0) {
+          combinedOptions.push({
+            label: 'Other Cities',
+            options: unknownCities
+          });
+        }
+      }
+
       console.log('Processed options:', combinedOptions);
-      return { combinedOptions };
+      return combinedOptions;
     } catch (err) {
       console.error('Error processing location data:', err);
       return { combinedOptions: [] };
@@ -69,12 +89,10 @@ const useLocationData = () => {
         
         if (!response.ok) {
           throw new Error('Failed to fetch locations');
-        }
-
-        const data = await response.json();
+        }        const data = await response.json();
         console.log('Fetched data:', data);
         
-        const { combinedOptions } = processLocationData(data);
+        const combinedOptions = processLocationData(data);
         setOptions(combinedOptions);
       } catch (err) {
         if (err.name !== 'AbortError') {
