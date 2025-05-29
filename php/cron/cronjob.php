@@ -37,8 +37,9 @@ $baseDir = dirname(__DIR__);
 // List of scripts to run in sequence
 $scripts = [
     // Data scraping and updates
-    ["$baseDir/api/scraper/index.php", "Update from e2necc", "scrape-e2necc"],
-    // ["$baseDir/api/scraper/index.php", "Daily data update", "daily-update"],
+    // ["$baseDir/api/scraper/index.php", "Update from e2necc", "scrape-e2necc"],
+    // this worked
+    ["$baseDir/api/scraper/index.php", "Daily data update", "daily-update"],
     
     // // Database maintenance
     // ["$baseDir/database/maintenance/archive_old_data.php", "Archive old data"],
