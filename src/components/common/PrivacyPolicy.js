@@ -29,18 +29,6 @@ const PrivacyPolicy = () => {
   const pageTitle = "Privacy Policy | Today Egg Rates";
   const pageDescription = "Learn how Today Egg Rates collects, uses, and protects your personal information. Our comprehensive privacy policy explains your rights and our data handling practices.";
 
-  const sections = [
-    { id: 'introduction', title: '1. Introduction' },
-    { id: 'information-collection', title: '2. Information We Collect' },
-    { id: 'information-usage', title: '3. How We Use Your Information' },
-    { id: 'cookies', title: '4. Cookies' },
-    { id: 'data-sharing', title: '5. Data Sharing' },
-    { id: 'data-security', title: '6. Data Security' },
-    { id: 'your-rights', title: '7. Your Rights' },
-    { id: 'policy-changes', title: '8. Changes to this Policy' },
-    { id: 'contact', title: '9. Contact Us' }
-  ];
-
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "WebPage",

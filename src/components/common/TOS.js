@@ -1,4 +1,4 @@
-import React, { useState, useMemo, memo } from 'react';
+import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import HeadSection from './HeadSection';
 import TableOfContents from '../blog/TableOfContents';
@@ -10,17 +10,7 @@ const TOS = () => {
   const { city, state } = useParams();
   const [selectedState, setSelectedState] = useState(state || '');
   const [selectedCity, setSelectedCity] = useState(city || '');
-  
-  const sections = useMemo(() => [
-    { id: 'introduction', title: '1. Introduction' },
-    { id: 'changes', title: '2. Changes to Terms' },
-    { id: 'use', title: '3. Use of Our Services' },
-    { id: 'intellectual-property', title: '4. Intellectual Property' },
-    { id: 'account-termination', title: '5. Account Termination' },
-    { id: 'liability', title: '6. Limitation of Liability' },
-    { id: 'governing-law', title: '7. Governing Law' },
-    { id: 'contact', title: '8. Contact Us' },
-  ], []);
+
 
   const lastUpdated = '2025-05-29';
   const pageTitle = 'Terms of Service - Today Egg Rates';
