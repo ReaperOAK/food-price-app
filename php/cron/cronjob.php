@@ -38,19 +38,19 @@ $baseDir = dirname(__DIR__);
 $scripts = [
     // Data scraping and updates
     ["$baseDir/api/scraper/index.php", "Update from e2necc", "scrape-e2necc"],
-    ["$baseDir/api/scraper/index.php", "Daily data update", "daily-update"],
+    // ["$baseDir/api/scraper/index.php", "Daily data update", "daily-update"],
     
-    // Database maintenance
-    ["$baseDir/database/maintenance/archive_old_data.php", "Archive old data"],
+    // // Database maintenance
+    // ["$baseDir/database/maintenance/archive_old_data.php", "Archive old data"],
     
-    // Web stories tasks
-    ["$baseDir/api/webstories/index.php", "Generate web stories", "generate"],
-    ["$baseDir/api/webstories/index.php", "Update web story thumbnails", "update-thumbnails"],
-    ["$baseDir/api/webstories/index.php", "Delete old web stories", "cleanup"],
+    // // Web stories tasks
+    // ["$baseDir/api/webstories/index.php", "Generate web stories", "generate"],
+    // ["$baseDir/api/webstories/index.php", "Update web story thumbnails", "update-thumbnails"],
+    // ["$baseDir/api/webstories/index.php", "Delete old web stories", "cleanup"],
     
-    // SEO tools
-    ["$baseDir/seo/generate_sitemap.php", "Generate main sitemap"],
-    ["$baseDir/api/webstories/index.php", "Generate web stories sitemap", "sitemap"]
+    // // SEO tools
+    // ["$baseDir/seo/generate_sitemap.php", "Generate main sitemap"],
+    // ["$baseDir/api/webstories/index.php", "Generate web stories sitemap", "sitemap"]
 ];
 
 // Log start of cron run
