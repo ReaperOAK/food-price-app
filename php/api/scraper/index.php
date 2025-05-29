@@ -2,6 +2,35 @@
 require_once __DIR__ . '/../core/BaseAPI.php';
 
 class DataScraper extends BaseAPI {
+    private $cityToState = [
+        "Ahmedabad" => "Gujarat",
+        "Ajmer" => "Rajasthan",
+        "Barwala" => "Haryana",
+        "Bengaluru (CC)" => "Karnataka",
+        "Bengaluru" => "Karnataka",
+        "Bangalore" => "Karnataka",
+        "Brahmapur (OD)" => "Odisha",
+        "Chennai (CC)" => "Tamil Nadu",
+        "Chittoor" => "Andhra Pradesh",
+        "Delhi (CC)" => "Delhi",
+        "E.Godavari" => "Andhra Pradesh",
+        "Hospet" => "Karnataka",
+        "Hyderabad" => "Telangana",
+        "Jabalpur" => "Madhya Pradesh",
+        "Kolkata (WB)" => "West Bengal",
+        "Ludhiana" => "Punjab",
+        "Mumbai (CC)" => "Maharashtra",
+        "Mysuru" => "Karnataka",
+        "Namakkal" => "Tamil Nadu",
+        "Pune" => "Maharashtra",
+        "Raipur" => "Chhattisgarh",
+        "Surat" => "Gujarat",
+        "Vijayawada" => "Andhra Pradesh",
+        "Vizag" => "Andhra Pradesh",
+        "W.Godavari" => "Andhra Pradesh",
+        "Warangal" => "Telangana"
+    ];
+
     public function handleRequest() {
         $method = $_SERVER['REQUEST_METHOD'];
         $action = $_GET['action'] ?? '';
@@ -40,6 +69,7 @@ class DataScraper extends BaseAPI {
         // Try multiple times with increasing delays
         $maxRetries = 3;
         $retryDelay = 5;
+        $html = false;
         
         for ($try = 1; $try <= $maxRetries; $try++) {
             $html = @file_get_contents($url, false, $context);
@@ -60,34 +90,93 @@ class DataScraper extends BaseAPI {
 
         $doc = new DOMDocument();
         @$doc->loadHTML($html);
+        $xpath = new DOMXPath($doc);
         
-        $tables = $doc->getElementsByTagName('table');
+        // Look for the specific table with egg prices
+        $tables = $xpath->query('//table[@border="1px"]');
+        if ($tables->length === 0) {
+            throw new Exception('Price table not found on e2necc website');
+        }
+
         $updatedCities = [];
         $errors = [];
+        $dayOfMonth = date('j'); // Get current day of month (1-31)
         
         $this->db->beginTransaction();
         
         try {
             foreach ($tables as $table) {
-                $rows = $table->getElementsByTagName('tr');
-                foreach ($rows as $row) {
-                    $cols = $row->getElementsByTagName('td');
-                    if ($cols->length >= 2) {
-                        $city = trim($cols->item(0)->textContent);
-                        $rate = $this->convertPaisaToRupees(trim($cols->item(1)->textContent));
+                $rows = $xpath->query('.//tr', $table);
+                foreach ($rows as $rowIndex => $row) {
+                    if ($rowIndex < 2) continue; // Skip header rows
+                    
+                    $cells = $xpath->query('.//td', $row);
+                    if ($cells->length >= $dayOfMonth + 1) {
+                        $city = trim($cells->item(0)->textContent);
                         
-                        if ($city && $rate) {
-                            try {
-                                $this->updateRate($city, $rate);
-                                $updatedCities[] = $city;
-                            } catch (Exception $e) {
-                                $errors[] = "Failed to update {$city}: " . $e->getMessage();
+                        // Skip if city is empty or contains "Prevailing Prices"
+                        if (empty($city) || strtolower($city) === 'prevailing prices') {
+                            continue;
+                        }
+                        
+                        // Clean and standardize city name
+                        $city = preg_replace('/\s*\(.*?\)\s*/', '', $city);
+                        $city = trim($city);
+                        
+                        // Standardize Bengaluru/Bangalore
+                        if (strtolower($city) === 'bangalore') {
+                            $city = 'Bengaluru';
+                        }
+
+                        // Get today's rate from the appropriate column
+                        $rateCell = $cells->item($dayOfMonth);
+                        if (!$rateCell) continue;
+                        
+                        $rate = trim($rateCell->textContent);
+                        
+                        // If today's rate is not available, find the last available rate
+                        if ($rate === '-' || $rate === '') {
+                            for ($i = $dayOfMonth - 1; $i > 0; $i--) {
+                                $previousRate = trim($cells->item($i)->textContent);
+                                if ($previousRate !== '-' && $previousRate !== '') {
+                                    $rate = $previousRate;
+                                    break;
+                                }
                             }
+                        }
+                        
+                        // Skip if no valid rate found
+                        if ($rate === '-' || $rate === '') continue;
+                        
+                        // Convert paisa to rupees
+                        $rateInRupees = $this->convertPaisaToRupees($rate);
+                        if ($rateInRupees <= 0) continue;
+                        
+                        // Get state for city
+                        $state = $this->cityToState[$city] ?? 'Unknown';
+                        
+                        try {
+                            if ($this->updateRate($city, $state, $rateInRupees)) {
+                                $updatedCities[] = [
+                                    'city' => $city,
+                                    'state' => $state,
+                                    'rate' => $rateInRupees
+                                ];
+                            }
+                        } catch (Exception $e) {
+                            $errors[] = "Failed to update {$city}: " . $e->getMessage();
+                            error_log("Error updating rate for {$city}: " . $e->getMessage());
                         }
                     }
                 }
-            }            $this->db->commit();
+            }
+            
+            $this->db->commit();
             $this->cache->invalidateAll();
+            
+            if (empty($updatedCities)) {
+                throw new Exception('No valid prices found in the table');
+            }
             
             if (empty($errors)) {
                 $this->sendResponse([
@@ -215,10 +304,9 @@ class DataScraper extends BaseAPI {
         }
     }
 
-    private function updateRate($city, $rate) {
+    private function updateRate($city, $state, $rate) {
         try {
             // Get or create state
-            $state = 'Unknown';  // Default state
             $stmt = $this->db->prepare("INSERT INTO states (name) VALUES (?) ON DUPLICATE KEY UPDATE id=LAST_INSERT_ID(id)");
             $stmt->execute([$state]);
             $stateId = $this->db->lastInsertId();
@@ -232,7 +320,7 @@ class DataScraper extends BaseAPI {
             $stmt->execute([$city, $stateId]);
             $cityId = $this->db->lastInsertId();
 
-            // Insert rate
+            // Insert or update rate
             $stmt = $this->db->prepare("
                 INSERT INTO egg_rates_normalized (city_id, rate, date)
                 VALUES (?, ?, CURRENT_DATE)
@@ -240,10 +328,18 @@ class DataScraper extends BaseAPI {
             ");
             $stmt->execute([$cityId, $rate, $rate]);
 
+            // Also update the updated_cities tracking table
+            $stmt = $this->db->prepare("
+                INSERT INTO updated_cities (city, state, date, rate) 
+                VALUES (?, ?, CURRENT_DATE, ?)
+                ON DUPLICATE KEY UPDATE rate = ?
+            ");
+            $stmt->execute([$city, $state, $rate, $rate]);
+
             return true;
         } catch (Exception $e) {
             error_log("Error in updateRate: " . $e->getMessage());
-            return false;
+            throw $e; // Re-throw to be handled by caller
         }
     }
 
