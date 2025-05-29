@@ -5,10 +5,10 @@ class BaseAPI {
     protected $cache;
 
     public function __construct() {
-        require_once __DIR__ . '/../../config/db.php';
+        require_once __DIR__ . '/Database.php';
         require_once __DIR__ . '/../../config/CacheManager.php';
         
-        $this->db = getConnection();
+        $this->db = Database::getInstance()->getConnection();
         $this->cache = new CacheManager();
     }
 
