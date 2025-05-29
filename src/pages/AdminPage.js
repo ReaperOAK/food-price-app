@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Select from 'react-select';
 import AdminNavbar from '../components/layout/AdminNavbar';
-import StateSelect from '../components/common/StateSelect';
-import CitySelect from '../components/common/CitySelect';
+import StateSelect from '../components/admin/StateSelect';
+import CitySelect from '../components/admin/CitySelect';
 import RateForm from '../components/admin/RateForm';
 import AddStateForm from '../components/admin/AddStateForm';
 import AddCityForm from '../components/admin/AddCityForm';
