@@ -19,11 +19,11 @@ const formatPrice = (price) => {
 
 export const getUniqueH1 = (selectedCity, selectedState, today = getFormattedDate()) => {
   if (selectedCity) {
-    return `Today's Egg Rate in ${selectedCity}, ${selectedState} (Updated ${today})`;
+    return `Egg Rates in ${selectedCity}`;
   } else if (selectedState) {
-    return `${selectedState} Egg Rate: Latest NECC Price Updates (${today})`;
+    return `${selectedState} Egg Rates`;
   } else {
-    return `India Egg Rates Today: Live NECC Price Updates (${today})`;
+    return `India Egg Rates Today`;
   }
 };
 

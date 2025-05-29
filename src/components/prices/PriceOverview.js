@@ -18,57 +18,61 @@ const PriceOverview = memo(({
 
   return (
     <section className="max-w-4xl mx-auto mb-8 px-4 sm:px-6 lg:px-8" aria-label="Price Overview">
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden transition-shadow duration-300 hover:shadow-xl">
         <div 
-          className="bg-gradient-to-r from-blue-700 to-blue-800 p-6 min-h-[200px] flex flex-col justify-center"
+          className="bg-gradient-to-r from-blue-800 to-blue-900 p-6 min-h-[180px] flex flex-col justify-center"
           style={{ 
             willChange: 'transform', 
-            containIntrinsicSize: '0 200px', 
+            containIntrinsicSize: '0 180px', 
             contentVisibility: 'auto' 
           }}
         >
           <h1 
-            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-4 h-auto sm:h-12"
-            style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.1)' }}
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-3"
           >
             {getUniqueH1()}
           </h1>
-          <p className="text-center text-white text-lg sm:text-xl font-semibold mb-2">
-            Current Rates for {displayName}
+          <p className="text-center text-white text-base sm:text-lg font-medium mb-2">
+            Updated {new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
           </p>
-          <p className="text-center text-white text-sm sm:text-base opacity-95">
+          <p className="text-center text-blue-100 text-sm sm:text-base">
             {selectedCity 
-              ? `Get the latest egg rates for ${locationDescription}. Updated daily with wholesale and retail prices.`
+              ? `Latest wholesale and retail prices for ${locationDescription}`
               : selectedState
-                ? `Check current egg prices across ${locationDescription}. Compare rates from different cities.`
-                : 'Track egg prices across India with our daily updated NECC rates from major cities.'
+                ? `Compare rates across ${locationDescription} cities`
+                : 'Daily NECC rates from major Indian cities'
             }
           </p>
         </div>
 
         <div className="p-4 sm:p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-gray-50 rounded-lg p-4 transition-transform hover:scale-105">
-              <h2 className="text-sm font-medium text-gray-800 mb-2">Today's Rate</h2>
-              <p className="text-lg sm:text-xl font-bold text-gray-900">
+            {/* Today's Rate Card */}
+            <div className="bg-blue-50 rounded-lg p-4 transition-transform duration-300 hover:scale-102 hover:bg-blue-100">
+              <h2 className="text-sm font-semibold text-blue-900 mb-2">Today's Rate</h2>
+              <p className="text-lg sm:text-xl font-bold text-blue-900">
                 <span className="sr-only">Price:</span>
                 ₹{formatPrice(todayRate)}
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 transition-transform hover:scale-105">
-              <h2 className="text-sm font-medium text-gray-800 mb-2">Tray Price</h2>
-              <p className="text-lg sm:text-xl font-bold text-gray-900">
+
+            {/* Tray Price Card */}
+            <div className="bg-green-50 rounded-lg p-4 transition-transform duration-300 hover:scale-102 hover:bg-green-100">
+              <h2 className="text-sm font-semibold text-green-900 mb-2">Tray Price</h2>
+              <p className="text-lg sm:text-xl font-bold text-green-900">
                 <span className="sr-only">Tray Price:</span>
                 ₹{formatPrice(trayPrice)}
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 transition-transform hover:scale-105">
-              <h2 className="text-sm font-medium text-gray-800 mb-2">Weekly Change</h2>
+
+            {/* Weekly Change Card */}
+            <div className="bg-gray-50 rounded-lg p-4 transition-transform duration-300 hover:scale-102 hover:bg-gray-100">
+              <h2 className="text-sm font-semibold text-gray-900 mb-2">Weekly Change</h2>
               <p className={`text-lg sm:text-xl font-bold ${
                 weeklyChange > 0 
-                  ? 'text-green-800' 
+                  ? 'text-green-700' 
                   : weeklyChange < 0 
-                    ? 'text-red-800' 
+                    ? 'text-red-700' 
                     : 'text-gray-900'
               }`}>
                 <span className="sr-only">Weekly Change:</span>
@@ -78,9 +82,11 @@ const PriceOverview = memo(({
                 }
               </p>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 transition-transform hover:scale-105">
-              <h2 className="text-sm font-medium text-gray-800 mb-2">30-Day Avg</h2>
-              <p className="text-lg sm:text-xl font-bold text-gray-900">
+
+            {/* 30-Day Average Card */}
+            <div className="bg-purple-50 rounded-lg p-4 transition-transform duration-300 hover:scale-102 hover:bg-purple-100">
+              <h2 className="text-sm font-semibold text-purple-900 mb-2">30-Day Avg</h2>
+              <p className="text-lg sm:text-xl font-bold text-purple-900">
                 <span className="sr-only">30 Day Average:</span>
                 ₹{formatPrice(averagePrice)}
               </p>
