@@ -4,6 +4,7 @@ import HeadSection from './HeadSection';
 import TableOfContents from '../blog/TableOfContents';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
+import Breadcrumb from '../layout/Breadcrumb';
 
 const PolicySection = memo(({ title, children, id }) => (
   <section 
@@ -74,6 +75,8 @@ const PrivacyPolicy = () => {
       />
 
       <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
+        <Breadcrumb />
+        
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           <div className="lg:col-span-1">
             <TableOfContents contentId="privacy-policy-content" blogId="privacy-policy" />
