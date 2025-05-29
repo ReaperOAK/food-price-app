@@ -1027,6 +1027,9 @@ video {
   margin-left: auto;
   margin-right: auto;
 }
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
 .mb-10 {
   margin-bottom: 2.5rem;
 }
@@ -1785,6 +1788,11 @@ video {
   --tw-gradient-to: rgb(240 253 244 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
+.from-white {
+  --tw-gradient-from: #fff var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(255 255 255 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
 .via-black\/30 {
   --tw-gradient-to: rgb(0 0 0 / 0)  var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), rgb(0 0 0 / 0.3) var(--tw-gradient-via-position), var(--tw-gradient-to);
@@ -1800,6 +1808,9 @@ video {
 }
 .to-gray-200 {
   --tw-gradient-to: #e5e7eb var(--tw-gradient-to-position);
+}
+.to-gray-50 {
+  --tw-gradient-to: #f9fafb var(--tw-gradient-to-position);
 }
 .to-green-100 {
   --tw-gradient-to: #dcfce7 var(--tw-gradient-to-position);
@@ -2889,11 +2900,17 @@ code {
     background-color: rgb(31 41 55 / 1);
     background-color: rgb(31 41 55 / var(--tw-bg-opacity, 1));
   }
+  .dark\:bg-green-900\/10 {
+    background-color: rgb(20 83 45 / 0.1);
+  }
   .dark\:bg-green-900\/20 {
     background-color: rgb(20 83 45 / 0.2);
   }
   .dark\:bg-purple-900\/20 {
     background-color: rgb(88 28 135 / 0.2);
+  }
+  .dark\:bg-red-900\/10 {
+    background-color: rgb(127 29 29 / 0.1);
   }
   .dark\:bg-red-900\/20 {
     background-color: rgb(127 29 29 / 0.2);
