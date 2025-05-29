@@ -56,23 +56,41 @@ function runScript($scriptPath, $taskName) {
 // Base directory
 $baseDir = dirname(__DIR__);
 
-// Helper function to make API calls
-function makeApiCall($endpoint, $action, $method = 'GET') {
-    $url = "http://localhost/api/$endpoint/index.php?action=$action";
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    if ($method === 'POST') {
-        curl_setopt($ch, CURLOPT_POST, 1);
+// Helper function to make API calls using direct include
+function makeApiCall($endpoint, $action) {
+    $startTime = microtime(true);
+    
+    // Include required files
+    require_once dirname(__DIR__) . '/api/core/BaseAPI.php';
+    $apiFile = dirname(__DIR__) . "/api/$endpoint/index.php";
+    
+    if (!file_exists($apiFile)) {
+        error_log("API file not found: $apiFile");
+        return [
+            'success' => false,
+            'error' => "API endpoint not found: $endpoint"
+        ];
     }
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    
+    // Set up the environment
+    $_GET['action'] = $action;
+    $_SERVER['REQUEST_METHOD'] = 'GET';
+    
+    // Capture output
+    ob_start();
+    include $apiFile;
+    $output = ob_get_clean();
+    
+    $endTime = microtime(true);
+    $executionTime = round($endTime - $startTime, 2);
+    
+    // Try to decode JSON response
+    $response = json_decode($output, true);
     
     return [
-        'success' => $httpCode >= 200 && $httpCode < 300,
-        'response' => $response,
-        'httpCode' => $httpCode
+        'success' => $response !== null && !isset($response['error']),
+        'response' => $output,
+        'executionTime' => $executionTime
     ];
 }
 
