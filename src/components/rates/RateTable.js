@@ -362,7 +362,8 @@ const handleLocalSort = (key) => {
 
         {/* Chart Section */}
         {showChart && (
-          <div className="mt-6 bg-white rounded-lg p-4">            <PriceChart 
+          <div className="mt-6 bg-white rounded-lg p-4">            
+            <PriceChart 
               data={currentItems}
               type={selectedCity ? 'line' : 'bar'}
               xKey={selectedCity ? 'date' : 'city'}
@@ -373,15 +374,13 @@ const handleLocalSort = (key) => {
           </div>
         )}
 
-        {/* Market Info */}
-        {selectedCity && (
-          <div className="mt-6">
-            <MarketInfo
-              selectedCity={selectedCity}
-              selectedState={selectedState}
-            />
-          </div>
-        )}
+        {/* Market Info - Show for both specific city and general India view */}
+        <div className="mt-6">
+          <MarketInfo
+            selectedCity={selectedCity}
+            selectedState={selectedState || 'India'}
+          />
+        </div>
       </div>
     </>
   );
