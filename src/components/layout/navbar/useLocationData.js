@@ -6,20 +6,49 @@ const useLocationData = () => {
   const [error, setError] = useState(null);
 
   const processLocationData = useCallback((data) => {
-    if (!Array.isArray(data)) {
-      console.error('Expected array of locations, got:', typeof data);
+    if (typeof data !== 'object' || data === null) {
+      console.error('Expected object with state/city data, got:', typeof data);
       return { combinedOptions: [] };
     }
 
     try {
-      // Create options for cities
-      const cityOptions = data.map(city => ({
-        value: city.name,
-        label: city.name,
-        type: 'city'
-      }));
+      // Create options for both states and cities
+      const combinedOptions = [];
 
-      return { combinedOptions: cityOptions };
+      // Process each state and its cities
+      Object.entries(data).forEach(([state, cities]) => {
+        if (state !== 'Unknown' && state !== 'special') { // Skip Unknown and special categories
+          // Add state as a group header
+          combinedOptions.push({
+            label: state,
+            options: cities.map(city => ({
+              value: city,
+              label: city,
+              type: 'city',
+              state: state
+            }))
+          });
+        }
+      });
+
+      // If there are cities in the Unknown category, add them directly
+      if (data['Unknown']) {
+        data['Unknown'].forEach(city => {
+          // Only add if not already present
+          if (!combinedOptions.some(group => 
+            group.options.some(option => option.value.toLowerCase() === city.toLowerCase())
+          )) {
+            combinedOptions.push({
+              value: city,
+              label: city,
+              type: 'city'
+            });
+          }
+        });
+      }
+
+      console.log('Processed options:', combinedOptions);
+      return { combinedOptions };
     } catch (err) {
       console.error('Error processing location data:', err);
       return { combinedOptions: [] };
@@ -43,11 +72,9 @@ const useLocationData = () => {
         }
 
         const data = await response.json();
-        console.log('Fetched data:', data); // Debug log
+        console.log('Fetched data:', data);
         
         const { combinedOptions } = processLocationData(data);
-        console.log('Processed options:', combinedOptions); // Debug log
-        
         setOptions(combinedOptions);
       } catch (err) {
         if (err.name !== 'AbortError') {

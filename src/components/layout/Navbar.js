@@ -32,23 +32,19 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
     if (!selectedOption || navigationLock.current) return;
     
     navigationLock.current = true;
-    const { type, label } = selectedOption;
+    const { value, state } = selectedOption;
     
-    if (type === 'city') {
-      const [city, state] = label.split(', ');
-      let selectedCityName = standardizeCityName(city);
-      
-      setSelectedCity(selectedCityName);
-      setSelectedState(state || '');
-      
-      requestAnimationFrame(() => {
-        const path = `/${selectedCityName.toLowerCase()}-egg-rate`;
-        if (location.pathname !== path) {
-          navigate(path, { replace: true });
-        }
-        navigationLock.current = false;
-      });
-    }
+    const selectedCityName = standardizeCityName(value);
+    setSelectedCity(selectedCityName);
+    setSelectedState(state || '');
+    
+    requestAnimationFrame(() => {
+      const path = `/${selectedCityName.toLowerCase()}-egg-rate`;
+      if (location.pathname !== path) {
+        navigate(path, { replace: true });
+      }
+      navigationLock.current = false;
+    });
   }, [navigate, location.pathname, setSelectedCity, setSelectedState, standardizeCityName]);
 
   const handleHomeClick = useMemo(() => (e) => {
