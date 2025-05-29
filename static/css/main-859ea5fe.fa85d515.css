@@ -1030,10 +1030,6 @@ video {
   margin-left: auto;
   margin-right: auto;
 }
-.my-6 {
-  margin-top: 1.5rem;
-  margin-bottom: 1.5rem;
-}
 .mb-10 {
   margin-bottom: 2.5rem;
 }
@@ -1267,6 +1263,9 @@ video {
 }
 .w-\[calc\(100\%-2rem\)\] {
   width: calc(100% - 2rem);
+}
+.w-auto {
+  width: auto;
 }
 .w-full {
   width: 100%;
@@ -1882,6 +1881,9 @@ video {
 .pt-4 {
   padding-top: 1rem;
 }
+.pt-8 {
+  padding-top: 2rem;
+}
 .text-left {
   text-align: left;
 }
@@ -2053,6 +2055,9 @@ video {
 .opacity-25 {
   opacity: 0.25;
 }
+.opacity-5 {
+  opacity: 0.05;
+}
 .opacity-50 {
   opacity: 0.5;
 }
@@ -2223,6 +2228,11 @@ code {
 
 .hover\:-translate-y-1:hover {
   --tw-translate-y: -0.25rem;
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.hover\:translate-x-1:hover {
+  --tw-translate-x: 0.25rem;
   transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
 }
 
