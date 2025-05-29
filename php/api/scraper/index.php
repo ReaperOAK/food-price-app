@@ -248,39 +248,80 @@ class DataScraper extends BaseAPI {
                         $stmt = $this->db->prepare("
                             INSERT INTO egg_rates_normalized (city_id, rate, date)
                             VALUES (?, ?, CURRENT_DATE)
+                            ON DUPLICATE KEY UPDATE rate = ?
                         ");
-                        $stmt->execute([$city['id'], $rate]);
-                        $updatedCities[] = $city['city'];
+                        $stmt->execute([$city['id'], $rate, $rate]);
+                        $updatedCities[] = [
+                            'city' => $city['city'],
+                            'state' => $city['state'],
+                            'rate' => $rate
+                        ];
                     }
                 }
             } catch (Exception $e) {
-                // Fallback to original tables
-                $query = "SELECT l.id, l.city, l.state 
-                         FROM locations l
-                         LEFT JOIN rates r ON l.id = r.location_id AND r.date = CURRENT_DATE
-                         WHERE r.id IS NULL";
+                // Log the error but don't throw, as we'll try the fallback
+                error_log("Error with normalized tables: " . $e->getMessage());
+                
+                // Fallback to original egg_rates table
+                $query = "SELECT er.city, er.state
+                         FROM egg_rates er
+                         LEFT JOIN (
+                             SELECT city, state, date 
+                             FROM egg_rates 
+                             WHERE date = CURRENT_DATE
+                         ) today ON er.city = today.city AND er.state = today.state
+                         WHERE today.date IS NULL
+                         GROUP BY er.city, er.state";
+                         
                 $stmt = $this->db->query($query);
                 $pendingCities = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 
                 foreach ($pendingCities as $city) {
-                    $rate = $this->estimateRate($city);
-                    if ($rate !== null) {
+                    // Get the most recent rate for this city
+                    $stmt = $this->db->prepare("
+                        SELECT rate 
+                        FROM egg_rates 
+                        WHERE city = ? AND state = ?
+                        ORDER BY date DESC 
+                        LIMIT 1
+                    ");
+                    $stmt->execute([$city['city'], $city['state']]);
+                    $rate = $stmt->fetchColumn();
+                    
+                    if ($rate !== false) {
+                        // Insert new rate record
                         $stmt = $this->db->prepare("
-                            INSERT INTO rates (location_id, rate, date)
-                            VALUES (?, ?, CURRENT_DATE)
+                            INSERT INTO egg_rates (city, state, date, rate)
+                            VALUES (?, ?, CURRENT_DATE, ?)
+                            ON DUPLICATE KEY UPDATE rate = ?
                         ");
-                        $stmt->execute([$city['id'], $rate]);
-                        $updatedCities[] = $city['city'];
+                        $stmt->execute([$city['city'], $city['state'], $rate, $rate]);
+                        
+                        $updatedCities[] = [
+                            'city' => $city['city'],
+                            'state' => $city['state'],
+                            'rate' => $rate
+                        ];
                     }
                 }
-            }            $this->db->commit();
+            }
+            
+            $this->db->commit();
             $this->cache->invalidateAll();
             
-            $this->sendResponse([
-                'success' => true,
-                'updated_cities' => $updatedCities,
-                'errors' => $errors
-            ]);
+            if (empty($updatedCities)) {
+                $this->sendResponse([
+                    'success' => true,
+                    'message' => 'No cities needed updates today',
+                    'updated_cities' => []
+                ]);
+            } else {
+                $this->sendResponse([
+                    'success' => true,
+                    'updated_cities' => $updatedCities,
+                    'errors' => $errors
+                ]);
+            }
         } catch (Exception $e) {
             $this->db->rollBack();
             throw $e;
@@ -324,6 +365,19 @@ class DataScraper extends BaseAPI {
                 ");
                 $stmt->execute([$city['state']]);
                 $rate = $stmt->fetchColumn();
+
+                if (!$rate) {
+                    // Try getting rate from non-normalized table as last resort
+                    $stmt = $this->db->prepare("
+                        SELECT rate
+                        FROM egg_rates
+                        WHERE city = ? OR state = ?
+                        ORDER BY date DESC
+                        LIMIT 1
+                    ");
+                    $stmt->execute([$city['name'], $city['state']]);
+                    $rate = $stmt->fetchColumn();
+                }
             }
 
             return $rate;

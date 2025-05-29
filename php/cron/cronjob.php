@@ -37,21 +37,20 @@ $baseDir = dirname(__DIR__);
 // List of scripts to run in sequence
 $scripts = [
     // Data scraping and updates
-    ["$baseDir/api/scraper/index.php", "Update from e2necc", "scrape-e2necc"],
-    
-    ["$baseDir/api/scraper/index.php", "Daily data update", "daily-update"],
+    ["$baseDir/api/scraper/update_from_e2necc.php", "Update from e2necc"],
+    ["$baseDir/api/scraper/daily_update.php", "Daily data update"],
     
     // Database maintenance
     ["$baseDir/database/maintenance/archive_old_data.php", "Archive old data"],
     
-    // Web stories tasks
-    ["$baseDir/api/webstories/index.php", "Generate web stories", "generate"],
-    ["$baseDir/api/webstories/index.php", "Update web story thumbnails", "update-thumbnails"],
-    ["$baseDir/api/webstories/index.php", "Delete old web stories", "cleanup"],
+    // Web stories generation and maintenance
+    ["$baseDir/webstories/generate_web_stories.php", "Generate web stories"],
+    ["$baseDir/webstories/update_webstory_thumbnails.php", "Update web story thumbnails"],
+    ["$baseDir/webstories/delete_old_webstories.php", "Delete old web stories"],
     
     // SEO tools
     ["$baseDir/seo/generate_sitemap.php", "Generate main sitemap"],
-    ["$baseDir/api/webstories/index.php", "Generate web stories sitemap", "sitemap"]
+    ["$baseDir/webstories/generate_webstories_sitemap.php", "Generate web stories sitemap"]
 ];
 
 // Log start of cron run
@@ -62,16 +61,8 @@ echo "===============================================\n";
 error_log("CRON: Started daily scheduled tasks run at $date");
 
 // Run each script in sequence
-foreach ($scripts as $script) {
-    $scriptPath = $script[0];
-    $taskName = $script[1];
-    $action = $script[2] ?? null;
-    
+foreach ($scripts as [$scriptPath, $taskName]) {
     if (file_exists($scriptPath)) {
-        // Set up action parameter if needed
-        if ($action) {
-            $_GET['action'] = $action;
-        }
         runScript($scriptPath, $taskName);
     } else {
         echo "❌ Script not found: $scriptPath\n";
