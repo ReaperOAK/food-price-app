@@ -75,11 +75,22 @@ function makeApiCall($endpoint, $action) {
     // Set up the environment
     $_GET['action'] = $action;
     $_SERVER['REQUEST_METHOD'] = 'GET';
-    
-    // Capture output
+      // Capture output and errors
     ob_start();
-    include $apiFile;
-    $output = ob_get_clean();
+    try {
+        include $apiFile;
+        $output = ob_get_clean();
+    } catch (Throwable $e) {
+        $output = ob_get_clean();
+        error_log("CRON ERROR: Exception in API call: " . $e->getMessage());
+        error_log("API Output: " . $output);
+        return [
+            'success' => false,
+            'error' => $e->getMessage(),
+            'response' => $output,
+            'executionTime' => 0
+        ];
+    }
     
     $endTime = microtime(true);
     $executionTime = round($endTime - $startTime, 2);
@@ -128,19 +139,18 @@ $date = date('Y-m-d H:i:s');
 echo "===============================================\n";
 echo "🔄 Starting scheduled tasks run at $date\n";
 echo "===============================================\n";
-error_log("CRON: Started daily scheduled tasks run at $date");
-
-// Run each task in sequence
-foreach ($tasks as $task) {
+error_log("CRON: Started daily scheduled tasks run at $date");    // Run each task in sequence
+foreach ($tasks as $index => $task) {
     $endpoint = $task[0];
     $action = $task[1];
     $taskName = $task[2];
     $scriptPath = $task[3] ?? null;
     
+    error_log("CRON DEBUG: Starting task {$index} of " . count($tasks) . ": $taskName");
+    
     $startTime = microtime(true);
     echo "Starting task: $taskName...\n";
-    
-    if ($scriptPath) {
+      if ($scriptPath) {
         // For tasks that still need direct file inclusion
         if (file_exists($scriptPath)) {
             $success = runScript($scriptPath, $taskName);
@@ -148,7 +158,9 @@ foreach ($tasks as $task) {
             echo "❌ Script not found: $scriptPath\n";
             error_log("CRON ERROR: Script not found: $scriptPath");
             continue;
-        }    } else {        // For API endpoint tasks
+        }
+    } else {
+        // For API endpoint tasks
         $result = makeApiCall($endpoint, $action);
         $success = $result['success'];
         
