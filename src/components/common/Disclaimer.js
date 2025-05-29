@@ -1,7 +1,7 @@
 import React, { useState, memo } from 'react';
 import { useParams } from 'react-router-dom';
 import HeadSection from './HeadSection';
-import TableOfContents from '../blog/TableOfContents';
+import TableOfContents from '../common/TableOfContents';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
 import Breadcrumb from '../layout/Breadcrumb';

@@ -6,7 +6,7 @@ import Footer from '../components/layout/Footer';
 import blogs from '../data/blogs'; 
 import BlogList from '../components/blog/BlogList';
 import Breadcrumb from '../components/layout/Breadcrumb';
-import TableOfContents from '../components/blog/TableOfContents';
+import TableOfContents from '../components/common/TableOfContents';
 import OptimizedImage from '../components/common/OptimizedImage';
 
 // Pre-define the import mapping for webpack to analyze
