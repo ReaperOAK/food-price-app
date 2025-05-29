@@ -139,13 +139,12 @@ foreach ($tasks as $task) {
             error_log("CRON ERROR: Script not found: $scriptPath");
             continue;
         }
-    } else {
-        // For API endpoint tasks
+    } else {        // For API endpoint tasks
         $result = makeApiCall($endpoint, $action);
         $success = $result['success'];
         
         if (!$success) {
-            echo "❌ Task failed: $taskName (HTTP {$result['httpCode']})\n";
+            echo "❌ Task failed: $taskName\n";
             error_log("CRON ERROR: Failed running $taskName. Response: " . $result['response']);
         } else {
             $endTime = microtime(true);
