@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 
-const TableHeader = ({
+const TableHeader = memo(({
   selectedCity,
   showMarket,
   showState,
@@ -15,116 +15,104 @@ const TableHeader = ({
   const headerCellStyle = {
     height: '48px',
     minHeight: '48px',
-    padding: '12px 16px',
-    backgroundColor: '#F9BE0C',
-    transition: 'background-color 0.2s ease-in-out'
+    padding: '0.75rem 1rem',
+    backgroundColor: '#F59E0B', // Improved color for better contrast
+    transition: 'background-color 0.2s ease-in-out',
+    position: 'sticky',
+    top: 0,
+    zIndex: 10
   };
 
+  const renderHeaderCell = (key, label, showSort = true, tooltip = '') => (
+    <th
+      className="border border-gray-300 cursor-pointer hover:bg-amber-500 transition-colors duration-200 whitespace-nowrap"
+      onClick={() => showSort && requestSort(key)}
+      role="columnheader"
+      aria-sort={sortConfig.key === key ? sortConfig.direction : 'none'}
+      style={headerCellStyle}
+      title={tooltip}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-gray-900 font-semibold text-sm md:text-base">
+          {label}
+        </span>
+        {showSort && (
+          <span className="text-xs ml-1" aria-hidden="true">
+            {getSortIcon(key)}
+          </span>
+        )}
+      </div>
+    </th>
+  );
+
   return (
-    <tr>
-      {(!selectedCity && showMarket) && (
-        <th
-          className="border border-gray-300 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
-          onClick={() => requestSort('city')}
-          role="columnheader"
-          aria-sort={sortConfig.key === 'city' ? sortConfig.direction : 'none'}
-          style={headerCellStyle}
-        >
-          <div className="flex items-center justify-between">
-            <span>{showSpecialRates ? 'Market Location' : 'Market'}</span>
-            <span className="text-xs ml-1">{getSortIcon('city')}</span>
-          </div>
-        </th>
+    <tr className="sticky top-0">
+      {(!selectedCity && showMarket) && renderHeaderCell(
+        'city',
+        showSpecialRates ? 'Market Location' : 'Market',
+        true,
+        'Click to sort by market name'
       )}
-      {showState && (
-        <th
-          className="border border-gray-300 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
-          onClick={() => requestSort('state')}
-          role="columnheader"
-          aria-sort={sortConfig.key === 'state' ? sortConfig.direction : 'none'}
-          style={headerCellStyle}
-        >
-          <div className="flex items-center justify-between">
-            <span>State</span>
-            <span className="text-xs ml-1">{getSortIcon('state')}</span>
-          </div>
-        </th>
+      
+      {showState && renderHeaderCell(
+        'state',
+        'State',
+        true,
+        'Click to sort by state'
       )}
-      {showDate && (
-        <th
-          className="border border-gray-300 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
-          onClick={() => requestSort('date')}
-          role="columnheader"
-          aria-sort={sortConfig.key === 'date' ? sortConfig.direction : 'none'}
-          style={headerCellStyle}
-        >
-          <div className="flex items-center justify-between">
-            <span>Date</span>
-            <span className="text-xs ml-1">{getSortIcon('date')}</span>
-          </div>
-        </th>
+      
+      {showDate && renderHeaderCell(
+        'date',
+        'Date',
+        true,
+        'Click to sort by date'
       )}
-      <th
-        className="border border-gray-300 cursor-pointer hover:bg-yellow-500 transition-colors duration-200"
-        onClick={() => requestSort('rate')}
-        role="columnheader"
-        aria-sort={sortConfig.key === 'rate' ? sortConfig.direction : 'none'}
-        style={headerCellStyle}
-      >
-        <div className="flex items-center justify-between">
-          <span>Rate Per Piece</span>
-          <span className="text-xs ml-1">{getSortIcon('rate')}</span>
-        </div>
-      </th>
+      
+      {renderHeaderCell(
+        'rate',
+        'Rate Per Piece',
+        true,
+        'Click to sort by rate'
+      )}
+
       {showPriceColumns && (
         <>
-          <th 
-            className="border border-gray-300"
-            role="columnheader"
-            style={headerCellStyle}
-          >
-            <div className="flex items-center justify-between">
-              <span>Tray Price (30)</span>
-              <span className="text-xs text-gray-500 ml-1" title="Calculated value">📊</span>
-            </div>
-          </th>
+          {renderHeaderCell(
+            'tray',
+            'Tray Price (30)',
+            false,
+            'Price for a tray of 30 eggs'
+          )}
+          
           {!showSpecialRates && (
             <>
-              <th 
-                className="border border-gray-300"
-                role="columnheader"
-                style={headerCellStyle}
-              >
-                <div className="flex items-center justify-between">
-                  <span>Price (100 Pcs)</span>
-                  <span className="text-xs text-gray-500 ml-1" title="Calculated value">📊</span>
-                </div>
-              </th>
-              <th 
-                className="border border-gray-300"
-                role="columnheader"
-                style={headerCellStyle}
-              >
-                <div className="flex items-center justify-between">
-                  <span>Peti (210)</span>
-                  <span className="text-xs text-gray-500 ml-1" title="Calculated value">📊</span>
-                </div>
-              </th>
+              {renderHeaderCell(
+                'hundred',
+                'Price (100 Pcs)',
+                false,
+                'Price for 100 eggs'
+              )}
+              {renderHeaderCell(
+                'peti',
+                'Peti (210)',
+                false,
+                'Price for a peti of 210 eggs'
+              )}
             </>
           )}
         </>
       )}
-      {showAdmin && (
-        <th 
-          className="border border-gray-300"
-          role="columnheader"
-          style={headerCellStyle}
-        >
-          Actions
-        </th>
+
+      {showAdmin && renderHeaderCell(
+        'actions',
+        'Actions',
+        false,
+        'Edit or delete entries'
       )}
     </tr>
   );
-};
+});
+
+TableHeader.displayName = 'TableHeader';
 
 export default TableHeader;
