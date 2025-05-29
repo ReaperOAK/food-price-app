@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, lazy, Suspense, memo } from 'react';
+import React, { useState, useCallback, useMemo, memo } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 // Function to generate FAQ schema (separate from component rendering)
