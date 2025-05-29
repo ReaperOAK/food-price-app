@@ -6,7 +6,6 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
 
   const {
     todayRate,
-    rate7DaysAgo,
     weeklyChange,
     weeklyChangePercent,
     averagePrice,
