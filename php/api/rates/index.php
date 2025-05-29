@@ -61,49 +61,28 @@ class RatesAPI extends BaseAPI {
         $cacheKey = $this->getCacheKey('latest_rates');
         if ($cached = $this->cache->get($cacheKey)) {
             $this->sendResponse($cached);
-            return;
         }
 
         try {
-            // Try normalized tables first
-            $query = "
-                SELECT c.name as city, s.name as state, ern.date, ern.rate
-                FROM egg_rates_normalized ern
-                JOIN cities c ON ern.city_id = c.id
-                JOIN states s ON c.state_id = s.id
-                WHERE (ern.city_id, ern.date) IN (
-                    SELECT city_id, MAX(date)
-                    FROM egg_rates_normalized
-                    GROUP BY city_id
-                )
-                ORDER BY ern.date DESC, c.name ASC
-            ";
-            
+            $query = "WITH LatestRates AS (
+                     SELECT city_id, rate, date,
+                            ROW_NUMBER() OVER (PARTITION BY city_id ORDER BY date DESC) as rn
+                     FROM egg_rates_normalized
+                     )
+                     SELECT c.name as city, s.name as state, lr.date, lr.rate
+                     FROM LatestRates lr
+                     JOIN cities c ON lr.city_id = c.id
+                     JOIN states s ON c.state_id = s.id
+                     WHERE lr.rn = 1
+                     ORDER BY s.name, c.name";
             $stmt = $this->db->query($query);
             $rates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            if (empty($rates)) {
-                // Fall back to original table
-                $query = "
-                    SELECT city, state, date, rate 
-                    FROM egg_rates 
-                    WHERE (city, date) IN (
-                        SELECT city, MAX(date) 
-                        FROM egg_rates 
-                        GROUP BY city
-                    )
-                    ORDER BY date DESC, city ASC
-                ";
-                
-                $stmt = $this->db->query($query);
-                $rates = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            }
-
-            $this->cache->set($cacheKey, $rates, 1800); // 30 minutes cache
+            $this->cache->set($cacheKey, $rates, 3600);
             $this->sendResponse($rates);
         } catch (Exception $e) {
             error_log("Error in getLatestRates: " . $e->getMessage());
-            $this->sendError('Failed to retrieve latest rates');
+            $this->sendError('Failed to retrieve rates');
         }
     }
 
@@ -111,49 +90,24 @@ class RatesAPI extends BaseAPI {
         $cacheKey = $this->getCacheKey('special_rates');
         if ($cached = $this->cache->get($cacheKey)) {
             $this->sendResponse($cached);
-            return;
         }
 
         try {
-            // Try normalized tables first
-            $query = "
-                SELECT c.name as city, ern.rate
-                FROM egg_rates_normalized ern
-                JOIN cities c ON ern.city_id = c.id
-                JOIN states s ON c.state_id = s.id
-                WHERE s.name = 'special'
-                AND (ern.city_id, ern.date) IN (
-                    SELECT city_id, MAX(date)
-                    FROM egg_rates_normalized ern2
-                    WHERE ern2.city_id = ern.city_id
-                    GROUP BY city_id
-                )
-                ORDER BY c.name ASC
-            ";
-            
+            $query = "WITH LatestRates AS (
+                     SELECT city_id, rate, date,
+                            ROW_NUMBER() OVER (PARTITION BY city_id ORDER BY date DESC) as rn
+                     FROM egg_rates_normalized
+                     )
+                     SELECT c.name as city, s.name as state, lr.date, lr.rate
+                     FROM LatestRates lr
+                     JOIN cities c ON lr.city_id = c.id
+                     JOIN states s ON c.state_id = s.id
+                     WHERE lr.rn = 1 AND s.name = 'Special'
+                     ORDER BY c.name";
             $stmt = $this->db->query($query);
             $rates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            if (empty($rates)) {
-                // Fall back to original table
-                $query = "
-                    SELECT city, rate
-                    FROM egg_rates
-                    WHERE state = 'special'
-                    AND (city, date) IN (
-                        SELECT city, MAX(date)
-                        FROM egg_rates
-                        WHERE state = 'special'
-                        GROUP BY city
-                    )
-                    ORDER BY city ASC
-                ";
-                
-                $stmt = $this->db->query($query);
-                $rates = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            }
-
-            $this->cache->set($cacheKey, $rates, 1800);
+            $this->cache->set($cacheKey, $rates, 3600);
             $this->sendResponse($rates);
         } catch (Exception $e) {
             error_log("Error in getSpecialRates: " . $e->getMessage());
@@ -162,31 +116,25 @@ class RatesAPI extends BaseAPI {
     }
 
     private function getAllRates() {
-        $date = $_GET['date'] ?? date('Y-m-d');
+        $date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
         
+        $cacheKey = $this->getCacheKey('all_rates', ['date' => $date]);
+        if ($cached = $this->cache->get($cacheKey)) {
+            $this->sendResponse($cached);
+        }
+
         try {
-            // Try normalized tables first
-            $query = "
-                SELECT c.name as city, s.name as state, ern.date, ern.rate, ern.id
-                FROM egg_rates_normalized ern
-                JOIN cities c ON ern.city_id = c.id
-                JOIN states s ON c.state_id = s.id
-                WHERE DATE(ern.date) = :date
-                ORDER BY s.name, c.name ASC
-            ";
-            
+            $query = "SELECT c.name as city, s.name as state, er.date, er.rate
+                     FROM egg_rates_normalized er
+                     JOIN cities c ON er.city_id = c.id
+                     JOIN states s ON c.state_id = s.id
+                     WHERE DATE(er.date) = :date
+                     ORDER BY s.name, c.name";
             $stmt = $this->db->prepare($query);
             $stmt->execute(['date' => $date]);
             $rates = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            if (empty($rates)) {
-                // Fall back to original table
-                $query = "SELECT * FROM egg_rates WHERE DATE(date) = :date ORDER BY state, city";
-                $stmt = $this->db->prepare($query);
-                $stmt->execute(['date' => $date]);
-                $rates = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            }
-
+            $this->cache->set($cacheKey, $rates, 3600);
             $this->sendResponse($rates);
         } catch (Exception $e) {
             error_log("Error in getAllRates: " . $e->getMessage());
