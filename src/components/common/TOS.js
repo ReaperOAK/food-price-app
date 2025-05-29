@@ -1,27 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import HeadSection from './HeadSection';
+import TableOfContents from '../blog/TableOfContents';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
-
-// Table of Contents component
-const TableOfContents = React.memo(({ sections }) => (
-  <nav className="hidden lg:block sticky top-24 overflow-y-auto max-h-[calc(100vh-8rem)] p-4 bg-white rounded-lg shadow-sm">
-    <h2 className="text-lg font-semibold mb-4 text-gray-900">Table of Contents</h2>
-    <ul className="space-y-2">
-      {sections.map((section) => (
-        <li key={section.id}>
-          <a
-            href={`#${section.id}`}
-            className="text-gray-600 hover:text-blue-600 transition-colors text-sm block py-1"
-          >
-            {section.title}
-          </a>
-        </li>
-      ))}
-    </ul>
-  </nav>
-));
 
 // Breadcrumb component
 const Breadcrumb = React.memo(() => (
@@ -54,30 +36,34 @@ const TOS = () => {
     { id: 'contact', title: '8. Contact Us' },
   ], []);
 
-  const lastUpdated = '2025-05-29';
   const pageTitle = 'Terms of Service - Today Egg Rates';
   const pageDescription = 'Terms of Service for Today Egg Rates - Your trusted source for daily egg prices across India. Read our terms and conditions of use.';
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": pageTitle,
+    "description": pageDescription,
+    "dateModified": new Date().toISOString(),
+    "publisher": {
+      "@type": "Organization",
+      "name": "Today Egg Rates"
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta name="robots" content="index,follow" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": pageTitle,
-            "description": pageDescription,
-            "publisher": {
-              "@type": "Organization",
-              "name": "Today Egg Rates"
-            },
-            "dateModified": lastUpdated
-          })}
-        </script>
-      </Helmet>
+      <HeadSection
+        getSeoTitle={() => pageTitle}
+        getSeoDescription={() => pageDescription}
+        getSeoKeywords={() => "terms of service, terms and conditions, user agreement, legal terms"}
+        location={window.location}
+        structuredData={structuredData}
+        generateFaqSchema={() => ({})}
+        selectedCity={selectedCity}
+        selectedState={selectedState}
+        eggRates={[]}
+      />
 
       <Navbar
         selectedState={selectedState}
@@ -86,18 +72,16 @@ const TOS = () => {
         selectedCity={selectedCity}
       />
 
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
-          <Breadcrumb />
-          
-          <div className="lg:grid lg:grid-cols-4 lg:gap-8">
-            <div className="lg:col-span-1">
-              <TableOfContents sections={sections} />
-            </div>
-
-            <div className="lg:col-span-3">
+      <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
+        <Breadcrumb />
+        
+        <div className="lg:grid lg:grid-cols-4 lg:gap-8">
+          <div className="lg:col-span-1">
+            <TableOfContents contentId="tos-content" blogId="terms-of-service" />
+          </div>
+          <div className="lg:col-span-3">
+            <div id="tos-content">
               <h1 className="text-4xl font-bold mb-8 text-gray-900">Terms of Service</h1>
-              <p className="text-sm text-gray-500 mb-8">Last updated: {lastUpdated}</p>
               
               <section id="introduction" className="mb-10 scroll-mt-24">
                 <h2 className="text-2xl font-semibold mb-4 text-gray-900">1. Introduction</h2>
@@ -177,9 +161,12 @@ const TOS = () => {
           </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );
 };
+
+Breadcrumb.displayName = 'Breadcrumb';
 
 export default React.memo(TOS);

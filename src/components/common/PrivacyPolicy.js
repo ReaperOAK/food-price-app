@@ -1,9 +1,9 @@
 import React, { useState, memo } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import HeadSection from './HeadSection';
+import TableOfContents from '../blog/TableOfContents';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
-import Breadcrumb from '../layout/Breadcrumb';
 
 const PolicySection = memo(({ title, children, id }) => (
   <section 
@@ -17,27 +17,6 @@ const PolicySection = memo(({ title, children, id }) => (
       {children}
     </div>
   </section>
-));
-
-const TableOfContents = memo(({ sections }) => (
-  <nav 
-    className="hidden lg:block sticky top-4 bg-white p-4 rounded-lg shadow-sm mb-6"
-    aria-label="Table of contents"
-  >
-    <h2 className="text-lg font-semibold mb-3 text-gray-800">Quick Navigation</h2>
-    <ul className="space-y-2">
-      {sections.map(section => (
-        <li key={section.id}>
-          <a
-            href={`#${section.id}`}
-            className="text-blue-600 hover:text-blue-800 hover:underline text-sm transition-colors duration-200"
-          >
-            {section.title}
-          </a>
-        </li>
-      ))}
-    </ul>
-  </nav>
 ));
 
 const PrivacyPolicy = () => {
@@ -61,29 +40,31 @@ const PrivacyPolicy = () => {
     { id: 'contact', title: '9. Contact Us' }
   ];
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": pageTitle,
+    "description": pageDescription,
+    "dateModified": new Date().toISOString(),
+    "publisher": {
+      "@type": "Organization",
+      "name": "Today Egg Rates"
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <link rel="canonical" href="https://todayeggrates.com/privacy" />
-        <meta name="robots" content="noindex,follow" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": pageTitle,
-            "description": pageDescription,
-            "publisher": {
-              "@type": "Organization",
-              "name": "Today Egg Rates"
-            },
-            "dateModified": lastUpdated
-          })}
-        </script>
-      </Helmet>
+      <HeadSection
+        getSeoTitle={() => pageTitle}
+        getSeoDescription={() => pageDescription}
+        getSeoKeywords={() => "privacy policy, data protection, personal information, cookies policy, data security"}
+        location={window.location}
+        structuredData={structuredData}
+        generateFaqSchema={() => ({})}
+        selectedCity={selectedCity}
+        selectedState={selectedState}
+        eggRates={[]}
+      />
 
       <Navbar
         selectedState={selectedState}
@@ -92,16 +73,13 @@ const PrivacyPolicy = () => {
         selectedCity={selectedCity}
       />
 
-      <main className="flex-grow">
-        <div className="container mx-auto px-4 py-6 max-w-7xl">
-          <Breadcrumb />
-          
-          <div className="lg:grid lg:grid-cols-4 lg:gap-8">
-            <div className="lg:col-span-1">
-              <TableOfContents sections={sections} />
-            </div>
-
-            <div className="lg:col-span-3">
+      <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
+        <div className="lg:grid lg:grid-cols-4 lg:gap-8">
+          <div className="lg:col-span-1">
+            <TableOfContents contentId="privacy-policy-content" blogId="privacy-policy" />
+          </div>
+          <div className="lg:col-span-3">
+            <div id="privacy-policy-content">
               <header className="mb-8">
                 <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Privacy Policy</h1>
                 <p className="text-gray-600">
@@ -228,6 +206,5 @@ const PrivacyPolicy = () => {
 };
 
 PolicySection.displayName = 'PolicySection';
-TableOfContents.displayName = 'TableOfContents';
 
 export default memo(PrivacyPolicy);

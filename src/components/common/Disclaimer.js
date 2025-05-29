@@ -1,6 +1,6 @@
 import React, { useState, memo } from 'react';
 import { useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import HeadSection from './HeadSection';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
 import Breadcrumb from '../layout/Breadcrumb';
@@ -20,28 +20,30 @@ const Disclaimer = () => {
   const pageTitle = "Disclaimer | Today Egg Rates";
   const pageDescription = "Important disclaimer about egg prices and rates information provided on TodayEggRates.com. Learn about our data accuracy, limitations, and terms of use.";
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": pageTitle,
+    "description": pageDescription,
+    "publisher": {
+      "@type": "Organization",
+      "name": "Today Egg Rates"
+    }
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Helmet>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        <link rel="canonical" href="https://todayeggrates.com/disclaimer" />
-        <meta name="robots" content="noindex,follow" />
-        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebPage",
-            "name": pageTitle,
-            "description": pageDescription,
-            "publisher": {
-              "@type": "Organization",
-              "name": "Today Egg Rates"
-            }
-          })}
-        </script>
-      </Helmet>
+      <HeadSection
+        getSeoTitle={() => pageTitle}
+        getSeoDescription={() => pageDescription}
+        getSeoKeywords={() => "egg rates, disclaimer, terms of service, egg price accuracy"}
+        location={window.location}
+        structuredData={structuredData}
+        generateFaqSchema={() => ({})}
+        selectedCity={selectedCity}
+        selectedState={selectedState}
+        eggRates={[]}
+      />
 
       <Navbar
         selectedState={selectedState}
