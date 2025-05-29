@@ -82,7 +82,7 @@ const DetailedEggInfo = memo(({ selectedCity, selectedState }) => {
 
           <div className="relative h-[300px] rounded-lg overflow-hidden">
             <OptimizedImage 
-              src="/eggrate3.webp" 
+              src="/desiegg.webp" 
               alt="India egg production statistics"
               fill
               className="object-cover rounded-lg"
