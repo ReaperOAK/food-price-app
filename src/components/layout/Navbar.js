@@ -1,7 +1,7 @@
 import React, { useState, useMemo, memo, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaBars, FaTimes } from 'react-icons/fa';
-
+import { useTheme } from '../../hooks/useTheme';
 import Logo from './navbar/Logo';
 import NavigationLinks from './navbar/NavigationLinks';
 import SearchBox from './navbar/SearchBox';
@@ -17,36 +17,49 @@ const Navbar = memo(({
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const menuRef = useRef(null);
+  const firstFocusableRef = useRef(null);
+  const lastFocusableRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { isDark } = useTheme();
   const { options, isLoading, error } = useLocationData();
 
   // Track navigation lock to prevent redundant navigations
   const navigationLock = useRef(false);
 
-  // Handle scroll effects
+  // Handle scroll effects with optimized performance
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
     const handleScroll = () => {
-      const scrolled = window.scrollY > 20;
-      setIsScrolled(scrolled);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrolled = lastScrollY > 20;
+          setIsScrolled(scrolled);
+          ticking = false;
+        });
+        ticking = true;
+      }
+      lastScrollY = window.scrollY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Handle click outside for mobile menu
+  // Improved click outside handler for mobile menu
   useEffect(() => {
+    if (!menuOpen) return;
+
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setMenuOpen(false);
       }
     };
 
-    if (menuOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
-    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
 
   // Close menu on route change
@@ -54,18 +67,29 @@ const Navbar = memo(({
     setMenuOpen(false);
   }, [location.pathname]);
 
-  // Handle keyboard navigation
+  // Enhanced keyboard navigation and focus trap
   useEffect(() => {
-    const handleEscape = (e) => {
+    if (!menuOpen) return;
+
+    const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setMenuOpen(false);
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        if (!e.shiftKey && document.activeElement === lastFocusableRef.current) {
+          e.preventDefault();
+          firstFocusableRef.current?.focus();
+        } else if (e.shiftKey && document.activeElement === firstFocusableRef.current) {
+          e.preventDefault();
+          lastFocusableRef.current?.focus();
+        }
       }
     };
 
-    if (menuOpen) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
-    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [menuOpen]);
 
   // Standardize city names
@@ -141,15 +165,15 @@ const Navbar = memo(({
     setMenuOpen(prev => !prev);
   }, []);
 
-  // Memoize select styles with improved contrast
+  // Memoize select styles with enhanced contrast and theme support
   const selectStyles = useMemo(() => ({
     control: (base, state) => ({
       ...base,
-      backgroundColor: 'white',
-      borderColor: state.isFocused ? '#2563EB' : '#E5E7EB',
-      boxShadow: state.isFocused ? '0 0 0 2px rgba(37, 99, 235, 0.2)' : 'none',
+      backgroundColor: isDark ? '#1F2937' : 'white',
+      borderColor: state.isFocused ? '#3B82F6' : isDark ? '#374151' : '#E5E7EB',
+      boxShadow: state.isFocused ? '0 0 0 2px rgba(59, 130, 246, 0.5)' : 'none',
       '&:hover': {
-        borderColor: '#2563EB',
+        borderColor: '#3B82F6',
       },
       padding: '0.5rem',
       borderRadius: '0.5rem',
@@ -159,41 +183,57 @@ const Navbar = memo(({
     menu: (base) => ({
       ...base,
       zIndex: 9999,
+      backgroundColor: isDark ? '#1F2937' : 'white',
       boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
       borderRadius: '0.5rem',
       overflow: 'hidden',
     }),
     option: (base, state) => ({
       ...base,
-      backgroundColor: state.isSelected ? '#2563EB' : state.isFocused ? '#EFF6FF' : 'white',
-      color: state.isSelected ? 'white' : '#1F2937',
+      backgroundColor: state.isSelected 
+        ? '#3B82F6' 
+        : state.isFocused 
+          ? isDark ? '#374151' : '#EFF6FF'
+          : isDark ? '#1F2937' : 'white',
+      color: state.isSelected 
+        ? 'white' 
+        : isDark 
+          ? '#E5E7EB'
+          : '#1F2937',
       padding: '0.75rem 1rem',
       '&:active': {
-        backgroundColor: '#1D4ED8',
+        backgroundColor: '#2563EB',
       },
       cursor: 'pointer',
     }),
     placeholder: (base) => ({
       ...base,
-      color: '#6B7280',
+      color: isDark ? '#9CA3AF' : '#6B7280',
     }),
     loadingMessage: (base) => ({
       ...base,
-      color: '#6B7280',
+      color: isDark ? '#9CA3AF' : '#6B7280',
     }),
     noOptionsMessage: (base) => ({
       ...base,
-      color: '#6B7280',
+      color: isDark ? '#9CA3AF' : '#6B7280',
     }),
-  }), []);
+  }), [isDark]);
 
   return (
     <nav 
       ref={menuRef}
       className={`
         sticky top-0 z-50 
-        ${isScrolled ? 'bg-white/95 dark:bg-gray-900/95' : 'bg-white dark:bg-gray-900'}
-        shadow-lg backdrop-blur-lg
+        ${isScrolled 
+          ? isDark 
+            ? 'bg-gray-900/95 shadow-lg shadow-gray-900/20' 
+            : 'bg-white/95 shadow-lg'
+          : isDark 
+            ? 'bg-gray-900' 
+            : 'bg-white'
+        }
+        backdrop-blur-lg
         transition-all duration-200
       `}
       role="navigation"
@@ -205,7 +245,8 @@ const Navbar = memo(({
           <div className="flex justify-between items-center flex-1 md:flex-none">
             <Link 
               to="/" 
-              onClick={handleHomeClick} 
+              onClick={handleHomeClick}
+              ref={firstFocusableRef}
               className="flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
               aria-label="Go to homepage"
             >
@@ -213,15 +254,16 @@ const Navbar = memo(({
             </Link>
             <button
               className="md:hidden inline-flex items-center justify-center p-2
-                         rounded-lg text-gray-700 hover:text-blue-600 
-                         hover:bg-gray-100 dark:text-gray-300 dark:hover:text-blue-400
-                         dark:hover:bg-gray-800 focus:outline-none focus:ring-2 
-                         focus:ring-blue-500 transition-colors duration-200"
+                       rounded-lg text-gray-700 hover:text-blue-600 
+                       hover:bg-gray-100 dark:text-gray-300 dark:hover:text-blue-400
+                       dark:hover:bg-gray-800 focus:outline-none focus:ring-2 
+                       focus:ring-blue-500 transition-colors duration-200"
               onClick={toggleMenu}
               aria-controls="mobile-menu"
               aria-expanded={menuOpen}
               aria-label={menuOpen ? "Close menu" : "Open menu"}
             >
+              <span className="sr-only">{menuOpen ? "Close menu" : "Open menu"}</span>
               {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
           </div>
@@ -235,10 +277,13 @@ const Navbar = memo(({
           </div>
 
           {/* Search Box */}
-          <div className={`
-            md:w-64 w-full order-last md:order-none mt-4 md:mt-0
-            ${menuOpen ? 'block' : 'hidden md:block'}
-          `}>
+          <div 
+            className={`
+              md:w-64 w-full order-last md:order-none mt-4 md:mt-0
+              ${menuOpen ? 'block' : 'hidden md:block'}
+              transition-all duration-300 ease-in-out
+            `}
+          >
             <SearchBox
               options={options}
               selectedCity={selectedCity}
@@ -250,6 +295,7 @@ const Navbar = memo(({
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
               isSearchFocused={isSearchFocused}
+              ref={lastFocusableRef}
             />
           </div>
         </div>
@@ -258,9 +304,10 @@ const Navbar = memo(({
         <div
           id="mobile-menu"
           className={`
-            ${menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}
+            ${menuOpen ? 'max-h-[calc(100vh-4rem)] opacity-100' : 'max-h-0 opacity-0'}
             md:hidden overflow-hidden transition-all duration-300 ease-in-out
           `}
+          aria-hidden={!menuOpen}
         >
           <div className="flex flex-col space-y-2 pb-4">
             <NavigationLinks 
@@ -275,7 +322,7 @@ const Navbar = memo(({
       {menuOpen && (
         <div 
           tabIndex={0} 
-          onFocus={() => setMenuOpen(false)}
+          onFocus={() => firstFocusableRef.current?.focus()}
           className="sr-only"
         >
           End of menu

@@ -1,17 +1,20 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo, forwardRef } from 'react';
 import Select from 'react-select';
 
-const SearchBox = memo(({
+const SearchBox = memo(forwardRef(({
   options,
   selectedCity,
   selectedState,
   handleChange,
   isLoading,
   error,
-  selectStyles
-}) => {
-  // Find the selected option
-  const findSelectedOption = () => {
+  selectStyles,
+  onFocus,
+  onBlur,
+  isSearchFocused
+}, ref) => {
+  // Find the selected option with memoization
+  const selectedOption = useMemo(() => {
     if (!selectedCity && !selectedState) return null;
     
     for (const group of options) {
@@ -28,46 +31,100 @@ const SearchBox = memo(({
       }
     }
     return null;
-  };
+  }, [selectedCity, selectedState, options]);
+
+  // Custom components for better accessibility and performance
+  const customComponents = useMemo(() => ({
+    IndicatorSeparator: () => null,
+    LoadingMessage: () => (
+      <div className="p-2 text-center text-gray-600 dark:text-gray-400">
+        <span className="inline-block animate-spin mr-2">⟳</span>
+        Loading locations...
+      </div>
+    ),
+    NoOptionsMessage: ({ selectProps }) => (
+      <div className="p-2 text-center text-gray-600 dark:text-gray-400">
+        {error ? "Error loading locations" : "No locations found"}
+      </div>
+    ),
+    Group: ({ children, ...props }) => (
+      <div className="py-1">
+        <div className="px-3 py-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+          {props.data.label}
+        </div>
+        {children}
+      </div>
+    ),
+    Option: ({ children, ...props }) => (
+      <div
+        {...props.innerProps}
+        className={`
+          px-3 py-2 cursor-pointer text-gray-700 dark:text-gray-300
+          ${props.isFocused ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
+          ${props.isSelected ? 'bg-blue-100 dark:bg-blue-800' : ''}
+        `}
+      >
+        {children}
+      </div>
+    ),
+  }), [error]);
 
   return (
-    <div className="w-full md:w-64 mt-4 md:mt-0">
+    <div 
+      className="relative w-full md:w-64 mt-4 md:mt-0 focus-within:z-10"
+      role="search"
+    >
       <Select
-        value={findSelectedOption()}
+        ref={ref}
+        value={selectedOption}
         onChange={handleChange}
         options={options}
         isLoading={isLoading}
         isDisabled={isLoading || error}
-        className="react-select-container"
+        className={`
+          react-select-container
+          ${isSearchFocused ? 'react-select-focused' : ''}
+        `}
         classNamePrefix="react-select"
         styles={selectStyles}
+        onFocus={onFocus}
+        onBlur={onBlur}
         aria-label="Search for city or state"
         inputId="location-select"
         aria-describedby="location-select-help"
         placeholder={isLoading ? "Loading locations..." : "Select City"}
         noOptionsMessage={() => error ? "Error loading locations" : "No locations found"}
         isClearable
-        components={{
-          IndicatorSeparator: () => null,
-          Group: ({ children, ...props }) => (
-            <div style={{ fontWeight: 'bold', color: '#4B5563' }}>
-              <div style={{ padding: '8px 12px' }}>{props.data.label}</div>
-              {children}
-            </div>
-          )
+        isSearchable
+        components={customComponents}
+        // Performance optimizations
+        filterOption={(option, inputValue) => {
+          if (!inputValue) return true;
+          const searchValue = inputValue.toLowerCase();
+          return (
+            option.label.toLowerCase().includes(searchValue) ||
+            (option.data?.state || '').toLowerCase().includes(searchValue)
+          );
         }}
+        // Accessibility enhancements
+        aria-invalid={error ? "true" : "false"}
+        aria-busy={isLoading}
       />
       {error && (
-        <p className="mt-1 text-sm text-red-600" role="alert">
+        <p 
+          className="mt-1 text-sm text-red-600 dark:text-red-400" 
+          role="alert"
+          id="location-select-error"
+        >
           {error}
         </p>
       )}
-      <span id="location-select-help" className="sr-only">
-        Select a city to view egg rates for that location
-      </span>
+      <div className="sr-only" id="location-select-help">
+        Type to search for a city or state, use arrow keys to navigate results, Enter to select
+      </div>
     </div>
   );
-});
+}));
 
 SearchBox.displayName = 'SearchBox';
 
