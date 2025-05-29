@@ -86,10 +86,8 @@ class DataScraper extends BaseAPI {
                         }
                     }
                 }
-            }
-
-            $this->db->commit();
-            $this->cache->clear();
+            }            $this->db->commit();
+            $this->cache->invalidateAll();
             
             if (empty($errors)) {
                 $this->sendResponse([
@@ -157,10 +155,8 @@ class DataScraper extends BaseAPI {
                         $updatedCities[] = $city['city'];
                     }
                 }
-            }
-
-            $this->db->commit();
-            $this->cache->clear();
+            }            $this->db->commit();
+            $this->cache->invalidateAll();
             
             $this->sendResponse([
                 'success' => true,

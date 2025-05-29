@@ -198,7 +198,7 @@ class LocationAPI extends BaseAPI {
             }
 
             $this->db->commit();
-            $this->cache->clear();
+            $this->cache->invalidateAll();
             $this->sendResponse(['success' => true]);
         } catch (Exception $e) {
             $this->db->rollBack();
@@ -247,7 +247,7 @@ class LocationAPI extends BaseAPI {
             }
 
             $this->db->commit();
-            $this->cache->clear();
+            $this->cache->invalidateAll();
             $this->sendResponse(['success' => true]);
         } catch (Exception $e) {
             $this->db->rollBack();

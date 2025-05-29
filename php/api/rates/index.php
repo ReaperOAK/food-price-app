@@ -309,7 +309,7 @@ class RatesAPI extends BaseAPI {
             // Use the shared updateEggRate function from db.php
             if (updateEggRate($this->db, $data['city'], $data['state'], $data['date'], $data['rate'])) {
                 $this->db->commit();
-                $this->cache->clear();
+                $this->cache->invalidateAll();
                 $this->sendResponse(['success' => true, 'message' => 'Rate added successfully']);
             } else {
                 throw new Exception('Failed to add rate');
@@ -335,7 +335,7 @@ class RatesAPI extends BaseAPI {
             // Then update the normalized table
             if (updateEggRate($this->db, $data['city'], $data['state'], $data['date'], $data['rate'])) {
                 $this->db->commit();
-                $this->cache->clear();
+                $this->cache->invalidateAll();
                 $this->sendResponse(['success' => true, 'message' => 'Rate updated successfully']);
             } else {
                 throw new Exception('Failed to update rate in normalized tables');
@@ -372,7 +372,7 @@ class RatesAPI extends BaseAPI {
 
             if (empty($errors)) {
                 $this->db->commit();
-                $this->cache->clear();
+                $this->cache->invalidateAll();
                 $this->sendResponse([
                     'success' => true,
                     'message' => 'All rates updated successfully',
@@ -418,7 +418,7 @@ class RatesAPI extends BaseAPI {
             $stmt->execute([$rate['city'], $rate['state'], $rate['date']]);
 
             $this->db->commit();
-            $this->cache->clear();
+            $this->cache->invalidateAll();
             $this->sendResponse(['success' => true, 'message' => 'Rate deleted successfully']);
         } catch (Exception $e) {
             $this->db->rollBack();

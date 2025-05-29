@@ -126,7 +126,7 @@ class WebStoryManager extends BaseAPI {
         }
 
         $this->createIndex($rates);
-        $this->cache->clear();
+        $this->cache->invalidateAll();
         $this->sendResponse(['success' => true, 'count' => count($rates)]);
     }
 
@@ -137,7 +137,7 @@ class WebStoryManager extends BaseAPI {
             $this->generateThumbnail($slug);
         }
 
-        $this->cache->clear();
+        $this->cache->invalidateAll();
         $this->sendResponse(['success' => true, 'count' => count($stories)]);
     }
 
@@ -179,7 +179,7 @@ class WebStoryManager extends BaseAPI {
             }
         }
 
-        $this->cache->clear();
+        $this->cache->invalidateAll();
         $this->sendResponse(['success' => true, 'deleted' => $count]);
     }
 
