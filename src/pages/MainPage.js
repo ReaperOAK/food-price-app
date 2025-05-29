@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
+import Breadcrumb from '../components/layout/Breadcrumb';
 import RateTable from '../components/rates/RateTable';
 import StateList from '../components/rates/StateList';
 import BlogList from '../components/blog/BlogList';
@@ -147,9 +148,9 @@ const MainPage = () => {
         selectedState={selectedState}
         setSelectedState={setSelectedState}
         selectedCity={selectedCity}
-        setSelectedCity={setSelectedCity}
-      />
+        setSelectedCity={setSelectedCity}      />
       <div className="container mx-auto px-4 w-full max-w-7xl">
+        <Breadcrumb />
         <div id="home" className="py-8">
           <div className="min-h-[500px]">
             {loading ? (
