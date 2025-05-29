@@ -4,48 +4,23 @@ ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 ini_set('error_log', dirname(__DIR__) . '/error.log');
 
-// Helper function to make API calls
-function makeApiCall($endpoint, $action, $taskName) {
+// Helper function to run a script and log the result
+function runScript($scriptPath, $taskName) {
     $startTime = microtime(true);
     echo "Starting task: $taskName...\n";
     
-    // Set up environment for API call
-    $_GET['action'] = $action;
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    
-    // Include the API file
+    // Include the script
     ob_start();
-    require_once dirname(__DIR__) . '/api/core/BaseAPI.php';
-    $apiFile = dirname(__DIR__) . "/api/$endpoint/index.php";
-    
-    if (!file_exists($apiFile)) {
-        echo "❌ API file not found: $apiFile\n";
-        error_log("CRON ERROR: API file not found: $apiFile");
-        return false;
-    }
-    
-    include $apiFile;
+    $result = include($scriptPath);
     $output = ob_get_clean();
     
     $endTime = microtime(true);
     $executionTime = round($endTime - $startTime, 2);
     
-    // Check if the output is valid JSON
-    $response = json_decode($output, true);
-    
-    if ($response === null) {
+    // Log the result
+    if ($result === false) {
         echo "❌ Task failed: $taskName (took {$executionTime}s)\n";
-        error_log("CRON ERROR: Invalid JSON response from $taskName");
-        error_log("Output: " . $output);
-        return false;
-    }
-    
-    // Check for success
-    $success = isset($response['success']) && $response['success'] === true;
-    
-    if (!$success) {
-        echo "❌ Task failed: $taskName (took {$executionTime}s)\n";
-        error_log("CRON ERROR: Task failed: $taskName");
+        error_log("CRON ERROR: Failed running $taskName");
         error_log("Output: " . $output);
     } else {
         echo "✅ Task completed: $taskName (took {$executionTime}s)\n";
@@ -54,27 +29,28 @@ function makeApiCall($endpoint, $action, $taskName) {
     
     // Add some delay between tasks to reduce server load
     sleep(10);
-    
-    return $success;
 }
 
-// List of tasks to run in sequence
-$tasks = [
+// Base directory
+$baseDir = dirname(__DIR__);
+
+// List of scripts to run in sequence
+$scripts = [
     // Data scraping and updates
-    ['scraper', 'scrape-e2necc', 'Update from e2necc'],
-    ['scraper', 'daily-update', 'Daily data update'],
+    ["$baseDir/api/scraper/index.php", "Update from e2necc", "scrape-e2necc"],
+    ["$baseDir/api/scraper/index.php", "Daily data update", "daily-update"],
     
     // Database maintenance
-    ['maintenance', 'archive', 'Archive old data'],
+    ["$baseDir/database/maintenance/archive_old_data.php", "Archive old data"],
     
     // Web stories tasks
-    ['webstories', 'generate', 'Generate web stories'],
-    ['webstories', 'update-thumbnails', 'Update web story thumbnails'],
-    ['webstories', 'cleanup', 'Delete old web stories'],
+    ["$baseDir/api/webstories/index.php", "Generate web stories", "generate"],
+    ["$baseDir/api/webstories/index.php", "Update web story thumbnails", "update-thumbnails"],
+    ["$baseDir/api/webstories/index.php", "Delete old web stories", "cleanup"],
     
     // SEO tools
-    ['seo', 'sitemap', 'Generate main sitemap'],
-    ['webstories', 'sitemap', 'Generate web stories sitemap']
+    ["$baseDir/seo/generate_sitemap.php", "Generate main sitemap"],
+    ["$baseDir/api/webstories/index.php", "Generate web stories sitemap", "sitemap"]
 ];
 
 // Log start of cron run
@@ -84,9 +60,22 @@ echo "🔄 Starting scheduled tasks run at $date\n";
 echo "===============================================\n";
 error_log("CRON: Started daily scheduled tasks run at $date");
 
-// Run each task in sequence
-foreach ($tasks as [$endpoint, $action, $taskName]) {
-    makeApiCall($endpoint, $action, $taskName);
+// Run each script in sequence
+foreach ($scripts as $script) {
+    $scriptPath = $script[0];
+    $taskName = $script[1];
+    $action = $script[2] ?? null;
+    
+    if (file_exists($scriptPath)) {
+        // Set up action parameter if needed
+        if ($action) {
+            $_GET['action'] = $action;
+        }
+        runScript($scriptPath, $taskName);
+    } else {
+        echo "❌ Script not found: $scriptPath\n";
+        error_log("CRON ERROR: Script not found: $scriptPath");
+    }
 }
 
 // Log end of cron run
