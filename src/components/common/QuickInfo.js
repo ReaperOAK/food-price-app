@@ -6,20 +6,32 @@ const QuickInfo = memo(({
   trayPrice, 
   weeklyChange, 
   weeklyChangePercent,
-  position = 'bottom-right' // Customizable position
+  position = 'bottom-right', // Customizable position
+  onClose
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   
-  // Handle responsive behavior
+  // Handle responsive behavior using matchMedia for better performance
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const mediaQuery = window.matchMedia('(max-width: 768px)');
+    const updateMobileState = (e) => setIsMobile(e.matches);
+    
+    // Set initial state
+    setIsMobile(mediaQuery.matches);
+    
+    // Add listener for changes
+    mediaQuery.addListener(updateMobileState);
+    
+    // Cleanup
+    return () => mediaQuery.removeListener(updateMobileState);
   }, []);
+
+  // Handle close
+  const handleClose = () => {
+    setIsVisible(false);
+    onClose?.();
+  };
 
   // Position classes based on prop
   const positionClasses = {
@@ -29,8 +41,8 @@ const QuickInfo = memo(({
     'top-left': 'top-4 left-4'
   }[position];
 
-  // Only render if there's data to show
-  if (!todayRate && !trayPrice) return null;
+  // Don't render if not visible or no data
+  if (!isVisible || (!todayRate && !trayPrice)) return null;
 
   return (
     <div
@@ -47,11 +59,12 @@ const QuickInfo = memo(({
         border border-gray-200 dark:border-gray-700
         backdrop-blur-sm bg-opacity-95 dark:bg-opacity-95
         z-50
+        ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}
       `}
     >
       {/* Close button */}
       <button
-        onClick={() => setIsVisible(false)}
+        onClick={handleClose}
         className="absolute -top-2 -right-2 bg-white dark:bg-gray-800 rounded-full p-1 shadow-md
                    hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none
                    focus:ring-2 focus:ring-blue-500 transition-colors"
