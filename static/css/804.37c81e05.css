@@ -1250,6 +1250,10 @@ video {
   margin-left: 1rem;
 }
 
+.ml-8 {
+  margin-left: 2rem;
+}
+
 .mr-2 {
   margin-right: 0.5rem;
 }
@@ -1549,6 +1553,10 @@ video {
   max-width: 20rem;
 }
 
+.flex-1 {
+  flex: 1 1;
+}
+
 .flex-shrink-0 {
   flex-shrink: 0;
 }
@@ -1795,10 +1803,6 @@ video {
 
 .overflow-y-auto {
   overflow-y: auto;
-}
-
-.overflow-x-hidden {
-  overflow-x: hidden;
 }
 
 .whitespace-nowrap {
