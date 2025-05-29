@@ -2,7 +2,7 @@ import { formatPrice } from '../../utils/formatters';
 import { memo, useMemo } from 'react';
 
 const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
-  const location = selectedCity || selectedState || 'your area';
+  const location = selectedCity || selectedState || 'India';
 
   const {
     todayRate,
