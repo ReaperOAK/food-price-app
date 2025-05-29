@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo, memo } from 'react';
+import React, { useEffect, useState, useMemo, memo, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 import { FaBars, FaTimes } from 'react-icons/fa';
@@ -99,6 +99,29 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   // Track navigation lock to prevent redundant navigations
   const navigationLock = React.useRef(false);
 
+  // Standardize city names
+  const standardizeCityName = useMemo(() => {
+    return (cityName) => {
+      const lowerCityName = cityName.toLowerCase();
+      if (lowerCityName === 'bangalore' || 
+          lowerCityName === 'bangalore (cc)' || 
+          lowerCityName === 'bengaluru (cc)' ||
+          lowerCityName === 'bengaluru') {
+        return 'Bengaluru';
+      }
+      return cityName;
+    };
+  }, []);
+
+  // Process location data
+  const processLocationData = useCallback((data) => {
+    if (Array.isArray(data)) {
+      const uniqueCities = [...new Set(data.map(city => city.name))];
+      setCityList(uniqueCities);
+      setIsLoading(false);
+    }
+  }, []);
+
   // Fetch locations with error handling and loading state
   useEffect(() => {
     const abortController = new AbortController();
@@ -130,54 +153,7 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
     fetchLocations();
 
     return () => abortController.abort();
-  }, []);
-
-  // Process location data
-  const processLocationData = (data) => {
-    const combinedOptions = [];
-    const stateSet = new Set();
-    const citySet = new Set();
-
-    for (const state in data) {
-      if (!stateSet.has(state)) {
-        combinedOptions.push({
-          value: state,
-          label: state,
-          type: 'state',
-        });
-        stateSet.add(state);
-      }
-
-      data[state].forEach(city => {
-        let cityName = standardizeCityName(city);
-        const cityLabel = `${cityName}, ${state}`;
-        
-        if (!citySet.has(cityLabel)) {
-          combinedOptions.push({
-            value: cityName,
-            label: cityLabel,
-            type: 'city',
-          });
-          citySet.add(cityLabel);
-        }
-      });
-    }
-
-    return { combinedOptions };
-  };
-
-  // Standardize city names
-  const standardizeCityName = (cityName) => {
-    const lowerCityName = cityName.toLowerCase();
-    if (lowerCityName === 'bangalore' || 
-        lowerCityName === 'bangalore (cc)' || 
-        lowerCityName === 'bengaluru (cc)' ||
-        lowerCityName === 'bengaluru') {
-      return 'Bengaluru';
-    }
-    return cityName;
-  };
-
+  }, [processLocationData]);
   // Memoize handlers
   const handleChange = useMemo(() => {
     return (selectedOption) => {
@@ -213,7 +189,7 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
         });
       }
     };
-  }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
+  }, [navigate, location.pathname, setSelectedCity, setSelectedState, standardizeCityName]);
 
   const handleHomeClick = useMemo(() => {
     return (e) => {
