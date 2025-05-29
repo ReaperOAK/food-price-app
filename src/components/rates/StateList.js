@@ -1,24 +1,71 @@
-import React from 'react';
+import React, { memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
+import PropTypes from 'prop-types';
 
-const StateList = ({ states, cities }) => {
-  // Define popular city and state lists for SEO enhancements
-  const popularCities = ['Mumbai', 'Chennai', 'Bangalore', 'Kolkata', 'Barwala', 'Siliguri', 'Hyderabad', 'Durgapur'];
-  const popularStates = ['Maharashtra', 'Tamil Nadu', 'Karnataka', 'West Bengal', 'Haryana', 'Kerala', 'Punjab', 'Telangana'];
-  
+const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
+  // Define popular city and state lists for SEO enhancements with their regions
+  const popularCities = useMemo(() => [
+    { name: 'Mumbai', state: 'Maharashtra' },
+    { name: 'Chennai', state: 'Tamil Nadu' },
+    { name: 'Bangalore', state: 'Karnataka' },
+    { name: 'Kolkata', state: 'West Bengal' },
+    { name: 'Barwala', state: 'Haryana' },
+    { name: 'Siliguri', state: 'West Bengal' },
+    { name: 'Hyderabad', state: 'Telangana' },
+    { name: 'Durgapur', state: 'West Bengal' }
+  ], []);
+
+  const popularStates = useMemo(() => [
+    { name: 'Maharashtra', region: 'West' },
+    { name: 'Tamil Nadu', region: 'South' },
+    { name: 'Karnataka', region: 'South' },
+    { name: 'West Bengal', region: 'East' },
+    { name: 'Haryana', region: 'North' },
+    { name: 'Kerala', region: 'South' },
+    { name: 'Punjab', region: 'North' },
+    { name: 'Telangana', region: 'South' }
+  ], []);
+
+  // Generate schema markup for SEO
+  const generateSchemaMarkup = useMemo(() => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "India Egg Rates - State and City Wise Egg Prices",
+      "description": "Check today's egg rates across different states and cities in India. Updated daily wholesale and NECC egg prices.",
+      "mainEntity": {
+        "@type": "ItemList",
+        "itemListElement": [
+          ...popularStates.map((state, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "item": {
+              "@type": "Place",
+              "name": `${state.name} Egg Market`,
+              "description": `Check daily egg rates in ${state.name}, ${state.region} India`
+            }
+          }))
+        ]
+      }
+    };
+  }, [popularStates]);
+
   const renderStateTableRows = () => {
     const rows = [];
     for (let i = 0; i < states.length; i += 3) {
       rows.push(
-        <tr key={i} className="bg-white border-b hover:bg-gray-50">
+        <tr key={i} className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
           {states.slice(i, i + 3).map(state => (
             <td key={state} className="px-6 py-4 text-center">
               <Link
                 to={`/state/${state.toLowerCase()}-egg-rate`}
-                className="text-blue-700 font-bold hover:underline transition duration-200"
+                className="inline-flex items-center justify-center w-full px-4 py-2 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
                 title={`Today's Egg Rate in ${state} - NECC Egg Price`}
+                aria-label={`View egg rates for ${state}`}
               >
-                {state} Egg Rate
+                <span className="text-lg font-semibold">{state}</span>
+                <span className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-300">View Rates</span>
               </Link>
             </td>
           ))}
@@ -32,15 +79,17 @@ const StateList = ({ states, cities }) => {
     const rows = [];
     for (let i = 0; i < cities.length; i += 3) {
       rows.push(
-        <tr key={i} className="bg-white border-b hover:bg-gray-50">
+        <tr key={i} className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
           {cities.slice(i, i + 3).map(city => (
             <td key={city} className="px-6 py-4 text-center">
               <Link
                 to={`/${city.toLowerCase()}-egg-rate`}
-                className="text-blue-700 font-bold hover:underline transition duration-200"
+                className="inline-flex items-center justify-center w-full px-4 py-2 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
                 title={`Today's Egg Rate in ${city} - Latest NECC Egg Price`}
+                aria-label={`View egg rates for ${city}`}
               >
-                {city} Egg Rate
+                <span className="text-lg font-semibold">{city}</span>
+                <span className="ml-2 text-sm font-medium text-blue-600 dark:text-blue-300">View Rates</span>
               </Link>
             </td>
           ))}
@@ -50,90 +99,127 @@ const StateList = ({ states, cities }) => {
     return rows;
   };
 
-  // Render popular cities section for SEO benefit
+  const renderLoadingSkeleton = () => (
+    <div className="animate-pulse">
+      <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {[...Array(6)].map((_, index) => (
+          <div key={index} className="h-12 bg-gray-200 rounded"></div>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderPopularCities = () => {
     return (
-      <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">Popular City Egg Rates</h3>
-        <div className="flex flex-wrap gap-2">
-          {popularCities.map(city => (
+      <section className="mt-6 p-6 bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-sm dark:from-gray-800 dark:to-gray-900" aria-labelledby="popular-cities-heading">
+        <h3 id="popular-cities-heading" className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Popular City Egg Rates</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {popularCities.map(({ name, state }) => (
             <Link 
-              key={city}
-              to={`/${city.toLowerCase()}-egg-rate`}
-              className="px-3 py-1 bg-white border border-blue-300 rounded-full text-sm text-blue-700 hover:bg-blue-100 transition duration-200"
-              title={`Check today's egg rate in ${city}`}
+              key={name}
+              to={`/${name.toLowerCase()}-egg-rate`}
+              className="group flex flex-col items-center p-4 bg-white border border-blue-200 rounded-lg hover:border-blue-400 hover:shadow-md transition duration-200 dark:bg-gray-800 dark:border-blue-800 dark:hover:border-blue-600"
+              title={`Check today's egg rate in ${name}, ${state}`}
             >
-              {city} Egg Rate Today
+              <span className="text-lg font-semibold text-blue-700 group-hover:text-blue-800 dark:text-blue-400 dark:group-hover:text-blue-300">{name}</span>
+              <span className="text-sm text-gray-600 mt-1 dark:text-gray-400">{state}</span>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
     );
   };
 
-  // Render popular states section for SEO benefit
   const renderPopularStates = () => {
     return (
-      <div className="mt-4 p-4 bg-green-50 rounded-lg">
-        <h3 className="text-lg font-semibold mb-3 text-gray-800">Popular State Egg Rates</h3>
-        <div className="flex flex-wrap gap-2">
-          {popularStates.map(state => (
+      <section className="mt-6 p-6 bg-gradient-to-br from-green-50 to-white rounded-lg shadow-sm dark:from-gray-800 dark:to-gray-900" aria-labelledby="popular-states-heading">
+        <h3 id="popular-states-heading" className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Popular State Egg Rates</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {popularStates.map(({ name, region }) => (
             <Link 
-              key={state}
-              to={`/state/${state.toLowerCase()}-egg-rate`}
-              className="px-3 py-1 bg-white border border-green-300 rounded-full text-sm text-green-700 hover:bg-green-100 transition duration-200"
-              title={`Check today's egg rates in ${state}`}
+              key={name}
+              to={`/state/${name.toLowerCase()}-egg-rate`}
+              className="group flex flex-col items-center p-4 bg-white border border-green-200 rounded-lg hover:border-green-400 hover:shadow-md transition duration-200 dark:bg-gray-800 dark:border-green-800 dark:hover:border-green-600"
+              title={`Check today's egg rates in ${name}, ${region} India`}
             >
-              {state} Egg Rate
+              <span className="text-lg font-semibold text-green-700 group-hover:text-green-800 dark:text-green-400 dark:group-hover:text-green-300">{name}</span>
+              <span className="text-sm text-gray-600 mt-1 dark:text-gray-400">{region} India</span>
             </Link>
           ))}
         </div>
-      </div>
+      </section>
     );
   };
 
   return (
-    <div className="p-6 mt-6 bg-gray-100 rounded-lg shadow-lg max-w-4xl mx-auto">
-      <h2 className="text-center bg-gray-200 rounded-lg w-full p-4 mt-4 text-xl font-semibold text-gray-800">
-        Daily Egg Price in Mandi, National Wholesale Market Rate
-      </h2>
-      
-      {/* Popular Cities Section */}
-      {renderPopularCities()}
-      
-      {/* Popular States Section */}
-      {renderPopularStates()}
-      
-      <h2 className="text-2xl font-bold mb-4 mt-6 text-center text-gray-800">State-wise Egg Rates</h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <tbody className="bg-white divide-y divide-gray-200">
-            {states.length > 0 ? renderStateTableRows() : (
-              <tr>
-                <td className="px-6 py-4 text-center text-gray-700" colSpan="3">Loading...</td>
-              </tr>
+    <>
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(generateSchemaMarkup)}
+        </script>
+      </Helmet>
+
+      <main className="p-4 sm:p-6 mt-6 bg-gradient-to-br from-gray-50 to-white rounded-lg shadow-lg max-w-7xl mx-auto dark:from-gray-900 dark:to-gray-800">
+        <h2 className="text-center bg-gradient-to-r from-yellow-100 to-yellow-50 rounded-lg w-full p-6 mt-4 text-2xl sm:text-3xl font-bold text-gray-800 dark:from-yellow-900 dark:to-yellow-800 dark:text-gray-100">
+          Daily Egg Price in Mandi - National Wholesale Market Rate
+        </h2>
+        
+        {isLoading ? renderLoadingSkeleton() : (
+          <>
+            {renderPopularCities()}
+            {renderPopularStates()}
+            
+            <section className="mt-8" aria-labelledby="state-rates-heading">
+              <h2 id="state-rates-heading" className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">State-wise Egg Rates</h2>
+              <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800">
+                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" role="table">
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {states.length > 0 ? renderStateTableRows() : (
+                      <tr>
+                        <td className="px-6 py-4 text-center text-gray-700 dark:text-gray-300" colSpan="3">No data available</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            {cities.length > 0 && (
+              <section className="mt-8" aria-labelledby="city-rates-heading">
+                <h2 id="city-rates-heading" className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">City-wise Egg Rates</h2>
+                <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" role="table">
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {renderCityTableRows()}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
             )}
-          </tbody>
-        </table>
-      </div>
-      {cities.length > 0 && (
-        <>
-          <h2 className="text-2xl font-bold mt-8 mb-4 text-center text-gray-800">City-wise Egg Rates</h2>
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <tbody className="bg-white divide-y divide-gray-200">
-                {renderCityTableRows()}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
-      
-      <div className="mt-6 text-sm text-gray-700">
-        <p>Egg rates updated daily. Last updated: {new Date().toLocaleDateString('en-US', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
-      </div>
-    </div>
+          </>
+        )}
+        
+        <footer className="mt-8 text-sm text-gray-600 dark:text-gray-400 text-center">
+          <p>Egg rates updated daily. Last updated: {new Date().toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          })}</p>
+        </footer>
+      </main>
+    </>
   );
+});
+
+StateList.propTypes = {
+  states: PropTypes.arrayOf(PropTypes.string).isRequired,
+  cities: PropTypes.arrayOf(PropTypes.string).isRequired,
+  isLoading: PropTypes.bool
 };
+
+StateList.displayName = 'StateList';
 
 export default StateList;
