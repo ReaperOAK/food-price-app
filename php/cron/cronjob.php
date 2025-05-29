@@ -56,23 +56,43 @@ function runScript($scriptPath, $taskName) {
 // Base directory
 $baseDir = dirname(__DIR__);
 
-// List of scripts to run in sequence
-$scripts = [
+// Helper function to make API calls
+function makeApiCall($endpoint, $action, $method = 'GET') {
+    $url = "http://localhost/api/$endpoint/index.php?action=$action";
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    if ($method === 'POST') {
+        curl_setopt($ch, CURLOPT_POST, 1);
+    }
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    
+    return [
+        'success' => $httpCode >= 200 && $httpCode < 300,
+        'response' => $response,
+        'httpCode' => $httpCode
+    ];
+}
+
+// List of tasks to run in sequence
+$tasks = [
     // Data scraping and updates
-    ["$baseDir/api/scraper/update_from_e2necc.php", "Update from e2necc"],
-    ["$baseDir/api/scraper/daily_update.php", "Daily data update"],
+    ['scraper', 'scrape-e2necc', 'Update from e2necc'],
+    ['scraper', 'daily-update', 'Daily data update'],
     
     // Database maintenance
-    ["$baseDir/database/maintenance/archive_old_data.php", "Archive old data"],
+    ['maintenance', 'archive', 'Archive old data', "$baseDir/database/maintenance/archive_old_data.php"],
     
-    // Web stories generation and maintenance
-    ["$baseDir/webstories/generate_web_stories.php", "Generate web stories"],
-    ["$baseDir/webstories/update_webstory_thumbnails.php", "Update web story thumbnails"],
-    ["$baseDir/webstories/delete_old_webstories.php", "Delete old web stories"],
+    // Web stories tasks
+    ['webstories', 'generate', 'Generate web stories'],
+    ['webstories', 'update-thumbnails', 'Update web story thumbnails'],
+    ['webstories', 'cleanup', 'Delete old web stories'],
     
     // SEO tools
-    ["$baseDir/seo/generate_sitemap.php", "Generate main sitemap"],
-    ["$baseDir/webstories/generate_webstories_sitemap.php", "Generate web stories sitemap"]
+    ['seo', 'sitemap', 'Generate main sitemap', "$baseDir/seo/generate_sitemap.php"],
+    ['webstories', 'sitemap', 'Generate web stories sitemap']
 ];
 
 // Log start of cron run
@@ -82,17 +102,43 @@ echo "🔄 Starting scheduled tasks run at $date\n";
 echo "===============================================\n";
 error_log("CRON: Started daily scheduled tasks run at $date");
 
-// Run each script in sequence
-foreach ($scripts as [$scriptPath, $taskName]) {
-    if (file_exists($scriptPath)) {
-        // Even if the script fails, continue with the next script
-        $success = runScript($scriptPath, $taskName);
-        // Add some delay between tasks to reduce server load
-        sleep(10);
+// Run each task in sequence
+foreach ($tasks as $task) {
+    $endpoint = $task[0];
+    $action = $task[1];
+    $taskName = $task[2];
+    $scriptPath = $task[3] ?? null;
+    
+    $startTime = microtime(true);
+    echo "Starting task: $taskName...\n";
+    
+    if ($scriptPath) {
+        // For tasks that still need direct file inclusion
+        if (file_exists($scriptPath)) {
+            $success = runScript($scriptPath, $taskName);
+        } else {
+            echo "❌ Script not found: $scriptPath\n";
+            error_log("CRON ERROR: Script not found: $scriptPath");
+            continue;
+        }
     } else {
-        echo "❌ Script not found: $scriptPath\n";
-        error_log("CRON ERROR: Script not found: $scriptPath");
+        // For API endpoint tasks
+        $result = makeApiCall($endpoint, $action);
+        $success = $result['success'];
+        
+        if (!$success) {
+            echo "❌ Task failed: $taskName (HTTP {$result['httpCode']})\n";
+            error_log("CRON ERROR: Failed running $taskName. Response: " . $result['response']);
+        } else {
+            $endTime = microtime(true);
+            $executionTime = round($endTime - $startTime, 2);
+            echo "✅ Task completed: $taskName (took {$executionTime}s)\n";
+            error_log("CRON SUCCESS: $taskName completed in {$executionTime}s");
+        }
     }
+    
+    // Add some delay between tasks to reduce server load
+    sleep(10);
 }
 
 // Log end of cron run
