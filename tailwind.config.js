@@ -20,9 +20,36 @@ module.exports = {
           '0%': { transform: 'translateY(10px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' }
         }
-      }
+      },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            color: theme('colors.gray.700'),
+            a: {
+              color: theme('colors.blue.500'),
+              '&:hover': {
+                color: theme('colors.blue.700'),
+              },
+            },
+          },
+        },
+        dark: {
+          css: {
+            color: theme('colors.gray.300'),
+            a: {
+              color: theme('colors.blue.400'),
+              '&:hover': {
+                color: theme('colors.blue.300'),
+              },
+            },
+          },
+        },
+      }),
     },
-  },  plugins: [],
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
   safelist: [
     // Only include specific classes that are dynamically used
     'animate-fade-in',
@@ -38,6 +65,8 @@ module.exports = {
     'lg:grid-cols-3',
     'text-green-500',
     'text-red-500',
-    'text-gray-500'
+    'text-gray-500',
+    // Dark mode classes
+    'dark'
   ]
 }

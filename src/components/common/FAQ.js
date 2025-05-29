@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, lazy, Suspense, memo } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 // Function to generate FAQ schema (separate from component rendering)
 export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
@@ -16,7 +17,6 @@ export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
   // Generate FAQ items based on data
   const faqItems = generateFaqList(selectedCity, selectedState, currentRate, trayPrice, formattedDate);
   
-  // Return the structured data object
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -106,64 +106,134 @@ export const generateFaqList = (selectedCity, selectedState, currentRate, trayPr
   return [...locationSpecificFAQs, ...defaultFAQs];
 };
 
-const FAQ = ({ selectedCity, selectedState, eggRates }) => {
-  const [openFAQ, setOpenFAQ] = useState(null);
-  const currentRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
-  const trayPrice = currentRate !== 'N/A' ? (currentRate * 30).toFixed(2) : 'N/A';
-  
-  // Format date for display
-  const formattedDate = new Date().toLocaleDateString('en-US', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric'
+const FAQItem = memo(({ faq, index, isOpen, onToggle }) => {
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true
   });
-  // Get the list of FAQs using the shared function
-  const faqList = generateFaqList(selectedCity, selectedState, currentRate, trayPrice, formattedDate);
 
-  const toggleFAQ = (index) => {
-    if (openFAQ === index) {
-      setOpenFAQ(null);
-    } else {
-      setOpenFAQ(index);
-    }
-  };
   return (
-    <div className="p-6 mt-6 mx-auto bg-white shadow-lg rounded-lg" id="faq-section">
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-800">Frequently Asked Questions</h2>
-      
-      {/* Note: FAQ Schema is now centralized and rendered only in MainPage.js */}
-      
-      <div className="divide-y divide-gray-200">
-        {faqList.map((faq, index) => (
-          <div key={index} className="py-4">
-            <button
-              className="flex justify-between items-center w-full text-left font-semibold text-gray-800 hover:text-blue-600 transition p-2 rounded-lg"
-              onClick={() => toggleFAQ(index)}
-              aria-expanded={openFAQ === index}
-              aria-controls={`faq-answer-${index}`}
-            >
-              <span className="pr-8">{faq.question}</span>
-              <svg
-                className={`w-5 h-5 transform transition-transform ${openFAQ === index ? "rotate-180 text-blue-500" : "text-gray-500"}`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </button>
-            <div 
-              id={`faq-answer-${index}`} 
-              className={`mt-2 text-gray-700 px-2 overflow-hidden transition-all duration-300 ${openFAQ === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}
-            >
-              <p className="pb-4">{faq.answer}</p>
-            </div>
-          </div>
-        ))}
+    <div 
+      ref={ref} 
+      className={`py-4 transform transition-transform duration-300 ${inView ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}`}
+    >
+      <button
+        className={`
+          flex justify-between items-center w-full text-left p-4 rounded-lg
+          font-semibold text-gray-900 dark:text-gray-100
+          hover:bg-blue-50 dark:hover:bg-blue-900
+          focus:outline-none focus:ring-2 focus:ring-blue-500
+          transition-all duration-300 ease-in-out
+          ${isOpen ? 'bg-blue-50 dark:bg-blue-900' : ''}
+        `}
+        onClick={() => onToggle(index)}
+        aria-expanded={isOpen}
+        aria-controls={`faq-answer-${index}`}
+      >
+        <span className="flex-grow pr-8">{faq.question}</span>
+        <span 
+          className={`transform transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}
+          aria-hidden="true"
+        >
+          <svg
+            className={`w-6 h-6 ${isOpen ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </button>
+      <div 
+        id={`faq-answer-${index}`}
+        role="region"
+        aria-labelledby={`faq-question-${index}`}
+        className={`
+          overflow-hidden transition-all duration-500 ease-in-out
+          ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}
+        `}
+      >
+        <div className="p-4 text-gray-700 dark:text-gray-300 prose prose-blue max-w-none">
+          {faq.answer}
+        </div>
       </div>
     </div>
   );
-};
+});
+
+FAQItem.displayName = 'FAQItem';
+
+const FAQ = memo(({ selectedCity, selectedState, eggRates }) => {
+  const [openFAQ, setOpenFAQ] = useState(null);
+  
+  const { currentRate, trayPrice, formattedDate } = useMemo(() => {
+    const rate = eggRates?.length > 0 ? eggRates[0].rate : 'N/A';
+    return {
+      currentRate: rate,
+      trayPrice: rate !== 'N/A' ? (rate * 30).toFixed(2) : 'N/A',
+      formattedDate: new Date().toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+    };
+  }, [eggRates]);
+
+  const faqList = useMemo(() => 
+    generateFaqList(selectedCity, selectedState, currentRate, trayPrice, formattedDate),
+    [selectedCity, selectedState, currentRate, trayPrice, formattedDate]
+  );
+
+  const toggleFAQ = useCallback((index) => {
+    setOpenFAQ(prev => prev === index ? null : index);
+  }, []);
+
+  const { ref, inView } = useInView({
+    threshold: 0.1,
+    triggerOnce: true
+  });
+
+  return (
+    <section 
+      ref={ref}
+      className={`
+        p-6 mt-6 mx-auto bg-white dark:bg-gray-800 
+        shadow-lg rounded-lg transition-all duration-500
+        max-w-4xl w-full transform
+        ${inView ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
+      `} 
+      id="faq-section"
+      aria-label="Frequently Asked Questions"
+    >
+      <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">
+        Frequently Asked Questions
+      </h2>
+      
+      <div className="divide-y divide-gray-200 dark:divide-gray-700">
+        {faqList.map((faq, index) => (
+          <FAQItem
+            key={index}
+            faq={faq}
+            index={index}
+            isOpen={openFAQ === index}
+            onToggle={toggleFAQ}
+          />
+        ))}
+      </div>
+
+      {/* Skip to next section link for better accessibility */}
+      <a 
+        href="#footer"
+        className="sr-only focus:not-sr-only focus:absolute focus:p-2 focus:bg-blue-500 focus:text-white"
+      >
+        Skip FAQ section
+      </a>
+    </section>
+  );
+});
+
+FAQ.displayName = 'FAQ';
 
 export default FAQ;
