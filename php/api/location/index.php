@@ -55,7 +55,7 @@ class LocationAPI extends BaseAPI {
             $this->sendResponse($cached);
         }
 
-        $stmt = $this->db->query("SELECT DISTINCT state FROM locations WHERE state IS NOT NULL ORDER BY state");
+        $stmt = $this->db->query("SELECT DISTINCT name as state FROM states ORDER BY name");
         $states = $stmt->fetchAll(PDO::FETCH_COLUMN);
         
         $this->cache->set($cacheKey, $states, 3600);
@@ -72,7 +72,12 @@ class LocationAPI extends BaseAPI {
             $this->sendResponse($cached);
         }
 
-        $stmt = $this->db->prepare("SELECT city FROM locations WHERE state = ? ORDER BY city");
+        $stmt = $this->db->prepare("
+            SELECT c.name as city 
+            FROM cities c 
+            JOIN states s ON c.state_id = s.id 
+            WHERE s.name = ? 
+            ORDER BY c.name");
         $stmt->execute([$state]);
         $cities = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
@@ -84,9 +89,11 @@ class LocationAPI extends BaseAPI {
         $cacheKey = $this->getCacheKey('states_and_cities');
         if ($cached = $this->cache->get($cacheKey)) {
             $this->sendResponse($cached);
-        }
-
-        $stmt = $this->db->query("SELECT state, city FROM locations ORDER BY state, city");
+        }        $stmt = $this->db->query("
+            SELECT s.name as state, c.name as city 
+            FROM cities c 
+            JOIN states s ON c.state_id = s.id 
+            ORDER BY s.name, c.name");
         $result = [];
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $result[$row['state']][] = $row['city'];
@@ -106,7 +113,12 @@ class LocationAPI extends BaseAPI {
             $this->sendResponse($cached);
         }
 
-        $stmt = $this->db->prepare("SELECT state FROM locations WHERE city = ? LIMIT 1");
+        $stmt = $this->db->prepare("
+            SELECT s.name as state 
+            FROM cities c 
+            JOIN states s ON c.state_id = s.id 
+            WHERE c.name = ? 
+            LIMIT 1");
         $stmt->execute([$city]);
         $state = $stmt->fetchColumn();
 
@@ -126,13 +138,21 @@ class LocationAPI extends BaseAPI {
             $this->db->beginTransaction();
 
             if ($data['type'] === 'state') {
-                $stmt = $this->db->prepare("INSERT INTO locations (state) VALUES (?)");
+                $stmt = $this->db->prepare("INSERT INTO states (name) VALUES (?)");
                 $stmt->execute([$data['name']]);
             } else if ($data['type'] === 'city') {
                 if (empty($data['state'])) {
                     $this->sendError('State is required for adding a city');
                 }
-                $stmt = $this->db->prepare("INSERT INTO locations (city, state) VALUES (?, ?)");
+                $stateStmt = $this->db->prepare("SELECT id FROM states WHERE name = ?");
+                $stateStmt->execute([$data['state']]);
+                $stateId = $stateStmt->fetchColumn();
+
+                if (!$stateId) {
+                    throw new Exception("State not found");
+                }
+
+                $stmt = $this->db->prepare("INSERT INTO cities (name, state_id) VALUES (?, ?)");
                 $stmt->execute([$data['name'], $data['state']]);
             } else {
                 $this->sendError('Invalid type. Must be "state" or "city"');
@@ -154,13 +174,21 @@ class LocationAPI extends BaseAPI {
             $this->db->beginTransaction();
 
             if ($data['type'] === 'state') {
-                $stmt = $this->db->prepare("DELETE FROM locations WHERE state = ?");
+                $stmt = $this->db->prepare("DELETE FROM states WHERE name = ?");
                 $stmt->execute([$data['name']]);
             } else if ($data['type'] === 'city') {
                 if (empty($data['state'])) {
                     $this->sendError('State is required for removing a city');
                 }
-                $stmt = $this->db->prepare("DELETE FROM locations WHERE city = ? AND state = ?");
+                $stateStmt = $this->db->prepare("SELECT id FROM states WHERE name = ?");
+                $stateStmt->execute([$data['state']]);
+                $stateId = $stateStmt->fetchColumn();
+
+                if (!$stateId) {
+                    throw new Exception("State not found");
+                }
+
+                $stmt = $this->db->prepare("DELETE FROM cities WHERE name = ? AND state_id = ?");
                 $stmt->execute([$data['name'], $data['state']]);
             } else {
                 $this->sendError('Invalid type. Must be "state" or "city"');
