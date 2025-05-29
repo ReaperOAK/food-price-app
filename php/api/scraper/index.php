@@ -20,21 +20,42 @@ class DataScraper extends BaseAPI {
         } catch (Exception $e) {
             $this->sendError($e->getMessage());
         }
-    }
-
-    private function scrapeFromE2NECC() {
-        $url = 'https://www.e2necc.com/eggprices.asp';
+    }    private function scrapeFromE2NECC() {
+        $url = 'https://www.e2necc.com/home/eggprice';
         $context = stream_context_create([
-            'http' => ['timeout' => 60],
+            'http' => [
+                'timeout' => 60,
+                'ignore_errors' => true,
+                'follow_location' => true,
+                'protocol_version' => '1.1',
+                'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36'
+            ],
             'ssl' => [
                 'verify_peer' => false,
-                'verify_peer_name' => false
+                'verify_peer_name' => false,
+                'allow_self_signed' => true
             ]
         ]);
 
-        $html = @file_get_contents($url, false, $context);
+        // Try multiple times with increasing delays
+        $maxRetries = 3;
+        $retryDelay = 5;
+        
+        for ($try = 1; $try <= $maxRetries; $try++) {
+            $html = @file_get_contents($url, false, $context);
+            if ($html !== false) {
+                break;
+            }
+            if ($try < $maxRetries) {
+                error_log("Retry $try failed for e2necc, waiting {$retryDelay}s before next attempt");
+                sleep($retryDelay);
+                $retryDelay *= 2; // Exponential backoff
+            }
+        }
+
         if (!$html) {
-            throw new Exception('Failed to fetch data from e2necc');
+            $error = error_get_last();
+            throw new Exception('Failed to fetch data from e2necc: ' . ($error['message'] ?? 'Unknown error'));
         }
 
         $doc = new DOMDocument();
