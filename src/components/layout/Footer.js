@@ -96,6 +96,18 @@ const Footer = memo(() => {
               ))}
             </nav>
           </div>
+
+          {/* Contact Info */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold mb-4">Contact</h2>
+            <div className="text-[#E6CCB2] space-y-2">
+              <p className="flex items-center transition-colors duration-300">
+                📧 <a href="mailto:contact@todayeggrates.com" className="ml-2 hover:text-white focus:outline-none focus:ring-2 focus:ring-[#E6CCB2] rounded-sm">
+                  contact@todayeggrates.com
+                </a>
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Divider with improved design */}
