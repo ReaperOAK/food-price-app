@@ -93,9 +93,11 @@ function makeApiCall($endpoint, $action) {
     }
     
     $endTime = microtime(true);
-    $executionTime = round($endTime - $startTime, 2);
-      // Try to decode JSON response
+    $executionTime = round($endTime - $startTime, 2);    // Try to decode JSON response
     $response = json_decode($output, true);
+    
+    // Log the raw output for debugging
+    error_log("CRON DEBUG: Raw API output for $endpoint/$action: " . $output);
     
     // Check if we have a valid JSON response
     if ($response === null) {
@@ -108,10 +110,19 @@ function makeApiCall($endpoint, $action) {
         ];
     }
     
+    // Consider it a success if response has success=true or contains expected data
+    $isSuccess = (isset($response['success']) && $response['success'] === true) || 
+                 (!isset($response['error']) && !empty($response));
+    
+    if (!$isSuccess) {
+        error_log("CRON DEBUG: API call failed. Response: " . json_encode($response));
+    }
+    
     return [
-        'success' => !isset($response['error']),
+        'success' => $isSuccess,
         'response' => $output,
-        'executionTime' => $executionTime
+        'executionTime' => $executionTime,
+        'error' => isset($response['error']) ? $response['error'] : null
     ];
 }
 
@@ -164,16 +175,20 @@ foreach ($tasks as $index => $task) {
         $result = makeApiCall($endpoint, $action);
         $success = $result['success'];
         
-        if (!$success) {
+    if (!$success) {
             echo "❌ Task failed: $taskName\n";
             error_log("CRON ERROR: Failed running $taskName. Response: " . $result['response']);
             if (isset($result['error'])) {
                 error_log("CRON ERROR: " . $result['error']);
             }
+            // Don't stop on failure, continue with next task
         } else {
             echo "✅ Task completed: $taskName (took {$result['executionTime']}s)\n";
             error_log("CRON SUCCESS: $taskName completed in {$result['executionTime']}s");
         }
+        
+        // Always continue to next task regardless of success/failure
+        continue;
     }
     
     // Add some delay between tasks to reduce server load
