@@ -1,6 +1,21 @@
 import React, { useEffect, useState, useRef, useCallback, memo } from 'react';
 import { debounce } from 'lodash';
 
+// Create debounced function outside component to avoid recreation
+const createDebouncedProgress = (contentId, setScrollProgress) => 
+  debounce(() => {
+    const contentElement = document.getElementById(contentId);
+    if (!contentElement) return;
+    
+    const scrollPosition = window.scrollY;
+    const totalHeight = contentElement.offsetHeight;
+    const windowHeight = window.innerHeight;
+    const scrollableHeight = totalHeight - windowHeight;
+    
+    const progress = Math.min((scrollPosition / scrollableHeight) * 100, 100);
+    setScrollProgress(progress);
+  }, 50);
+
 const TableOfContents = memo(({ contentId, blogId, isSticky = false }) => {
   const [headings, setHeadings] = useState([]);
   const [activeId, setActiveId] = useState('');
@@ -9,23 +24,24 @@ const TableOfContents = memo(({ contentId, blogId, isSticky = false }) => {
   const observerRef = useRef(null);
   const mutationObserverRef = useRef(null);
   const tocRef = useRef(null);
+  const debouncedProgressRef = useRef(null);
 
-  // Debounced scroll progress calculation
-  const updateScrollProgress = useCallback(
-    debounce(() => {
-      const contentElement = document.getElementById(contentId);
-      if (!contentElement) return;
-      
-      const scrollPosition = window.scrollY;
-      const totalHeight = contentElement.offsetHeight;
-      const windowHeight = window.innerHeight;
-      const scrollableHeight = totalHeight - windowHeight;
-      
-      const progress = Math.min((scrollPosition / scrollableHeight) * 100, 100);
-      setScrollProgress(progress);
-    }, 50),
-    [contentId]
-  );
+  // Initialize debounced scroll progress calculation
+  useEffect(() => {
+    debouncedProgressRef.current = createDebouncedProgress(contentId, setScrollProgress);
+    return () => {
+      if (debouncedProgressRef.current) {
+        debouncedProgressRef.current.cancel();
+      }
+    };
+  }, [contentId]);
+
+  // Use the debounced function from ref
+  const updateScrollProgress = useCallback(() => {
+    if (debouncedProgressRef.current) {
+      debouncedProgressRef.current();
+    }
+  }, []);
 
   useEffect(() => {
     const extractHeadings = () => {
@@ -124,7 +140,6 @@ const TableOfContents = memo(({ contentId, blogId, isSticky = false }) => {
       window.removeEventListener('scroll', updateScrollProgress);
       window.removeEventListener('resize', handleResize);
       handleResize.cancel();
-      updateScrollProgress.cancel();
     };
   }, [contentId, blogId, updateScrollProgress]);
 
