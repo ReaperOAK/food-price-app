@@ -83,12 +83,22 @@ function makeApiCall($endpoint, $action) {
     
     $endTime = microtime(true);
     $executionTime = round($endTime - $startTime, 2);
-    
-    // Try to decode JSON response
+      // Try to decode JSON response
     $response = json_decode($output, true);
     
+    // Check if we have a valid JSON response
+    if ($response === null) {
+        error_log("API Response is not valid JSON: " . $output);
+        return [
+            'success' => false,
+            'response' => $output,
+            'executionTime' => $executionTime,
+            'error' => 'Invalid JSON response'
+        ];
+    }
+    
     return [
-        'success' => $response !== null && !isset($response['error']),
+        'success' => !isset($response['error']),
         'response' => $output,
         'executionTime' => $executionTime
     ];
@@ -138,19 +148,19 @@ foreach ($tasks as $task) {
             echo "❌ Script not found: $scriptPath\n";
             error_log("CRON ERROR: Script not found: $scriptPath");
             continue;
-        }
-    } else {        // For API endpoint tasks
+        }    } else {        // For API endpoint tasks
         $result = makeApiCall($endpoint, $action);
         $success = $result['success'];
         
         if (!$success) {
             echo "❌ Task failed: $taskName\n";
             error_log("CRON ERROR: Failed running $taskName. Response: " . $result['response']);
+            if (isset($result['error'])) {
+                error_log("CRON ERROR: " . $result['error']);
+            }
         } else {
-            $endTime = microtime(true);
-            $executionTime = round($endTime - $startTime, 2);
-            echo "✅ Task completed: $taskName (took {$executionTime}s)\n";
-            error_log("CRON SUCCESS: $taskName completed in {$executionTime}s");
+            echo "✅ Task completed: $taskName (took {$result['executionTime']}s)\n";
+            error_log("CRON SUCCESS: $taskName completed in {$result['executionTime']}s");
         }
     }
     
