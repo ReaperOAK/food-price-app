@@ -1,243 +1,92 @@
-import React, { useEffect, useState, useMemo, memo, useCallback } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import Select from 'react-select';
 import { FaBars, FaTimes } from 'react-icons/fa';
-import OptimizedImage from '../common/OptimizedImage';
 
-// Memoize navigation links to prevent unnecessary re-renders
-const NavigationLinks = memo(({ handleHomeClick, handleCityClick }) => (
-  <>
-    <Link
-      to="/"
-      className="text-gray-800 hover:text-blue-600 font-medium transition duration-300 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onClick={handleHomeClick}
-    >
-      Home
-    </Link>
-    <Link
-      to="/mumbai-egg-rate"
-      className="text-gray-800 hover:text-blue-600 font-medium transition duration-300 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onClick={(e) => handleCityClick('Mumbai', e)}
-    >
-      Mumbai
-    </Link>
-    <Link
-      to="/kolkata-egg-rate"
-      className="text-gray-800 hover:text-blue-600 font-medium transition duration-300 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onClick={(e) => handleCityClick('Kolkata', e)}
-    >
-      Kolkata
-    </Link>
-    <Link
-      to="/lucknow-egg-rate"
-      className="text-gray-800 hover:text-blue-600 font-medium transition duration-300 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onClick={(e) => handleCityClick('Lucknow', e)}
-    >
-      Lucknow
-    </Link>
-    <Link
-      to="/barwala-egg-rate"
-      className="text-gray-800 hover:text-blue-600 font-medium transition duration-300 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onClick={(e) => handleCityClick('Barwala', e)}
-    >
-      Barwala
-    </Link>
-    <Link
-      to="/hyderabad-egg-rate"
-      className="text-gray-800 hover:text-blue-600 font-medium transition duration-300 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onClick={(e) => handleCityClick('Hyderabad', e)}
-    >
-      Hyderabad
-    </Link>
-    <Link
-      to="/chennai-egg-rate"
-      className="text-gray-800 hover:text-blue-600 font-medium transition duration-300 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      onClick={(e) => handleCityClick('Chennai', e)}
-    >
-      Chennai
-    </Link>
-    <Link
-      to="/webstories"
-      className="text-gray-800 hover:text-blue-600 font-medium transition duration-300 py-2 px-3 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    >
-      Web Stories
-    </Link>
-  </>
-));
-
-NavigationLinks.displayName = 'NavigationLinks';
-
-// Memoized Logo component
-const Logo = memo(() => (
-  <div 
-    className="logo-container relative w-48 h-16"
-    style={{ maxWidth: '192px' }}
-  >
-    <OptimizedImage
-      src="/logo.webp"
-      alt="Food Price App Logo"
-      className="w-full h-full object-contain"
-      width={192}
-      height={64}
-      loading="eager"
-      priority={true}
-      sizes="(max-width: 768px) 150px, 192px"
-    />
-  </div>
-));
-
-Logo.displayName = 'Logo';
+import Logo from './navbar/Logo';
+import NavigationLinks from './navbar/NavigationLinks';
+import SearchBox from './navbar/SearchBox';
+import useLocationData from './navbar/useLocationData';
 
 const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState }) => {
-  const [options, setOptions] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
+  const { options, isLoading, error } = useLocationData();
 
   // Track navigation lock to prevent redundant navigations
   const navigationLock = React.useRef(false);
 
   // Standardize city names
-  const standardizeCityName = useMemo(() => {
-    return (cityName) => {
-      const lowerCityName = cityName.toLowerCase();
-      if (lowerCityName === 'bangalore' || 
-          lowerCityName === 'bangalore (cc)' || 
-          lowerCityName === 'bengaluru (cc)' ||
-          lowerCityName === 'bengaluru') {
-        return 'Bengaluru';
-      }
-      return cityName;
-    };
-  }, []);
-
-  // Process location data
-  const processLocationData = useCallback((data) => {
-    if (Array.isArray(data)) {
-      // Create options for both cities and states
-      const cityOptions = data.map(city => ({
-        value: city.name,
-        label: city.name,
-        type: 'city'
-      }));
-      
-      const combinedOptions = cityOptions;
-      return { combinedOptions };
+  const standardizeCityName = useMemo(() => (cityName) => {
+    const lowerCityName = cityName.toLowerCase();
+    if (lowerCityName === 'bangalore' || 
+        lowerCityName === 'bangalore (cc)' || 
+        lowerCityName === 'bengaluru (cc)' ||
+        lowerCityName === 'bengaluru') {
+      return 'Bengaluru';
     }
-    return { combinedOptions: [] };
+    return cityName;
   }, []);
 
-  // Fetch locations with error handling and loading state
-  useEffect(() => {
-    const abortController = new AbortController();
-
-    const fetchLocations = async () => {
-      try {
-        setIsLoading(true);
-        const response = await fetch('/php/api/location/get_states_and_cities.php', {
-          signal: abortController.signal
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch locations');
-        }
-
-        const data = await response.json();
-        const { combinedOptions } = processLocationData(data);
-        setOptions(combinedOptions);
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          console.error('Error fetching locations:', err);
-          setError(err.message);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchLocations();
-
-    return () => abortController.abort();
-  }, [processLocationData]);
-  // Memoize handlers
-  const handleChange = useMemo(() => {
-    return (selectedOption) => {
-      if (!selectedOption || navigationLock.current) return;
+  const handleChange = useMemo(() => (selectedOption) => {
+    if (!selectedOption || navigationLock.current) return;
+    
+    navigationLock.current = true;
+    const { type, label } = selectedOption;
+    
+    if (type === 'city') {
+      const [city, state] = label.split(', ');
+      let selectedCityName = standardizeCityName(city);
       
-      navigationLock.current = true;
-      const { type, label } = selectedOption;
-      
-      if (type === 'city') {
-        const [city, state] = label.split(', ');
-        let selectedCityName = standardizeCityName(city);
-        
-        setSelectedCity(selectedCityName);
-        setSelectedState(state);
-        
-        requestAnimationFrame(() => {
-          const path = `/${selectedCityName.toLowerCase()}-egg-rate`;
-          if (location.pathname !== path) {
-            navigate(path, { replace: true });
-          }
-          navigationLock.current = false;
-        });
-      } else if (type === 'state') {
-        setSelectedCity('');
-        setSelectedState(label);
-        
-        requestAnimationFrame(() => {
-          const path = `/state/${label.toLowerCase()}-egg-rate`;
-          if (location.pathname !== path) {
-            navigate(path, { replace: true });
-          }
-          navigationLock.current = false;
-        });
-      }
-    };
-  }, [navigate, location.pathname, setSelectedCity, setSelectedState, standardizeCityName]);
-
-  const handleHomeClick = useMemo(() => {
-    return (e) => {
-      if (navigationLock.current) {
-        e.preventDefault();
-        return;
-      }
-      
-      navigationLock.current = true;
-      setSelectedCity('');
-      setSelectedState('');
-      
-      if (location.pathname !== '/') {
-        navigate('/');
-      }
+      setSelectedCity(selectedCityName);
+      setSelectedState(state || '');
       
       requestAnimationFrame(() => {
-        navigationLock.current = false;
-      });
-    };
-  }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
-
-  const handleCityClick = useMemo(() => {
-    return (city, e) => {
-      if (navigationLock.current) {
-        e?.preventDefault();
-        return;
-      }
-      
-      navigationLock.current = true;
-      setSelectedCity(city);
-      setSelectedState('');
-      
-      requestAnimationFrame(() => {
-        const path = `/${city.toLowerCase()}-egg-rate`;
+        const path = `/${selectedCityName.toLowerCase()}-egg-rate`;
         if (location.pathname !== path) {
           navigate(path, { replace: true });
         }
         navigationLock.current = false;
       });
-    };
+    }
+  }, [navigate, location.pathname, setSelectedCity, setSelectedState, standardizeCityName]);
+
+  const handleHomeClick = useMemo(() => (e) => {
+    if (navigationLock.current) {
+      e.preventDefault();
+      return;
+    }
+    
+    navigationLock.current = true;
+    setSelectedCity('');
+    setSelectedState('');
+    
+    if (location.pathname !== '/') {
+      navigate('/');
+    }
+    
+    requestAnimationFrame(() => {
+      navigationLock.current = false;
+    });
+  }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
+
+  const handleCityClick = useMemo(() => (city, e) => {
+    if (navigationLock.current) {
+      e?.preventDefault();
+      return;
+    }
+    
+    navigationLock.current = true;
+    setSelectedCity(city);
+    setSelectedState('');
+    
+    requestAnimationFrame(() => {
+      const path = `/${city.toLowerCase()}-egg-rate`;
+      if (location.pathname !== path) {
+        navigate(path, { replace: true });
+      }
+      navigationLock.current = false;
+    });
   }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
@@ -311,35 +160,15 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
           </div>
 
           {/* Search Box */}
-          <div className="w-full md:w-64 mt-4 md:mt-0">
-            <Select
-              value={options.find(option => option.value === (selectedCity || selectedState))}
-              onChange={handleChange}
-              options={options}
-              isLoading={isLoading}
-              isDisabled={isLoading || error}
-              className="react-select-container"
-              classNamePrefix="react-select"
-              styles={selectStyles}
-              aria-label="Search for city or state"
-              inputId="location-select"
-              aria-describedby="location-select-help"
-              placeholder={isLoading ? "Loading locations..." : "Select City, State"}
-              noOptionsMessage={() => error ? "Error loading locations" : "No locations found"}
-              isClearable
-              components={{
-                IndicatorSeparator: () => null
-              }}
-            />
-            {error && (
-              <p className="mt-1 text-sm text-red-600" role="alert">
-                {error}
-              </p>
-            )}
-            <span id="location-select-help" className="sr-only">
-              Select a city or state to view egg rates for that location
-            </span>
-          </div>
+          <SearchBox
+            options={options}
+            selectedCity={selectedCity}
+            selectedState={selectedState}
+            handleChange={handleChange}
+            isLoading={isLoading}
+            error={error}
+            selectStyles={selectStyles}
+          />
         </div>
 
         {/* Mobile Navigation */}
