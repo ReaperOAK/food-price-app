@@ -116,10 +116,17 @@ const Navbar = ({ setSelectedCity, setSelectedState, selectedCity, selectedState
   // Process location data
   const processLocationData = useCallback((data) => {
     if (Array.isArray(data)) {
-      const uniqueCities = [...new Set(data.map(city => city.name))];
-      setCityList(uniqueCities);
-      setIsLoading(false);
+      // Create options for both cities and states
+      const cityOptions = data.map(city => ({
+        value: city.name,
+        label: city.name,
+        type: 'city'
+      }));
+      
+      const combinedOptions = cityOptions;
+      return { combinedOptions };
     }
+    return { combinedOptions: [] };
   }, []);
 
   // Fetch locations with error handling and loading state
