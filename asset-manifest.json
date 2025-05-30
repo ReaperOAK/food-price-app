@@ -1,7 +1,7 @@
 {
   "files": {
     "main-84781932.js": "/static/js/main-84781932.1ac172a2.js",
-    "runtime.js": "/static/js/runtime.e9d15b5f.js",
+    "runtime.js": "/static/js/runtime.d64a8d53.js",
     "static/js/7302.b89100b0.chunk.js": "/static/js/7302.b89100b0.chunk.js",
     "static/js/5719.ed35b31a.chunk.js": "/static/js/5719.ed35b31a.chunk.js",
     "static/js/6215.6a61106b.chunk.js": "/static/js/6215.6a61106b.chunk.js",
@@ -14,7 +14,7 @@
     "webstory-viewer.js": "/static/js/webstory-viewer.f2154158.chunk.js",
     "static/js/3807.7bc636af.chunk.js": "/static/js/3807.7bc636af.chunk.js",
     "static/js/6796.f39de8b4.chunk.js": "/static/js/6796.f39de8b4.chunk.js",
-    "static/js/613.4e5d496c.chunk.js": "/static/js/613.4e5d496c.chunk.js",
+    "static/js/613.a238f1d4.chunk.js": "/static/js/613.a238f1d4.chunk.js",
     "core-282b4355.js": "/static/js/core-282b4355.3010c8b8.js",
     "routing-b6221038.js": "/static/js/routing-b6221038.51571716.chunk.js",
     "chart-836cd60a.js": "/static/js/chart-836cd60a.c5c629a9.chunk.js",
@@ -90,7 +90,7 @@
     "index.html": "/index.html"
   },
   "entrypoints": [
-    "static/js/runtime.e9d15b5f.js",
+    "static/js/runtime.d64a8d53.js",
     "static/js/core-8b4dd223.16c53f64.js",
     "static/js/core-e5bca7e4.3b24e67e.js",
     "static/js/core-8f67ea0a.e21fcd68.js",
