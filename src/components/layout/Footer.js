@@ -1,7 +1,6 @@
 import React, { memo } from "react";
 import { Link } from "react-router-dom";
 import { FaFacebook, FaTwitter, FaInstagram } from "react-icons/fa";
-import { Helmet } from "react-helmet-async";
 
 const FooterLink = memo(({ href, children, external = false, className = "", icon: Icon = null }) => {
   const baseClasses = "inline-flex items-center gap-2 text-gray-200 hover:text-white focus:text-white focus:outline-none focus:ring-2 focus:ring-orange-200 rounded-sm px-2 py-1.5 transition-all duration-300 ease-in-out text-base sm:text-sm";
@@ -63,12 +62,7 @@ const Footer = memo(() => {
 
   return (
     <footer className="bg-[#2D1810] text-white py-8 sm:py-12 px-4 mt-8 relative print:hidden" role="contentinfo">
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(organizationSchema)}
-        </script>
-      </Helmet>
-
+      
       {/* Subtle background pattern */}
       <div 
         className="absolute inset-0 opacity-[0.03] pointer-events-none"
