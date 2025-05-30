@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'tailwindcss/tailwind.css';
 import OptimizedImage from '../../components/common/OptimizedImage';
 import RateTable from '../../components/rates/RateTable';
+import { fetchRatesForDays } from '../../services/api';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -11,18 +12,9 @@ const EggRates = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/php/api/rates/get_rates.php?city=Barwala&state=Haryana&days=7')
-      .then(response => response.json())
+    fetchRatesForDays('Barwala', 'Haryana', 7)
       .then(data => {
-        // Ensure rates are numbers and add default values
-        const parsedData = data.map(rate => ({
-          id: rate.id || String(Math.random()),
-          city: rate.city || 'Barwala',
-          state: rate.state || 'Haryana',
-          date: rate.date || new Date().toISOString().split('T')[0],
-          rate: typeof rate.rate === 'number' ? rate.rate : parseFloat(rate.rate) || 0
-        }));
-        setEggRates(parsedData);
+        setEggRates(data);
         setIsLoading(false);
       })
       .catch(error => {

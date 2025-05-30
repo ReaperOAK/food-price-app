@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import Select from 'react-select';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import AdminNavbar from '../components/layout/AdminNavbar';
 import StateSelect from '../components/admin/StateSelect';
 import CitySelect from '../components/admin/CitySelect';
@@ -7,9 +6,20 @@ import RateForm from '../components/admin/RateForm';
 import AddStateForm from '../components/admin/AddStateForm';
 import AddCityForm from '../components/admin/AddCityForm';
 import RateTable from '../components/rates/RateTable';
+import Select from 'react-select';
+import { 
+  fetchAllRates, 
+  fetchStatesAndCities, 
+  updateMultipleRates, 
+  deleteRate,
+  addStateOrCity,
+  removeStateOrCity,
+  updateRate as updateSingleRate,
+  fetchRates
+} from '../services/api';
 
 const AdminPage = ({ setIsAuthenticated }) => {
-  const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split('T')[0];
   const [eggRate, setEggRate] = useState({ date: today, rate: '' });
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [options, setOptions] = useState([]);
@@ -30,43 +40,42 @@ const AdminPage = ({ setIsAuthenticated }) => {
   // Define fetchEggRates function to get egg rates data
   const fetchEggRates = useCallback(() => {
     setLoading(true);
-    fetch(`/php/api/rates/get_all_rates.php?date=${selectedDate}`)
-      .then(res => res.json())
+    fetchAllRates(selectedDate)
       .then(data => {
         setEggRates(data);
         setLoading(false);
       })
       .catch(error => {
-        console.error('Error fetching rates:', error);
-        setError(error);
+        console.error('Error fetching egg rates:', error);
+        setError(error.message);
         setLoading(false);
       });
   }, [selectedDate]);
   
   // Define fetchCitiesAndStates function to get location data
   const fetchCitiesAndStates = useCallback(() => {
-    fetch('/php/api/location/get_states_and_cities.php')
-      .then(res => res.json())
+    fetchStatesAndCities()
       .then(data => {
-        const combinedOptions = [];
-        const stateOptions = [];
-        for (const state in data) {
-          stateOptions.push({ value: state, label: state });
-          combinedOptions.push({
-            value: state,
-            label: state,
-            type: 'state',
-          });
-          data[state].forEach(city => {
-            combinedOptions.push({
-              value: `${city}-${state}`, // Ensure unique value
-              label: `${city}, ${state}`,
-              type: 'city',
-            });
-          });
-        }
-        setOptions(combinedOptions);
+        // Process the data as before
+        const stateOptions = Object.keys(data)
+          .filter(state => state !== 'Unknown' && state !== 'special')
+          .map(state => ({ value: state, label: state }));
         setStates(stateOptions);
+
+        const cityOptions = [];
+        Object.entries(data).forEach(([state, cities]) => {
+          if (state !== 'Unknown' && state !== 'special') {
+            cities.forEach(city => {
+              cityOptions.push({
+                value: city,
+                label: `${city}, ${state}`,
+                type: 'city',
+                state: state
+              });
+            });
+          }
+        });
+        setOptions(cityOptions);
       })
       .catch(error => console.error('Error fetching states and cities:', error));
   }, []);
@@ -83,41 +92,176 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const payload = selectedOptions.map(option => {
-      const [cityName, state] = option.type === 'city' ? option.label.split(', ') : [null, option.value];
-      return {
-        city: cityName,
-        state: state || '', // Ensure state is not null
-        date: eggRate.date,
-        rate: eggRate.rate,
-        type: option.type,
-      };
-    });
+    const payload = selectedOptions.map(option => ({
+      city: option.value,
+      state: option.state,
+      rate: parseFloat(eggRate.rate),
+      date: eggRate.date
+    }));
 
-    fetch('/php/api/rates/update_multiple_rates.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
-    })
-      .then(res => res.json())
+    updateMultipleRates(payload)
       .then(response => {
-        fetchEggRates(); // Refresh the list of egg rates
-        resetForm(); // Reset form
+        if (response.success) {
+          alert('Rates updated successfully!');
+          fetchEggRates();
+          resetForm();
+        } else {
+          alert('Failed to update rates: ' + response.message);
+        }
       })
       .catch(error => console.error("Error submitting data:", error));
   };
 
   const handleDelete = (rate) => {
-    fetch('/php/api/rates/delete_rate.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: rate.id }), // Send ID for deletion
-    })
-      .then(res => res.json())
+    deleteRate(rate.id)
       .then(response => {
-        fetchEggRates(); // Refresh the list of egg rates
+        if (response.success) {
+          alert('Rate deleted successfully!');
+          fetchEggRates();
+        } else {
+          alert('Failed to delete rate: ' + response.message);
+        }
       })
       .catch(error => console.error("Error deleting item:", error));
+  };
+
+  const handleAddState = (e) => {
+    e.preventDefault();
+    addStateOrCity('state', newState)
+      .then(response => {
+        if (response.success) {
+          alert('State added successfully!');
+          setNewState('');
+          fetchCitiesAndStates();
+        } else {
+          alert('Failed to add state: ' + response.message);
+        }
+      })
+      .catch(error => console.error("Error adding state:", error));
+  };
+
+  const handleAddCity = (e) => {
+    e.preventDefault();
+    addStateOrCity('city', newCity, newCityState.value)
+      .then(response => {
+        if (response.success) {
+          alert('City added successfully!');
+          setNewCity('');
+          setNewCityState(null);
+          fetchCitiesAndStates();
+        } else {
+          alert('Failed to add city: ' + response.message);
+        }
+      })
+      .catch(error => console.error("Error adding city:", error));
+  };
+
+  const handleRemoveState = (e) => {
+    e.preventDefault();
+    removeStateOrCity('state', removeState)
+      .then(response => {
+        if (response.success) {
+          alert('State removed successfully!');
+          setRemoveState('');
+          fetchCitiesAndStates();
+        } else {
+          alert('Failed to remove state: ' + response.message);
+        }
+      })
+      .catch(error => console.error("Error removing state:", error));
+  };
+
+  const handleRemoveCity = (e) => {
+    e.preventDefault();
+    const cityName = removeCity.label.split(', ')[0];
+    removeStateOrCity('city', cityName, removeCityState.value)
+      .then(response => {
+        if (response.success) {
+          alert('City removed successfully!');
+          setRemoveCity(null);
+          setRemoveCityState(null);
+          fetchCitiesAndStates();
+        } else {
+          alert('Failed to remove city: ' + response.message);
+        }
+      })
+      .catch(error => console.error("Error removing city:", error));
+  };
+
+  const handleEditRate = (rate) => {
+    const updatedRates = eggRates.map(r => r.id === rate.id ? rate : r);
+    setEggRates(updatedRates);
+  
+    updateSingleRate(rate)
+      .then(response => {
+        if (!response.success) {
+          alert('Failed to update rate: ' + response.message);
+          fetchEggRates(); // Refresh the data if update failed
+        }
+      })
+      .catch(error => {
+        console.error("Error updating rate:", error);
+        fetchEggRates(); // Refresh the data if there was an error
+      });
+  };
+
+  const handleStateChange = (selectedState) => {
+    setSelectedState(selectedState);
+    setSelectedOptions([]);
+    const stateOptions = options.filter(option => 
+      option.type === 'city' && 
+      option.state === selectedState.value
+    );
+    setSelectedOptions(stateOptions);
+  };
+
+  const handleSelectAll = () => {
+    const allCities = options.filter(option => 
+      option.type === 'city' && 
+      (!selectedState || option.state === selectedState.value)
+    );
+    setSelectedOptions(allCities);
+  };
+
+  const handleCopyPreviousRates = async () => {
+    if (selectedOptions.length === 0) {
+      alert('Please select at least one city');
+      return;
+    }
+    
+    try {
+      const cities = selectedOptions.map(option => ({
+        city: option.value,
+        state: option.state
+      }));
+      
+      const rates = await fetchRates(null, null);
+      const previousRates = {};
+      
+      rates.forEach(rate => {
+        previousRates[`${rate.city}-${rate.state}`] = rate.rate;
+      });
+      
+      const newPayload = cities.map(city => ({
+        city: city.city,
+        state: city.state,
+        rate: previousRates[`${city.city}-${city.state}`] || '',
+        date: today
+      })).filter(item => item.rate !== '');
+
+      if (newPayload.length === 0) {
+        alert('No previous rates found for selected cities');
+        return;
+      }
+
+      await updateMultipleRates(newPayload);
+      alert('Rates copied successfully!');
+      fetchEggRates();
+      resetForm();
+    } catch (error) {
+      console.error('Error copying previous rates:', error);
+      alert('Failed to copy previous rates');
+    }
   };
 
   const handleSort = (key) => {
@@ -128,9 +272,15 @@ const AdminPage = ({ setIsAuthenticated }) => {
     setSortConfig({ key, direction });
   };
 
-  const sortedEggRates = React.useMemo(() => {
+  const sortedEggRates = useMemo(() => {
     let sortableRates = [...eggRates];
     sortableRates.sort((a, b) => {
+      if (sortConfig.key === 'rate') {
+        return sortConfig.direction === 'ascending' 
+          ? parseFloat(a.rate) - parseFloat(b.rate)
+          : parseFloat(b.rate) - parseFloat(a.rate);
+      }
+      
       if (a[sortConfig.key] < b[sortConfig.key]) {
         return sortConfig.direction === 'ascending' ? -1 : 1;
       }
@@ -141,174 +291,6 @@ const AdminPage = ({ setIsAuthenticated }) => {
     });
     return sortableRates;
   }, [eggRates, sortConfig]);
-
-  const handleStateChange = (selectedState) => {
-    setSelectedState(selectedState);
-    setSelectedOptions([]); // Reset selected options
-    const stateOptions = options.filter(option => option.type === 'city' && option.label.includes(selectedState.value));
-    setSelectedOptions(stateOptions);
-  };
-
-  const handleSelectAll = () => {
-    const allCities = options.filter(option => option.type === 'city');
-    setSelectedOptions(allCities);
-  };
-
-  const handleCopyPreviousRates = () => {
-    if (selectedOptions.length === 0) {
-      alert('Please select at least one city.');
-      return;
-    }
-  
-    const fetchLatestRates = async (cities) => {
-      console.log('Fetching latest rates for cities:', cities);
-      const response = await fetch('/php/api/rates/get_latest_rates.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(cities),
-      });
-      const data = await response.json();
-      console.log('Fetched latest rates:', data);
-      return data;
-    };
-  
-    const updateRates = async () => {
-      const cities = selectedOptions
-        .filter(option => option.type === 'city') // Ensure only cities are selected
-        .map(option => {
-          const [cityName, state] = option.label.split(', ');
-          return { city: cityName, state: state };
-        });
-  
-      console.log('Selected cities for updating rates:', cities);
-  
-      const latestRates = await fetchLatestRates(cities);
-  
-      const payload = latestRates.map(rate => ({
-        city: rate.city,
-        state: rate.state,
-        date: eggRate.date,
-        rate: rate.rate || eggRate.rate,
-        type: 'city',
-      }));
-  
-      console.log('Payload for updating rates:', payload);
-  
-      fetch('/php/api/rates/update_multiple_rates.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
-        .then(res => res.json())
-        .then(response => {
-          console.log('Response from updating rates:', response);
-          fetchEggRates(); // Refresh the list of egg rates
-          resetForm(); // Reset form
-        })
-        .catch(error => console.error("Error submitting data:", error));
-    };
-  
-    updateRates();
-  };
-
-  const handleAddState = (e) => {
-    e.preventDefault();
-    fetch('/php/api/location/add_state_city.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'state', name: newState }),
-    })
-      .then(res => res.json())
-      .then(response => {
-        if (response.success) {
-          fetchCitiesAndStates(); // Refresh the list of states and cities
-          setNewState(''); // Reset form
-        } else {
-          alert(response.error);
-        }
-      })
-      .catch(error => console.error("Error adding state:", error));
-  };
-
-  const handleAddCity = (e) => {
-    e.preventDefault();
-    fetch('/php/api/location/add_state_city.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'city', name: newCity, state: newCityState.value }),
-    })
-      .then(res => res.json())
-      .then(response => {
-        if (response.success) {
-          fetchCitiesAndStates(); // Refresh the list of states and cities
-          setNewCity(''); // Reset form
-          setNewCityState(null); // Reset form
-        } else {
-          alert(response.error);
-        }
-      })
-      .catch(error => console.error("Error adding city:", error));
-  };
-
-  const handleRemoveState = (e) => {
-    e.preventDefault();
-    fetch('/php/api/location/remove_state_city.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'state', name: removeState }),
-    })
-      .then(res => res.json())
-      .then(response => {
-        if (response.success) {
-          fetchCitiesAndStates(); // Refresh the list of states and cities
-          setRemoveState(''); // Reset form
-        } else {
-          alert(response.error);
-        }
-      })
-      .catch(error => console.error("Error removing state:", error));
-  };
-
-  const handleRemoveCity = (e) => {
-    e.preventDefault();
-    fetch('/php/api/location/remove_state_city.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'city', name: removeCity.label.split(', ')[0], state: removeCityState.value }),
-    })
-      .then(res => res.json())
-      .then(response => {
-        if (response.success) {
-          fetchCitiesAndStates(); // Refresh the list of states and cities
-          setRemoveCity(null); // Reset form
-          setRemoveCityState(null); // Reset form
-        } else {
-          alert(response.error);
-        }
-      })
-      .catch(error => console.error("Error removing city:", error));
-  };
-
-  const handleEditRate = (rate) => {
-    const updatedRates = eggRates.map(r => r.id === rate.id ? rate : r);
-    setEggRates(updatedRates);
-  
-    // Send the updated rate to the backend
-    fetch('/php/api/rates/update_rate.php', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(rate),
-    })
-      .then(res => res.json())
-      .then(response => {
-        if (response.success) {
-          fetchEggRates(); // Refresh the list of egg rates
-        } else {
-          console.error("Error updating rate:", response.error);
-        }
-      })
-      .catch(error => console.error("Error updating rate:", error));
-  };
 
   const resetForm = () => {
     setEggRate({ date: today, rate: '' });

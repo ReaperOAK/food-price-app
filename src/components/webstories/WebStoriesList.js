@@ -4,6 +4,7 @@ import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
 import { Helmet } from 'react-helmet';
 import OptimizedImage from '../common/OptimizedImage';
+import { fetchWebStories } from '../../services/api';
 
 const WebStoriesList = () => {
   const [webStories, setWebStories] = useState([]);
@@ -16,15 +17,7 @@ const WebStoriesList = () => {
   const fetchStories = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/php/get_web_stories.php', {
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error(`Failed to fetch web stories: ${response.status} ${response.statusText}`);
-      }
-      const data = await response.json();
+      const data = await fetchWebStories();
       setWebStories(data);
     } catch (error) {
       console.error('Error fetching web stories:', error);

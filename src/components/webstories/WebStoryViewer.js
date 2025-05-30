@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
 import { Helmet } from 'react-helmet';
+import { fetchWebStories, checkWebStoryFileExists } from '../../services/api';
 
 const WebStoryViewer = () => {
   const { slug } = useParams();
@@ -16,16 +17,8 @@ const WebStoryViewer = () => {
   const fetchStoryData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch('/php/get_web_stories.php', {
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch web story data');
-      }
-      const data = await response.json();
-      const story = data.find(s => s.slug === slug);
+      const stories = await fetchWebStories();
+      const story = stories.find(s => s.slug === slug);
       
       if (story) {
         setStoryData(story);
@@ -33,15 +26,7 @@ const WebStoryViewer = () => {
         setSelectedState(story.state);
         
         // Check if the story file exists
-        const storyFileCheck = await fetch(`/webstories/${slug}.html`, { 
-          method: 'HEAD',
-          headers: {
-            'Accept': 'text/html',
-          },
-        });
-        if (!storyFileCheck.ok) {
-          throw new Error('Web story content not found');
-        }
+        await checkWebStoryFileExists(slug);
       } else {
         throw new Error('Story not found');
       }

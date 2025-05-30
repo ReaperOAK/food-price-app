@@ -1,9 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
+import { fetchStatesAndCities } from '../../../services/api';
 
 const useLocationData = () => {
   const [options, setOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);  const processLocationData = useCallback((data) => {
+  const [error, setError] = useState(null);  
+
+  const processLocationData = useCallback((data) => {
     if (typeof data !== 'object' || data === null) {
       console.error('Expected object with state/city data, got:', typeof data);
       return [];
@@ -83,13 +86,7 @@ const useLocationData = () => {
         setIsLoading(true);
         setError(null);
         
-        const response = await fetch('/php/api/location/get_states_and_cities.php', {
-          signal: abortController.signal
-        });
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch locations');
-        }        const data = await response.json();
+        const data = await fetchStatesAndCities(abortController.signal);
         console.log('Fetched data:', data);
         
         const combinedOptions = processLocationData(data);
