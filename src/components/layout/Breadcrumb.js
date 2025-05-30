@@ -1,4 +1,4 @@
-import React, { useMemo, memo, useCallback } from 'react';
+import React, { useMemo, memo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
