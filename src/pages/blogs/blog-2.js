@@ -49,31 +49,33 @@ const EggRates = () => {
             </p>
             
             <div className="grid gap-4">
-              {({
-                title: 'Production Costs',
-                description: 'Feed prices, labor costs, and infrastructure maintenance affect base prices',
-                icon: '💰'
-              },
-              {
-                title: 'Transportation Costs',
-                description: 'Distance from farms to markets impacts final pricing',
-                icon: '🚛'
-              },
-              {
-                title: 'Quality Standards',
-                description: 'Different grades and sizes command varying prices',
-                icon: '⭐'
-              },
-              {
-                title: 'Seasonal Demand',
-                description: 'Festivals and weather conditions influence consumption patterns',
-                icon: '📅'
-              },
-              {
-                title: 'Market Supply',
-                description: 'Available stock levels affect daily price fluctuations',
-                icon: '📦'
-              }).map((factor, index) => (
+              {[
+                {
+                  title: 'Production Costs',
+                  description: 'Feed prices, labor costs, and infrastructure maintenance affect base prices',
+                  icon: '💰'
+                },
+                {
+                  title: 'Transportation Costs',
+                  description: 'Distance from farms to markets impacts final pricing',
+                  icon: '🚛'
+                },
+                {
+                  title: 'Quality Standards',
+                  description: 'Different grades and sizes command varying prices',
+                  icon: '⭐'
+                },
+                {
+                  title: 'Seasonal Demand',
+                  description: 'Festivals and weather conditions influence consumption patterns',
+                  icon: '📅'
+                },
+                {
+                  title: 'Market Supply',
+                  description: 'Available stock levels affect daily price fluctuations',
+                  icon: '📦'
+                }
+              ].map((factor, index) => (
                 <div 
                   key={index}
                   className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-300"
