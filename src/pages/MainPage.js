@@ -5,6 +5,9 @@ import Breadcrumb from '../components/layout/Breadcrumb';
 import LoadingSkeleton from '../components/common/LoadingSkeleton';
 import HeadSection from '../components/common/HeadSection';
 import PriceOverview from '../components/prices/PriceOverview';
+import { getUniqueH1, getSeoTitle, getSeoDescription, getSeoKeywords } from '../utils/seo';
+import { useWebStories, useRates, useLocations, useBlogs } from '../hooks/useData';
+import { generateFaqSchema } from '../components/common/FAQ';
 
 // Lazy load non-critical components
 const RateTable = lazy(() => import('../components/rates/RateTable'));
@@ -18,9 +21,7 @@ const PriceTrendsWidget = lazy(() => import('../components/prices/PriceTrendsWid
 const DetailedEggInfo = lazy(() => import('../components/prices/DetailedEggInfo'));
 const PriceTrends = lazy(() => import('../components/prices/PriceTrends'));
 
-import { getUniqueH1, getSeoTitle, getSeoDescription, getSeoKeywords } from '../utils/seo';
-import { useWebStories, useRates, useLocations, useBlogs } from '../hooks/useData';
-import { generateFaqSchema } from '../components/common/FAQ';
+
 
 const MainPage = () => {
   // URL and location parameters

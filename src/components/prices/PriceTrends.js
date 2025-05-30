@@ -12,7 +12,6 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
     trayPrice,
   } = useMemo(() => {
     const today = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
-    const sevenDaysAgo = eggRates.length > 7 ? eggRates[6].rate : 'N/A';
     const change = eggRates.length > 7 ? (eggRates[0].rate - eggRates[6].rate).toFixed(2) : 'N/A';
     const changePercent = eggRates.length > 7 ? ((eggRates[0].rate - eggRates[6].rate) / eggRates[6].rate * 100).toFixed(2) : 'N/A';
     const avgPrice = eggRates.length > 0 ? (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates.length).toFixed(2) : 'N/A';
