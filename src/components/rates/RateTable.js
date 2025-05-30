@@ -62,16 +62,16 @@ const RateTable = ({
     z-10
     border-b border-amber-600 dark:border-amber-700
   `, [ROW_HEIGHT]);
-
   // Enhanced loading skeleton
   const renderLoadingSkeleton = useCallback(() => (
     <div className={`${containerClasses} animate-pulse`} role="status" aria-label="Loading egg rates">
-      <div className="min-h-[${TABLE_MIN_HEIGHT}]">
+      <div style={{ minHeight: TABLE_MIN_HEIGHT }}>
         <div className={headerClasses}></div>
         {[...Array(LOADING_ROWS)].map((_, index) => (
           <div 
             key={index} 
-            className="h-[${ROW_HEIGHT}] p-4 flex items-center border-t border-gray-100 dark:border-gray-800 space-x-4"
+            style={{ height: ROW_HEIGHT }}
+            className="p-4 flex items-center border-t border-gray-100 dark:border-gray-800 space-x-4"
           >
             <div className="w-1/4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
             <div className="w-1/4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
@@ -99,46 +99,62 @@ const RateTable = ({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedRates.slice(indexOfFirstItem, indexOfLastItem);
   const pages = Array.from({ length: Math.ceil(rates.length / itemsPerPage) }, (_, i) => i + 1);
-const handleLocalSort = (key) => {
-    let direction = 'ascending';
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending';
-    }
-    setSortConfig({ key, direction });
-  };
-
-  const requestSort = (key) => {
+  const requestSort = useCallback((key) => {
     if (externalHandleSort) {
       externalHandleSort(key);
     } else {
-      handleLocalSort(key);
+      // Local sort logic moved inside useCallback
+      let direction = 'ascending';
+      if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+        direction = 'descending';
+      }
+      setSortConfig({ key, direction });
     }
-  };
+  }, [externalHandleSort, sortConfig]);
 
-  const handleEditClick = (rate) => {
+  const handleEditClick = useCallback((rate) => {
     setEditingRate(rate.id);
     setEditedRate(rate);
-  };
+  }, []);
 
-  const handleSaveClick = () => {
+  const handleSaveClick = useCallback(() => {
     if (onEdit) {
       onEdit(editedRate);
     }
     setEditingRate(null);
-  };
-
-  const handleCancelClick = () => {
+  }, [onEdit, editedRate]);
+  const handleCancelClick = useCallback(() => {
     setEditingRate(null);
     setEditedRate({});
-  };
-
-  const handleChange = (e) => {
+  }, []);
+  
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setEditedRate((prevRate) => ({
       ...prevRate,
       [name]: value,
     }));
-  };
+  }, []);
+
+  // Sort icon helper function
+  const getSortIcon = useCallback((columnKey) => {
+    if (sortConfig.key !== columnKey) {
+      return (
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        </svg>
+      );
+    }
+    return (
+      <svg className="w-4 h-4 text-amber-800 dark:text-amber-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+          d={sortConfig.direction === 'ascending' 
+            ? "M8 7l4-4m0 0l4 4m-4-4v18" 
+            : "M16 17l-4 4m0 0l-4-4m4 4V3"} />
+      </svg>
+    );
+  }, [sortConfig]);
+
   // Prepare chart data
   const chartData = selectedCity ? 
     // For city view, use all data sorted by date
@@ -168,9 +184,8 @@ const handleLocalSort = (key) => {
       month: 'long',
       day: 'numeric'
     });
-
-  // Schema data
-  const localBusinessSchema = selectedCity ? {
+  // Schema data - memoized local business schema
+  const localBusinessSchema = useMemo(() => selectedCity ? {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": `Egg Market ${selectedCity}`,
@@ -221,9 +236,8 @@ const handleLocalSort = (key) => {
         }
       }
     }
-  } : null;
-  
-  const productSchema = selectedCity ? {
+  } : null, [selectedCity, selectedState, latestRate]);
+    const productSchema = useMemo(() => selectedCity ? {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `Eggs in ${selectedCity}, ${selectedState}`,
@@ -243,7 +257,7 @@ const handleLocalSort = (key) => {
       "ratingValue": "4.8",
       "reviewCount": "254"
     }
-  } : null;
+  } : null, [selectedCity, selectedState, latestRate]);
 
   // Memoize the rendered content for better performance
   const content = useMemo(() => {
@@ -379,11 +393,31 @@ const handleLocalSort = (key) => {
           </div>
         </div>
       </>
-    );
-  }, [
-    isLoading, rates, selectedCity, showSpecialRates, chartData, 
+    );  }, [
+    // Data and loading states
+    isLoading, rates, selectedCity, selectedState, showSpecialRates, chartData,
     latestRate, latestRateDate, rateChange, percentageChange, trayPrice,
-    containerClasses, headerClasses, tableClasses
+    
+    // UI states and editing
+    currentItems, currentPage, editedRate, editingRate, hoveredRow,
+    
+    // Schema data
+    localBusinessSchema, productSchema,
+      // Event handlers and callbacks
+    handleSaveClick, onDelete, renderLoadingSkeleton, requestSort,
+    handleCancelClick, handleChange, handleEditClick,
+    
+    // Configuration and styling
+    containerClasses, headerClasses, tableClasses, getSortIcon,
+    
+    // Show/hide flags
+    showAdmin, showChart, showDate, showMarket, showPriceColumns, showState,
+    
+    // Sorting configuration
+    sortConfig,
+    
+    // Pagination
+    pages
   ]);
 
   return content;
