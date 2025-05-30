@@ -5,6 +5,7 @@ module.exports = {
     "./public/index.html",
     "./public/templates/**/*.html"
   ],
+  darkMode: 'media', // or 'class' if you want to toggle manually
   theme: {
     extend: {
       animation: {
