@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useState, useEffect, Suspense } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { useInView } from 'react-intersection-observer';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
 import blogs from '../data/blogs'; 
@@ -8,50 +9,97 @@ import BlogList from '../components/blog/BlogList';
 import Breadcrumb from '../components/layout/Breadcrumb';
 import TableOfContents from '../components/common/TableOfContents';
 import OptimizedImage from '../components/common/OptimizedImage';
+import LoadingSkeleton from '../components/common/LoadingSkeleton';
 
 // Pre-define the import mapping for webpack to analyze
 const blogComponentMap = {
   'egg-rate-barwala': () => import('../pages/blogs/egg-rate-barwala'),
   'blog-1': () => import('../pages/blogs/blog-1'),
   'blog-2': () => import('../pages/blogs/blog-2'),
-  // Add any future blog links here
 };
 
 const BlogPage = () => {
   const { link } = useParams();
+  const navigate = useNavigate();
   const blog = blogs.find((b) => b.link === link);
   const [ContentComponent, setContentComponent] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   
-  // Format the date for schema
+  const { ref, inView } = useInView({
+    triggerOnce: true,
+    threshold: 0.1,
+  });
+  
+  // Format dates for schema and display
   const formattedDate = blog ? new Date(blog.uploadDate).toISOString() : new Date().toISOString();
+  const displayDate = blog ? new Date(blog.uploadDate).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }) : '';
   
-  // Generate related articles links based on current blog tags
-  const relatedBlogs = blog ? blogs.filter(b => 
-    b.link !== link && 
-    b.tags && blog.tags && 
-    b.tags.some(tag => blog.tags.includes(tag))
-  ).slice(0, 3) : [];
+  // Generate related articles based on tags
+  const relatedBlogs = blog ? blogs
+    .filter(b => 
+      b.link !== link && 
+      b.tags && blog.tags && 
+      b.tags.some(tag => blog.tags.includes(tag))
+    )
+    .slice(0, 3) : [];
+
+  // Filter out current blog from recommendations
+  const otherBlogs = blogs.filter((b) => b.link !== link);
 
   useEffect(() => {
-    if (blog && blogComponentMap[blog.link]) {
-      blogComponentMap[blog.link]()
-        .then((module) => {
+    let isMounted = true;
+    
+    const loadContent = async () => {
+      if (!blog || !blogComponentMap[blog.link]) {
+        setError('Blog not found');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const module = await blogComponentMap[blog.link]();
+        if (isMounted) {
           setContentComponent(() => module.default);
-        })
-        .catch((error) => {
-          console.error("Error loading content component:", error);
-        });
-    }
+          setIsLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) {
+          console.error("Error loading content:", err);
+          setError('Failed to load blog content');
+          setIsLoading(false);
+        }
+      }
+    };
+
+    setIsLoading(true);
+    loadContent();
+
+    return () => {
+      isMounted = false;
+    };
   }, [blog]);
 
   if (!blog) {
-    return <div>Blog not found</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col items-center justify-center p-4">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">Blog Not Found</h1>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">The blog post you're looking for doesn't exist.</p>
+        <Link 
+          to="/blog"
+          className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          Back to Blog List
+        </Link>
+      </div>
+    );
   }
 
-  // Filter out the current blog from the list of blogs
-  const otherBlogs = blogs.filter((b) => b.link !== link);
-  
-  // Create article schema
+  // Article schema for SEO
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -61,7 +109,7 @@ const BlogPage = () => {
     },
     "headline": blog.title,
     "description": blog.description,
-    "image": blog.image,
+    "image": `https://todayeggrates.com${blog.image}`,
     "author": {
       "@type": "Organization",
       "name": "Today Egg Rates",
@@ -72,125 +120,193 @@ const BlogPage = () => {
       "name": "Today Egg Rates",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://todayeggrates.com/eggpic.webp"
+        "url": "https://todayeggrates.com/logo.webp"
       }
     },
     "datePublished": formattedDate,
-    "dateModified": formattedDate
+    "dateModified": formattedDate,
+    "keywords": blog.tags ? blog.tags.join(', ') : 'egg rate, egg price, NECC egg rate'
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <Helmet>
-        <title>{blog.title} - Today Egg Rates</title>
+        {/* Primary Meta Tags */}
+        <title>{`${blog.title} - Today Egg Rates`}</title>
         <meta name="description" content={blog.description} />
         <meta name="keywords" content={blog.tags ? blog.tags.join(', ') : 'egg rate, egg price, NECC egg rate'} />
         <link rel="canonical" href={`https://todayeggrates.com/blog/${blog.link}`} />
         
-        {/* Article Schema */}
+        {/* Schema.org markup */}
         <script type="application/ld+json">
           {JSON.stringify(articleSchema)}
         </script>
         
-        {/* Open Graph Tags */}
+        {/* Open Graph */}
         <meta property="og:title" content={blog.title} />
         <meta property="og:description" content={blog.description} />
         <meta property="og:type" content="article" />
         <meta property="og:url" content={`https://todayeggrates.com/blog/${blog.link}`} />
-        <meta property="og:image" content={blog.image} />
+        <meta property="og:image" content={`https://todayeggrates.com${blog.image}`} />
         <meta property="article:published_time" content={formattedDate} />
         <meta property="article:modified_time" content={formattedDate} />
+        <meta property="og:site_name" content="Today Egg Rates" />
         
         {/* Twitter Card */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={blog.title} />
         <meta name="twitter:description" content={blog.description} />
-        <meta name="twitter:image" content={blog.image} />
+        <meta name="twitter:image" content={`https://todayeggrates.com${blog.image}`} />
       </Helmet>
       
       <Navbar />
       
-      <div className="flex-grow p-4 md:p-8 lg:p-12">
-        {/* Breadcrumb */}
-        <div className="max-w-4xl mx-auto mb-4">
+      <main className="flex-grow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Breadcrumb />
-        </div>
-        
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-          {/* Blog Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">{blog.title}</h1>
-            <div className="flex items-center text-sm text-gray-600 mb-6">
-              <time dateTime={blog.uploadDate}>
-                {new Date(blog.uploadDate).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </time>
-              <span className="mx-2">•</span>
-              <span>Today Egg Rates</span>
-            </div>            <OptimizedImage 
-              src={blog.image} 
-              alt={blog.title} 
-              className="w-full h-auto rounded-lg mb-6 object-cover"
-              width={800}
-              height={400}
-            />
-          </div>
           
-          {/* Table of Contents - only show for longer posts */}
-          {ContentComponent && <TableOfContents 
-            key={blog.link} 
-            contentId="blog-content" 
-            blogId={blog.link} 
-            isSticky={false} 
-          />}
-          
-          {/* Blog Content */}
-          <div id="blog-content">
-            {ContentComponent ? <ContentComponent /> : <p>Loading content...</p>}
-          </div>
-          
-          {/* Tags */}
-          {blog.tags && blog.tags.length > 0 && (
-            <div className="mt-8 pt-4 border-t border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">Tags</h3>
-              <div className="flex flex-wrap gap-2">
-                {blog.tags.map(tag => (
-                  <span 
-                    key={tag}
-                    className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-600"
-                  >
-                    {tag}
-                  </span>
-                ))}
+          <article ref={ref} className={`mt-8 transition-opacity duration-1000 ${inView ? 'opacity-100' : 'opacity-0'}`}>
+            <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+              {/* Hero Section */}
+              <div className="relative">
+                <OptimizedImage 
+                  src={blog.image}
+                  alt={blog.title}
+                  className="w-full h-[40vh] sm:h-[50vh] object-cover"
+                  width={1200}
+                  height={600}
+                  priority={true}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <div className="absolute bottom-0 p-6 sm:p-8 text-white">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+                    {blog.title}
+                  </h1>
+                  <div className="mt-4 flex items-center space-x-4 text-sm sm:text-base">
+                    <time dateTime={blog.uploadDate} className="flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                      </svg>
+                      {displayDate}
+                    </time>
+                    <span className="flex items-center">
+                      <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+                      </svg>
+                      Today Egg Rates
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-6 sm:p-8">
+                {/* Content */}
+                {isLoading ? (
+                  <LoadingSkeleton />
+                ) : error ? (
+                  <div className="text-center py-12">
+                    <p className="text-red-600 dark:text-red-400 text-lg">{error}</p>
+                    <button 
+                      onClick={() => navigate(0)} 
+                      className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                    >
+                      Try Again
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    {/* Table of Contents */}
+                    {ContentComponent && (
+                      <div className="mb-8">
+                        <TableOfContents 
+                          key={blog.link} 
+                          contentId="blog-content" 
+                          blogId={blog.link} 
+                          isSticky={true}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Main Content */}
+                    <div id="blog-content" className="prose prose-lg dark:prose-invert max-w-none">
+                      <Suspense fallback={<LoadingSkeleton />}>
+                        {ContentComponent && <ContentComponent />}
+                      </Suspense>
+                    </div>
+                    
+                    {/* Tags */}
+                    {blog.tags && blog.tags.length > 0 && (
+                      <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+                          Related Topics
+                        </h2>
+                        <div className="flex flex-wrap gap-2">
+                          {blog.tags.map(tag => (
+                            <span 
+                              key={tag}
+                              className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
-          )}
-          
-          {/* Related Articles */}
-          {relatedBlogs.length > 0 && (
-            <div className="mt-8 pt-4 border-t border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-700 mb-4">Related Articles</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {relatedBlogs.map(relatedBlog => (
-                  <Link 
-                    key={relatedBlog.link} 
-                    to={`/blog/${relatedBlog.link}`}
-                    className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
-                  >
-                    <h4 className="font-medium text-blue-700">{relatedBlog.title}</h4>
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-2">{relatedBlog.description}</p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+
+            {/* Related Articles */}
+            {relatedBlogs.length > 0 && (
+              <section className="mt-12 max-w-4xl mx-auto">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
+                  Related Articles
+                </h2>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {relatedBlogs.map(relatedBlog => (
+                    <Link 
+                      key={relatedBlog.link} 
+                      to={`/blog/${relatedBlog.link}`}
+                      className="group block bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                    >
+                      <div className="aspect-w-16 aspect-h-9 relative">
+                        <OptimizedImage
+                          src={relatedBlog.image}
+                          alt={relatedBlog.title}
+                          className="object-cover transform group-hover:scale-105 transition-transform duration-300"
+                          width={400}
+                          height={225}
+                          loading="lazy"
+                        />
+                      </div>
+                      <div className="p-4">
+                        <h3 className="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+                          {relatedBlog.title}
+                        </h3>
+                        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                          {relatedBlog.description}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              </section>
+            )}
+          </article>
         </div>
-      </div>
+      </main>
+
+      {/* More Articles */}
+      <section className="bg-gray-50 dark:bg-gray-900/50 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
+            More Articles
+          </h2>
+          <BlogList blogs={otherBlogs} />
+        </div>
+      </section>
       
-      <BlogList blogs={otherBlogs} />
       <Footer />
     </div>
   );
