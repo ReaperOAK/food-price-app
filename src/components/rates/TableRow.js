@@ -1,4 +1,5 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
+import PropTypes from 'prop-types';
 
 const TableRow = memo(({
   rate,
@@ -21,21 +22,63 @@ const TableRow = memo(({
   setHoveredRow,
   rowHeight = '48px'
 }) => {
-  const cellStyle = {
-    height: rowHeight,
-    minHeight: rowHeight,
-    transition: 'all 0.2s ease-in-out',
-    padding: '0.75rem 1rem'
+  const baseCellClasses = useMemo(() => `
+    px-3 py-2 align-middle
+    text-gray-800 dark:text-gray-200
+    transition-colors duration-200
+  `.trim(), []);
+
+  const rowClasses = useMemo(() => `
+    ${index % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800/50' : 'bg-white dark:bg-gray-800'}
+    hover:bg-amber-50 dark:hover:bg-amber-900/20
+    ${hoveredRow === index ? 'bg-amber-50 dark:bg-amber-900/20' : ''}
+    transition-colors duration-200
+  `.trim(), [index, hoveredRow]);
+
+  const inputClasses = useMemo(() => `
+    w-full px-2 py-1
+    border border-gray-300 dark:border-gray-600
+    rounded-md
+    bg-white dark:bg-gray-700
+    text-gray-900 dark:text-gray-100
+    focus:ring-2 focus:ring-amber-500 dark:focus:ring-amber-400
+    focus:border-transparent
+    transition-all duration-200
+    placeholder-gray-400 dark:placeholder-gray-500
+  `.trim(), []);
+
+  const buttonBaseClasses = useMemo(() => `
+    px-3 py-1
+    rounded-md text-sm font-medium
+    focus:outline-none focus:ring-2 focus:ring-offset-2
+    transition-colors duration-200
+    disabled:opacity-50 disabled:cursor-not-allowed
+    min-w-[4rem]
+  `.trim(), []);
+
+  const renderButton = (type, onClick, label) => {
+    const buttonColors = {
+      edit: 'bg-amber-500 hover:bg-amber-600 focus:ring-amber-500 text-white',
+      save: 'bg-green-500 hover:bg-green-600 focus:ring-green-500 text-white',
+      cancel: 'bg-gray-500 hover:bg-gray-600 focus:ring-gray-500 text-white',
+      delete: 'bg-red-500 hover:bg-red-600 focus:ring-red-500 text-white'
+    };
+
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`${buttonBaseClasses} ${buttonColors[type]}`}
+        aria-label={label}
+      >
+        {label}
+      </button>
+    );
   };
 
   const renderPriceCell = (amount, tooltip) => (
-    <td className="border border-gray-300 p-2" style={cellStyle} role="cell">
-      <span 
-        className="whitespace-nowrap text-sm md:text-base" 
-        title={tooltip}
-      >
-        ₹{amount.toFixed(2)}
-      </span>
+    <td className={`${baseCellClasses} text-right`} title={tooltip}>
+      <span className="font-medium">₹{amount.toFixed(2)}</span>
     </td>
   );
 
@@ -45,8 +88,7 @@ const TableRow = memo(({
       name={name}
       value={value}
       onChange={handleChange}
-      className="border border-gray-300 p-2 rounded w-full focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
-      style={{ height: '32px' }}
+      className={inputClasses}
       aria-label={`Edit ${name}`}
       {...extraProps}
     />
@@ -54,63 +96,48 @@ const TableRow = memo(({
 
   return (
     <tr
-      className={`
-        ${index % 2 === 0 ? 'bg-amber-50' : 'bg-amber-100'}
-        hover:bg-cyan-50 transition-colors duration-200
-        ${hoveredRow === index ? 'bg-cyan-50' : ''}
-      `}
-      style={cellStyle}
+      className={rowClasses}
       onMouseEnter={() => setHoveredRow(index)}
       onMouseLeave={() => setHoveredRow(null)}
-      role="row"
+      style={{ height: rowHeight }}
     >
       {(!selectedCity && showMarket) && (
-        <td className="border border-gray-300" style={cellStyle} role="cell">
-          {rate.city ? (
-            <a 
-              href={`/${rate.city.toLowerCase()}-egg-rate`}
-              className="text-blue-700 hover:text-blue-900 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-1 text-sm md:text-base"
-              title={`View ${rate.city} egg rates`}
-            >
-              {rate.city}
-            </a>
-          ) : (
-            <span className="text-gray-500">N/A</span>
-          )}
+        <td className={baseCellClasses}>
+          <a 
+            href={`/${rate.city.toLowerCase()}-egg-rate`}
+            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+            aria-label={`View egg rates for ${rate.city}`}
+          >
+            {rate.city || 'N/A'}
+          </a>
         </td>
       )}
 
       {showState && (
-        <td className="border border-gray-300" style={cellStyle} role="cell">
-          <span className="text-sm md:text-base">{rate.state}</span>
+        <td className={baseCellClasses}>
+          {rate.state || 'N/A'}
         </td>
       )}
 
       {showDate && (
-        <td className="border border-gray-300" style={cellStyle} role="cell">
+        <td className={baseCellClasses}>
           {editingRate === rate.id ? (
             renderEditableInput('date', 'date', editedRate.date)
           ) : (
-            <span 
-              className="text-sm md:text-base"
-              title={`Last updated: ${rate.date}`}
-            >
-              {rate.date}
-            </span>
+            <time dateTime={rate.date}>{rate.date}</time>
           )}
         </td>
       )}
 
-      <td className="border border-gray-300" style={cellStyle} role="cell">
+      <td className={baseCellClasses}>
         {editingRate === rate.id ? (
           renderEditableInput('number', 'rate', editedRate.rate, {
             step: "0.01",
-            min: "0"
+            min: "0",
+            'aria-label': 'Edit rate per piece'
           })
         ) : (
-          <span className="font-medium text-sm md:text-base">
-            ₹{parseFloat(rate.rate).toFixed(2)}
-          </span>
+          <span className="font-medium">₹{parseFloat(rate.rate).toFixed(2)}</span>
         )}
       </td>
 
@@ -127,49 +154,51 @@ const TableRow = memo(({
       )}
 
       {showAdmin && (
-        <td className="border border-gray-300 space-x-2" style={cellStyle} role="cell">
-          <div className="flex flex-wrap gap-2">
-            {editingRate === rate.id ? (
-              <>
-                <button
-                  onClick={handleSaveClick}
-                  className="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 min-w-[60px]"
-                  aria-label="Save changes"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={handleCancelClick}
-                  className="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 min-w-[60px]"
-                  aria-label="Cancel editing"
-                >
-                  Cancel
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => handleEditClick(rate)}
-                  className="bg-amber-600 text-white px-3 py-1 rounded text-sm hover:bg-amber-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-opacity-50 min-w-[60px]"
-                  aria-label={`Edit ${rate.city} rate`}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => onDelete && onDelete(rate)}
-                  className="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 min-w-[60px]"
-                  aria-label={`Delete ${rate.city} rate`}
-                >
-                  Delete
-                </button>
-              </>
-            )}
-          </div>
+        <td className={`${baseCellClasses} space-x-2`}>
+          {editingRate === rate.id ? (
+            <div className="flex gap-2">
+              {renderButton('save', handleSaveClick, 'Save')}
+              {renderButton('cancel', handleCancelClick, 'Cancel')}
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              {renderButton('edit', () => handleEditClick(rate), 'Edit')}
+              {renderButton('delete', () => onDelete?.(rate), 'Delete')}
+            </div>
+          )}
         </td>
       )}
     </tr>
   );
 });
+
+TableRow.propTypes = {
+  rate: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    city: PropTypes.string,
+    state: PropTypes.string,
+    date: PropTypes.string,
+    rate: PropTypes.number
+  }).isRequired,
+  index: PropTypes.number.isRequired,
+  hoveredRow: PropTypes.number,
+  selectedCity: PropTypes.string,
+  showMarket: PropTypes.bool,
+  showState: PropTypes.bool,
+  showDate: PropTypes.bool,
+  showPriceColumns: PropTypes.bool,
+  showSpecialRates: PropTypes.bool,
+  showAdmin: PropTypes.bool,
+  editingRate: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  editedRate: PropTypes.object,
+  handleChange: PropTypes.func.isRequired,
+  handleEditClick: PropTypes.func.isRequired,
+  handleSaveClick: PropTypes.func.isRequired,
+  handleCancelClick: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
+  setHoveredRow: PropTypes.func.isRequired,
+  rowHeight: PropTypes.string
+};
 
 TableRow.displayName = 'TableRow';
 

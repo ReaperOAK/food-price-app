@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import PriceChart from './PriceChart';
 import { Helmet } from 'react-helmet';
 import TableHeader from './TableHeader';
@@ -25,82 +25,63 @@ const RateTable = ({
   showMarket = true,
   isLoading = false
 }) => {
+  // State management with memoization
   const [currentPage, setCurrentPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ key: selectedCity ? 'date' : 'city', direction: 'ascending' });
   const [editingRate, setEditingRate] = useState(null);
   const [editedRate, setEditedRate] = useState({});
   const [hoveredRow, setHoveredRow] = useState(null);
 
-  // Constants for fixed dimensions to prevent CLS
+  // Constants for fixed dimensions to prevent CLS (Cumulative Layout Shift)
   const TABLE_MIN_HEIGHT = '400px';
   const ROW_HEIGHT = '48px';
   const TABLE_WRAPPER_MIN_HEIGHT = '600px';
   const LOADING_ROWS = 5;
 
-  const containerStyle = {
-    minHeight: TABLE_WRAPPER_MIN_HEIGHT,
-    backgroundColor: '#ffffff',
-    transition: 'all 0.2s ease-in-out'
-  };
+  const containerClasses = useMemo(() => `
+    min-h-[${TABLE_WRAPPER_MIN_HEIGHT}]
+    bg-white dark:bg-gray-900
+    rounded-lg shadow-lg
+    border border-gray-200 dark:border-gray-700
+    transition-all duration-300
+    hover:shadow-xl
+  `, [TABLE_WRAPPER_MIN_HEIGHT]);
 
-  const tableStyle = {
-    minHeight: TABLE_MIN_HEIGHT,
-    width: '100%',
-    backgroundColor: '#ffffff',
-  };
+  const tableClasses = useMemo(() => `
+    min-h-[${TABLE_MIN_HEIGHT}]
+    w-full
+    bg-white dark:bg-gray-900
+    border-collapse
+    border-spacing-0
+  `, [TABLE_MIN_HEIGHT]);
 
-  const headerStyle = {
-    height: ROW_HEIGHT,
-    backgroundColor: '#F9BE0C',
-    position: 'sticky',
-    top: 0,
-    zIndex: 10,
-  };
+  const headerClasses = useMemo(() => `
+    h-[${ROW_HEIGHT}]
+    bg-amber-500 dark:bg-amber-600
+    sticky top-0
+    z-10
+    border-b border-amber-600 dark:border-amber-700
+  `, [ROW_HEIGHT]);
 
-  const cellStyle = {
-    height: ROW_HEIGHT,
-    padding: '12px 16px',
-  };
-
-  const getSortIcon = (columnKey) => {
-    if (sortConfig.key !== columnKey) return '↕️';
-    return sortConfig.direction === 'ascending' ? '↑' : '↓';
-  };
-
-  // Enhanced loading skeleton with fixed heights
-  const renderLoadingSkeleton = () => (
-    <div style={containerStyle} className="overflow-hidden rounded-lg shadow" role="status" aria-label="Loading egg rates">
-      <div className="animate-pulse" style={{ minHeight: TABLE_MIN_HEIGHT }}>
-        <div style={headerStyle} className="bg-gray-200 mb-2"></div>
+  // Enhanced loading skeleton
+  const renderLoadingSkeleton = useCallback(() => (
+    <div className={`${containerClasses} animate-pulse`} role="status" aria-label="Loading egg rates">
+      <div className="min-h-[${TABLE_MIN_HEIGHT}]">
+        <div className={headerClasses}></div>
         {[...Array(LOADING_ROWS)].map((_, index) => (
           <div 
             key={index} 
-            style={{ ...cellStyle, height: ROW_HEIGHT }} 
-            className="flex items-center border-t border-gray-100 space-x-4"
+            className="h-[${ROW_HEIGHT}] p-4 flex items-center border-t border-gray-100 dark:border-gray-800 space-x-4"
           >
-            <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
-            <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
-            <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
-            <div className="w-1/4 h-4 bg-gray-200 rounded"></div>
+            <div className="w-1/4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="w-1/4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="w-1/4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            <div className="w-1/4 h-4 bg-gray-200 dark:bg-gray-700 rounded"></div>
           </div>
         ))}
       </div>
     </div>
-  );
-
-  // Show loading skeleton with fixed dimensions
-  if (isLoading) {
-    return renderLoadingSkeleton();
-  }
-
-  // Handle empty data
-  if (!rates || rates.length === 0) {
-    return (
-      <div style={tableStyle} className="flex items-center justify-center text-gray-500">
-        <p>No data available</p>
-      </div>
-    );
-  }
+  ), [containerClasses, headerClasses]);
 
   // Sort rates
   const sortedRates = externalHandleSort ? rates : [...rates].sort((a, b) => {
@@ -264,71 +245,69 @@ const handleLocalSort = (key) => {
     }
   } : null;
 
-  return (
-    <>
-      {/* Schema data handling */}
-      {selectedCity && (
-        <Helmet>
-          {localBusinessSchema && (
-            <script type="application/ld+json">
-              {JSON.stringify(localBusinessSchema)}
-            </script>
-          )}
-          {productSchema && (
-            <script type="application/ld+json">
-              {JSON.stringify(productSchema)}
-            </script>
-          )}
-        </Helmet>
-      )}
+  // Memoize the rendered content for better performance
+  const content = useMemo(() => {
+    if (isLoading) {
+      return renderLoadingSkeleton();
+    }
 
-      {/* Main table container with fixed dimensions */}
-      <div style={containerStyle} className="bg-gray-100 rounded-lg shadow-lg">
-        {/* Special rates header */}
-        {showSpecialRates && (
-          <div className="p-6 bg-white rounded-t-lg">
-            <h2 className="text-3xl font-bold text-center text-gray-800">Special Rates</h2>
-            <p className="text-center text-gray-600 mt-2">Today's wholesale egg rates for special markets and bulk buyers</p>
-          </div>
+    if (!rates || rates.length === 0) {
+      return (
+        <div className={`${tableClasses} flex items-center justify-center p-8`}>
+          <p className="text-gray-500 dark:text-gray-400">No data available</p>
+        </div>
+      );
+    }
+
+    return (
+      <>
+        {selectedCity && (
+          <Helmet>
+            {localBusinessSchema && (
+              <script type="application/ld+json">
+                {JSON.stringify(localBusinessSchema)}
+              </script>
+            )}
+            {productSchema && (
+              <script type="application/ld+json">
+                {JSON.stringify(productSchema)}
+              </script>
+            )}
+          </Helmet>
         )}
 
-        {/* Rate Summary Section */}
-        {!showSpecialRates && chartData.length > 0 && (
-          <div className="bg-white rounded-t-lg">
-            <RateSummary 
-              latestRate={latestRate}
-              latestRateDate={latestRateDate}
-              rateChange={rateChange}
-              percentageChange={percentageChange}
-              trayPrice={trayPrice}
-            />
-          </div>
-        )}
+        <div className={containerClasses}>
+          {showSpecialRates && (
+            <div className="p-6 bg-white dark:bg-gray-800 rounded-t-lg border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-800 dark:text-gray-100">
+                Special Rates
+              </h2>
+              <p className="text-center text-gray-600 dark:text-gray-400 mt-2">
+                Today's wholesale egg rates for special markets and bulk buyers
+              </p>
+            </div>
+          )}
 
-        {/* Table Section with fixed height */}
-        <div className="overflow-x-auto bg-white rounded-lg" style={tableStyle}>
-          <table className="min-w-full border border-gray-300" role="table" aria-label="Egg Rates Table">
-            <thead className="sticky top-0 z-10" style={headerStyle}>
-              <TableHeader 
-                selectedCity={selectedCity}
-                showMarket={showMarket}
-                showState={showState}
-                showDate={showDate}
-                showPriceColumns={showPriceColumns}
-                showSpecialRates={showSpecialRates}
-                showAdmin={showAdmin}
-                sortConfig={sortConfig}
-                requestSort={requestSort}
-                getSortIcon={getSortIcon}
+          {!showSpecialRates && chartData.length > 0 && (
+            <div className="bg-white dark:bg-gray-800 rounded-t-lg">
+              <RateSummary 
+                latestRate={latestRate}
+                latestRateDate={latestRateDate}
+                rateChange={rateChange}
+                percentageChange={percentageChange}
+                trayPrice={trayPrice}
               />
-            </thead>
-            <tbody>
-              {currentItems.map((rate, index) => (
-                <TableRow
-                  key={`${rate.city}-${rate.date}-${index}`}
-                  rate={rate}
-                  index={index}
-                  hoveredRow={hoveredRow}
+            </div>
+          )}
+
+          <div className="overflow-x-auto bg-white dark:bg-gray-800 rounded-lg">
+            <table 
+              className="min-w-full border-collapse" 
+              role="table" 
+              aria-label="Egg Rates Table"
+            >
+              <thead className={headerClasses}>
+                <TableHeader 
                   selectedCity={selectedCity}
                   showMarket={showMarket}
                   showState={showState}
@@ -336,55 +315,78 @@ const handleLocalSort = (key) => {
                   showPriceColumns={showPriceColumns}
                   showSpecialRates={showSpecialRates}
                   showAdmin={showAdmin}
-                  editingRate={editingRate}
-                  editedRate={editedRate}
-                  handleChange={handleChange}
-                  handleEditClick={handleEditClick}
-                  handleSaveClick={handleSaveClick}
-                  handleCancelClick={handleCancelClick}
-                  onDelete={onDelete}
-                  setHoveredRow={setHoveredRow}
-                  rowHeight={ROW_HEIGHT}
+                  sortConfig={sortConfig}
+                  requestSort={requestSort}
+                  getSortIcon={getSortIcon}
                 />
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {currentItems.map((rate, index) => (
+                  <TableRow
+                    key={`${rate.city}-${rate.date}-${index}`}
+                    rate={rate}
+                    index={index}
+                    hoveredRow={hoveredRow}
+                    selectedCity={selectedCity}
+                    showMarket={showMarket}
+                    showState={showState}
+                    showDate={showDate}
+                    showPriceColumns={showPriceColumns}
+                    showSpecialRates={showSpecialRates}
+                    showAdmin={showAdmin}
+                    editingRate={editingRate}
+                    editedRate={editedRate}
+                    handleChange={handleChange}
+                    handleEditClick={handleEditClick}
+                    handleSaveClick={handleSaveClick}
+                    handleCancelClick={handleCancelClick}
+                    onDelete={onDelete}
+                    setHoveredRow={setHoveredRow}
+                    rowHeight={ROW_HEIGHT}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
 
-        {/* Pagination */}
-        <div className="bg-white rounded-b-lg">
-          <Pagination
-            currentPage={currentPage}
-            setCurrentPage={setCurrentPage}
-            pages={pages}
-            isLoading={isLoading}
-          />
-        </div>
-
-        {/* Chart Section */}
-        {showChart && (
-          <div className="mt-6 bg-white rounded-lg p-4">            
-            <PriceChart 
-              data={currentItems}
-              type={selectedCity ? 'line' : 'bar'}
-              xKey={selectedCity ? 'date' : 'city'}
-              yKey="rate"
-              title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
+          <div className="bg-white dark:bg-gray-800 rounded-b-lg border-t border-gray-200 dark:border-gray-700">
+            <Pagination
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              pages={pages}
               isLoading={isLoading}
             />
           </div>
-        )}
 
-        {/* Market Info - Show for both specific city and general India view */}
-        <div className="mt-6">
-          <MarketInfo
-            selectedCity={selectedCity}
-            selectedState={selectedState || 'India'}
-          />
+          {showChart && (
+            <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">            
+              <PriceChart 
+                data={currentItems}
+                type={selectedCity ? 'line' : 'bar'}
+                xKey={selectedCity ? 'date' : 'city'}
+                yKey="rate"
+                title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
+                isLoading={isLoading}
+              />
+            </div>
+          )}
+
+          <div className="mt-6">
+            <MarketInfo
+              selectedCity={selectedCity}
+              selectedState={selectedState || 'India'}
+            />
+          </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  }, [
+    isLoading, rates, selectedCity, showSpecialRates, chartData, 
+    latestRate, latestRateDate, rateChange, percentageChange, trayPrice,
+    containerClasses, headerClasses, tableClasses
+  ]);
+
+  return content;
 };
 
-export default RateTable;
+export default React.memo(RateTable);

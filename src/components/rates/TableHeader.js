@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 
 const TableHeader = memo(({
   selectedCity,
@@ -12,67 +12,84 @@ const TableHeader = memo(({
   requestSort,
   getSortIcon
 }) => {
-  const headerCellStyle = {
-    height: '48px',
-    minHeight: '48px',
-    padding: '0.75rem 1rem',
-    backgroundColor: '#F59E0B', // Improved color for better contrast
-    transition: 'background-color 0.2s ease-in-out',
-    position: 'sticky',
-    top: 0,
-    zIndex: 10
+  const headerCellClasses = useMemo(() => `
+    p-3 text-left align-middle cursor-pointer
+    border-b border-amber-600 dark:border-amber-700
+    hover:bg-amber-600 dark:hover:bg-amber-700
+    transition-colors duration-200
+    whitespace-nowrap
+    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500
+  `.trim(), []);
+
+  const headerTextClasses = useMemo(() => `
+    text-gray-900 dark:text-gray-100 
+    font-semibold text-sm md:text-base
+    flex items-center gap-2
+  `.trim(), []);
+
+  const renderSortIcon = (key) => {
+    if (sortConfig.key !== key) {
+      return (
+        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+        </svg>
+      );
+    }
+    return (
+      <svg className="w-4 h-4 text-amber-800 dark:text-amber-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+          d={sortConfig.direction === 'ascending' 
+            ? "M8 7l4-4m0 0l4 4m-4-4v18" 
+            : "M16 17l-4 4m0 0l-4-4m4 4V3"} />
+      </svg>
+    );
   };
 
-  const renderHeaderCell = (key, label, showSort = true, tooltip = '') => (
+  const renderHeaderCell = (key, label, sortable = true, tooltip = '') => (
     <th
-      className="border border-gray-300 cursor-pointer hover:bg-amber-500 transition-colors duration-200 whitespace-nowrap"
-      onClick={() => showSort && requestSort(key)}
-      role="columnheader"
-      aria-sort={sortConfig.key === key ? sortConfig.direction : 'none'}
-      style={headerCellStyle}
-      title={tooltip}
+      scope="col"
+      className={headerCellClasses}
+      onClick={() => sortable && requestSort(key)}
+      role={sortable ? 'columnheader button' : 'columnheader'}
+      aria-sort={sortConfig.key === key ? sortConfig.direction : undefined}
+      title={tooltip || label}
+      tabIndex={sortable ? 0 : -1}
     >
-      <div className="flex items-center justify-between gap-2">
-        <span className="text-gray-900 font-semibold text-sm md:text-base">
-          {label}
-        </span>
-        {showSort && (
-          <span className="text-xs ml-1" aria-hidden="true">
-            {getSortIcon(key)}
-          </span>
-        )}
+      <div className={headerTextClasses}>
+        <span>{label}</span>
+        {sortable && renderSortIcon(key)}
       </div>
     </th>
   );
 
   return (
-    <tr className="sticky top-0">
+    <tr>
       {(!selectedCity && showMarket) && renderHeaderCell(
         'city',
         showSpecialRates ? 'Market Location' : 'Market',
         true,
-        'Click to sort by market name'
+        'Sort markets alphabetically'
       )}
       
       {showState && renderHeaderCell(
         'state',
         'State',
         true,
-        'Click to sort by state'
+        'Sort by state name'
       )}
       
       {showDate && renderHeaderCell(
         'date',
         'Date',
         true,
-        'Click to sort by date'
+        'Sort by date'
       )}
       
       {renderHeaderCell(
         'rate',
         'Rate Per Piece',
         true,
-        'Click to sort by rate'
+        'Sort by egg rate'
       )}
 
       {showPriceColumns && (
