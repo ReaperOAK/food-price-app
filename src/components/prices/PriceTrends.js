@@ -11,9 +11,7 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
     rate7DaysAgo,
     weeklyChange,
     weeklyChangePercent,
-    averagePrice,
     isPositiveChange,
-    monthlyTrend
   } = useMemo(() => {
     const todayRate = eggRates.length > 0 ? eggRates[0].rate : 'N/A';
     const rate7DaysAgo = eggRates.length > 7 ? eggRates[6].rate : 'N/A';
