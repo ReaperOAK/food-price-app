@@ -247,7 +247,7 @@ const Navbar = memo(({
               to="/" 
               onClick={handleHomeClick}
               ref={firstFocusableRef}
-              className="flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+              className="flex-shrink-0 rounded-lg"
               aria-label="Go to homepage"
             >
               <Logo />

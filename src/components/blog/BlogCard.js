@@ -15,6 +15,7 @@ const BlogCard = ({ blog, priority = false }) => {
         transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
       itemScope 
       itemType="http://schema.org/BlogPosting"
+      role="listitem"
     >
       <Link 
         to={`/blog/${blog.link}`}
