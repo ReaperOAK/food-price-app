@@ -46,20 +46,6 @@ const legalLinks = [
 const Footer = memo(() => {
   const currentYear = new Date().getFullYear();
 
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Today Egg Rates",
-    "url": "https://todayeggrates.com",
-    "logo": "https://todayeggrates.com/logo.webp",
-    "sameAs": socialLinks.map(link => link.url),
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "email": "contact@todayeggrates.com",
-      "contactType": "customer service"
-    }
-  };
-
   return (
     <footer className="bg-[#2D1810] text-white py-8 sm:py-12 px-4 mt-8 relative print:hidden" role="contentinfo">
       
