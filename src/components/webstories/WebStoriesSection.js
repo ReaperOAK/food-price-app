@@ -13,19 +13,19 @@ const WebStoriesSection = memo(({
   return (
     <section className="mt-10 px-4 sm:px-6 lg:px-8" aria-labelledby="webstories-heading">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 id="webstories-heading" className="text-2xl font-semibold text-white-800 tracking-tight">
+        <h2 id="webstories-heading" className="text-2xl font-semibold text-gray-800 dark:text-gray-100 tracking-tight">
           Featured Web Stories
         </h2>
         <button
           onClick={() => setShowWebStories(!showWebStories)}
-          className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:bg-indigo-800 transition-all duration-200 flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:bg-indigo-800 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:active:bg-indigo-700 transition-all duration-200 flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={webStoriesLoading}
           aria-expanded={showWebStories}
           aria-controls="stories-grid"
         >
           {webStoriesLoading ? (
             <>
-              <svg className="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="animate-spin h-5 w-5 mr-2 text-white dark:text-gray-200" viewBox="0 0 24 24" aria-hidden="true">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
