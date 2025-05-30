@@ -13,7 +13,7 @@ const WebStoriesSection = memo(({
   return (
     <section className="mt-10 px-4 sm:px-6 lg:px-8" aria-labelledby="webstories-heading">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-        <h2 id="webstories-heading" className="text-2xl font-semibold text-gray-800 tracking-tight">
+        <h2 id="webstories-heading" className="text-2xl font-semibold text-white-800 tracking-tight">
           Featured Web Stories
         </h2>
         <button
