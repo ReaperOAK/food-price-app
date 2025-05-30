@@ -114,10 +114,8 @@ const HeadSection = memo(({
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="apple-mobile-web-app-title" content="Today Egg Rates" />
       <meta name="mobile-web-app-capable" content="yes" />
-      
-      {/* Security Headers */}
+        {/* Security Headers */}
       <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
-      <meta httpEquiv="X-Frame-Options" content="SAMEORIGIN" />
       <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
     </Helmet>
   );

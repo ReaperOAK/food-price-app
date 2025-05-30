@@ -25,37 +25,58 @@ The Food Price App provides comprehensive egg price information across different
         └── 📁admin
             └── AddCityForm.js
             └── AddStateForm.js
+            └── CitySelect.js
             └── LoginPage.js
             └── RateForm.js
+            └── StateSelect.js
         └── 📁blog
             └── BlogCard.js
             └── BlogList.js
-            └── TableOfContents.js
         └── 📁common
-            └── CitySelect.js
             └── Disclaimer.js
             └── FAQ.js
+            └── HeadSection.js
+            └── LoadingSkeleton.js
             └── OptimizedImage.js
             └── PrivacyPolicy.js
-            └── StateSelect.js
+            └── QuickInfo.js
+            └── TableOfContents.js
             └── TOS.js
         └── 📁layout
             └── AdminNavbar.js
             └── Breadcrumb.js
             └── Footer.js
+            └── 📁navbar
+                └── Logo.js
+                └── NavigationLinks.js
+                └── SearchBox.js
+                └── useLocationData.js
             └── Navbar.js
             └── RootLayout.js
+        └── 📁prices
+            └── DetailedEggInfo.js
+            └── PriceOverview.js
+            └── PriceTrends.js
+            └── PriceTrendsWidget.js
         └── 📁rates
-            └── RateChart.js
+            └── MarketInfo.js
+            └── Pagination.js
+            └── PriceChart.js
+            └── RateSummary.js
             └── RateTable.js
             └── StateList.js
-            └── StatePage.js
+            └── TableHeader.js
+            └── TableRow.js
         └── 📁webstories
             └── WebStoriesList.js
+            └── WebStoriesSection.js
             └── WebStoryViewer.js
     └── 📁data
         └── blogs.js
         └── eggprices.js
+    └── 📁hooks
+        └── useData.js
+        └── useTheme.js
     └── 📁pages
         └── AdminPage.js
         └── BlogPage.js
@@ -64,8 +85,12 @@ The Food Price App provides comprehensive egg price information across different
             └── blog-2.js
             └── egg-rate-barwala.js
         └── MainPage.js
+    └── 📁services
+        └── api.js
     └── 📁utils
+        └── formatters.js
         └── ScrollToTop.js
+        └── seo.js
     └── App.css
     └── App.js
     └── App.test.js
@@ -85,6 +110,7 @@ The Food Price App provides comprehensive egg price information across different
 | **App.js** | Main application component with smart code splitting, lazy loading, and enhanced performance optimizations |
 | **index.js** | Entry point with router configuration and suspense handling |
 | **useData.js** | Custom data fetching hooks for real-time state management |
+| **useTheme.js** | Theme management hook for dark/light mode |
 | **api.js** | Centralized API services for consistent data access |
 | **formatters.js** | Utility functions for data formatting and presentation |
 | **seo.js** | SEO utilities for metadata and structured data |
@@ -123,72 +149,43 @@ The Food Price App provides comprehensive egg price information across different
 ### 🧱 UI Components
 
 #### Navigation & Structure
-- **Navbar.js**: Main navigation with search dropdown to find cities/states
+- **Navbar/** 
+  - **Logo.js**: Branded logo component
+  - **NavigationLinks.js**: Navigation menu items
+  - **SearchBox.js**: Location search with autocomplete
+  - **useLocationData.js**: Location data management hook
 - **AdminNavbar.js**: Admin-specific navigation with logout functionality
 - **Footer.js**: Site-wide footer with copyright info and legal links
 - **Breadcrumb.js**: Context-aware navigation path with structured data for SEO
 - **RootLayout.js**: Main layout component for wrapping pages with common elements
 
-#### Content Sections
+#### Price Display Components
+- **DetailedEggInfo.js**: Comprehensive price information display
+- **PriceOverview.js**: Summarized price dashboard
+- **PriceTrends.js**: Advanced trend analysis
+- **PriceTrendsWidget.js**: Embeddable price trend widget
+- **MarketInfo.js**: Market-specific information display
+- **RateSummary.js**: Quick price summary component
+- **RateTable.js**: Interactive data table with advanced features
+- **TableHeader.js**: Reusable sortable table header
+- **TableRow.js**: Optimized table row component with memoization
+- **StateList.js**: Interactive grid of states and cities
+- **Pagination.js**: Reusable pagination component
+
+#### Performance Components
+- **LoadingSkeleton.js**: Optimized loading states with CLS prevention
+- **HeadSection.js**: Centralized meta tag and SEO management
+- **QuickInfo.js**: Fast-loading summary information
+- **OptimizedImage.js**: Optimized image component with lazy loading
+
+#### Content Components
+- **BlogCard.js**: Blog post preview component
+- **BlogList.js**: Grid display of blog posts
+- **TableOfContents.js**: Dynamic table of contents with scroll sync
 - **FAQ.js**: Dynamic FAQ section with location-tailored questions
-
-#### Data Display
-- **RateTable.js**: Interactive table showing egg rates with rich features:
-  - Pagination support
-  - Sortable columns (city, state, date, rate)
-  - Special rates display for wholesale/bulk buyers
-  - Price calculations (per piece, tray of 30, pack of 100, peti of 210)
-  - SEO-optimized with structured data (Schema.org)
-  - Admin mode for CRUD operations
-  - Responsive design with horizontal scrolling
-  - Price change indicators with percentage calculations
-
-- **RateChart.js**: Interactive price visualization component with features:
-  - Support for both bar and line charts
-  - Historical trend visualization
-  - Price comparison across locations
-  - Customizable time ranges
-  - Responsive design with adaptive layout
-  - Dynamic tooltips with detailed price information
-  - Color-coded price change indicators
-
-- **RateChart.js**: Chart component for visualizing egg rates with features:
-  - Support for both bar and line charts
-  - Customizable data points and hover states
-  - Currency formatting for price values
-  - Automatic date formatting for x-axis
-  - Responsive layout with maintainable aspect ratio
-  - Custom tooltips with price information
-
-- **StateList.js**: Interactive grid of states and cities with:
-  - Direct navigation links to city/state specific pages
-  - Last updated timestamps
-  - Organized display of market locations
-  - Hierarchical data presentation
-
-- **DefaultTable.js**: Generic table for displaying egg rates without specific location
-- **SpecialRatesTable.js**: Highlights featured or promoted egg rates from special markets
-- **EggRatesTable.js**: Admin-facing table for managing egg rate entries
-
-#### Forms & Inputs
-- **CitySelect.js**: Multi-select dropdown for choosing cities
-- **StateSelect.js**: Dropdown for selecting states with filtering capabilities
-- **RateForm.js**: Form for updating egg rates with batch operations
-- **AddStateForm.js**: Admin form for adding new states
-- **AddCityForm.js**: Admin form for adding new cities with state association
-
-#### Blog Components
-- **BlogList.js**: Grid display of blog posts with sorting and filtering
-- **BlogCard.js**: Card component for individual blog previews
-- **TableOfContents.js**: Dynamic table of contents for blog posts with anchor links
-- **blogs/blog-1.js**: "Understanding Today's Egg Rates Across Major Indian Cities"
-- **blogs/blog-2.js**: "Understanding Egg Rates in India"
-- **blogs/egg-rate-barwala.js**: Barwala market analysis article
-
-#### Legal Pages
-- **PrivacyPolicy.js**: Privacy policy information
-- **TOS.js**: Terms of Service details
-- **Disclaimer.js**: Legal disclaimers about the egg price data
+- **WebStoriesList.js**: Grid layout of web stories
+- **WebStoriesSection.js**: Optimized web stories section
+- **WebStoryViewer.js**: Full-screen story viewer
 
 ### 📊 Data Files
 
