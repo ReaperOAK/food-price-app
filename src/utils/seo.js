@@ -41,11 +41,11 @@ export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getF
 export const getSeoDescription = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   if (selectedCity) {
     const trayPrice = todayRate !== 'N/A' ? formatPrice(todayRate * 30) : 'N/A';
-    return `✓ Live egg rates in ${selectedCity}, ${selectedState}: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (30 eggs). Compare NECC egg prices, market trends, and daily updates for ${selectedCity} - ${today}. Real-time wholesale and retail egg rates.`;
+    return `✓ Live wholesale egg rates in ${selectedCity}, ${selectedState}: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (30 eggs). Get official NECC egg prices, wholesale market trends, and daily price updates for ${selectedCity}'s egg market - ${today}. Compare retail and wholesale rates from authorized dealers.`;
   } else if (selectedState) {
-    return `✓ Today's ${selectedState} egg rates: Get live NECC egg prices from major cities. Compare wholesale & retail egg rates, market analysis, and price trends in ${selectedState}. Updated ${today} with reliable data.`;
+    return `✓ Today's ${selectedState} wholesale egg rates: Get live NECC egg prices from major city markets. Compare wholesale & retail egg rates, market analysis, and daily price trends in ${selectedState}'s poultry markets. Updated ${today} with reliable market data.`;
   } else {
-    return `✓ Check today's egg rates across India. Live NECC egg prices from Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare wholesale & retail rates, market insights & price trends (${today}).`;
+    return `✓ Check today's wholesale egg rates across India. Live NECC egg prices from Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ city markets. Compare official wholesale & retail rates, real-time market insights & daily price trends (${today}). Trusted by traders nationwide.`;
   }
 };
 
@@ -56,7 +56,13 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
     'egg price',
     'egg rate per dozen',
     'wholesale egg rate',
-    'retail egg price'
+    'retail egg price',
+    'live egg rates',
+    'egg market price',
+    'egg tray price',
+    'current egg rates',
+    'poultry market rates',
+    'egg trading price'
   ];
 
   if (selectedCity) {
@@ -66,6 +72,9 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       `egg rate in ${selectedCity.toLowerCase()}`,
       `${selectedCity.toLowerCase()} egg price today`,
       `necc egg rate in ${selectedCity.toLowerCase()}`,
+      `${selectedCity.toLowerCase()} wholesale egg price`,
+      `${selectedCity.toLowerCase()} egg market rate`,
+      `${selectedCity.toLowerCase()} poultry market price`,
       ...baseKeywords
     ].join(', ');
   } else if (selectedState) {
@@ -75,6 +84,9 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       `today egg rate in ${selectedState.toLowerCase()}`,
       `${selectedState.toLowerCase()} egg price today`,
       `necc egg rate in ${selectedState.toLowerCase()}`,
+      `${selectedState.toLowerCase()} wholesale egg market`,
+      `${selectedState.toLowerCase()} poultry rates`,
+      `egg market price ${selectedState.toLowerCase()}`,
       ...baseKeywords
     ].join(', ');
   } else {
@@ -84,10 +96,15 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       'today egg rate',
       'national egg rate',
       'all india egg rate',
+      'wholesale egg market india',
+      'indian poultry market rates',
+      'egg trading price india',
       'today egg rate in mumbai',
       'today egg rate in chennai',
       'today egg rate in kolkata',
+      'today egg rate in bangalore',
       'barwala egg rate today',
+      'live egg market rates',
       ...baseKeywords
     ].join(', ');
   }

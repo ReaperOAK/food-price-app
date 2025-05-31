@@ -38,68 +38,68 @@ export const generateFaqList = (selectedCity, selectedState, currentRate, trayPr
   const defaultFAQs = [
     {
       question: `What is today's egg rate in India?`,
-      answer: `Today's egg rates in India vary by location. The national average egg rate today is updated daily from NECC (National Egg Coordination Committee) sources. Visit our homepage for the latest egg rates across all major cities.`
+      answer: `Today's egg rates in India vary by location. The national average NECC egg rate today (${formattedDate}) is continuously monitored and updated. Our real-time egg price tracking system provides live wholesale and retail egg rates from the National Egg Coordination Committee (NECC) for all major cities. Visit our homepage for comprehensive egg price updates across India's wholesale markets.`
     },
     {
       question: `What is NECC egg rate today?`,
-      answer: `The official NECC (National Egg Coordination Committee) egg rate today is updated on our website daily. NECC announces egg prices for different zones including Namakkal, Chennai, Delhi, Mumbai, Kolkata and other major markets.`
+      answer: `The official NECC (National Egg Coordination Committee) egg rate today is meticulously tracked and updated on our platform. NECC announces daily wholesale and retail egg prices for different zones including Namakkal, Chennai, Delhi, Mumbai, Kolkata, and other major markets. These NECC rates serve as the authoritative benchmark for egg prices across India's poultry industry.`
     },
     {
       question: `How are egg rates determined in India?`,
-      answer: `Egg rates in India are determined by the National Egg Coordination Committee (NECC) based on factors like production costs, demand-supply dynamics, seasonal variations, and regional differences. These rates are announced daily and serve as a benchmark for wholesale egg prices across the country.`
+      answer: `Egg rates in India are determined by the National Egg Coordination Committee (NECC) through a comprehensive analysis of multiple factors: current poultry feed costs, market demand-supply dynamics, seasonal variations, regional market conditions, and transportation costs. NECC egg prices are announced daily and serve as the standard reference for wholesale and retail egg rates across India's poultry markets.`
     },
     {
       question: `What is a peti of eggs and how much does it cost today?`,
-      answer: `A "peti" (box) of eggs typically contains 30 eggs (one tray). The price of 1 peti egg varies by location. Based on today's rates, a peti of eggs costs approximately ₹150-₹200 depending on your city. Check our city-specific pages for exact prices in your area.`
+      answer: `A "peti" (box) or tray of eggs contains 30 eggs, which is the standard wholesale unit in India's egg market. Today's peti rates vary by location and are directly influenced by NECC price guidelines. Based on current market rates (${formattedDate}), a peti of eggs typically costs between ₹150-₹200, with exact wholesale and retail prices varying by city and state. Check our location-specific pages for precise egg tray rates in your area.`
     },
     {
-      question: `Why do egg prices fluctuate?`,
-      answer: `Egg prices fluctuate due to factors like seasonal demand, feed costs, production levels, transportation costs, festivals, weather conditions, and disease outbreaks affecting poultry. The National Egg Coordination Committee (NECC) monitors these factors when setting daily egg rates.`
+      question: `Why do egg prices fluctuate in the Indian market?`,
+      answer: `Egg prices in India's wholesale and retail markets fluctuate due to several key factors: seasonal demand variations, poultry feed costs, production levels, transportation expenses, regional festival demands, weather conditions affecting poultry farms, and any disease outbreaks impacting poultry. The National Egg Coordination Committee (NECC) monitors these market dynamics when establishing daily egg rates for different regions.`
     },
     {
-      question: `What is the difference between farm eggs and market eggs?`,
-      answer: `Farm eggs come directly from producers without passing through the formal market system, while market eggs are distributed through the organized channels regulated by bodies like NECC. Market egg rates are standardized while farm egg prices may vary based on local factors.`
+      question: `What is the difference between farm eggs and NECC market eggs?`,
+      answer: `Farm eggs are sourced directly from local poultry producers without passing through the formal market system, while NECC market eggs are distributed through organized channels regulated by the National Egg Coordination Committee. NECC egg rates are standardized across wholesale markets, ensuring consistent pricing, while farm egg prices may vary based on local market conditions and direct-to-consumer sales.`
     },
     {
-      question: `How much does a tray of 30 eggs cost today?`,
-      answer: `The cost of a tray of 30 eggs (commonly referred to as 1 peti) varies by location. In major cities, the current price ranges from ₹150 to ₹200. Our website provides daily updated city-specific egg rates across India.`
+      question: `How much does a wholesale tray of 30 eggs cost today in the Indian market?`,
+      answer: `The wholesale cost of a tray (30 eggs) varies across India's markets. Currently in major wholesale markets, prices range from ₹150 to ₹200 per tray based on NECC guidelines. Our website provides daily updated wholesale and retail egg rates specific to each city and state, helping you track market prices effectively.`
     },
     {
-      question: `What are the factors that affect egg rates?`,
-      answer: `Egg rates are affected by multiple factors including: production costs (feed, labor, maintenance), seasonal demand fluctuations, transportation costs, regional supply-demand balance, weather conditions, disease outbreaks in poultry, and government policies regarding the poultry industry.`
+      question: `What market factors affect egg rates in India?`,
+      answer: `Indian egg market rates are influenced by multiple factors: poultry feed costs, labor expenses, farm maintenance costs, seasonal wholesale demand patterns, transportation logistics, regional supply-demand dynamics, weather impacts on poultry farms, disease prevention measures, and government policies affecting the poultry industry. The NECC considers all these factors in determining daily egg rates.`
     }
   ];
 
   // Location-specific FAQs
   const locationSpecificFAQs = selectedCity ? [
     {
-      question: `What is today's egg rate in ${selectedCity}?`,
-      answer: `Today's egg rate in ${selectedCity}, ${selectedState || ''} is ₹${currentRate} per egg (as of ${formattedDate}).`
+      question: `What is today's egg rate in ${selectedCity} wholesale market?`,
+      answer: `Today's NECC egg rate in ${selectedCity}, ${selectedState || ''} is ₹${currentRate} per egg (updated ${formattedDate}). This price reflects current wholesale market conditions and is based on official NECC guidelines for ${selectedCity}'s poultry market.`
     },
     {
-      question: `What is the price of 30 eggs (1 tray) in ${selectedCity} today?`,
-      answer: `The price of 30 eggs (1 tray) in ${selectedCity} today is ₹${trayPrice} (as of ${formattedDate}).`
+      question: `What is the wholesale price of 30 eggs (1 tray) in ${selectedCity} today?`,
+      answer: `The current wholesale price of 30 eggs (1 tray) in ${selectedCity}'s market is ₹${trayPrice} (as of ${formattedDate}). This rate follows NECC's price guidelines and reflects local market conditions in ${selectedCity}'s wholesale egg market.`
     },
     {
-      question: `What is the NECC egg rate in ${selectedCity} today?`,
-      answer: `The NECC egg rate in ${selectedCity} today is ₹${currentRate} per egg. NECC (National Egg Coordination Committee) updates egg prices daily based on market conditions.`
+      question: `What is the official NECC egg rate in ${selectedCity} today?`,
+      answer: `The official NECC wholesale egg rate in ${selectedCity} today is ₹${currentRate} per egg. This price is set by the National Egg Coordination Committee (NECC) based on ${selectedCity}'s local market conditions and updated daily to reflect accurate market rates.`
     },
     {
-      question: `How do egg prices in ${selectedCity} compare to national average?`,
-      answer: `Egg prices in ${selectedCity} may differ from the national average based on local factors like transportation costs, regional demand, and distribution network efficiency. You can compare ${selectedCity}'s egg rates with other cities on our main rates page.`
+      question: `How do ${selectedCity}'s egg market prices compare to national rates?`,
+      answer: `${selectedCity}'s egg market prices may differ from the national average due to local factors such as transportation costs to wholesale markets, regional consumer demand, and distribution network efficiency. Compare ${selectedCity}'s current egg rates with other major markets on our comprehensive rates page.`
     }
   ] : selectedState ? [
     {
-      question: `What is the average egg rate in ${selectedState}?`,
-      answer: `The average egg rate in ${selectedState} varies across different cities. We calculate the state average based on NECC rates from major cities in ${selectedState}. This information is updated daily on our website.`
+      question: `What is the average egg rate in ${selectedState}'s markets today?`,
+      answer: `The average egg rate in ${selectedState}'s wholesale markets varies across different cities. We calculate the state average based on official NECC rates from major wholesale markets in ${selectedState}. This market information is updated daily on our platform to reflect current prices.`
     },
     {
-      question: `How do egg prices in ${selectedState} compare to other states?`,
-      answer: `Egg prices in ${selectedState} may be higher or lower than other states depending on factors like local production capacity, transportation networks, and consumer demand. You can compare rates across different states on our website.`
+      question: `How do ${selectedState}'s egg market prices compare to other states?`,
+      answer: `${selectedState}'s egg market prices may be higher or lower than other states depending on factors like local poultry production capacity, wholesale market distribution networks, and regional consumer demand. Compare current rates across different state markets on our website.`
     },
     {
-      question: `Which city in ${selectedState} has the lowest egg prices?`,
-      answer: `Egg prices can vary within ${selectedState}. Cities closer to major production centers typically have lower prices. Check our state page for ${selectedState} to see a comparison of egg rates across different cities in the state.`
+      question: `Which wholesale market in ${selectedState} has the lowest egg prices?`,
+      answer: `Egg prices vary across wholesale markets in ${selectedState}. Markets closer to major poultry production centers typically offer lower wholesale rates. Visit our detailed ${selectedState} market page to compare current egg rates across different wholesale markets in the state.`
     }
   ] : [];
 
