@@ -44,20 +44,38 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
   return (
     <>
       <Helmet>
-        <title>Egg Price Trends in {location} - {today}</title>
-        <meta name="description" content={`Latest egg price trends and analysis for ${location}. Today's rate: ₹${formatPrice(todayRate)} per piece. Weekly change: ${weeklyChangePercent}%. Updated ${today}.`} />
+        <title>Today's Egg Rate in {location} - Daily NECC Price Updates {today}</title>
+        <meta name="description" content={`Latest egg prices and NECC rates in ${location}. Today's egg rate: ₹${formatPrice(todayRate)} per piece. Compare today's egg price with wholesale rates, retail prices, and supermarket rates. Updated ${today} with live egg rates.`} />
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Product",
-            "name": "Eggs",
-            "description": `Egg prices and trends in ${location}`,
+            "name": `Egg Rates in ${location}`,
+            "description": `Live egg prices and NECC rates in ${location}. Compare today's egg price, wholesale rates, and retail prices.`,
             "offers": {
-              "@type": "Offer",
-              "price": todayRate,
+              "@type": "AggregateOffer",
+              "lowPrice": todayRate,
+              "highPrice": todayRate + 0.45,
               "priceCurrency": "INR",
-              "availability": "https://schema.org/InStock",
-              "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString()
+              "offerCount": "4",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "price": todayRate,
+                  "priceCurrency": "INR",
+                  "itemCondition": "https://schema.org/NewCondition",
+                  "availability": "https://schema.org/InStock",
+                  "name": "NECC Wholesale Rate"
+                },
+                {
+                  "@type": "Offer",
+                  "price": todayRate + 0.35,
+                  "priceCurrency": "INR",
+                  "itemCondition": "https://schema.org/NewCondition",
+                  "availability": "https://schema.org/InStock",
+                  "name": "Retail Rate"
+                }
+              ]
             }
           })}
         </script>
@@ -66,34 +84,34 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
       <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl">
           <div className="bg-gradient-to-br from-blue-800 to-blue-900 p-6 sm:p-8">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-4">
-              Egg Price Trends in {location}
-            </h2>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white text-center mb-4">
+              Today's Egg Rate in {location} - Live NECC Price Updates
+            </h1>
             <p className="text-blue-100 text-center text-sm sm:text-base">
-              Updated on {today}
+              Last Updated: {today} - Check Today's Egg Price
             </p>
           </div>
           
           <div className="p-6 sm:p-8 space-y-8">
             <section aria-labelledby="market-analysis" className="space-y-6">
-              <h3 id="market-analysis" className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                Market Analysis for {location}
-              </h3>
+              <h2 id="market-analysis" className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                Today's Egg Market Analysis for {location}
+              </h2>
               
               <div className="prose prose-lg dark:prose-invert max-w-none">
                 <p className="text-gray-600 dark:text-gray-300">
-                  As per the latest report, the egg rate in {location} has reached 
+                  Today's egg rate in {location} is currently at 
                   <span className="font-semibold text-blue-600 dark:text-blue-400"> ₹{formatPrice(todayRate)} </span> 
-                  per piece. {isPositiveChange 
-                    ? "This indicates an upward trend in prices, primarily driven by increased production costs and market demand." 
-                    : "The market is showing signs of stabilization with a slight decrease in prices."}
+                  per piece. The NECC egg price today shows {isPositiveChange 
+                    ? "an upward trend, with increased rates driven by higher production costs and market demand." 
+                    : "a stabilizing trend with slightly decreased rates."} Compare today's egg price with wholesale rates and retail prices below.
                 </p>
                 
                 <p className="text-gray-600 dark:text-gray-300 mt-4">
-                  The recent trend shows a {isPositiveChange ? "rise" : "decline"} of 
+                  The current egg rate shows a {isPositiveChange ? "rise" : "decline"} of 
                   <span className={`font-semibold ${isPositiveChange ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
                     {" "}₹{formatPrice(Math.abs(weeklyChange))} ({Math.abs(weeklyChangePercent)}%)
-                  </span> compared to last week's prices.
+                  </span> from last week's NECC egg price. Daily egg rates and live updates help you track price changes in {location}'s egg market.
                 </p>
               </div>
 
@@ -102,7 +120,7 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 
                              rounded-xl p-5 border border-blue-200 dark:border-blue-800
                              transform transition-all duration-300 hover:scale-105">
-                  <h4 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Today's Rate</h4>
+                  <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">Today's Egg Rate</h3>
                   <div className="flex items-baseline">
                     <span className="text-2xl sm:text-3xl font-bold text-blue-900 dark:text-blue-100">
                       ₹{formatPrice(todayRate)}
@@ -135,7 +153,7 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
                 <div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 
                              rounded-xl p-5 border border-purple-200 dark:border-purple-800
                              transform transition-all duration-300 hover:scale-105">
-                  <h4 className="text-sm font-semibold text-purple-900 dark:text-purple-100 mb-2">Tray Price (30 Eggs)</h4>
+                  <h3 className="text-sm font-semibold text-purple-900 dark:text-purple-100 mb-2">Today's Egg Tray Price (30 Eggs)</h3>
                   <div className="flex items-baseline">
                     <span className="text-2xl sm:text-3xl font-bold text-purple-900 dark:text-purple-100">
                       ₹{formatPrice(todayRate * 30)}
@@ -147,19 +165,19 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
             </section>
 
             <section aria-labelledby="price-details" className="mt-8">
-              <h3 id="price-details" className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
-                Detailed Price Information
-              </h3>
+              <h2 id="price-details" className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
+                Today's Detailed Egg Price Information - NECC Rates
+              </h2>
 
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                   <thead className="bg-gray-50 dark:bg-gray-800">
                     <tr>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Price Category
+                        Egg Price Category
                       </th>
                       <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                        Rate
+                        Today's Rate
                       </th>
                     </tr>
                   </thead>
@@ -190,42 +208,46 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
             </section>
 
             <section aria-labelledby="market-insights" className="mt-8">
-              <h3 id="market-insights" className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
-                Market Insights
-              </h3>
+              <h2 id="market-insights" className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100 mb-6">
+                Live Egg Market Insights - Price Trends
+              </h2>
               
               <div className="prose prose-lg dark:prose-invert max-w-none space-y-4">
                 <p className="text-gray-600 dark:text-gray-300">
-                  The egg market in {location} has shown {isPositiveChange ? 'an upward' : 'a downward'} trend in recent weeks. 
-                  Key factors influencing current prices include:
+                  The egg market in {location} shows {isPositiveChange ? 'increasing' : 'decreasing'} NECC rates. 
+                  Today's egg price trends are influenced by several key factors affecting wholesale and retail rates:
                 </p>
                 
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <li className="flex items-start space-x-2">
                     <span className="text-blue-500 dark:text-blue-400">•</span>
-                    <span>Feed costs (corn and soybean prices)</span>
+                    <span>Daily egg rate fluctuations based on feed costs</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-blue-500 dark:text-blue-400">•</span>
-                    <span>Transportation and logistics</span>
+                    <span>Live NECC price updates and market trends</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-blue-500 dark:text-blue-400">•</span>
-                    <span>Seasonal demand variations</span>
+                    <span>Seasonal variations in egg production</span>
                   </li>
                   <li className="flex items-start space-x-2">
                     <span className="text-blue-500 dark:text-blue-400">•</span>
-                    <span>Market supply conditions</span>
+                    <span>Today's wholesale and retail market conditions</span>
                   </li>
                 </ul>
+
+                <p className="text-gray-600 dark:text-gray-300 mt-4">
+                  Stay updated with live egg rates and NECC price changes in {location}. Compare today's egg prices with historical data to make informed purchasing decisions. Whether you're looking for wholesale egg rates or retail prices, our daily updates provide comprehensive market information.
+                </p>
               </div>
             </section>
 
             <footer className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
               <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  <strong className="text-gray-900 dark:text-gray-200">Note:</strong> All prices are sourced from NECC and local market surveys. 
-                  Prices may vary slightly based on location and vendor. Last updated: {today}
+                  <strong className="text-gray-900 dark:text-gray-200">Note:</strong> All egg prices and NECC rates are sourced from official channels and local market surveys. 
+                  Today's egg price may vary slightly based on location and vendor. Last updated: {today}. Check back daily for live egg rate updates.
                 </p>
               </div>
             </footer>
