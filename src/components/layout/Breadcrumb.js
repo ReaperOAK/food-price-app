@@ -48,15 +48,18 @@ BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
 const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
   const navigate = useNavigate();
   const navigationLock = useRef(false);
-
   const handleClick = (e, path) => {
-    if (navigationLock.current) {
+    if (navigationLock.current || !path) {
       e.preventDefault();
       return;
     }
     
     navigationLock.current = true;
 
+    // Extract city name from path for egg rate pages
+    const pathSegments = path.split('/').filter(Boolean);
+    const lastSegment = pathSegments[pathSegments.length - 1];
+    
     // The home link should trigger proper state cleanup
     if (path === '/') {
       e.preventDefault();
@@ -72,6 +75,25 @@ const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
           navigationLock.current = false;
         });
       return;
+    }
+    
+    // Handle egg rate pages
+    if (lastSegment?.includes('-egg-rate')) {
+      e.preventDefault();
+      const cityName = lastSegment.replace('-egg-rate', '');
+      if (cityName) {
+        Promise.resolve()
+          .then(() => {
+            item.onCityChange?.(cityName);
+            item.onStateChange?.('');
+            return new Promise(resolve => setTimeout(resolve, 0));
+          })
+          .then(() => {
+            navigate(path);
+            navigationLock.current = false;
+          });
+        return;
+      }
     }
     
     navigationLock.current = false;
