@@ -17,10 +17,10 @@ export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
   // Generate FAQ items based on data
   const faqItems = generateFaqList(selectedCity, selectedState, currentRate, trayPrice, formattedDate);
   
-  return {
+  const schema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "itemListElement": faqItems.map(faq => ({
+    "mainEntity": faqItems.map(faq => ({
       "@type": "Question",
       "position": faqItems.indexOf(faq) + 1,
       "name": faq.question,
@@ -30,6 +30,11 @@ export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
       }
     }))
   };
+
+  // For backward compatibility, also include itemListElement
+  schema.itemListElement = schema.mainEntity;
+  
+  return schema;
 };
 
 // Function to generate the FAQ list (used by both schema and component)
