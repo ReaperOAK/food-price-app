@@ -94,7 +94,8 @@ const Navbar = memo(({
 
   // Standardize city names
   const standardizeCityName = useCallback((cityName) => {
-    const lowerCityName = cityName.toLowerCase();
+    if (!cityName) return '';
+    const lowerCityName = cityName.toLowerCase?.() || cityName;
     if (lowerCityName === 'bangalore' || 
         lowerCityName === 'bangalore (cc)' || 
         lowerCityName === 'bengaluru (cc)' ||
@@ -111,11 +112,16 @@ const Navbar = memo(({
     const { value, state } = selectedOption;
     
     const selectedCityName = standardizeCityName(value);
+    if (!selectedCityName) {
+      navigationLock.current = false;
+      return;
+    }
+
     setSelectedCity(selectedCityName);
     setSelectedState(state || '');
     
     requestAnimationFrame(() => {
-      const path = `/${selectedCityName.toLowerCase()}-egg-rate`;
+      const path = `/${selectedCityName?.toLowerCase?.() || selectedCityName}-egg-rate`;
       if (location.pathname !== path) {
         navigate(path, { replace: true });
       }
@@ -145,12 +151,10 @@ const Navbar = memo(({
       });
   }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
   const handleCityClick = useCallback((city, e) => {
-    if (navigationLock.current) {
+    if (navigationLock.current || !city) {
       e?.preventDefault();
       return;
     }
-    
-    if (!city) return;
     
     navigationLock.current = true;
     
@@ -161,7 +165,7 @@ const Navbar = memo(({
         return new Promise(resolve => setTimeout(resolve, 0));
       })
       .then(() => {
-        const path = `/${city.toLowerCase()}-egg-rate`;
+        const path = `/${city?.toLowerCase?.() || city}-egg-rate`;
         if (location.pathname !== path) {
           navigate(path, { replace: true });
         }

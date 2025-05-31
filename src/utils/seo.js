@@ -66,32 +66,32 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
     'national egg rate',
     'all india egg rate'
   ];
-
   if (selectedCity) {
+    const cityLower = selectedCity.toLowerCase?.() || selectedCity;
     return [
-      `necc egg rate ${selectedCity.toLowerCase()}`,
-      `${selectedCity.toLowerCase()} egg rate today`,
-      `today egg rate in ${selectedCity.toLowerCase()}`,
-      `egg rate in ${selectedCity.toLowerCase()}`,
-      `${selectedCity.toLowerCase()} egg price today`,
-      `necc rate in ${selectedCity.toLowerCase()}`,
-      `${selectedCity.toLowerCase()} wholesale egg rate`,
-      `${selectedCity.toLowerCase()} egg market rate`,
-      `${selectedCity.toLowerCase()} poultry market price`,
-      `${selectedCity.toLowerCase()} daily egg rate`,
+      `necc egg rate ${cityLower}`,
+      `${cityLower} egg rate today`,
+      `today egg rate in ${cityLower}`,
+      `egg rate in ${cityLower}`,
+      `${cityLower} egg price today`,
+      `necc rate in ${cityLower}`,
+      `${cityLower} wholesale egg rate`,
+      `${cityLower} egg market rate`,
+      `${cityLower} poultry market price`,
+      `${cityLower} daily egg rate`,
       ...baseKeywords
-    ].join(', ');
-  } else if (selectedState) {
+    ].join(', ');  } else if (selectedState) {
+    const stateLower = selectedState.toLowerCase?.() || selectedState;
     return [
-      `necc egg rate ${selectedState.toLowerCase()}`,
-      `${selectedState.toLowerCase()} egg rate today`,
-      `today egg rate in ${selectedState.toLowerCase()}`,
-      `egg rate in ${selectedState.toLowerCase()}`,
-      `${selectedState.toLowerCase()} egg price today`,
-      `necc rate in ${selectedState.toLowerCase()}`,
-      `${selectedState.toLowerCase()} wholesale egg market`,
-      `${selectedState.toLowerCase()} daily egg rate`,
-      `${selectedState.toLowerCase()} poultry rates`,
+      `necc egg rate ${stateLower}`,
+      `${stateLower} egg rate today`,
+      `today egg rate in ${stateLower}`,
+      `egg rate in ${stateLower}`,
+      `${stateLower} egg price today`,
+      `necc rate in ${stateLower}`,
+      `${stateLower} wholesale egg market`,
+      `${stateLower} daily egg rate`,
+      `${stateLower} poultry rates`,
       ...baseKeywords
     ].join(', ');
   } else {

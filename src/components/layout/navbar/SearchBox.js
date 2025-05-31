@@ -19,14 +19,13 @@ const SearchBox = memo(forwardRef(({
     
     for (const group of options) {
       // If it's a group (has options property)
-      if (group.options) {
-        const found = group.options.find(option => 
-          option.value.toLowerCase() === (selectedCity || '').toLowerCase()
+      if (group.options) {        const found = group.options.find(option => 
+          (option.value?.toLowerCase() || '') === (selectedCity?.toLowerCase() || '')
         );
         if (found) return found;
       }
       // If it's a direct option (from Unknown category)
-      else if (group.value?.toLowerCase() === (selectedCity || '').toLowerCase()) {
+      else if ((group.value?.toLowerCase() || '') === (selectedCity?.toLowerCase() || '')) {
         return group;
       }
     }
@@ -109,11 +108,10 @@ const SearchBox = memo(forwardRef(({
         components={customComponents}
         // Performance optimizations
         filterOption={(option, inputValue) => {
-          if (!inputValue) return true;
-          const searchValue = inputValue.toLowerCase();
+          if (!inputValue) return true;          const searchValue = inputValue?.toLowerCase() || '';
           return (
-            option.label.toLowerCase().includes(searchValue) ||
-            (option.data?.state || '').toLowerCase().includes(searchValue)
+            (option.label?.toLowerCase() || '').includes(searchValue) ||
+            (option.data?.state?.toLowerCase() || '').includes(searchValue)
           );
         }}
         // Accessibility enhancements
