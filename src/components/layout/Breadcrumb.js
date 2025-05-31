@@ -121,14 +121,19 @@ const Breadcrumb = memo(() => {
         });
       });
 
+      // Fixed schema structure according to Schema.org requirements
       const breadcrumbSchema = {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
         "itemListElement": breadcrumbItems.map(item => ({
           "@type": "ListItem",
           "position": item.position,
-          "name": item.name,
-          "item": `https://todayeggrates.com${item.path}`
+          "item": {
+            "@type": "WebPage",
+            "@id": `https://todayeggrates.com${item.path}`,
+            "name": item.name,
+            "url": `https://todayeggrates.com${item.path}`
+          }
         }))
       };
 
@@ -195,6 +200,8 @@ const Breadcrumb = memo(() => {
               itemType="https://schema.org/ListItem"
             >
               <meta itemProp="position" content={item.position} />
+              <meta itemProp="item" content={`https://todayeggrates.com${item.path}`} />
+              <meta itemProp="name" content={item.name} />
               <BreadcrumbItem
                 item={item}
                 isLast={index === items.length - 1}
