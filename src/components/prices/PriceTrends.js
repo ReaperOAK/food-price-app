@@ -42,10 +42,7 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
   }, []);
 
   return (
-    <>
-      <Helmet>
-        <title>Today's Egg Rate in {location} - Daily NECC Price Updates {today}</title>
-        <meta name="description" content={`Latest egg prices and NECC rates in ${location}. Today's egg rate: ₹${formatPrice(todayRate)} per piece. Compare today's egg price with wholesale rates, retail prices, and supermarket rates. Updated ${today} with live egg rates.`} />
+    <>      <Helmet>
         <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",

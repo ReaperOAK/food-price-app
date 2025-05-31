@@ -1,9 +1,9 @@
 import React, { useState, useEffect, Suspense } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
 import Navbar from '../components/layout/Navbar';
 import Footer from '../components/layout/Footer';
+import HeadSection from '../components/common/HeadSection';
 import blogs from '../data/blogs'; 
 import BlogList from '../components/blog/BlogList';
 import Breadcrumb from '../components/layout/Breadcrumb';
@@ -20,6 +20,7 @@ const blogComponentMap = {
 
 const BlogPage = () => {
   const { link } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const blog = blogs.find((b) => b.link === link);
   const [ContentComponent, setContentComponent] = useState(null);
@@ -130,34 +131,14 @@ const BlogPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <Helmet>
-        {/* Primary Meta Tags */}
-        <title>{`${blog.title} - Today Egg Rates`}</title>
-        <meta name="description" content={blog.description} />
-        <meta name="keywords" content={blog.tags ? blog.tags.join(', ') : 'egg rate, egg price, NECC egg rate'} />
-        <link rel="canonical" href={`https://todayeggrates.com/blog/${blog.link}`} />
-        
-        {/* Schema.org markup */}
-        <script type="application/ld+json">
-          {JSON.stringify(articleSchema)}
-        </script>
-        
-        {/* Open Graph */}
-        <meta property="og:title" content={blog.title} />
-        <meta property="og:description" content={blog.description} />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={`https://todayeggrates.com/blog/${blog.link}`} />
-        <meta property="og:image" content={`https://todayeggrates.com${blog.image}`} />
-        <meta property="article:published_time" content={formattedDate} />
-        <meta property="article:modified_time" content={formattedDate} />
-        <meta property="og:site_name" content="Today Egg Rates" />
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={blog.title} />
-        <meta name="twitter:description" content={blog.description} />
-        <meta name="twitter:image" content={`https://todayeggrates.com${blog.image}`} />
-      </Helmet>
+      <HeadSection
+        getSeoTitle={() => blog ? `${blog.title} - Today Egg Rates` : 'Blog - Today Egg Rates'}
+        getSeoDescription={() => blog ? blog.description : 'View our collection of informative articles about egg rates and market trends across India'}
+        getSeoKeywords={() => blog ? blog.tags ? blog.tags.join(', ') : 'egg rate, egg price, NECC egg rate' : 'egg rates, egg market, egg industry news'}
+        location={location}
+        structuredData={articleSchema}
+        generateFaqSchema={() => ({})}
+      />
       
       <Navbar />
       

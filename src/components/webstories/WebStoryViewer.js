@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
-import { Helmet } from 'react-helmet';
+import HeadSection from '../common/HeadSection';
 import { fetchWebStories, checkWebStoryFileExists } from '../../services/api';
 
 const WebStoryViewer = () => {
   const { slug } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -41,30 +42,26 @@ const WebStoryViewer = () => {
   useEffect(() => {
     fetchStoryData();
   }, [fetchStoryData]);
-
-  const renderHelmet = () => {
-    if (storyData) {
-      const ogDescription = `Current egg rate in ${storyData.city}, ${storyData.state}: ₹${storyData.rate} (Updated: ${storyData.date})`;
-      const canonicalUrl = `https://todayeggrates.com/webstory/${storyData.slug}`;
-      
-      return (
-        <Helmet>
-          <title>{`${storyData.title} - Today Egg Rates`}</title>
-          <meta name="description" content={`View the latest egg rates in ${storyData.city}, ${storyData.state}. Current price: ₹${storyData.rate} per egg (Updated: ${storyData.date})`} />
-          <link rel="canonical" href={canonicalUrl} />
-          <meta property="og:title" content={storyData.title} />
-          <meta property="og:description" content={ogDescription} />
-          <meta property="og:image" content={`https://todayeggrates.com${storyData.thumbnail}`} />
-          <meta property="og:url" content={canonicalUrl} />
-          <meta property="og:type" content="article" />
-          <meta name="twitter:card" content="summary_large_image" />
-          <meta name="twitter:title" content={storyData.title} />
-          <meta name="twitter:description" content={ogDescription} />
-          <meta name="twitter:image" content={`https://todayeggrates.com${storyData.thumbnail}`} />
-        </Helmet>
-      );
-    }
-    return null;
+  const generateStorySchema = () => {
+    if (!storyData) return {};
+    
+    return {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": `Egg Rate in ${storyData.city}, ${storyData.state}`,
+      "description": `Current egg rate in ${storyData.city}, ${storyData.state}: ₹${storyData.rate} (Updated: ${storyData.date})`,
+      "image": `https://todayeggrates.com${storyData.thumbnail}`,
+      "datePublished": storyData.date,
+      "dateModified": storyData.date,
+      "publisher": {
+        "@type": "Organization",
+        "name": "Today Egg Rates",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://todayeggrates.com/logo.webp"
+        }
+      }
+    };
   };
 
   const renderLoadingState = () => (
@@ -127,10 +124,18 @@ const WebStoryViewer = () => {
       <Footer />
     </div>
   );
-
   const renderContent = () => (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      {renderHelmet()}
+      <HeadSection
+        getSeoTitle={() => storyData ? `Egg Rate in ${storyData.city}, ${storyData.state} - Web Story | Today Egg Rates` : 'Web Story | Today Egg Rates'}
+        getSeoDescription={() => storyData ? `View current egg rates and market updates for ${storyData.city}, ${storyData.state}. Price: ₹${storyData.rate} (Updated: ${storyData.date})` : 'Web Story Not Found'}
+        getSeoKeywords={() => storyData ? `egg rate ${storyData.city}, ${storyData.state} egg price, egg market ${storyData.city}` : 'egg rates, egg prices'}
+        location={location}
+        structuredData={generateStorySchema()}
+        generateFaqSchema={() => ({})}
+        selectedCity={selectedCity}
+        selectedState={selectedState}
+      />
       <Navbar
         selectedState={selectedState}
         setSelectedState={setSelectedState}

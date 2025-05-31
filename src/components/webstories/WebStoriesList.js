@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Navbar from '../layout/Navbar';
 import Footer from '../layout/Footer';
-import { Helmet } from 'react-helmet';
+import HeadSection from '../common/HeadSection';
 import OptimizedImage from '../common/OptimizedImage';
 import { fetchWebStories } from '../../services/api';
 
 const WebStoriesList = () => {
+  const location = useLocation();
   const [webStories, setWebStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -87,17 +88,16 @@ const WebStoriesList = () => {
 
   const renderContent = () => (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      <Helmet>
-        <title>Egg Rate Web Stories - Latest Egg Prices Across India</title>
-        <meta name="description" content="Browse visual web stories featuring the latest egg rates in cities across India. Get quick and easy access to current egg prices in an engaging format." />
-        <meta name="keywords" content="egg rate web stories, egg price updates, visual egg rates, India egg prices, NECC egg rates stories" />
-        <link rel="canonical" href="https://todayeggrates.com/webstories" />
-        <meta property="og:title" content="Egg Rate Web Stories - Latest Egg Prices Across India" />
-        <meta property="og:description" content="Browse visual web stories featuring the latest egg rates in cities across India. Get quick and easy access to current egg prices in an engaging format." />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://todayeggrates.com/webstories" />
-        <meta name="twitter:card" content="summary_large_image" />
-      </Helmet>
+      <HeadSection
+        getSeoTitle={() => "Egg Rate Web Stories - Live Price Updates | Today Egg Rates"}
+        getSeoDescription={() => "View our collection of web stories featuring live egg rates from cities across India. Get daily price updates, market trends, and regional comparisons in an engaging visual format."}
+        getSeoKeywords={() => "egg rate web stories, egg price updates, live egg rates, city egg prices, daily egg updates, egg market trends"}
+        location={location}
+        structuredData={generateStoriesSchema()}
+        generateFaqSchema={() => ({})}
+        selectedCity={selectedCity}
+        selectedState={selectedState}
+      />
       <Navbar
         selectedState={selectedState}
         setSelectedState={setSelectedState}
@@ -179,6 +179,26 @@ const WebStoriesList = () => {
       <Footer />
     </div>
   );
+
+  const generateStoriesSchema = () => {
+    return {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "itemListElement": webStories.map((story, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "item": {
+          "@type": "Article",
+          "headline": story.title,
+          "description": `Current egg rate in ${story.city}, ${story.state}: ₹${story.rate}`,
+          "image": `https://todayeggrates.com${story.thumbnail}`,
+          "datePublished": story.date,
+          "dateModified": story.date,
+          "url": `https://todayeggrates.com/webstory/${story.slug}`
+        }
+      }))
+    };
+  };
 
   if (loading) return renderLoadingState();
   if (error) return renderError();
