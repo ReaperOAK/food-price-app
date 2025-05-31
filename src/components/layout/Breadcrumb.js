@@ -48,6 +48,7 @@ BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
 const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
   const navigate = useNavigate();
   const navigationLock = useRef(false);
+  
   const handleClick = (e, path) => {
     if (navigationLock.current || !path) {
       e.preventDefault();
@@ -55,68 +56,68 @@ const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
     }
     
     navigationLock.current = true;
+    e.preventDefault();
 
-    // Extract city name from path for egg rate pages
-    const pathSegments = path.split('/').filter(Boolean);
-    const lastSegment = pathSegments[pathSegments.length - 1];
-      // The home link should trigger proper state cleanup
-    if (path === '/') {
-      e.preventDefault();
+    const updateStateAndNavigate = async () => {
       try {
-        // Clear states first
-        item.onStateChange?.('');
-        item.onCityChange?.('');
-        
-        // Add a small delay to ensure state updates are processed
-        setTimeout(() => {
-          navigate('/');
-          navigationLock.current = false;
-        }, 0);
-      } catch (error) {
-        console.error('Error handling home link:', error);
-        navigationLock.current = false;
-      }
-      return;
-    }
-      // Handle egg rate pages
-    if (lastSegment?.includes('-egg-rate')) {
-      e.preventDefault();
-      try {
-        const cityName = lastSegment.replace('-egg-rate', '');
-        if (cityName) {
-          // Update states first
-          item.onCityChange?.(cityName);
-          item.onStateChange?.('');
+        if (path === '/') {
+          // Handle home navigation
+          await Promise.resolve()
+            .then(() => {
+              item.onStateChange?.('');
+              item.onCityChange?.('');
+              return new Promise(resolve => setTimeout(resolve, 0));
+            })
+            .then(() => {
+              navigate('/');
+            });
+        } else {
+          // Handle other paths
+          const pathSegments = path.split('/').filter(Boolean);
+          const lastSegment = pathSegments[pathSegments.length - 1];
           
-          // Add a small delay to ensure state updates are processed
-          setTimeout(() => {
+          // Handle egg rate pages
+          if (lastSegment?.includes('-egg-rate')) {
+            const cityName = lastSegment.replace('-egg-rate', '');
+            if (cityName) {
+              await Promise.resolve()
+                .then(() => {
+                  item.onCityChange?.(cityName);
+                  item.onStateChange?.('');
+                  return new Promise(resolve => setTimeout(resolve, 0));
+                })
+                .then(() => {
+                  navigate(path);
+                });
+            }
+          } else {
+            // Handle any other navigation
             navigate(path);
-            navigationLock.current = false;
-          }, 0);
-          return;
+          }
         }
       } catch (error) {
-        console.error('Error handling egg rate link:', error);
+        console.error('Error handling navigation:', error);
+      } finally {
+        navigationLock.current = false;
       }
-    }
-    
-    // Always unlock navigation if we reach this point
-    navigationLock.current = false;
+    };
+
+    updateStateAndNavigate();
   };
 
-  const linkClasses = useMemo(() => `
-    inline-flex items-center
-    px-2 py-1
-    text-blue-800 hover:text-blue-900
-    hover:underline focus:outline-none
-    focus:ring-2 focus:ring-blue-600 focus:ring-offset-1
-    rounded
-    text-sm sm:text-base md:text-base
-    transition-all duration-200
-    font-medium
-    min-h-[44px]
-    hover:bg-blue-50/50
-  `.trim(), []);
+  const linkClasses = useMemo(() => [
+    'inline-flex items-center',
+    'px-2 py-1',
+    'text-blue-800 hover:text-blue-900',
+    'hover:underline focus:outline-none',
+    'focus:ring-2 focus:ring-blue-600 focus:ring-offset-1',
+    'rounded',
+    'text-sm sm:text-base md:text-base',
+    'transition-all duration-200',
+    'font-medium',
+    'min-h-[44px]',
+    'hover:bg-blue-50/50'
+  ].join(' '), []);
 
   const currentPageClasses = useMemo(() => `
     inline-flex items-center
