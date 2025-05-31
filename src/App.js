@@ -11,10 +11,12 @@ import {
 import RootLayout from './components/layout/RootLayout';
 import blogs from './data/blogs';
 
+
 // Lazy load page components
 const MainPage = lazy(() => import('./pages/MainPage'));
 const BlogPage = lazy(() => import('./pages/BlogPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
+const SEOAutomationDashboard = lazy(()=> import('./components/seo/SEOAutomationDashboard'));
 
 // Reusable component preloader
 const preloadComponent = (importFn) => {
@@ -162,6 +164,7 @@ function App() {
             path="/admin/*"
             element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" replace />}
           />
+          <Route path="/admin/seo" component={SEOAutomationDashboard} />
           
           {/* Content pages */}
           <Route path="/blog/:link" element={<BlogPage blogs={blogs} />} />
