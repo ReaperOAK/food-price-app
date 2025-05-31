@@ -20,8 +20,9 @@ export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "mainEntity": faqItems.map(faq => ({
+    "itemListElement": faqItems.map(faq => ({
       "@type": "Question",
+      "position": faqItems.indexOf(faq) + 1,
       "name": faq.question,
       "acceptedAnswer": {
         "@type": "Answer",
