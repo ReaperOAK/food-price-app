@@ -1,29 +1,37 @@
-import React, { useMemo, memo } from 'react';
+import React, { useMemo, memo, useRef } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
 const formatSegmentName = (segment, index) => {
   if (!segment) return '';
   
-  if (segment.includes('-egg-rate')) {
-    return segment.replace('-egg-rate', '').charAt(0).toUpperCase() + 
-           segment.slice(1).replace('-egg-rate', '') + ' Egg Rate';
-  }
-  
-  const specialCases = {
-    'blog': (idx) => idx === 0 ? 'Blog' : 'Blog',
-    'state': (idx) => idx === 0 ? 'States' : 'State',
-    'webstories': () => 'Web Stories'
-  };
+  try {
+    if (typeof segment === 'string' && segment.includes('-egg-rate')) {
+      // Safely handle case where segment might be undefined/null
+      return segment.replace('-egg-rate', '').charAt(0).toUpperCase() + 
+             segment.slice(1).replace('-egg-rate', '') + ' Egg Rate';
+    }
+    
+    const specialCases = {
+      'blog': (idx) => idx === 0 ? 'Blog' : 'Blog',
+      'state': (idx) => idx === 0 ? 'States' : 'State',
+      'webstories': () => 'Web Stories'
+    };
 
-  if (specialCases[segment]) {
-    return specialCases[segment](index);
-  }
+    if (specialCases[segment]) {
+      return specialCases[segment](index);
+    }
 
-  return segment
-    .split('-')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
+    // Ensure segment is a string before operations
+    return String(segment)
+      .split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  } catch (error) {
+    console.error('Error formatting segment:', error);
+    return ''; // Return empty string as fallback
+  }
 };
 
 const BreadcrumbSeparator = memo(() => (
@@ -39,6 +47,37 @@ const BreadcrumbSeparator = memo(() => (
 BreadcrumbSeparator.displayName = 'BreadcrumbSeparator';
 
 const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
+  const navigate = useNavigate();
+  const navigationLock = useRef(false);
+
+  const handleClick = (e, path) => {
+    if (navigationLock.current) {
+      e.preventDefault();
+      return;
+    }
+    
+    navigationLock.current = true;
+
+    // The home link should trigger proper state cleanup
+    if (path === '/') {
+      e.preventDefault();
+      Promise.resolve()
+        .then(() => {
+          // Clear states first
+          item.onStateChange?.('');
+          item.onCityChange?.('');
+          return new Promise(resolve => setTimeout(resolve, 0));
+        })
+        .then(() => {
+          navigate('/');
+          navigationLock.current = false;
+        });
+      return;
+    }
+    
+    navigationLock.current = false;
+  };
+
   const linkClasses = useMemo(() => `
     inline-flex items-center
     px-2 py-1
@@ -75,10 +114,10 @@ const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
   }
 
   return (
-    <>
-      <Link 
+    <>      <Link 
         to={item.path}
         className={linkClasses}
+        onClick={(e) => handleClick(e, item.path)}
         aria-label={`Navigate to ${item.name}`}
       >
         {item.name}
@@ -88,12 +127,17 @@ const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
   );
 });
 
-const Breadcrumb = memo(() => {
+const Breadcrumb = memo(({ setSelectedCity, setSelectedState }) => {
   const location = useLocation();
-  
-  const { pathSegments, items, schema } = useMemo(() => {
+    const { pathSegments, items, schema } = useMemo(() => {
     try {
-      const segments = location.pathname.split('/').filter(segment => segment !== '');
+      if (!location || !location.pathname) {
+        return { pathSegments: [], items: [], schema: null };
+      }
+
+      const segments = location.pathname
+        .split('/')
+        .filter(segment => segment !== '' && segment != null);
       
       if (segments.length === 0) {
         return { pathSegments: [], items: [], schema: null };
@@ -201,9 +245,12 @@ const Breadcrumb = memo(() => {
             >
               <meta itemProp="position" content={item.position} />
               <meta itemProp="item" content={`https://todayeggrates.com${item.path}`} />
-              <meta itemProp="name" content={item.name} />
-              <BreadcrumbItem
-                item={item}
+              <meta itemProp="name" content={item.name} />              <BreadcrumbItem
+                item={{
+                  ...item,
+                  onStateChange: setSelectedState,
+                  onCityChange: setSelectedCity
+                }}
                 isLast={index === items.length - 1}
                 showSeparator={index < items.length - 1}
               />
