@@ -157,14 +157,16 @@ function App() {
           <Route path="/privacy" element={<LegalPages.PrivacyPolicy />} />
           <Route path="/terms" element={<LegalPages.TOS />} />
           <Route path="/disclaimer" element={<LegalPages.Disclaimer />} />
-          
-          {/* Auth protected routes */}
+            {/* Auth protected routes */}
           <Route path="/login" element={<LoginPage setIsAuthenticated={setIsAuthenticated} />} />
           <Route
             path="/admin/*"
             element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" replace />}
           />
-          <Route path="/admin/seo" component={SEOAutomationDashboard} />
+          <Route 
+            path="/admin/seo" 
+            element={isAuthenticated ? <SEOAutomationDashboard /> : <Navigate to="/login" replace />} 
+          />
           
           {/* Content pages */}
           <Route path="/blog/:link" element={<BlogPage blogs={blogs} />} />
