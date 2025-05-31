@@ -1,6 +1,5 @@
 import React, { useMemo, memo, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Link, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 
 const formatSegmentName = (segment, index) => {
@@ -179,9 +178,7 @@ const Breadcrumb = memo(({ setSelectedCity, setSelectedState }) => {
             "url": `https://todayeggrates.com${item.path}`
           }
         }))
-      };
-
-      return { 
+      };      return { 
         pathSegments: segments, 
         items: breadcrumbItems,
         schema: breadcrumbSchema
@@ -190,7 +187,7 @@ const Breadcrumb = memo(({ setSelectedCity, setSelectedState }) => {
       console.error('Error in breadcrumb generation:', error);
       return { pathSegments: [], items: [], schema: null };
     }
-  }, [location.pathname]);
+  }, [location]); // Including entire location object since we use it in the null check
 
   const containerClasses = useMemo(() => `
     flex py-3 px-4 mb-5
