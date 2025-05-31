@@ -1,5 +1,8 @@
 import { Helmet } from 'react-helmet';
 import { memo } from 'react';
+import DesktopOptimizer from '../seo/DesktopOptimizer';
+import InternationalSEO from '../seo/InternationalSEO'; 
+import HighTrafficCityOptimizer from '../seo/HighTrafficCityOptimizer';
 
 const HeadSection = memo(({
   getSeoTitle,
@@ -10,7 +13,10 @@ const HeadSection = memo(({
   generateFaqSchema,
   selectedCity,
   selectedState,
-  eggRates
+  eggRates,
+  userCountry, // New prop for international optimization
+  todayRate,   // New prop for high-traffic city optimization
+  trayPrice    // New prop for high-traffic city optimization
 }) => {
   const canonicalUrl = `https://todayeggrates.com${
     location.pathname === '/' 
@@ -41,12 +47,28 @@ const HeadSection = memo(({
         crossOrigin="anonymous"
       />
       <link rel="dns-prefetch" href="https://todayeggrates.com" />
-      
-      {/* Core Meta Tags */}
-      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        {/* Core Meta Tags */}
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, viewport-fit=cover" />
       <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
       <meta name="theme-color" content="#ffffff" />
       <meta name="format-detection" content="telephone=no" />
+      
+      {/* Desktop Performance Optimization */}
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta name="google" content="nositelinkssearchbox" />
+      <meta name="msvalidate.01" content="verification-for-bing" />
+      
+      {/* International SEO - Currency & Location */}
+      <meta name="geo.region" content="IN" />
+      <meta name="geo.placename" content="India" />
+      <meta name="geo.position" content="20.5937;78.9629" />
+      <meta name="ICBM" content="20.5937, 78.9629" />
+      
+      {/* Rich Results Enhancement */}
+      <meta name="news_keywords" content="NECC egg rate today, live egg prices, Indian egg market, poultry prices" />
+      <meta name="article:publisher" content="https://todayeggrates.com" />
+      <meta name="article:section" content="Agriculture & Food Prices" />
+      <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />
       
       {/* SEO Meta Tags */}
       <title>{getSeoTitle(selectedCity, selectedState)}</title>
@@ -77,8 +99,7 @@ const HeadSection = memo(({
         })}
       </script>
       
-      <meta property="article:modified_time" content={new Date().toISOString()} />
-        {/* OpenGraph Tags */}
+      <meta property="article:modified_time" content={new Date().toISOString()} />      {/* OpenGraph Tags - Enhanced for International Audience */}
       <meta property="og:site_name" content="Today Egg Rates - NECC Egg Rate Today" />
       <meta property="og:title" content={getSeoTitle(selectedCity, selectedState)} />
       <meta property="og:description" content={getSeoDescription(selectedCity, selectedState)} />
@@ -88,7 +109,16 @@ const HeadSection = memo(({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:locale" content="en_IN" />
+      <meta property="og:locale:alternate" content="en_US" />
+      <meta property="og:locale:alternate" content="en_AU" />
+      <meta property="og:locale:alternate" content="en_GB" />
       <meta property="og:image:alt" content="NECC egg rate today and live egg price updates" />
+      <meta property="og:updated_time" content={new Date().toISOString()} />
+      <meta property="business:contact_data:street_address" content="Mumbai, India" />
+      <meta property="business:contact_data:locality" content="Mumbai" />
+      <meta property="business:contact_data:region" content="Maharashtra" />
+      <meta property="business:contact_data:postal_code" content="400001" />
+      <meta property="business:contact_data:country_name" content="India" />
       
       {/* Twitter Tags */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -112,10 +142,24 @@ const HeadSection = memo(({
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       <meta name="apple-mobile-web-app-title" content="NECC Egg Rate Today" />
-      <meta name="mobile-web-app-capable" content="yes" />
-        {/* Security Headers */}
+      <meta name="mobile-web-app-capable" content="yes" />      {/* Security Headers */}
       <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
       <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+      
+      {/* Performance and SEO Optimization Components */}
+      <DesktopOptimizer />
+      <InternationalSEO 
+        userCountry={userCountry}
+        selectedCity={selectedCity}
+        selectedState={selectedState}
+        todayRate={todayRate}
+      />
+      <HighTrafficCityOptimizer
+        selectedCity={selectedCity}
+        selectedState={selectedState} 
+        todayRate={todayRate}
+        trayPrice={trayPrice}
+      />
     </Helmet>
   );
 });
