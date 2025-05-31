@@ -20,7 +20,7 @@ const useLocationData = () => {
       Object.entries(data).forEach(([state, cities]) => {
         if (state !== 'Unknown' && state !== 'special') {
           const cityOptions = cities.map(city => {
-            processedCities.add(city.toLowerCase());
+            processedCities.add(city.toLowerCase() || city);
             return {
               value: city,
               label: city,
@@ -55,7 +55,7 @@ const useLocationData = () => {
       // Process Unknown cities that haven't been included yet
       if (data.Unknown?.length > 0) {
         const unknownCities = data.Unknown
-          .filter(city => !processedCities.has(city.toLowerCase()))
+          .filter(city => !processedCities.has(city.toLowerCase()||city))
           .map(city => ({
             value: city,
             label: city,

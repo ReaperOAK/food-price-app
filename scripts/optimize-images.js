@@ -13,6 +13,7 @@ sharp.concurrency(1); // Limit concurrency to prevent memory issues
 async function optimizeImage(inputPath) {
   const dir = path.dirname(inputPath);
   const ext = path.extname(inputPath);
+  const extLower = ext.toLowerCase() || ext;
   const basename = path.basename(inputPath, ext);
   
   try {
@@ -64,7 +65,7 @@ async function optimizeImage(inputPath) {
     }
     
     // Optimize original size if not already webp
-    if (ext.toLowerCase() !== '.webp') {
+    if (extLower !== '.webp') {
       const originalOptimized = path.join(optimizedDir, `${basename}.webp`);
       await image
         .webp({ 

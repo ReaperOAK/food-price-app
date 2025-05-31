@@ -104,7 +104,7 @@ const TableRow = memo(({
       {(!selectedCity && showMarket) && (
         <td className={baseCellClasses}>
           <a 
-            href={`/${rate.city.toLowerCase()}-egg-rate`}
+            href={`/${rate.city.toLowerCase()||rate.city}-egg-rate`}
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
             aria-label={`View egg rates for ${rate.city}`}
           >

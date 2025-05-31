@@ -166,7 +166,7 @@ const OptimizedImage = memo(({
           decoding={priority ? 'sync' : 'async'}
           sizes={getSizes()}
           srcSet={optimizedSrcSet(src)}
-          fetchpriority={priority ? 'high' : /hero|banner/.test(className.toLowerCase()) ? 'high' : 'auto'}
+          fetchpriority={priority ? 'high' : /hero|banner/.test(className.toLowerCase() || className) ? 'high' : 'auto'}
           onLoad={(e) => {
             setLoaded(true);
             if (imgRef.current) {
