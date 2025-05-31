@@ -78,9 +78,8 @@ const HeadSection = memo(({
       </script>
       
       <meta property="article:modified_time" content={new Date().toISOString()} />
-      
-      {/* OpenGraph Tags */}
-      <meta property="og:site_name" content="Today Egg Rates" />
+        {/* OpenGraph Tags */}
+      <meta property="og:site_name" content="Today Egg Rates - NECC Egg Rate Today" />
       <meta property="og:title" content={getSeoTitle(selectedCity, selectedState)} />
       <meta property="og:description" content={getSeoDescription(selectedCity, selectedState)} />
       <meta property="og:url" content={canonicalUrl} />
@@ -89,6 +88,7 @@ const HeadSection = memo(({
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
       <meta property="og:locale" content="en_IN" />
+      <meta property="og:image:alt" content="NECC egg rate today and live egg price updates" />
       
       {/* Twitter Tags */}
       <meta name="twitter:card" content="summary_large_image" />
@@ -97,7 +97,7 @@ const HeadSection = memo(({
       <meta name="twitter:title" content={getSeoTitle(selectedCity, selectedState)} />
       <meta name="twitter:description" content={getSeoDescription(selectedCity, selectedState)} />
       <meta name="twitter:image" content="https://todayeggrates.com/eggpic.webp" />
-      <meta name="twitter:image:alt" content="Egg rates and prices visualization" />
+      <meta name="twitter:image:alt" content="NECC egg rate today, live egg prices and daily egg rate updates" />
       
       {/* Performance Optimizations */}
       <link 
@@ -107,12 +107,11 @@ const HeadSection = memo(({
         type="font/woff2" 
         crossOrigin="anonymous" 
       />
-      
-      {/* PWA Tags */}
-      <meta name="application-name" content="Today Egg Rates" />
+        {/* PWA Tags */}
+      <meta name="application-name" content="NECC Egg Rate Today - Live Updates" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-      <meta name="apple-mobile-web-app-title" content="Today Egg Rates" />
+      <meta name="apple-mobile-web-app-title" content="NECC Egg Rate Today" />
       <meta name="mobile-web-app-capable" content="yes" />
         {/* Security Headers */}
       <meta httpEquiv="X-Content-Type-Options" content="nosniff" />

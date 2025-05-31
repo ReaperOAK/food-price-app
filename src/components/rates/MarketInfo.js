@@ -49,22 +49,19 @@ const MarketInfo = memo(({ selectedCity, selectedState, isLoading = false }) => 
                    p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 
                    border border-blue-100 dark:border-gray-700"
         aria-labelledby="market-info-title"
-      >
-        <h3 
+      >        <h3 
           id="market-info-title"
           className="text-xl sm:text-2xl font-semibold text-blue-900 dark:text-blue-100 mb-4 
                      transition-colors duration-200"
         >
-          About {selectedCity} Egg Market
+          {selectedCity} NECC Egg Rate Market & Today's Price Information
         </h3>
 
         <div className="space-y-6">
           {/* Overview Section */}
           <div className="prose prose-blue dark:prose-invert max-w-none">
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              The egg market in {selectedCity}, {selectedState} follows the general poultry market trends 
-              in the region. Prices are influenced by factors such as feed costs, seasonal demand, 
-              transportation expenses, and overall market conditions.
+              The NECC egg rate market in {selectedCity}, {selectedState} provides today's egg rate and daily egg rate updates following National Egg Coordination Committee guidelines. Current egg rate today and NECC rates are influenced by feed costs, seasonal demand, transportation, and live market conditions. Check today egg rate, NECC egg price today, and wholesale egg rates for accurate pricing information.
             </p>
           </div>
 
@@ -84,12 +81,12 @@ const MarketInfo = memo(({ selectedCity, selectedState, isLoading = false }) => 
           </div>
 
           {/* Price Updates Info */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mt-6">
-            <p className="text-gray-700 dark:text-gray-300">
-              <strong className="text-blue-900 dark:text-blue-100">Daily Updates: </strong>
-              {selectedCity}'s egg rates are updated daily based on the National Egg Coordination 
-              Committee (NECC) publications and local market surveys. Our website provides the most 
-              current prices to help consumers and traders make informed decisions.
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 mt-6">            <p className="text-gray-700 dark:text-gray-300">
+              <strong className="text-blue-900 dark:text-blue-100">Live NECC Rate Updates: </strong>
+              {selectedCity}'s egg rate today and NECC egg rates are updated daily based on National Egg Coordination 
+              Committee publications and local market surveys. Our platform provides today's egg rate, live NECC rates, 
+              and current egg price information to help consumers and traders make informed decisions. Get accurate 
+              today egg rate and daily egg rate updates for better market insights.
             </p>
           </div>
 

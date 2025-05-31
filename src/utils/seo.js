@@ -30,22 +30,22 @@ export const getUniqueH1 = (selectedCity, selectedState, today = getFormattedDat
 export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   const formattedRate = formatPrice(todayRate);
   if (selectedCity) {
-    return `NECC Egg Rate Today ${selectedCity}: ₹${formattedRate}/egg | ${today} Official Prices`;
+    return `NECC Egg Rate Today ${selectedCity}: ₹${formattedRate}/egg | Today Egg Rate ${today} Live Updates`;
   } else if (selectedState) {
-    return `NECC Egg Rate ${selectedState}: Today's Price Updates (${today}) | Official Rates`;
+    return `NECC Egg Rate ${selectedState} Today: Live Price Updates (${today}) | Today Egg Rate`;
   } else {
-    return `NECC Egg Rate Today: India Price List (${today}) | Today Egg Rates`;
+    return `NECC Egg Rate Today India: Live Price List (${today}) | Today Egg Rate & NECC Rates`;
   }
 };
 
 export const getSeoDescription = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   if (selectedCity) {
     const trayPrice = todayRate !== 'N/A' ? formatPrice(todayRate * 30) : 'N/A';
-    return `✓ Official NECC egg rate in ${selectedCity}, ${selectedState}: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (30 eggs). Daily updated wholesale & retail prices from National Egg Coordination Committee (NECC). Get live ${selectedCity} egg market rates - ${today}. Compare poultry market prices.`;
+    return `✓ NECC egg rate today in ${selectedCity}, ${selectedState}: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray. Live today egg rate, NECC rates, and daily egg rate updates from National Egg Coordination Committee. Get accurate egg rate today and current egg prices - ${today}. Compare market rates & wholesale prices.`;
   } else if (selectedState) {
-    return `✓ NECC ${selectedState} egg rates today (${today}): Official wholesale prices from National Egg Coordination Committee. Live updates from major ${selectedState} markets including retail & wholesale rates. Daily poultry market analysis and price trends from authorized dealers.`;
+    return `✓ NECC egg rate today ${selectedState} (${today}): Official today egg rate from National Egg Coordination Committee. Live NECC rates, daily egg rate updates from major ${selectedState} markets. Get today's egg rate, wholesale & retail prices, and current egg market analysis.`;
   } else {
-    return `✓ NECC egg rate today India (${today}): National Egg Coordination Committee official prices. Live updates from Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare wholesale & retail rates, daily market trends. Most reliable egg price source for traders.`;
+    return `✓ NECC egg rate today India (${today}): Live today egg rate from National Egg Coordination Committee. Official NECC rates from Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare today's egg rate, daily egg rate, wholesale & retail prices. Most reliable egg price source.`;
   }
 };
 
@@ -55,16 +55,22 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
     'necc rate',
     'egg rate today',
     'today egg rate',
+    'necc egg rate today',
     'today egg price',
     'egg price today',
     'daily egg rate',
     'necc egg price',
+    'necc egg',
+    'egg rate',
     'wholesale egg rate',
     'egg market price',
-    'egg tray price',
-    'live egg rates',
     'national egg rate',
-    'all india egg rate'
+    'all india egg rate',
+    'barwala egg rate today',
+    'barwala egg rate',
+    'live egg rates',
+    'egg tray price',
+    'necc rates'
   ];
   if (selectedCity) {
     const cityLower = selectedCity.toLowerCase?.() || selectedCity;
@@ -75,10 +81,12 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       `egg rate in ${cityLower}`,
       `${cityLower} egg price today`,
       `necc rate in ${cityLower}`,
+      `necc egg rate today ${cityLower}`,
+      `today egg rate ${cityLower}`,
       `${cityLower} wholesale egg rate`,
       `${cityLower} egg market rate`,
-      `${cityLower} poultry market price`,
       `${cityLower} daily egg rate`,
+      `${cityLower} necc rates`,
       ...baseKeywords
     ].join(', ');  } else if (selectedState) {
     const stateLower = selectedState.toLowerCase?.() || selectedState;
@@ -89,9 +97,11 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       `egg rate in ${stateLower}`,
       `${stateLower} egg price today`,
       `necc rate in ${stateLower}`,
+      `necc egg rate today ${stateLower}`,
+      `today egg rate ${stateLower}`,
       `${stateLower} wholesale egg market`,
       `${stateLower} daily egg rate`,
-      `${stateLower} poultry rates`,
+      `${stateLower} necc rates`,
       ...baseKeywords
     ].join(', ');
   } else {
@@ -100,6 +110,8 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       'necc egg rate india',
       'today egg rate',
       'egg rate today india',
+      'necc egg rate today india',
+      'today egg rate india',
       'national egg rate',
       'all india egg rate',
       'daily egg rate',
@@ -109,7 +121,11 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       'today egg rate in kolkata',
       'today egg rate in bangalore',
       'barwala egg rate today',
+      'barwala egg rate',
       'wholesale egg market india',
+      'necc egg',
+      'egg rate',
+      'necc rates',
       ...baseKeywords
     ].join(', ');
   }
@@ -123,11 +139,15 @@ export const generateStructuredData = (selectedCity, selectedState, todayRate, t
     "@context": "https://schema.org",
     "@type": "Product",
     "name": selectedCity 
-      ? `Eggs in ${selectedCity}, ${selectedState}`
+      ? `NECC Egg Rate Today in ${selectedCity}, ${selectedState}`
       : selectedState 
-        ? `Eggs in ${selectedState}`
-        : "Eggs in India",
+        ? `NECC Egg Rate Today in ${selectedState}`
+        : "NECC Egg Rate Today India - Live Updates",
     "description": getSeoDescription(selectedCity, selectedState, todayRate, today),
+    "brand": {
+      "@type": "Brand",
+      "name": "NECC - National Egg Coordination Committee"
+    },
     "offers": {
       "@type": "AggregateOffer",
       "priceCurrency": "INR",
@@ -137,7 +157,7 @@ export const generateStructuredData = (selectedCity, selectedState, todayRate, t
       "availability": "https://schema.org/InStock",
       "seller": {
         "@type": "Organization",
-        "name": "Today Egg Rates",
+        "name": "Today Egg Rates - NECC Rate Updates",
         "url": baseUrl
       }
     },
