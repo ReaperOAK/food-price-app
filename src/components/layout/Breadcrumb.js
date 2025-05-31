@@ -59,43 +59,48 @@ const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
     // Extract city name from path for egg rate pages
     const pathSegments = path.split('/').filter(Boolean);
     const lastSegment = pathSegments[pathSegments.length - 1];
-    
-    // The home link should trigger proper state cleanup
+      // The home link should trigger proper state cleanup
     if (path === '/') {
       e.preventDefault();
-      Promise.resolve()
-        .then(() => {
-          // Clear states first
-          item.onStateChange?.('');
-          item.onCityChange?.('');
-          return new Promise(resolve => setTimeout(resolve, 0));
-        })
-        .then(() => {
+      try {
+        // Clear states first
+        item.onStateChange?.('');
+        item.onCityChange?.('');
+        
+        // Add a small delay to ensure state updates are processed
+        setTimeout(() => {
           navigate('/');
           navigationLock.current = false;
-        });
+        }, 0);
+      } catch (error) {
+        console.error('Error handling home link:', error);
+        navigationLock.current = false;
+      }
       return;
     }
-    
-    // Handle egg rate pages
+      // Handle egg rate pages
     if (lastSegment?.includes('-egg-rate')) {
       e.preventDefault();
-      const cityName = lastSegment.replace('-egg-rate', '');
-      if (cityName) {
-        Promise.resolve()
-          .then(() => {
-            item.onCityChange?.(cityName);
-            item.onStateChange?.('');
-            return new Promise(resolve => setTimeout(resolve, 0));
-          })
-          .then(() => {
+      try {
+        const cityName = lastSegment.replace('-egg-rate', '');
+        if (cityName) {
+          // Update states first
+          item.onCityChange?.(cityName);
+          item.onStateChange?.('');
+          
+          // Add a small delay to ensure state updates are processed
+          setTimeout(() => {
             navigate(path);
             navigationLock.current = false;
-          });
-        return;
+          }, 0);
+          return;
+        }
+      } catch (error) {
+        console.error('Error handling egg rate link:', error);
       }
     }
     
+    // Always unlock navigation if we reach this point
     navigationLock.current = false;
   };
 
