@@ -122,7 +122,6 @@ const Navbar = memo(({
       navigationLock.current = false;
     });
   }, [navigate, location.pathname, setSelectedCity, setSelectedState, standardizeCityName]);
-
   const handleHomeClick = useCallback((e) => {
     if (navigationLock.current) {
       e.preventDefault();
@@ -130,35 +129,44 @@ const Navbar = memo(({
     }
     
     navigationLock.current = true;
-    setSelectedCity('');
-    setSelectedState('');
     
-    if (location.pathname !== '/') {
-      navigate('/');
-    }
-    
-    requestAnimationFrame(() => {
-      navigationLock.current = false;
-    });
+    // Set state to empty first and wait for it to take effect
+    Promise.resolve()
+      .then(() => {
+        setSelectedCity('');
+        setSelectedState('');
+        return new Promise(resolve => setTimeout(resolve, 0));
+      })
+      .then(() => {
+        if (location.pathname !== '/') {
+          navigate('/');
+        }
+        navigationLock.current = false;
+      });
   }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
-
   const handleCityClick = useCallback((city, e) => {
     if (navigationLock.current) {
       e?.preventDefault();
       return;
     }
     
-    navigationLock.current = true;
-    setSelectedCity(city);
-    setSelectedState('');
+    if (!city) return;
     
-    requestAnimationFrame(() => {
-      const path = `/${city.toLowerCase()}-egg-rate`;
-      if (location.pathname !== path) {
-        navigate(path, { replace: true });
-      }
-      navigationLock.current = false;
-    });
+    navigationLock.current = true;
+    
+    Promise.resolve()
+      .then(() => {
+        setSelectedCity(city);
+        setSelectedState('');
+        return new Promise(resolve => setTimeout(resolve, 0));
+      })
+      .then(() => {
+        const path = `/${city.toLowerCase()}-egg-rate`;
+        if (location.pathname !== path) {
+          navigate(path, { replace: true });
+        }
+        navigationLock.current = false;
+      });
   }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
 
   const toggleMenu = useCallback(() => {
