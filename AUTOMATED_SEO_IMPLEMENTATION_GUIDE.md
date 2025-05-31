@@ -1,7 +1,7 @@
 # 🤖 Automated SEO System - Implementation Guide
 
 ## Overview
-This automated SEO system reads Google Search Console data from CSV files in the `public/reports` directory and automatically applies intelligent SEO optimizations to improve your food price app's search performance.
+This automated SEO system reads Google Search Console data from CSV files in the `/reports` directory and automatically applies intelligent SEO optimizations to improve your food price app's search performance.
 
 ## 📊 System Architecture
 
@@ -49,8 +49,8 @@ npm install
 ### 3. Configure File Permissions
 ```bash
 # Ensure reports directory is writable
-chmod 755 public/reports/
-chmod 644 public/reports/*.csv
+chmod 755 /reports/
+chmod 644 /reports/*.csv
 
 # Ensure PHP log directory exists
 mkdir public/php/logs/
@@ -68,7 +68,7 @@ import SEOAutomationDashboard from './components/seo/SEOAutomationDashboard';
 
 ## 📁 CSV File Requirements
 
-The system expects these CSV files in `public/reports/`:
+The system expects these CSV files in `/reports/`:
 - `Queries.csv` - Keyword performance data
 - `Pages.csv` - Page performance data  
 - `Countries.csv` - Geographic performance

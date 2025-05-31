@@ -20,10 +20,10 @@ function testFileExistence() {
         'src/components/seo/SEOAutomationDashboard.js',
         'public/php/seo_automation.php',
         'sql_seo_upgrades.sql',
-        'public/reports/Queries.csv',
-        'public/reports/Pages.csv',
-        'public/reports/Countries.csv',
-        'public/reports/Devices.csv'
+        '/reports/Queries.csv',
+        '/reports/Pages.csv',
+        '/reports/Countries.csv',
+        '/reports/Devices.csv'
     ];
     
     let allFilesExist = true;

@@ -1,6 +1,6 @@
 /**
  * Automated SEO Engine
- * Reads from CSV files in public/reports directory and automatically applies SEO optimizations
+ * Reads from CSV files in /reports directory and automatically applies SEO optimizations
  * This system processes Google Search Console data and dynamically optimizes content
  */
 
