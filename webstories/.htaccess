@@ -1,5 +1,18 @@
 # Enable URL rewriting
 RewriteEngine On
 
-# Rewrite rule for web stories
+# Handle legacy URLs with state codes and double hyphens (404 fix)
+# Pattern: city-statecode--egg-rate.html → redirect via PHP handler
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([a-z0-9-]+)-[a-z]{2}--egg-rate\.html$ /php/webstories/legacy_redirect_handler.php [L]
+
+# Handle URLs with double hyphens but no state codes
+# Pattern: city--egg-rate.html → redirect via PHP handler  
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([a-z0-9-]+)--egg-rate\.html$ /php/webstories/legacy_redirect_handler.php [L]
+
+# Rewrite rule for web stories (without .html extension)
 RewriteRule ^([a-z0-9-]+)-egg-rate$ $1-egg-rate.html [L]
+
+# Handle direct access to HTML files and redirect to clean URLs
+RewriteRule ^([a-z0-9-]+)-egg-rate\.html$ /webstory/$1-egg-rate [R=301,L]
