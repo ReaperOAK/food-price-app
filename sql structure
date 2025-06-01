@@ -1,40 +1,55 @@
 -- ========================================================
--- DATABASE STRUCTURE - FOOD PRICE APPLICATION
+-- DATABASE STRUCTURE - FOOD PRICE APPLICATION WITH SEO
+-- Updated: June 2025 - Includes Automated SEO System
 -- ========================================================
 
 -- --------------------------------------------------------
--- Table: STATES
--- Description: Contains list of states/provinces
+-- Table: STATES (Enhanced with SEO)
+-- Description: Contains list of states/provinces with SEO optimization
 -- --------------------------------------------------------
 
 DESCRIBE states;
 
 /*
-+------------+--------------+------+-----+-------------------+----------------+
-| Field      | Type         | Null | Key | Default           | Extra          |
-+------------+--------------+------+-----+-------------------+----------------+
-| id         | int(11)      | NO   | PRI | NULL              | auto_increment |
-| name       | varchar(100) | NO   | UNI | NULL              |                |
-| created_at | timestamp    | YES  |     | current_timestamp |                |
-+------------+--------------+------+-----+-------------------+----------------+
++-------------------+--------------+------+-----+-------------------+----------------+
+| Field             | Type         | Null | Key | Default           | Extra          |
++-------------------+--------------+------+-----+-------------------+----------------+
+| id                | int(11)      | NO   | PRI | NULL              | auto_increment |
+| name              | varchar(100) | NO   | UNI | NULL              |                |
+| seo_slug          | varchar(150) | YES  | MUL | NULL              |                |
+| meta_title        | varchar(255) | YES  |     | NULL              |                |
+| meta_description  | text         | YES  |     | NULL              |                |
+| seo_keywords      | text         | YES  |     | NULL              |                |
+| search_volume     | int(11)      | YES  | MUL | 0                 |                |
+| ranking_keywords  | json         | YES  |     | NULL              |                |
+| last_seo_update   | timestamp    | YES  |     | NULL              |                |
+| created_at        | timestamp    | YES  |     | current_timestamp |                |
++-------------------+--------------+------+-----+-------------------+----------------+
 */
 
 -- --------------------------------------------------------
--- Table: CITIES
--- Description: Contains list of cities with state references
+-- Table: CITIES (Enhanced with SEO)
+-- Description: Contains list of cities with state references and SEO optimization
 -- --------------------------------------------------------
 
 DESCRIBE cities;
 
 /*
-+------------+--------------+------+-----+-------------------+----------------+
-| Field      | Type         | Null | Key | Default           | Extra          |
-+------------+--------------+------+-----+-------------------+----------------+
-| id         | int(11)      | NO   | PRI | NULL              | auto_increment |
-| name       | varchar(100) | NO   | MUL | NULL              |                |
-| state_id   | int(11)      | NO   | MUL | NULL              |                |
-| created_at | timestamp    | YES  |     | current_timestamp |                |
-+------------+--------------+------+-----+-------------------+----------------+
++-------------------+--------------+------+-----+-------------------+----------------+
+| Field             | Type         | Null | Key | Default           | Extra          |
++-------------------+--------------+------+-----+-------------------+----------------+
+| id                | int(11)      | NO   | PRI | NULL              | auto_increment |
+| name              | varchar(100) | NO   | MUL | NULL              |                |
+| seo_slug          | varchar(150) | YES  | MUL | NULL              |                |
+| state_id          | int(11)      | NO   | MUL | NULL              |                |
+| meta_title        | varchar(255) | YES  |     | NULL              |                |
+| meta_description  | text         | YES  |     | NULL              |                |
+| seo_keywords      | text         | YES  |     | NULL              |                |
+| search_volume     | int(11)      | YES  | MUL | 0                 |                |
+| ranking_keywords  | json         | YES  |     | NULL              |                |
+| last_seo_update   | timestamp    | YES  |     | NULL              |                |
+| created_at        | timestamp    | YES  |     | current_timestamp |                |
++-------------------+--------------+------+-----+-------------------+----------------+
 */
 
 -- --------------------------------------------------------
@@ -57,22 +72,27 @@ DESCRIBE egg_rates;
 */
 
 -- --------------------------------------------------------
--- Table: EGG_RATES_NORMALIZED
--- Description: Contains normalized egg price data with city references
+-- Table: EGG_RATES_NORMALIZED (Enhanced with SEO tracking)
+-- Description: Contains normalized egg price data with city references and SEO tracking
 -- --------------------------------------------------------
 
 DESCRIBE egg_rates_normalized;
 
 /*
-+------------+--------------+------+-----+-------------------+----------------+
-| Field      | Type         | Null | Key | Default           | Extra          |
-+------------+--------------+------+-----+-------------------+----------------+
-| id         | int(11)      | NO   | PRI | NULL              | auto_increment |
-| city_id    | int(11)      | NO   | MUL | NULL              |                |
-| date       | date         | NO   | MUL | NULL              |                |
-| rate       | decimal(10,2)| NO   |     | NULL              |                |
-| created_at | timestamp    | YES  |     | current_timestamp |                |
-+------------+--------------+------+-----+-------------------+----------------+
++---------------------+--------------+------+-----+-------------------+----------------+
+| Field               | Type         | Null | Key | Default           | Extra          |
++---------------------+--------------+------+-----+-------------------+----------------+
+| id                  | int(11)      | NO   | PRI | NULL              | auto_increment |
+| city_id             | int(11)      | NO   | MUL | NULL              |                |
+| date                | date         | NO   | MUL | NULL              |                |
+| rate                | decimal(10,2)| NO   |     | NULL              |                |
+| page_views          | int(11)      | YES  | MUL | 0                 |                |
+| organic_clicks      | int(11)      | YES  | MUL | 0                 |                |
+| search_impressions  | int(11)      | YES  | MUL | 0                 |                |
+| avg_search_position | decimal(5,2) | YES  |     | 0.00              |                |
+| last_seo_analysis   | timestamp    | YES  |     | NULL              |                |
+| created_at          | timestamp    | YES  |     | current_timestamp |                |
++---------------------+--------------+------+-----+-------------------+----------------+
 */
 
 -- --------------------------------------------------------
@@ -113,3 +133,224 @@ DESCRIBE updated_cities;
 | rate  | decimal(10,2)| NO   |     | NULL    |                |
 +-------+--------------+------+-----+---------+----------------+
 */
+
+-- ========================================================
+-- NEW SEO TABLES - AUTOMATED SEO SYSTEM
+-- ========================================================
+
+-- --------------------------------------------------------
+-- Table: SEO_KEYWORDS
+-- Description: Stores keyword performance data from search console
+-- --------------------------------------------------------
+
+DESCRIBE seo_keywords;
+
+/*
++----------------+--------------+------+-----+-------------------+----------------+
+| Field          | Type         | Null | Key | Default           | Extra          |
++----------------+--------------+------+-----+-------------------+----------------+
+| id             | int(11)      | NO   | PRI | NULL              | auto_increment |
+| keyword        | varchar(255) | NO   | MUL | NULL              |                |
+| clicks         | int(11)      | YES  | MUL | 0                 |                |
+| impressions    | int(11)      | YES  |     | 0                 |                |
+| ctr            | decimal(5,4) | YES  |     | 0.0000            |                |
+| position       | decimal(5,2) | YES  | MUL | 0.00              |                |
+| priority_score | decimal(8,2) | YES  | MUL | 0.00              |                |
+| status         | enum         | YES  | MUL | 'active'          |                |
+| first_seen     | date         | YES  |     | NULL              |                |
+| last_updated   | timestamp    | YES  | MUL | current_timestamp |                |
+| created_at     | timestamp    | YES  |     | current_timestamp |                |
++----------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: SEO_PAGES
+-- Description: Stores page performance data from search console
+-- --------------------------------------------------------
+
+DESCRIBE seo_pages;
+
+/*
++------------------------+--------------+------+-----+-------------------+----------------+
+| Field                  | Type         | Null | Key | Default           | Extra          |
++------------------------+--------------+------+-----+-------------------+----------------+
+| id                     | int(11)      | NO   | PRI | NULL              | auto_increment |
+| page_url               | varchar(500) | NO   | UNI | NULL              |                |
+| page_type              | enum         | YES  | MUL | 'other'           |                |
+| clicks                 | int(11)      | YES  | MUL | 0                 |                |
+| impressions            | int(11)      | YES  |     | 0                 |                |
+| ctr                    | decimal(5,4) | YES  | MUL | 0.0000            |                |
+| position               | decimal(5,2) | YES  |     | 0.00              |                |
+| optimization_potential | decimal(10,2)| YES  |     | 0.00              |                |
+| last_optimized         | date         | YES  |     | NULL              |                |
+| optimization_status    | enum         | YES  | MUL | 'needs_optimization' |             |
+| created_at             | timestamp    | YES  |     | current_timestamp |                |
+| updated_at             | timestamp    | YES  |     | current_timestamp |                |
++------------------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: SEO_OPTIMIZATIONS
+-- Description: Stores applied SEO optimizations and their results
+-- --------------------------------------------------------
+
+DESCRIBE seo_optimizations;
+
+/*
++-------------------+--------------+------+-----+-------------------+----------------+
+| Field             | Type         | Null | Key | Default           | Extra          |
++-------------------+--------------+------+-----+-------------------+----------------+
+| id                | int(11)      | NO   | PRI | NULL              | auto_increment |
+| optimization_type | enum         | NO   | MUL | NULL              |                |
+| target_type       | enum         | NO   |     | NULL              |                |
+| target_value      | varchar(500) | NO   | MUL | NULL              |                |
+| description       | text         | YES  |     | NULL              |                |
+| before_value      | text         | YES  |     | NULL              |                |
+| after_value       | text         | YES  |     | NULL              |                |
+| impact_score      | decimal(8,2) | YES  |     | 0.00              |                |
+| status            | enum         | YES  | MUL | 'pending'         |                |
+| applied_date      | timestamp    | YES  | MUL | NULL              |                |
+| performance_delta | json         | YES  |     | NULL              |                |
+| created_at        | timestamp    | YES  |     | current_timestamp |                |
++-------------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: SEO_INSIGHTS
+-- Description: Stores daily SEO insights and analytics
+-- --------------------------------------------------------
+
+DESCRIBE seo_insights;
+
+/*
++--------------------+--------------+------+-----+-------------------+----------------+
+| Field              | Type         | Null | Key | Default           | Extra          |
++--------------------+--------------+------+-----+-------------------+----------------+
+| id                 | int(11)      | NO   | PRI | NULL              | auto_increment |
+| insight_date       | date         | NO   | MUL | NULL              |                |
+| insight_type       | enum         | NO   | MUL | NULL              |                |
+| title              | varchar(255) | NO   |     | NULL              |                |
+| description        | text         | YES  |     | NULL              |                |
+| data_points        | json         | YES  |     | NULL              |                |
+| recommendations    | json         | YES  |     | NULL              |                |
+| priority           | enum         | YES  |     | 'medium'          |                |
+| processing_status  | enum         | YES  | MUL | 'pending'         |                |
+| created_at         | timestamp    | YES  |     | current_timestamp |                |
++--------------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: SEO_CONTENT_GAPS
+-- Description: Identifies content opportunities based on search data
+-- --------------------------------------------------------
+
+DESCRIBE seo_content_gaps;
+
+/*
++----------------+--------------+------+-----+-------------------+----------------+
+| Field          | Type         | Null | Key | Default           | Extra          |
++----------------+--------------+------+-----+-------------------+----------------+
+| id             | int(11)      | NO   | PRI | NULL              | auto_increment |
+| keyword        | varchar(255) | NO   | MUL | NULL              |                |
+| content_type   | enum         | NO   | MUL | NULL              |                |
+| impressions    | int(11)      | YES  |     | 0                 |                |
+| avg_position   | decimal(5,2) | YES  |     | 0.00              |                |
+| difficulty     | enum         | YES  |     | 'medium'          |                |
+| priority_score | decimal(8,2) | YES  | MUL | 0.00              |                |
+| suggested_url  | varchar(500) | YES  |     | NULL              |                |
+| content_brief  | text         | YES  |     | NULL              |                |
+| status         | enum         | YES  | MUL | 'identified'      |                |
+| created_at     | timestamp    | YES  |     | current_timestamp |                |
++----------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: SEO_INTERNATIONAL_OPPORTUNITIES
+-- Description: Tracks international market opportunities
+-- --------------------------------------------------------
+
+DESCRIBE seo_international_opportunities;
+
+/*
++----------------------+--------------+------+-----+-------------------+----------------+
+| Field                | Type         | Null | Key | Default           | Extra          |
++----------------------+--------------+------+-----+-------------------+----------------+
+| id                   | int(11)      | NO   | PRI | NULL              | auto_increment |
+| country_name         | varchar(100) | NO   | MUL | NULL              |                |
+| country_code         | varchar(2)   | NO   | MUL | NULL              |                |
+| clicks               | int(11)      | YES  |     | 0                 |                |
+| impressions          | int(11)      | YES  |     | 0                 |                |
+| ctr                  | decimal(5,4) | YES  |     | 0.0000            |                |
+| position             | decimal(5,2) | YES  |     | 0.00              |                |
+| market_potential     | decimal(8,2) | YES  |     | 0.00              |                |
+| optimization_applied | boolean      | YES  | MUL | FALSE             |                |
+| created_at           | timestamp    | YES  |     | current_timestamp |                |
++----------------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: SEO_DEVICE_PERFORMANCE
+-- Description: Tracks device-specific SEO performance
+-- --------------------------------------------------------
+
+DESCRIBE seo_device_performance;
+
+/*
++-------------------+--------------+------+-----+-------------------+----------------+
+| Field             | Type         | Null | Key | Default           | Extra          |
++-------------------+--------------+------+-----+-------------------+----------------+
+| id                | int(11)      | NO   | PRI | NULL              | auto_increment |
+| device_type       | enum         | NO   | MUL | NULL              |                |
+| page_url          | varchar(500) | NO   | MUL | NULL              |                |
+| clicks            | int(11)      | YES  |     | 0                 |                |
+| impressions       | int(11)      | YES  |     | 0                 |                |
+| ctr               | decimal(5,4) | YES  |     | 0.0000            |                |
+| position          | decimal(5,2) | YES  | MUL | 0.00              |                |
+| performance_date  | date         | NO   | MUL | NULL              |                |
+| created_at        | timestamp    | YES  |     | current_timestamp |                |
++-------------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- --------------------------------------------------------
+-- Table: SEO_AUTOMATED_REPORTS
+-- Description: Stores automated report processing logs
+-- --------------------------------------------------------
+
+DESCRIBE seo_automated_reports;
+
+/*
++------------------------------+--------------+------+-----+-------------------+----------------+
+| Field                        | Type         | Null | Key | Default           | Extra          |
++------------------------------+--------------+------+-----+-------------------+----------------+
+| id                           | int(11)      | NO   | PRI | NULL              | auto_increment |
+| report_type                  | varchar(50)  | NO   | MUL | NULL              |                |
+| file_name                    | varchar(255) | NO   | MUL | NULL              |                |
+| file_size                    | bigint       | YES  |     | NULL              |                |
+| records_processed            | int(11)      | YES  |     | 0                 |                |
+| processing_start_time        | timestamp    | YES  | MUL | NULL              |                |
+| processing_end_time          | timestamp    | YES  |     | NULL              |                |
+| processing_duration_seconds  | int(11)      | YES  |     | NULL              |                |
+| status                       | enum         | YES  | MUL | 'pending'         |                |
+| error_message                | text         | YES  |     | NULL              |                |
+| optimizations_applied        | int(11)      | YES  |     | 0                 |                |
+| insights_generated           | int(11)      | YES  |     | 0                 |                |
+| created_at                   | timestamp    | YES  |     | current_timestamp |                |
++------------------------------+--------------+------+-----+-------------------+----------------+
+*/
+
+-- ========================================================
+-- SEO DASHBOARD VIEWS
+-- ========================================================
+
+-- View: v_top_keywords - Top performing keywords
+-- View: v_optimization_opportunities - Pages needing optimization
+-- View: v_international_summary - International market opportunities
+-- View: v_device_comparison - Device performance comparison
+-- View: v_content_gaps_priority - Content gap priorities
+
+-- ========================================================
+-- SEO STORED PROCEDURES
+-- ========================================================
+
+-- PROCEDURE: UpdateKeywordPerformance - Updates keyword metrics
+-- PROCEDURE: GenerateDailyInsights - Generates daily SEO insights
