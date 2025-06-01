@@ -63,6 +63,79 @@ function formatImagePath($imagePath) {
     return '/images/webstories/' . $imagePath;
 }
 
+// Helper function to generate city slug with state code for proper file naming
+function generateCitySlug($city, $state = null) {
+    debug_log("SLUG", "Generating slug for city: {$city}, state: {$state}");
+    
+    // First, check if the city name contains a state code in parentheses like "Allahabad (CC)"
+    $stateCode = '';
+    $cleanCity = $city;
+    
+    if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
+        $cleanCity = trim($matches[1]);
+        $stateCode = strtolower($matches[2]);
+        debug_log("SLUG", "Extracted state code '{$stateCode}' from city name");
+    } elseif ($state) {
+        // If no state code in city name, try to derive from state name
+        $stateCode = extractStateCodeFromStateName($state);
+    }
+    
+    // Generate the base city slug
+    $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
+    $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
+    
+    // Add state code if available, using double dash pattern
+    if ($stateCode) {
+        $slug = $citySlug . '-' . $stateCode . '--egg-rate';
+    } else {
+        $slug = $citySlug . '-egg-rate';
+    }
+    
+    debug_log("SLUG", "Generated slug: {$slug}");
+    return $slug;
+}
+
+// Helper function to extract state code from state name
+function extractStateCodeFromStateName($stateName) {
+    // Common state name to code mappings based on the data patterns observed
+    $stateMapping = [
+        'chhattisgarh' => 'cc',
+        'odisha' => 'od', 
+        'orissa' => 'od',
+        'west bengal' => 'wb',
+        'andhra pradesh' => 'ap',
+        'telangana' => 'tg',
+        'tamil nadu' => 'tn',
+        'karnataka' => 'ka',
+        'kerala' => 'kl',
+        'maharashtra' => 'mh',
+        'gujarat' => 'gj',
+        'rajasthan' => 'rj',
+        'madhya pradesh' => 'mp',
+        'uttar pradesh' => 'up',
+        'bihar' => 'br',
+        'jharkhand' => 'jh',
+        'punjab' => 'pb',
+        'haryana' => 'hr',
+        'himachal pradesh' => 'hp',
+        'jammu and kashmir' => 'jk',
+        'uttarakhand' => 'uk',
+        'assam' => 'as',
+        'manipur' => 'mn',
+        'mizoram' => 'mz',
+        'nagaland' => 'nl',
+        'tripura' => 'tr',
+        'meghalaya' => 'ml',
+        'arunachal pradesh' => 'ar',
+        'sikkim' => 'sk',
+        'goa' => 'ga',
+        'delhi' => 'dl'
+    ];
+    
+    $stateLower = strtolower(trim($stateName));
+    return isset($stateMapping[$stateLower]) ? $stateMapping[$stateLower] : '';
+}
+
 // Use a try-catch block around the entire script to catch any unexpected errors
 try {
     debug_log("START", "Beginning web stories generation");
@@ -215,10 +288,9 @@ try {
                 $state = $row['state'];
                 $rate = $row['rate'];
                 $date = $row['date'];
-                
-                debug_log("INDEX", "Adding index entry for {$city}, {$state}");
-                $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-                $html .= "<li><a href='{$citySlug}-egg-rate.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
+                  debug_log("INDEX", "Adding index entry for {$city}, {$state}");
+                $citySlug = generateCitySlug($city, $state);
+                $html .= "<li><a href='{$citySlug}.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
             }
             
             $html .= "</ul></body></html>";
@@ -462,12 +534,14 @@ try {
     if ($result && $result->num_rows > 0) {
         debug_log("PROCESS", "Found " . $result->num_rows . " cities to generate web stories for");
         $storiesGenerated = 0;
-        
-        while ($row = $result->fetch_assoc()) {
+          while ($row = $result->fetch_assoc()) {
             $city = $row['city'];
             $state = $row['state'];
             $rate = $row['rate'];
             $date = $row['date'];
+            
+            // Generate the proper city slug with state code
+            $citySlug = generateCitySlug($city, $state);
             
             debug_log("STORY", "Processing city: {$city}, {$state}");
             
@@ -492,9 +566,8 @@ try {
             $story = str_replace('{{COVER_IMAGE}}', $coverImagePath, $story);
             $story = str_replace('{{TRAY_PRICE_IMAGE}}', $trayPriceImagePath, $story);
             $story = str_replace('{{CTA_IMAGE}}', $ctaImagePath, $story);
-            
-            // Save web story
-            $storyPath = $storiesDir . '/' . $citySlug . '-egg-rate.html';
+              // Save web story
+            $storyPath = $storiesDir . '/' . $citySlug . '.html';
             debug_log("SAVE", "Saving web story to {$storyPath}");
             
             if (file_put_contents($storyPath, $story) === false) {

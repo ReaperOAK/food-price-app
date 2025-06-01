@@ -86,18 +86,18 @@ if ($result->num_rows > 0) {
         }
         
         // Create a URL-friendly city name
-        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+        $citySlug = generateCitySlug($city, $state);
         
         // Format date for display
         $displayDate = date('F j, Y', strtotime($date));
         
         // Check if the web story file exists
-        $storyFilename = $storiesDir . '/' . $citySlug . '-egg-rate.html';
+        $storyFilename = $storiesDir . '/' . $citySlug . '.html';
         if (file_exists($storyFilename)) {
             // Add to stories array
             $stories[] = [
                 'title' => "Egg Rate in $city, $state",
-                'slug' => $citySlug . '-egg-rate',
+                'slug' => $citySlug,
                 'thumbnail' => "/images/webstories/thumbnail-$citySlug.webp",
                 'date' => $displayDate,
                 'rate' => $rate,

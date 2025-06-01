@@ -48,11 +48,10 @@ if (!function_exists('deleteOldWebStories')) {
     
         // Get current date for comparison
         $currentDate = new DateTime();
-        
-        // Get all city-date combinations from the database that are within the retention period
+          // Get all city-date combinations from the database that are within the retention period
         $retentionDate = date('Y-m-d', strtotime("-$daysToKeep days"));
         $sql = "
-            SELECT DISTINCT city, date 
+            SELECT DISTINCT city, state, date 
             FROM egg_rates 
             WHERE date >= '$retentionDate'
         ";
@@ -62,8 +61,8 @@ if (!function_exists('deleteOldWebStories')) {
         
         if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
-                // Create a URL-friendly city name
-                $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $row['city']));
+                // Create a URL-friendly city name using the new slug format
+                $citySlug = generateCitySlug($row['city'], $row['state']);
                 $activeCities[$citySlug] = true;
             }
         }
@@ -78,13 +77,21 @@ if (!function_exists('deleteOldWebStories')) {
                 if (basename($storyFile) === 'index.html') {
                     continue;
                 }
+                  $filename = basename($storyFile, '.html');
                 
-                $filename = basename($storyFile, '.html');
+                // Extract city slug from filename - handle both new and old patterns
+                $citySlug = null;
                 
-                // Extract city slug from filename (assuming format is city-egg-rate.html)
-                if (preg_match('/^(.*)-egg-rate$/', $filename, $matches)) {
+                // New pattern: city-statecode--egg-rate.html (e.g., allahabad-cc--egg-rate.html)
+                if (preg_match('/^(.+)--egg-rate$/', $filename, $matches)) {
                     $citySlug = $matches[1];
-                    
+                }
+                // Legacy pattern: city-egg-rate.html (e.g., allahabad-egg-rate.html)  
+                elseif (preg_match('/^(.+)-egg-rate$/', $filename, $matches)) {
+                    $citySlug = $matches[1];
+                }
+                
+                if ($citySlug) {                if ($citySlug) {
                     // If the city is not in our active list, delete the story
                     if (!isset($activeCities[$citySlug])) {
                         if (unlink($storyFile)) {
@@ -120,6 +127,137 @@ if (!function_exists('deleteOldWebStories')) {
     }
 }
 
+// Helper function to generate city slug with state code for proper file naming
+if (!function_exists('generateCitySlug')) {
+    function generateCitySlug($city, $state = null) {
+        // First, check if the city name contains a state code in parentheses like "Allahabad (CC)"
+        $stateCode = '';
+        $cleanCity = $city;
+        
+        if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
+            $cleanCity = trim($matches[1]);
+            $stateCode = strtolower($matches[2]);
+        } elseif ($state) {
+            // If no state code in city name, try to derive from state name
+            $stateCode = extractStateCodeFromStateName($state);
+        }
+        
+        // Generate the base city slug
+        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
+        $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
+        
+        // Add state code if available, using double dash pattern
+        if ($stateCode) {
+            $slug = $citySlug . '-' . $stateCode . '--egg-rate';
+        } else {
+            $slug = $citySlug . '-egg-rate';
+        }
+        
+        return $slug;
+    }
+}
+
+// Helper function to extract state code from state name
+if (!function_exists('extractStateCodeFromStateName')) {
+    function extractStateCodeFromStateName($stateName) {
+        // Common state name to code mappings based on the data patterns observed
+        $stateMapping = [
+            'chhattisgarh' => 'cc',
+            'odisha' => 'od', 
+            'orissa' => 'od',
+            'west bengal' => 'wb',
+            'andhra pradesh' => 'ap',
+            'telangana' => 'tg',
+            'tamil nadu' => 'tn',
+            'karnataka' => 'ka',
+            'kerala' => 'kl',
+            'maharashtra' => 'mh',
+            'gujarat' => 'gj',
+            'rajasthan' => 'rj',
+            'madhya pradesh' => 'mp',
+            'uttar pradesh' => 'up',
+            'bihar' => 'br',
+            'jharkhand' => 'jh',
+            'punjab' => 'pb',
+            'haryana' => 'hr',
+            'himachal pradesh' => 'hp',
+            'jammu and kashmir' => 'jk',
+            'uttarakhand' => 'uk',
+            'assam' => 'as',
+            'manipur' => 'mn',
+            'mizoram' => 'mz',
+            'nagaland' => 'nl',
+            'tripura' => 'tr',
+            'meghalaya' => 'ml',
+            'arunachal pradesh' => 'ar',
+            'sikkim' => 'sk',
+            'goa' => 'ga',
+            'delhi' => 'dl'
+        ];
+        
+        $stateLower = strtolower(trim($stateName));
+        return isset($stateMapping[$stateLower]) ? $stateMapping[$stateLower] : '';
+    }
+}
+
+/**
+ * Generate web stories for all cities in the database
+ *
+ * @param mysqli $conn Database connection
+ * @param string $storiesDir Directory where web stories will be stored
+ * @param string $imageDir Directory where web story images will be stored
+ * @return void
+ */
+if (!function_exists('generateWebStories')) {
+    function generateWebStories($conn, $storiesDir, $imageDir) {
+        // Get the list of cities from the database
+        $sql = "SELECT DISTINCT city, state FROM egg_rates";
+        $result = $conn->query($sql);
+        
+        if ($result && $result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $city = $row['city'];
+                $state = $row['state'];
+                
+                // Generate the city slug
+                $citySlug = generateCitySlug($city, $state);
+                
+                // Define the file paths
+                $storyFile = "$storiesDir/$citySlug.html";
+                $thumbnailFile = "$imageDir/thumbnail-$citySlug.webp";
+                
+                // Check if the story file already exists
+                if (!file_exists($storyFile)) {
+                    // Generate the web story content (simplified example)
+                    $storyContent = "<html><body>";
+                    $storyContent .= "<h1>Web Story for $city, $state</h1>";
+                    $storyContent .= "<p>Latest egg rates and news.</p>";
+                    $storyContent .= "</body></html>";
+                    
+                    // Save the story to a file
+                    file_put_contents($storyFile, $storyContent);
+                    echo "Generated new web story: " . basename($storyFile) . "<br>";
+                }
+                
+                // Check if the thumbnail exists, if not, create a placeholder
+                if (!file_exists($thumbnailFile)) {
+                    // Create a placeholder image (1x1 pixel transparent GIF)
+                    $placeholder = imagecreatetruecolor(1, 1);
+                    $transparent = imagecolorallocatealpha($placeholder, 255, 255, 255, 127);
+                    imagefill($placeholder, 0, 0, $transparent);
+                    imagealphablending($placeholder, false);
+                    imagesavealpha($placeholder, true);
+                    
+                    // Save the placeholder as a WebP file
+                    imagewebp($placeholder, $thumbnailFile);
+                    imagedestroy($placeholder);
+                    echo "Generated placeholder thumbnail: thumbnail-$citySlug.webp<br>";
+                }
+            }
+        }
+    }
+}
+
 // Only run the script if called directly, not when included
 if (basename($_SERVER['SCRIPT_FILENAME']) == basename(__FILE__)) {
     $needRegenerateIndex = deleteOldWebStories($storiesDir, $imageDir, $daysToKeep, $conn, true);
@@ -132,5 +270,5 @@ if (basename($_SERVER['SCRIPT_FILENAME']) == basename(__FILE__)) {
     }
     
     echo "Old web stories cleanup completed.";
-}
+}}
 ?>

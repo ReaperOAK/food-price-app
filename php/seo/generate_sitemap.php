@@ -23,6 +23,79 @@ if (!isset($conn) || $conn->connect_error) {
     }
 }
 
+// Helper function to generate city slug with state code for proper file naming
+if (!function_exists('generateCitySlug')) {
+    function generateCitySlug($city, $state = null) {
+        // First, check if the city name contains a state code in parentheses like "Allahabad (CC)"
+        $stateCode = '';
+        $cleanCity = $city;
+        
+        if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
+            $cleanCity = trim($matches[1]);
+            $stateCode = strtolower($matches[2]);
+        } elseif ($state) {
+            // If no state code in city name, try to derive from state name
+            $stateCode = extractStateCodeFromStateName($state);
+        }
+        
+        // Generate the base city slug
+        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
+        $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
+        
+        // Add state code if available, using double dash pattern
+        if ($stateCode) {
+            $slug = $citySlug . '-' . $stateCode . '--egg-rate';
+        } else {
+            $slug = $citySlug . '-egg-rate';
+        }
+        
+        return $slug;
+    }
+}
+
+// Helper function to extract state code from state name
+if (!function_exists('extractStateCodeFromStateName')) {
+    function extractStateCodeFromStateName($stateName) {
+        // Common state name to code mappings based on the data patterns observed
+        $stateMapping = [
+            'chhattisgarh' => 'cc',
+            'odisha' => 'od', 
+            'orissa' => 'od',
+            'west bengal' => 'wb',
+            'andhra pradesh' => 'ap',
+            'telangana' => 'tg',
+            'tamil nadu' => 'tn',
+            'karnataka' => 'ka',
+            'kerala' => 'kl',
+            'maharashtra' => 'mh',
+            'gujarat' => 'gj',
+            'rajasthan' => 'rj',
+            'madhya pradesh' => 'mp',
+            'uttar pradesh' => 'up',
+            'bihar' => 'br',
+            'jharkhand' => 'jh',
+            'punjab' => 'pb',
+            'haryana' => 'hr',
+            'himachal pradesh' => 'hp',
+            'jammu and kashmir' => 'jk',
+            'uttarakhand' => 'uk',
+            'assam' => 'as',
+            'manipur' => 'mn',
+            'mizoram' => 'mz',
+            'nagaland' => 'nl',
+            'tripura' => 'tr',
+            'meghalaya' => 'ml',
+            'arunachal pradesh' => 'ar',
+            'sikkim' => 'sk',
+            'goa' => 'ga',
+            'delhi' => 'dl'
+        ];
+        
+        $stateLower = strtolower(trim($stateName));
+        return isset($stateMapping[$stateLower]) ? $stateMapping[$stateLower] : '';
+    }
+}
+
 // Define file paths
 $basePath = dirname(dirname(__DIR__)); // Go up two levels from seo directory
 $sitemapXmlFile = $basePath . '/sitemap.xml';
@@ -108,11 +181,10 @@ try {
 if ($cities_result && $cities_result->num_rows > 0) {
     // Create an array to track unique states
     $unique_states = [];
-    
-    while ($row = $cities_result->fetch_assoc()) {
-        // Add city URL
-        $city_url = strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate';
-        $url = $baseUrl . '/' . $city_url;
+      while ($row = $cities_result->fetch_assoc()) {
+        // Add city URL using new slug format
+        $citySlug = generateCitySlug($row['city_name'], $row['state_name']);
+        $url = $baseUrl . '/' . $citySlug;
         
         $xml .= '<url>' . PHP_EOL;
         $xml .= '  <loc>' . $url . '</loc>' . PHP_EOL;
@@ -142,11 +214,10 @@ if ($cities_result && $cities_result->num_rows > 0) {
             $txt .= $state_full_url . PHP_EOL;
             $state_count++;
         }
-        
-        // Also add the webstory URL for this city if it exists
-        $webstory_path = $basePath . '/webstories/' . strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate.html';
+          // Also add the webstory URL for this city if it exists
+        $webstory_path = $basePath . '/webstories/' . $citySlug . '.html';
         if (file_exists($webstory_path)) {
-            $webstory_url = $baseUrl . '/webstory/' . strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate';
+            $webstory_url = $baseUrl . '/webstory/' . $citySlug;
             
             $xml .= '<url>' . PHP_EOL;
             $xml .= '  <loc>' . $webstory_url . '</loc>' . PHP_EOL;
