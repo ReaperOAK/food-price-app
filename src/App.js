@@ -162,11 +162,11 @@ function App() {
             path="/admin/*"
             element={isAuthenticated ? <AdminPage setIsAuthenticated={setIsAuthenticated} /> : <Navigate to="/login" replace />}
           />
-          
-          {/* Content pages */}
+            {/* Content pages */}
           <Route path="/blog/:link" element={<BlogPage blogs={blogs} />} />
           <Route path="/maintenance" element={<MaintenancePage />} />
           <Route path="/webstories" element={<WebStoriesList />} />
+          <Route path="/webstories/" element={<WebStoriesList />} />
           <Route path="/webstory/:slug" element={<WebStoryViewer />} />
           <Route path="/disable-site" element={<DisableSite />} />
           
