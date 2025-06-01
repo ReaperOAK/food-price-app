@@ -15,6 +15,79 @@ if (!function_exists('debug_log')) {
     }
 }
 
+// Helper function to generate city slug with state code for proper file naming
+if (!function_exists('generateCitySlug')) {
+    function generateCitySlug($city, $state = null) {
+        // First, check if the city name contains a state code in parentheses like "Allahabad (CC)"
+        $stateCode = '';
+        $cleanCity = $city;
+        
+        if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
+            $cleanCity = trim($matches[1]);
+            $stateCode = strtolower($matches[2]);
+        } elseif ($state) {
+            // If no state code in city name, try to derive from state name
+            $stateCode = extractStateCodeFromStateName($state);
+        }
+        
+        // Generate the base city slug
+        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
+        $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
+        
+        // Add state code if available, using double dash pattern
+        if ($stateCode) {
+            $slug = $citySlug . '-' . $stateCode . '--egg-rate';
+        } else {
+            $slug = $citySlug . '-egg-rate';
+        }
+        
+        return $slug;
+    }
+}
+
+// Helper function to extract state code from state name
+if (!function_exists('extractStateCodeFromStateName')) {
+    function extractStateCodeFromStateName($stateName) {
+        // Common state name to code mappings based on the data patterns observed
+        $stateMapping = [
+            'chhattisgarh' => 'cc',
+            'odisha' => 'od', 
+            'orissa' => 'od',
+            'west bengal' => 'wb',
+            'andhra pradesh' => 'ap',
+            'telangana' => 'tg',
+            'tamil nadu' => 'tn',
+            'karnataka' => 'ka',
+            'kerala' => 'kl',
+            'maharashtra' => 'mh',
+            'gujarat' => 'gj',
+            'rajasthan' => 'rj',
+            'madhya pradesh' => 'mp',
+            'uttar pradesh' => 'up',
+            'bihar' => 'br',
+            'jharkhand' => 'jh',
+            'punjab' => 'pb',
+            'haryana' => 'hr',
+            'himachal pradesh' => 'hp',
+            'jammu and kashmir' => 'jk',
+            'uttarakhand' => 'uk',
+            'assam' => 'as',
+            'manipur' => 'mn',
+            'mizoram' => 'mz',
+            'nagaland' => 'nl',
+            'tripura' => 'tr',
+            'meghalaya' => 'ml',
+            'arunachal pradesh' => 'ar',
+            'sikkim' => 'sk',
+            'goa' => 'ga',
+            'delhi' => 'dl'
+        ];
+        
+        $stateLower = strtolower(trim($stateName));
+        return isset($stateMapping[$stateLower]) ? $stateMapping[$stateLower] : '';
+    }
+}
+
 debug_log("START", "Beginning thumbnail generation process");
 
 // Check if GD library is available
@@ -236,10 +309,9 @@ $errorCities = 0;
 debug_log("PROCESS", "Beginning processing of " . ($result ? $result->num_rows : 0) . " cities");
 
 if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $city = $row['city'];
+    while ($row = $result->fetch_assoc()) {        $city = $row['city'];
         $state = $row['state'];
-        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
+        $citySlug = generateCitySlug($city, $state);
         
         debug_log("CITY", "Processing city: {$city}, {$state}", ["slug" => $citySlug]);
         
@@ -247,9 +319,9 @@ if ($result && $result->num_rows > 0) {
         // Try multiple possible webstory file patterns
         $webstoryFile = null;
         $possiblePatterns = [
-            $webstoriesDir . '/' . $citySlug . '-egg-rate.html',
-            $webstoriesDir . '/' . $citySlug . '_egg_rate.html',
             $webstoriesDir . '/' . $citySlug . '.html',
+            $webstoriesDir . '/' . $citySlug . '-egg-rate.html', // Legacy pattern
+            $webstoriesDir . '/' . $citySlug . '_egg_rate.html',
             $webstoriesDir . '/egg-rate-' . $citySlug . '.html'
         ];
 
