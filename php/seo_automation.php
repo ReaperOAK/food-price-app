@@ -11,7 +11,8 @@ class AutomatedSEOService {
     private $logFile;
     
     public function __construct() {
-        $this->db = Database::getConnection();
+        global $conn;
+        $this->db = $conn;
         $this->logFile = __DIR__ . '/logs/seo_automation.log';
         
         // Ensure log directory exists
@@ -481,6 +482,104 @@ class AutomatedSEOService {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Get keywords with filtering and sorting
+     */
+    public function getKeywords($limit = 50, $sort = 'clicks', $order = 'DESC') {
+        $allowedSorts = ['clicks', 'impressions', 'ctr', 'avg_position', 'search_volume'];
+        if (!in_array($sort, $allowedSorts)) $sort = 'clicks';
+        if (!in_array($order, ['ASC', 'DESC'])) $order = 'DESC';
+        
+        $stmt = $this->db->prepare("
+            SELECT * FROM seo_keywords 
+            ORDER BY {$sort} {$order} 
+            LIMIT ?
+        ");
+        $stmt->execute([$limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get pages with filtering and sorting
+     */
+    public function getPages($limit = 50, $sort = 'clicks', $order = 'DESC') {
+        $allowedSorts = ['clicks', 'impressions', 'ctr', 'avg_position'];
+        if (!in_array($sort, $allowedSorts)) $sort = 'clicks';
+        if (!in_array($order, ['ASC', 'DESC'])) $order = 'DESC';
+        
+        $stmt = $this->db->prepare("
+            SELECT * FROM seo_pages 
+            ORDER BY {$sort} {$order} 
+            LIMIT ?
+        ");
+        $stmt->execute([$limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get optimizations with pagination
+     */
+    public function getOptimizations($limit = 20, $offset = 0) {
+        $stmt = $this->db->prepare("
+            SELECT * FROM seo_optimizations 
+            ORDER BY created_at DESC 
+            LIMIT ? OFFSET ?
+        ");
+        $stmt->execute([$limit, $offset]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get content gaps
+     */
+    public function getContentGaps() {
+        $stmt = $this->db->prepare("
+            SELECT * FROM seo_content_gaps 
+            ORDER BY opportunity_score DESC 
+            LIMIT 20
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get international opportunities
+     */
+    public function getInternationalOpportunities() {
+        $stmt = $this->db->prepare("
+            SELECT * FROM seo_international_opportunities 
+            ORDER BY opportunity_score DESC 
+            LIMIT 20
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get device performance data
+     */
+    public function getDevicePerformance() {
+        $stmt = $this->db->prepare("
+            SELECT * FROM seo_device_performance 
+            ORDER BY clicks DESC
+        ");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get processing logs
+     */
+    public function getProcessingLogs($limit = 100) {
+        $stmt = $this->db->prepare("
+            SELECT * FROM seo_automated_reports 
+            ORDER BY created_at DESC 
+            LIMIT ?
+        ");
+        $stmt->execute([$limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     // Helper methods
     private function determinePageType($url) {
         if (strpos($url, '/rates') !== false) return 'rates';
@@ -552,44 +651,398 @@ class AutomatedSEOService {
         if (strpos($filename, 'Devices') !== false) return 'devices';
         if (strpos($filename, 'Dates') !== false) return 'dates';
         return 'other';
-    }
-
-    private function log($message, $level = 'INFO') {
+    }    private function log($message, $level = 'INFO') {
         $timestamp = date('Y-m-d H:i:s');
         $logMessage = "[{$timestamp}] [{$level}] {$message}" . PHP_EOL;
         file_put_contents($this->logFile, $logMessage, FILE_APPEND | LOCK_EX);
     }
 }
 
-// API Endpoints
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: application/json');
-    
-    $seoService = new AutomatedSEOService();
-    $action = $_POST['action'] ?? $_GET['action'] ?? '';
-    
-    try {
-        switch ($action) {
-            case 'process_reports':
-                $result = $seoService->processCSVReports();
-                echo json_encode(['success' => true, 'data' => $result]);
-                break;
-                
-            case 'get_dashboard':
-                $data = $seoService->getDashboardData();
-                echo json_encode(['success' => true, 'data' => $data]);
-                break;
-                
-            case 'get_status':
-                $status = $seoService->getProcessingStatus();
-                echo json_encode(['success' => true, 'data' => $status]);
-                break;
-                
-            default:
-                echo json_encode(['success' => false, 'error' => 'Invalid action']);
+// API Endpoints Handler
+        try {
+            $stmt = $this->db->prepare("
+                SELECT 
+                    COUNT(*) as total_reports,
+                    MAX(created_at) as last_processed,
+                    SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_reports,
+                    SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END) as failed_reports
+                FROM seo_automated_reports 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            ");
+            $stmt->execute();
+            $stats = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            // Get latest optimizations
+            $stmt = $this->db->prepare("
+                SELECT COUNT(*) as optimization_count
+                FROM seo_optimizations 
+                WHERE created_at >= DATE_SUB(NOW(), INTERVAL 24 HOUR)
+            ");
+            $stmt->execute();
+            $optimizations = $stmt->fetch(PDO::FETCH_ASSOC);
+            
+            return [
+                'isProcessing' => false, // You might want to track this in a separate table
+                'lastProcessed' => $stats['last_processed'],
+                'totalReports' => intval($stats['total_reports']),
+                'completedReports' => intval($stats['completed_reports']),
+                'failedReports' => intval($stats['failed_reports']),
+                'optimizationsCreated' => intval($optimizations['optimization_count']),
+                'timestamp' => date('Y-m-d H:i:s')
+            ];
+        } catch (Exception $e) {
+            $this->log("Error getting processing status: " . $e->getMessage(), 'ERROR');
+            throw $e;
         }
-    } catch (Exception $e) {
-        echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    
+
+    /**
+     * Get dashboard data
+     */
+    public function getDashboardData() {
+        try {
+            // Get top keywords
+            $stmt = $this->db->prepare("
+                SELECT keyword, clicks, impressions, ctr, avg_position, search_volume
+                FROM seo_keywords 
+                ORDER BY clicks DESC 
+                LIMIT 10
+            ");
+            $stmt->execute();
+            $topKeywords = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get top pages
+            $stmt = $this->db->prepare("
+                SELECT page_url, clicks, impressions, ctr, avg_position
+                FROM seo_pages 
+                ORDER BY clicks DESC 
+                LIMIT 10
+            ");
+            $stmt->execute();
+            $topPages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get recent optimizations
+            $stmt = $this->db->prepare("
+                SELECT optimization_type, target_url, meta_title, meta_description, 
+                       keywords, status, created_at
+                FROM seo_optimizations 
+                ORDER BY created_at DESC 
+                LIMIT 10
+            ");
+            $stmt->execute();
+            $recentOptimizations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get content gaps
+            $stmt = $this->db->prepare("
+                SELECT keyword, search_volume, competition_level, opportunity_score
+                FROM seo_content_gaps 
+                ORDER BY opportunity_score DESC 
+                LIMIT 5
+            ");
+            $stmt->execute();
+            $contentGaps = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            return [
+                'topKeywords' => $topKeywords,
+                'topPages' => $topPages,
+                'recentOptimizations' => $recentOptimizations,
+                'contentGaps' => $contentGaps,
+                'timestamp' => date('Y-m-d H:i:s')
+            ];
+        } catch (Exception $e) {
+            $this->log("Error getting dashboard data: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
     }
+
+    /**
+     * Get SEO insights
+     */
+    public function getInsights($timeframe = '7d') {
+        try {
+            $dateFilter = '';
+            switch ($timeframe) {
+                case '1d':
+                    $dateFilter = "WHERE created_at >= DATE_SUB(NOW(), INTERVAL 1 DAY)";
+                    break;
+                case '7d':
+                    $dateFilter = "WHERE created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+                    break;
+                case '30d':
+                    $dateFilter = "WHERE created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                    break;
+            }
+            
+            $stmt = $this->db->prepare("
+                SELECT insight_type, insight_data, confidence_score, created_at
+                FROM seo_insights 
+                {$dateFilter}
+                ORDER BY confidence_score DESC, created_at DESC
+                LIMIT 20
+            ");
+            $stmt->execute();
+            
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            $this->log("Error getting insights: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+
+    /**
+     * Handle file upload
+     */
+    public function handleFileUpload() {
+        try {
+            if (!isset($_FILES['csvFile']) || $_FILES['csvFile']['error'] !== UPLOAD_ERR_OK) {
+                throw new Exception('No file uploaded or upload error occurred');
+            }
+            
+            $uploadedFile = $_FILES['csvFile'];
+            $fileType = $_POST['fileType'] ?? 'unknown';
+            
+            // Validate file type
+            $allowedTypes = ['text/csv', 'application/csv', 'text/plain'];
+            if (!in_array($uploadedFile['type'], $allowedTypes)) {
+                throw new Exception('Invalid file type. Only CSV files are allowed.');
+            }
+            
+            // Create uploads directory if it doesn't exist
+            $uploadsDir = __DIR__ . '/../reports/';
+            if (!is_dir($uploadsDir)) {
+                mkdir($uploadsDir, 0755, true);
+            }
+            
+            // Generate unique filename
+            $filename = $fileType . '_' . date('Y-m-d_H-i-s') . '.csv';
+            $targetPath = $uploadsDir . $filename;
+            
+            // Move uploaded file
+            if (!move_uploaded_file($uploadedFile['tmp_name'], $targetPath)) {
+                throw new Exception('Failed to save uploaded file');
+            }
+            
+            // Process the uploaded file immediately
+            $records = $this->processCSVFile($targetPath);
+            
+            $this->log("File uploaded and processed: {$filename}, {$records} records");
+            
+            return [
+                'filename' => $filename,
+                'records_processed' => $records,
+                'file_path' => $targetPath
+            ];
+        } catch (Exception $e) {
+            $this->log("Error handling file upload: " . $e->getMessage(), 'ERROR');
+            throw $e;
+        }
+    }
+}
+
+// API Endpoints Handler
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type');
+
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
+$seoService = new AutomatedSEOService();
+$action = $_REQUEST['action'] ?? '';
+
+try {
+    switch ($action) {
+        case 'process':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('POST method required');
+            }
+            $result = $seoService->processCSVReports();
+            echo json_encode(['success' => true, 'data' => $result]);
+            break;
+            
+        case 'status':
+            $status = $seoService->getProcessingStatus();
+            echo json_encode(['success' => true, 'data' => $status]);
+            break;
+            
+        case 'dashboard':
+            $data = $seoService->getDashboardData();
+            echo json_encode(['success' => true, 'data' => $data]);
+            break;
+            
+        case 'insights':
+            $timeframe = $_GET['timeframe'] ?? '7d';
+            $insights = $seoService->getInsights($timeframe);
+            echo json_encode(['success' => true, 'data' => $insights]);
+            break;
+            
+        case 'upload':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('POST method required');
+            }
+            $result = $seoService->handleFileUpload();
+            echo json_encode(['success' => true, 'data' => $result]);
+            break;
+            
+        case 'keywords':
+            $limit = intval($_GET['limit'] ?? 50);
+            $sort = $_GET['sort'] ?? 'clicks';
+            $order = $_GET['order'] ?? 'DESC';
+            
+            $allowedSorts = ['clicks', 'impressions', 'ctr', 'avg_position', 'search_volume'];
+            if (!in_array($sort, $allowedSorts)) $sort = 'clicks';
+            if (!in_array($order, ['ASC', 'DESC'])) $order = 'DESC';
+            
+            $stmt = $seoService->db->prepare("
+                SELECT * FROM seo_keywords 
+                ORDER BY {$sort} {$order} 
+                LIMIT ?
+            ");
+            $stmt->execute([$limit]);
+            $keywords = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $keywords]);
+            break;
+            
+        case 'pages':
+            $limit = intval($_GET['limit'] ?? 50);
+            $sort = $_GET['sort'] ?? 'clicks';
+            $order = $_GET['order'] ?? 'DESC';
+            
+            $allowedSorts = ['clicks', 'impressions', 'ctr', 'avg_position'];
+            if (!in_array($sort, $allowedSorts)) $sort = 'clicks';
+            if (!in_array($order, ['ASC', 'DESC'])) $order = 'DESC';
+            
+            $stmt = $seoService->db->prepare("
+                SELECT * FROM seo_pages 
+                ORDER BY {$sort} {$order} 
+                LIMIT ?
+            ");
+            $stmt->execute([$limit]);
+            $pages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $pages]);
+            break;
+            
+        case 'optimizations':
+            $limit = intval($_GET['limit'] ?? 20);
+            $offset = intval($_GET['offset'] ?? 0);
+            
+            $stmt = $seoService->db->prepare("
+                SELECT * FROM seo_optimizations 
+                ORDER BY created_at DESC 
+                LIMIT ? OFFSET ?
+            ");
+            $stmt->execute([$limit, $offset]);
+            $optimizations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $optimizations]);
+            break;
+            
+        case 'content_gaps':
+            $stmt = $seoService->db->prepare("
+                SELECT * FROM seo_content_gaps 
+                ORDER BY opportunity_score DESC 
+                LIMIT 20
+            ");
+            $stmt->execute();
+            $gaps = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $gaps]);
+            break;
+            
+        case 'international':
+            $stmt = $seoService->db->prepare("
+                SELECT * FROM seo_international_opportunities 
+                ORDER BY opportunity_score DESC 
+                LIMIT 20
+            ");
+            $stmt->execute();
+            $opportunities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $opportunities]);
+            break;
+            
+        case 'devices':
+            $stmt = $seoService->db->prepare("
+                SELECT * FROM seo_device_performance 
+                ORDER BY clicks DESC
+            ");
+            $stmt->execute();
+            $devices = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $devices]);
+            break;
+            
+        case 'logs':
+            $limit = intval($_GET['limit'] ?? 100);
+            
+            $stmt = $seoService->db->prepare("
+                SELECT * FROM seo_automated_reports 
+                ORDER BY created_at DESC 
+                LIMIT ?
+            ");
+            $stmt->execute([$limit]);
+            $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            echo json_encode(['success' => true, 'data' => $logs]);
+            break;
+            
+        case 'force_process':
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+                throw new Exception('POST method required');
+            }
+            $result = $seoService->processCSVReports();
+            echo json_encode(['success' => true, 'data' => $result, 'message' => 'Force processing completed']);
+            break;
+            
+        case 'export':
+            $format = $_GET['format'] ?? 'json';
+            $data = $seoService->getDashboardData();
+            
+            if ($format === 'csv') {
+                header('Content-Type: text/csv');
+                header('Content-Disposition: attachment; filename="seo_data_' . date('Y-m-d') . '.csv"');
+                
+                // Simple CSV export (you can enhance this)
+                echo "Type,Name,Clicks,Impressions,CTR,Position\n";
+                foreach ($data['topKeywords'] as $keyword) {
+                    echo "Keyword,{$keyword['keyword']},{$keyword['clicks']},{$keyword['impressions']},{$keyword['ctr']},{$keyword['avg_position']}\n";
+                }
+                foreach ($data['topPages'] as $page) {
+                    echo "Page,{$page['page_url']},{$page['clicks']},{$page['impressions']},{$page['ctr']},{$page['avg_position']}\n";
+                }
+            } else {
+                echo json_encode(['success' => true, 'data' => $data]);
+            }
+            break;
+            
+        default:
+            if (empty($action)) {
+                // Return available endpoints
+                echo json_encode([
+                    'success' => true, 
+                    'message' => 'SEO Automation API',
+                    'endpoints' => [
+                        'GET /seo_automation.php?action=status' => 'Get processing status',
+                        'GET /seo_automation.php?action=dashboard' => 'Get dashboard data',
+                        'POST /seo_automation.php?action=process' => 'Process CSV reports',
+                        'POST /seo_automation.php?action=upload' => 'Upload CSV file',
+                        'GET /seo_automation.php?action=insights&timeframe=7d' => 'Get insights',
+                        'GET /seo_automation.php?action=keywords' => 'Get keyword data',
+                        'GET /seo_automation.php?action=pages' => 'Get page data',
+                        'GET /seo_automation.php?action=optimizations' => 'Get optimizations',
+                        'POST /seo_automation.php?action=force_process' => 'Force process CSV'
+                    ]
+                ]);            } else {
+                echo json_encode(['success' => false, 'error' => 'Invalid action: ' . $action]);
+            }
+            break;
+    }
+} catch (Exception $e) {
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }
 ?>
