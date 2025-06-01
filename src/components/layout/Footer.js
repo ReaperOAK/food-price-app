@@ -43,6 +43,27 @@ const legalLinks = [
   { name: "Terms of Service", path: "/terms" }
 ];
 
+// Enhanced city and state links for orphan page linking
+const popularCityLinks = [
+  { name: "Mumbai", path: "/mumbai-egg-rate" },
+  { name: "Delhi", path: "/delhi-egg-rate" },
+  { name: "Bengaluru", path: "/bengaluru-egg-rate" },
+  { name: "Chennai", path: "/chennai-egg-rate" },
+  { name: "Hyderabad", path: "/hyderabad-egg-rate" },
+  { name: "Kolkata", path: "/kolkata-egg-rate" },
+  { name: "Lucknow", path: "/lucknow-egg-rate" },
+  { name: "Kanpur", path: "/kanpur-(cc)-egg-rate" }
+];
+
+const popularStateLinks = [
+  { name: "Maharashtra", path: "/state/maharashtra-egg-rate" },
+  { name: "Uttar Pradesh", path: "/state/uttar-pradesh-egg-rate" },
+  { name: "West Bengal", path: "/state/west-bengal-egg-rate" },
+  { name: "Tamil Nadu", path: "/state/tamil-nadu-egg-rate" },
+  { name: "Karnataka", path: "/state/karnataka-egg-rate" },
+  { name: "Telangana", path: "/state/telangana-egg-rate" }
+];
+
 const Footer = memo(() => {
   const currentYear = new Date().getFullYear();
 
@@ -60,13 +81,37 @@ const Footer = memo(() => {
 
       <div className="container mx-auto w-full max-w-7xl relative">
         {/* Main footer content */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-8 mb-12">
           {/* Brand section */}
           <div className="space-y-4">
             <h2 className="text-2xl font-bold text-white dark:text-gray-100 mb-4">Today Egg Rates</h2>
             <p className="text-gray-200 dark:text-gray-300 text-base sm:text-sm leading-relaxed max-w-xs">
               Your trusted source for daily egg price updates across India. Get reliable, up-to-date information about egg rates in your city.
             </p>
+          </div>
+
+          {/* Popular Cities - New section for orphan linking */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-white dark:text-gray-100 mb-4">Popular Cities</h2>
+            <nav className="flex flex-col space-y-2" aria-label="Popular cities footer links">
+              {popularCityLinks.map(({ name, path }) => (
+                <FooterLink key={name} href={path} className="text-sm">
+                  {name}
+                </FooterLink>
+              ))}
+            </nav>
+          </div>
+
+          {/* Major States - New section for state orphan linking */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-white dark:text-gray-100 mb-4">Major States</h2>
+            <nav className="flex flex-col space-y-2" aria-label="Major states footer links">
+              {popularStateLinks.map(({ name, path }) => (
+                <FooterLink key={name} href={path} className="text-sm">
+                  {name}
+                </FooterLink>
+              ))}
+            </nav>
           </div>
 
           {/* Quick Links */}
@@ -78,40 +123,43 @@ const Footer = memo(() => {
                   {name}
                 </FooterLink>
               ))}
+              <FooterLink href="/webstories">Web Stories</FooterLink>
             </nav>
           </div>
 
-          {/* Social Links */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white dark:text-gray-100 mb-4">Connect With Us</h2>
-            <nav className="flex flex-col space-y-3" aria-label="Social media links">
-              {socialLinks.map(({ name, url, icon }) => (
-                <FooterLink 
-                  key={name} 
-                  href={url} 
-                  external 
-                  icon={icon}
-                >
-                  {name}
-                </FooterLink>
-              ))}
-            </nav>
-          </div>
+          {/* Social Links & Contact - Combined */}
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold text-white dark:text-gray-100 mb-4">Connect With Us</h2>
+              <nav className="flex flex-col space-y-3" aria-label="Social media links">
+                {socialLinks.map(({ name, url, icon }) => (
+                  <FooterLink 
+                    key={name} 
+                    href={url} 
+                    external 
+                    icon={icon}
+                  >
+                    {name}
+                  </FooterLink>
+                ))}
+              </nav>
+            </div>
 
-          {/* Contact Info */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white dark:text-gray-100 mb-4">Contact</h2>
-            <div className="text-gray-200 dark:text-gray-300 space-y-3">
-              <p className="flex items-center transition-colors duration-300 text-base sm:text-sm">
-                <span aria-hidden="true" className="mr-2">📧</span>
-                <a 
-                  href="mailto:contact@todayeggrates.com" 
-                  className="hover:text-white dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-200 dark:focus:ring-orange-300 rounded-sm px-1"
-                  aria-label="Send us an email"
-                >
-                  contact@todayeggrates.com
-                </a>
-              </p>
+            {/* Contact Info */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-white dark:text-gray-100">Contact</h3>
+              <div className="text-gray-200 dark:text-gray-300 space-y-3">
+                <p className="flex items-center transition-colors duration-300 text-base sm:text-sm">
+                  <span aria-hidden="true" className="mr-2">📧</span>
+                  <a 
+                    href="mailto:contact@todayeggrates.com" 
+                    className="hover:text-white dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-200 dark:focus:ring-orange-300 rounded-sm px-1"
+                    aria-label="Send us an email"
+                  >
+                    contact@todayeggrates.com
+                  </a>
+                </p>
+              </div>
             </div>
           </div>
         </div>

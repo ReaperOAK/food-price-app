@@ -1,4 +1,5 @@
 import { memo } from 'react';
+import { Link } from 'react-router-dom';
 
 const CityMarketInsights = memo(({ selectedCity, selectedState, todayRate, trayPrice }) => {
   if (!selectedCity) return null;
@@ -111,7 +112,37 @@ const CityMarketInsights = memo(({ selectedCity, selectedState, todayRate, trayP
                   <span className="text-green-500 mt-1">✓</span>
                   <span>Store eggs properly to maintain freshness and quality</span>
                 </li>
-              </ul>
+              </ul>            </div>
+          </div>
+
+          {/* Internal Links Section for SEO */}
+          <div className="mt-8 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-600 rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 text-center">
+              Related Egg Rate Information
+            </h3>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-3">Popular Cities</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <Link to="/mumbai-egg-rate" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Mumbai Rates</Link>
+                  <Link to="/delhi-egg-rate" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Delhi Rates</Link>
+                  <Link to="/bengaluru-egg-rate" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Bengaluru Rates</Link>
+                  <Link to="/chennai-egg-rate" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Chennai Rates</Link>
+                  <Link to="/kanpur-(cc)-egg-rate" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Kanpur Rates</Link>
+                  <Link to="/muzaffurpur-(cc)-egg-rate" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">Muzaffurpur Rates</Link>
+                </div>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-800 dark:text-gray-200 mb-3">State Markets</h4>
+                <div className="grid grid-cols-2 gap-2">
+                  <Link to="/state/maharashtra-egg-rate" className="text-sm text-green-600 dark:text-green-400 hover:underline">Maharashtra</Link>
+                  <Link to="/state/uttar-pradesh-egg-rate" className="text-sm text-green-600 dark:text-green-400 hover:underline">Uttar Pradesh</Link>
+                  <Link to="/state/west-bengal-egg-rate" className="text-sm text-green-600 dark:text-green-400 hover:underline">West Bengal</Link>
+                  <Link to="/state/jammu-and-kashmir-egg-rate" className="text-sm text-green-600 dark:text-green-400 hover:underline">Jammu Kashmir</Link>
+                  <Link to="/state/bihar-egg-rate" className="text-sm text-green-600 dark:text-green-400 hover:underline">Bihar</Link>
+                  <Link to="/state/kerala-egg-rate" className="text-sm text-green-600 dark:text-green-400 hover:underline">Kerala</Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>

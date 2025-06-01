@@ -22,6 +22,7 @@ const DetailedEggInfo = lazy(() => import('../components/prices/DetailedEggInfo'
 const PriceTrends = lazy(() => import('../components/prices/PriceTrends'));
 const CityMarketInsights = lazy(() => import('../components/content/CityMarketInsights'));
 const RelatedCityLinks = lazy(() => import('../components/content/RelatedCityLinks'));
+const StateNavigationGrid = lazy(() => import('../components/content/StateNavigationGrid'));
 
 
 
@@ -336,9 +337,7 @@ const MainPage = () => {
                       selectedState={selectedState} 
                     />
                   </section>
-                )}
-
-                {/* Related City Links Section - Universal SEO linking */}
+                )}                {/* Related City Links Section - Universal SEO linking */}
                 {selectedCity && cities.length > 0 && (
                   <section aria-label="Compare Rates in Other Cities">
                     <RelatedCityLinks 
@@ -346,6 +345,13 @@ const MainPage = () => {
                       selectedState={selectedState}
                       allCities={cities}
                     />
+                  </section>
+                )}
+
+                {/* State Navigation Grid - For state pages to link to all states */}
+                {selectedState && !selectedCity && (
+                  <section aria-label="Explore Other States">
+                    <StateNavigationGrid selectedState={selectedState} />
                   </section>
                 )}
                 

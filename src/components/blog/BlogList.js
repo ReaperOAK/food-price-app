@@ -47,20 +47,46 @@ const BlogList = ({ blogs, selectedCity, selectedState }) => {
     }))
   };
 
-  // Memoize resource links for better performance
+  // Memoize resource links for better performance - Enhanced with orphan pages
   const resourceLinks = useMemo(() => ({
     popularCities: {
       'Mumbai': '/mumbai-egg-rate',
       'Delhi': '/delhi-egg-rate',
       'Hyderabad': '/hyderabad-egg-rate',
       'Barwala': '/barwala-egg-rate',
-      'Bengaluru': '/bengaluru-egg-rate'
+      'Bengaluru': '/bengaluru-egg-rate',
+      'Chennai': '/chennai-egg-rate',
+      'Kolkata': '/kolkata-egg-rate',
+      'Lucknow': '/lucknow-egg-rate',
+      'Kanpur': '/kanpur-(cc)-egg-rate',
+      'Varanasi': '/varanasi-(cc)-egg-rate',
+      'Allahabad': '/allahabad-(cc)-egg-rate',
+      'Muzaffurpur': '/muzaffurpur-(cc)-egg-rate',
+      'Ranchi': '/ranchi--(cc)-egg-rate',
+      'Indore': '/indore-(cc)-egg-rate',
+      'Brahmapur': '/brahmapur-(od)-egg-rate'
+    },
+    majorStates: {      'Maharashtra': '/state/maharashtra-egg-rate',
+      'Uttar Pradesh': '/state/uttar-pradesh-egg-rate',
+      'West Bengal': '/state/west-bengal-egg-rate',
+      'Tamil Nadu': '/state/tamil-nadu-egg-rate',
+      'Karnataka': '/state/karnataka-egg-rate',
+      'Telangana': '/state/telangana-egg-rate',
+      'Gujarat': '/state/gujarat-egg-rate',
+      'Rajasthan': '/state/rajasthan-egg-rate',
+      'Andhra Pradesh': '/state/andhra-pradesh-egg-rate',
+      'Madhya Pradesh': '/state/madhya-pradesh-egg-rate',
+      'Haryana': '/state/haryana-egg-rate',
+      'Punjab': '/state/punjab-egg-rate'
     },
     marketResources: {
       'Egg Rate Web Stories': '/webstories',
       'Barwala Market Analysis': '/blog/egg-rate-barwala',
       'Understanding Today\'s Egg Rates': '/blog/blog-1',
-      'Egg Rate Trends in India': '/blog/blog-2'
+      'Egg Rate Trends in India': '/blog/blog-2',
+      'Delhi Egg Market': '/delhi-egg-rate',
+      'Kerala Egg Rates': '/state/kerala-egg-rate',
+      'Bihar Egg Market': '/state/bihar-egg-rate'
     }
   }), []);
 
@@ -132,7 +158,7 @@ const BlogList = ({ blogs, selectedCity, selectedState }) => {
           </h3>
           
           <div className="grid sm:grid-cols-2 gap-8">
-            {/* Popular Cities */}
+            {/* Popular Cities - Enhanced with orphan pages */}
             <div className="space-y-4">
               <h4 className="font-semibold text-blue-800 dark:text-blue-200">
                 Popular Cities
@@ -158,31 +184,58 @@ const BlogList = ({ blogs, selectedCity, selectedState }) => {
               </nav>
             </div>
 
-            {/* Market Resources */}
+            {/* Major States - New section for state orphan pages */}
             <div className="space-y-4">
               <h4 className="font-semibold text-blue-800 dark:text-blue-200">
-                Market Resources
+                Major States
               </h4>
-              <nav className="grid gap-2" aria-label="Market resources navigation">
-                {Object.entries(resourceLinks.marketResources).map(([title, path]) => (
+              <nav className="grid gap-2" aria-label="Major states navigation">
+                {Object.entries(resourceLinks.majorStates).map(([state, path]) => (
                   <Link 
-                    key={title}
+                    key={state}
                     to={path}
-                    className="text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100 transition-colors duration-200 flex items-center group"
+                    className="text-green-600 dark:text-green-300 hover:text-green-800 dark:hover:text-green-100 transition-colors duration-200 flex items-center group"
                   >
                     <svg 
-                      className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-600 dark:text-blue-500 dark:group-hover:text-blue-300" 
+                      className="w-4 h-4 mr-2 text-green-400 group-hover:text-green-600 dark:text-green-500 dark:group-hover:text-green-300" 
                       fill="none" 
                       stroke="currentColor" 
                       viewBox="0 0 24 24"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
-                    {title}
+                    {state}
                   </Link>
                 ))}
               </nav>
             </div>
+          </div>
+
+          {/* Market Resources - Enhanced */}
+          <div className="mt-8 space-y-4">
+            <h4 className="font-semibold text-blue-800 dark:text-blue-200">
+              Market Resources
+            </h4>
+            <nav className="grid sm:grid-cols-2 gap-2" aria-label="Market resources navigation">
+              {Object.entries(resourceLinks.marketResources).map(([title, path]) => (
+                <Link 
+                  key={title}
+                  to={path}
+                  className="text-blue-600 dark:text-blue-300 hover:text-blue-800 dark:hover:text-blue-100 transition-colors duration-200 flex items-center group"
+                >
+                  <svg 
+                    className="w-4 h-4 mr-2 text-blue-400 group-hover:text-blue-600 dark:text-blue-500 dark:group-hover:text-blue-300" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  {title}
+                </Link>
+              ))}
+            </nav>
           </div>
         </aside>
       )}

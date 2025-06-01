@@ -10,15 +10,32 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
       .filter(city => city.state === selectedState && city.city !== selectedCity)
       .slice(0, 4);
     
-    // If not enough cities from same state, add popular cities
-    const popularCities = ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Kolkata']
-      .filter(city => city !== selectedCity)
-      .slice(0, 6 - sameCities.length);
+    // Enhanced popular cities list including orphan pages
+    const popularCities = [
+      'Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Kolkata',
+      'Lucknow', 'Kanpur', 'Varanasi', 'Allahabad', 'Muzaffurpur', 
+      'Ranchi', 'Indore', 'Brahmapur'
+    ].filter(city => city !== selectedCity)
+     .slice(0, 8 - sameCities.length);
     
     return [...sameCities, ...popularCities.map(city => ({ city, state: 'Various' }))];
   };
 
+  // Get related states for cross-linking
+  const getRelatedStates = () => {
+    const majorStates = [
+      'Maharashtra', 'Uttar Pradesh', 'West Bengal', 'Tamil Nadu', 'Karnataka', 
+      'Telangana', 'Gujarat', 'Rajasthan', 'Andhra Pradesh', 'Madhya Pradesh',
+      'Haryana', 'Punjab', 'Bihar', 'Kerala', 'Odisha', 'Jharkhand'
+    ];
+    
+    return majorStates
+      .filter(state => state !== selectedState)
+      .slice(0, 6);
+  };
+
   const relatedCities = getRelatedCities();
+  const relatedStates = getRelatedStates();
 
   if (relatedCities.length === 0) return null;
 
@@ -29,7 +46,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
           Compare Egg Rates in Other Cities
         </h3>
         
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {relatedCities.map((cityData, index) => (
             <Link
               key={index}
@@ -48,7 +65,32 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
           ))}
         </div>
 
-        {/* State-level link */}
+        {/* State-level links */}
+        <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+            Explore State-wise Egg Rates
+          </h4>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {relatedStates.map((state, index) => (
+              <Link
+                key={index}
+                to={`/state/${state.toLowerCase().replace(/\s+/g, '-')}-egg-rate`}
+                className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 
+                           rounded-lg p-3 text-center hover:shadow-md transition-all duration-200 
+                           hover:from-green-100 hover:to-green-200 dark:hover:from-green-800/30 dark:hover:to-green-700/30"
+              >
+                <p className="font-medium text-gray-900 dark:text-white text-xs">
+                  {state}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  State Rates
+                </p>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* Current state link if viewing a city */}
         {selectedState && (
           <div className="mt-6 text-center">
             <Link
