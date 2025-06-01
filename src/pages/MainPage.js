@@ -348,6 +348,27 @@ const MainPage = () => {
                   </section>
                 )}
 
+                {/* Rate Table Section */}
+                <section aria-label="City Table">
+                  {!selectedCity && !selectedState ? (
+                   <RateTable
+                      key="default-table"
+                      rates={eggRates}
+                      showPriceColumns={true}
+                      showChart={true}
+                      chartType="bar"
+                    />
+                  ) : (
+                    <RateTable
+                      key="default-table"
+                      rates={eggRates}
+                      showPriceColumns={true}
+                      showChart={true}
+                      chartType="bar"
+                    />
+                  )}
+                </section>
+
                 {/* State Navigation Grid - For state pages to link to all states */}
                 {selectedState && !selectedCity && (
                   <section aria-label="Explore Other States">
