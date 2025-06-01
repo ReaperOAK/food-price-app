@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import HeadSection from './HeadSection';
 import TableOfContents from '../common/TableOfContents';
 import Navbar from '../layout/Navbar';
@@ -22,6 +22,7 @@ const PolicySection = memo(({ title, children, id }) => (
 
 const PrivacyPolicy = () => {
   const { city, state } = useParams();
+  const location = useLocation();
   const [selectedState, setSelectedState] = useState(state || '');
   const [selectedCity, setSelectedCity] = useState(city || '');
 
@@ -47,7 +48,7 @@ const PrivacyPolicy = () => {
         getSeoTitle={() => pageTitle}
         getSeoDescription={() => pageDescription}
         getSeoKeywords={() => "privacy policy, data protection, personal information, cookies policy, data security"}
-        location={window.location}
+        location={location}
         structuredData={structuredData}
         generateFaqSchema={() => ({})}
         selectedCity={selectedCity}

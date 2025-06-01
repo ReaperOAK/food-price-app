@@ -1,5 +1,5 @@
 import React, { useState, memo } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import HeadSection from './HeadSection';
 import TableOfContents from '../common/TableOfContents';
 import Navbar from '../layout/Navbar';
@@ -18,6 +18,7 @@ const DisclaimerSection = memo(({ title, children, id }) => (
 
 const Disclaimer = () => {
   const { city, state } = useParams();
+  const location = useLocation();
   const [selectedState, setSelectedState] = useState(state || '');
   const [selectedCity, setSelectedCity] = useState(city || '');
 
@@ -41,7 +42,7 @@ const Disclaimer = () => {
         getSeoTitle={() => pageTitle}
         getSeoDescription={() => pageDescription}
         getSeoKeywords={() => "egg rates, disclaimer, terms of service, egg price accuracy"}
-        location={window.location}
+        location={location}
         structuredData={structuredData}
         generateFaqSchema={() => ({})}
         selectedCity={selectedCity}

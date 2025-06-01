@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import HeadSection from './HeadSection';
 import TableOfContents from '../common/TableOfContents';
 import Navbar from '../layout/Navbar';
@@ -8,6 +8,7 @@ import Breadcrumb from '../layout/Breadcrumb';
 
 const TOS = () => {
   const { city, state } = useParams();
+  const location = useLocation();
   const [selectedState, setSelectedState] = useState(state || '');
   const [selectedCity, setSelectedCity] = useState(city || '');
 
@@ -34,7 +35,7 @@ const TOS = () => {
         getSeoTitle={() => pageTitle}
         getSeoDescription={() => pageDescription}
         getSeoKeywords={() => "terms of service, terms and conditions, user agreement, legal terms"}
-        location={window.location}
+        location={location}
         structuredData={structuredData}
         generateFaqSchema={() => ({})}
         selectedCity={selectedCity}
