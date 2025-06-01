@@ -16,13 +16,17 @@
   # Remove www
   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
   RewriteRule ^(.*)$ https://%1/$1 [R=301,L,QSA]
+  # Handle /webstories route specially
+  # If request is exactly /webstories (no trailing slash), serve React app
+  RewriteRule ^webstories$ /index.html [L]
   
-  # Add trailing slash to /webstories
-  RewriteRule ^webstories$ webstories/ [R=301,L,QSA]
+  # If request is /webstories/ (with trailing slash), check if it's a directory request
+  # If no specific file is requested in webstories/, serve React app
+  RewriteCond %{REQUEST_URI} ^/webstories/$
+  RewriteRule ^webstories/$ /index.html [L]
   
-  # Remove trailing slashes except for /webstories/
+  # Remove trailing slashes for all other routes
   RewriteCond %{REQUEST_FILENAME} !-d
-  RewriteCond %{REQUEST_URI} !^/webstories/
   RewriteRule ^(.*)/$ /$1 [L,R=301,QSA]
   
   # Handle 3XX redirects
