@@ -69,10 +69,9 @@ const HeadSection = memo(({
       <meta name="article:publisher" content="https://todayeggrates.com" />
       <meta name="article:section" content="Agriculture & Food Prices" />
       <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />
-      
-      {/* SEO Meta Tags */}
-      <title>{getSeoTitle(selectedCity, selectedState)}</title>
-      <meta name="description" content={getSeoDescription(selectedCity, selectedState)} />
+        {/* SEO Meta Tags */}
+      <title>{getSeoTitle(selectedCity, selectedState, eggRates?.[0]?.rate)}</title>
+      <meta name="description" content={getSeoDescription(selectedCity, selectedState, eggRates?.[0]?.rate)} />
       <meta name="keywords" content={getSeoKeywords(selectedCity, selectedState)} />
       <meta name="author" content="Today Egg Rates" />
       <link rel="canonical" href={canonicalUrl} />

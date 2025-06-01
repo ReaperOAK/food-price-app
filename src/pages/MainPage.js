@@ -20,6 +20,8 @@ const WebStoriesSection = lazy(() => import('../components/webstories/WebStories
 const PriceTrendsWidget = lazy(() => import('../components/prices/PriceTrendsWidget'));
 const DetailedEggInfo = lazy(() => import('../components/prices/DetailedEggInfo'));
 const PriceTrends = lazy(() => import('../components/prices/PriceTrends'));
+const CityMarketInsights = lazy(() => import('../components/content/CityMarketInsights'));
+const RelatedCityLinks = lazy(() => import('../components/content/RelatedCityLinks'));
 
 
 
@@ -305,15 +307,25 @@ const MainPage = () => {
                       itemsPerPage={5}
                     />
                   </section>
-                )}
-
-                {/* Detailed Info Section */}
+                )}                {/* Detailed Info Section */}
                 <section aria-label="Detailed Egg Information">
                   <DetailedEggInfo 
                     selectedCity={selectedCity} 
                     selectedState={selectedState} 
                   />
                 </section>
+
+                {/* City Market Insights Section - Universal SEO content */}
+                {selectedCity && (
+                  <section aria-label="Market Insights and Analysis">
+                    <CityMarketInsights 
+                      selectedCity={selectedCity}
+                      selectedState={selectedState}
+                      todayRate={priceMetrics.todayRate}
+                      trayPrice={priceMetrics.trayPrice}
+                    />
+                  </section>
+                )}
 
                 {/* Blog Section */}
                 {blogs.length > 0 && (
@@ -322,6 +334,17 @@ const MainPage = () => {
                       blogs={blogs} 
                       selectedCity={selectedCity} 
                       selectedState={selectedState} 
+                    />
+                  </section>
+                )}
+
+                {/* Related City Links Section - Universal SEO linking */}
+                {selectedCity && cities.length > 0 && (
+                  <section aria-label="Compare Rates in Other Cities">
+                    <RelatedCityLinks 
+                      selectedCity={selectedCity}
+                      selectedState={selectedState}
+                      allCities={cities}
                     />
                   </section>
                 )}

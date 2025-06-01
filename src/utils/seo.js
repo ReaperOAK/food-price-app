@@ -19,11 +19,11 @@ const formatPrice = (price) => {
 
 export const getUniqueH1 = (selectedCity, selectedState, today = getFormattedDate()) => {
   if (selectedCity) {
-    return `Egg Rates in ${selectedCity}`;
+    return `Today Egg Rate in ${selectedCity} - Egg Rate Today ${selectedCity}`;
   } else if (selectedState) {
-    return `${selectedState} Egg Rates`;
+    return `${selectedState} Egg Rate Today - Today Egg Rate ${selectedState}`;
   } else {
-    return `India Egg Rates Today`;
+    return `India Egg Rates Today - NECC Live Price Updates`;
   }
 };
 
@@ -68,8 +68,7 @@ export const getSeoDescription = (selectedCity, selectedState, todayRate, today 
   }
 };
 
-export const getSeoKeywords = (selectedCity, selectedState) => {
-  const baseKeywords = [
+export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeywords = [
     'necc egg rate',
     'necc rate',
     'egg rate today',
@@ -89,7 +88,21 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
     'barwala egg rate',
     'live egg rates',
     'egg tray price',
-    'necc rates'
+    'necc rates',
+    // Additional semantic keywords from SEO audit
+    'today egg rate',
+    'egg rate',
+    'national egg',
+    'egg market',
+    'poultry market',
+    'fresh eggs',
+    'daily prices',
+    'market rates',
+    'wholesale prices',
+    'retail prices',
+    'egg vendors',
+    'egg suppliers',
+    'poultry farms'
   ];
   
   // International SEO keywords for diaspora communities
