@@ -16,18 +16,9 @@
   # Remove www
   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
   RewriteRule ^(.*)$ https://%1/$1 [R=301,L,QSA]
-    # Add trailing slash to /webstories
+  
+  # Add trailing slash to /webstories
   RewriteRule ^webstories$ webstories/ [R=301,L,QSA]
-  
-  # Handle legacy web stories URLs (404 fix)
-  # Pattern: /webstories/city-statecode--egg-rate.html → redirect to React route
-  RewriteRule ^webstories/([a-z0-9-]+)-[a-z]{2}--egg-rate\.html$ /webstory/$1-egg-rate [R=301,L,QSA]
-  
-  # Pattern: /webstories/city--egg-rate.html → redirect to React route
-  RewriteRule ^webstories/([a-z0-9-]+)--egg-rate\.html$ /webstory/$1-egg-rate [R=301,L,QSA]
-  
-  # Handle direct access to webstories HTML files → redirect to React route
-  RewriteRule ^webstories/([a-z0-9-]+)-egg-rate\.html$ /webstory/$1-egg-rate [R=301,L,QSA]
   
   # Remove trailing slashes except for /webstories/
   RewriteCond %{REQUEST_FILENAME} !-d

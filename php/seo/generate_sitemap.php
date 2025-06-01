@@ -142,12 +142,11 @@ if ($cities_result && $cities_result->num_rows > 0) {
             $txt .= $state_full_url . PHP_EOL;
             $state_count++;
         }
-          // Also add the webstory URL for this city if it exists
-        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $row['city_name']));
-        $citySlug = trim($citySlug, '-'); // Remove leading/trailing hyphens
-        $webstory_path = $basePath . '/webstories/' . $citySlug . '-egg-rate.html';
+        
+        // Also add the webstory URL for this city if it exists
+        $webstory_path = $basePath . '/webstories/' . strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate.html';
         if (file_exists($webstory_path)) {
-            $webstory_url = $baseUrl . '/webstory/' . $citySlug . '-egg-rate';
+            $webstory_url = $baseUrl . '/webstory/' . strtolower(str_replace(' ', '-', $row['city_name'])) . '-egg-rate';
             
             $xml .= '<url>' . PHP_EOL;
             $xml .= '  <loc>' . $webstory_url . '</loc>' . PHP_EOL;

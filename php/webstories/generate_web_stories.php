@@ -59,81 +59,8 @@ function formatImagePath($imagePath) {
         return '/' . $imagePath;
     }
     
-    // Default case - add the standard path    return '/images/webstories/' . $imagePath;
-}
-
-// Function to generate state code from state name
-function generateStateCode($stateName) {
-    $stateMapping = [
-        'West Bengal' => 'wb',
-        'Odisha' => 'od', 
-        'Orissa' => 'od',
-        'Maharashtra' => 'mh',
-        'Karnataka' => 'ka',
-        'Tamil Nadu' => 'tn',
-        'Andhra Pradesh' => 'ap',
-        'Telangana' => 'ts',
-        'Kerala' => 'kl',
-        'Gujarat' => 'gj',
-        'Rajasthan' => 'rj',
-        'Madhya Pradesh' => 'mp',
-        'Uttar Pradesh' => 'up',
-        'Bihar' => 'br',
-        'Jharkhand' => 'jh',
-        'Chhattisgarh' => 'cg',
-        'Haryana' => 'hr',
-        'Punjab' => 'pb',
-        'Delhi' => 'dl',
-        'Himachal Pradesh' => 'hp',
-        'Uttarakhand' => 'uk',
-        'Jammu and Kashmir' => 'jk',
-        'Assam' => 'as',
-        'Meghalaya' => 'ml',
-        'Manipur' => 'mn',
-        'Mizoram' => 'mz',
-        'Nagaland' => 'nl',
-        'Tripura' => 'tr',
-        'Arunachal Pradesh' => 'ar',
-        'Sikkim' => 'sk',
-        'Goa' => 'ga'
-    ];
-    
-    // Default fallback code if state not found
-    return isset($stateMapping[$stateName]) ? $stateMapping[$stateName] : 'cc';
-}
-
-// Function to create legacy URL aliases for 404 fix
-function createLegacyUrlAlias($storiesDir, $citySlug, $stateCode, $content) {
-    // Create legacy URL pattern: city-statecode--egg-rate.html
-    $legacySlug = $citySlug . '-' . $stateCode . '--egg-rate.html';
-    $legacyPath = $storiesDir . '/' . $legacySlug;
-    
-    debug_log("LEGACY", "Creating legacy URL alias: {$legacySlug}");
-    
-    // Create a redirect HTML file for the legacy URL
-    $redirectHtml = '<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>Redirecting...</title>
-    <meta http-equiv="refresh" content="0;url=/webstory/' . $citySlug . '-egg-rate">
-    <link rel="canonical" href="https://todayeggrates.com/webstory/' . $citySlug . '-egg-rate">
-</head>
-<body>
-    <script>
-        window.location.replace("/webstory/' . $citySlug . '-egg-rate");
-    </script>
-    <p>If you are not redirected automatically, <a href="/webstory/' . $citySlug . '-egg-rate">click here</a>.</p>
-</body>
-</html>';
-    
-    if (file_put_contents($legacyPath, $redirectHtml) !== false) {
-        debug_log("LEGACY", "Successfully created legacy alias: {$legacySlug}");
-        return true;
-    } else {
-        debug_log("ERROR", "Failed to create legacy alias: {$legacySlug}");
-        return false;
-    }
+    // Default case - add the standard path
+    return '/images/webstories/' . $imagePath;
 }
 
 // Use a try-catch block around the entire script to catch any unexpected errors
@@ -288,9 +215,9 @@ try {
                 $state = $row['state'];
                 $rate = $row['rate'];
                 $date = $row['date'];
-                  debug_log("INDEX", "Adding index entry for {$city}, {$state}");
+                
+                debug_log("INDEX", "Adding index entry for {$city}, {$state}");
                 $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-                $citySlug = trim($citySlug, '-'); // Remove leading/trailing hyphens
                 $html .= "<li><a href='{$citySlug}-egg-rate.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
             }
             
@@ -417,21 +344,12 @@ try {
             debug_log("ERROR", "Failed to create default image: " . $e->getMessage());
             throw new Exception("Could not create default background image: " . $e->getMessage());
         }
-    }    if (empty($backgroundImages)) {
+    }
+
+    if (empty($backgroundImages)) {
         debug_log("ERROR", "No valid background images available");
         throw new Exception("No valid background images available and could not create default");
     }
-
-    // Set up images for the web story template
-    $coverImage = $backgroundImages[0];
-    $trayPriceImage = count($backgroundImages) > 1 ? $backgroundImages[1] : $backgroundImages[0];
-    $ctaImage = count($backgroundImages) > 2 ? $backgroundImages[2] : $backgroundImages[0];
-    
-    debug_log("IMAGES", "Using images", [
-        "cover" => $coverImage,
-        "trayPrice" => $trayPriceImage,
-        "cta" => $ctaImage
-    ]);
 
     // Get today's date
     $today = date('Y-m-d');
@@ -544,7 +462,8 @@ try {
     if ($result && $result->num_rows > 0) {
         debug_log("PROCESS", "Found " . $result->num_rows . " cities to generate web stories for");
         $storiesGenerated = 0;
-          while ($row = $result->fetch_assoc()) {
+        
+        while ($row = $result->fetch_assoc()) {
             $city = $row['city'];
             $state = $row['state'];
             $rate = $row['rate'];
@@ -557,13 +476,6 @@ try {
                 debug_log("SKIP", "Skipping {$city} - rate is too old");
                 continue;
             }
-            
-            // Create URL-friendly city slug
-            $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-            $citySlug = trim($citySlug, '-'); // Remove leading/trailing hyphens
-            
-            // Generate state code for legacy URL support
-            $stateCode = generateStateCode($state);
             
             // Replace template variables
             $story = $template;
@@ -581,20 +493,12 @@ try {
             $story = str_replace('{{TRAY_PRICE_IMAGE}}', $trayPriceImagePath, $story);
             $story = str_replace('{{CTA_IMAGE}}', $ctaImagePath, $story);
             
-            // Save main web story
+            // Save web story
             $storyPath = $storiesDir . '/' . $citySlug . '-egg-rate.html';
             debug_log("SAVE", "Saving web story to {$storyPath}");
             
             if (file_put_contents($storyPath, $story) === false) {
                 debug_log("ERROR", "Failed to save web story for {$city}");
-                continue;
-            }
-            
-            // Create legacy URL alias to fix 404 errors
-            createLegacyUrlAlias($storiesDir, $citySlug, $stateCode, $story);
-            
-            $storiesGenerated++;
-            debug_log("SUCCESS", "Generated web story for {$city}");
                 continue;
             }
             

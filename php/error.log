@@ -3651,10 +3651,3 @@ Stack trace:
 #0 C:\Owais\food-price-app\public\php\webstories\generate_web_stories.php(72): require_once()
 #1 {main}
   thrown in C:\Owais\food-price-app\public\php\config\db.php on line 11
-[01-Jun-2025 15:22:39 UTC] 2025-06-01 15:22:39 [WEB STORIES] START: Beginning web stories generation
-[01-Jun-2025 15:22:39 UTC] 2025-06-01 15:22:39 [WEB STORIES] DB: Including database configuration
-[01-Jun-2025 15:22:39 UTC] PHP Fatal error:  Uncaught Error: Class "mysqli" not found in C:\Owais\food-price-app\public\php\config\db.php:11
-Stack trace:
-#0 C:\Owais\food-price-app\public\php\webstories\generate_web_stories.php(72): require_once()
-#1 {main}
-  thrown in C:\Owais\food-price-app\public\php\config\db.php on line 11

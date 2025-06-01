@@ -84,9 +84,9 @@ if ($result->num_rows > 0) {
         if (strtotime($date) < strtotime('-3 days')) {
             continue;
         }
-          // Create a URL-friendly city name
+        
+        // Create a URL-friendly city name
         $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $city));
-        $citySlug = trim($citySlug, '-'); // Remove leading/trailing hyphens
         
         // Format date for display
         $displayDate = date('F j, Y', strtotime($date));
