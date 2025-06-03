@@ -39,27 +39,37 @@ if ($html !== false) {
             if (!empty($cells)) {
                 $rows[] = $cells;
             }
+        }        // Function to standardize city names by removing state codes
+        function standardizeCityName($cityName) {
+            // Remove state codes in parentheses and trim
+            $cleanName = preg_replace('/\s*\([A-Z]+\)\s*/', '', trim($cityName));
+            
+            // Handle specific city name variations
+            $cityMappings = [
+                'Bangalore' => 'Bengaluru',
+                'Luknow' => 'Lucknow'
+            ];
+            
+            return isset($cityMappings[$cleanName]) ? $cityMappings[$cleanName] : $cleanName;
         }
 
-        // City to state mapping
+        // City to state mapping (using standardized names without state codes)
         $cityToState = [
             "Ahmedabad" => "Gujarat",
             "Ajmer" => "Rajasthan",
             "Barwala" => "Haryana",
-            "Bengaluru (CC)" => "Karnataka",
             "Bengaluru" => "Karnataka",
-            "Bangalore" => "Karnataka",
-            "Brahmapur (OD)" => "Odisha",
-            "Chennai (CC)" => "Tamil Nadu",
+            "Brahmapur" => "Odisha",
+            "Chennai" => "Tamil Nadu",
             "Chittoor" => "Andhra Pradesh",
-            "Delhi (CC)" => "Delhi",
+            "Delhi" => "Delhi",
             "E.Godavari" => "Andhra Pradesh",
             "Hospet" => "Karnataka",
             "Hyderabad" => "Telangana",
             "Jabalpur" => "Madhya Pradesh",
-            "Kolkata (WB)" => "West Bengal",
+            "Kolkata" => "West Bengal",
             "Ludhiana" => "Punjab",
-            "Mumbai (CC)" => "Maharashtra",
+            "Mumbai" => "Maharashtra",
             "Mysuru" => "Karnataka",
             "Namakkal" => "Tamil Nadu",
             "Pune" => "Maharashtra",
@@ -69,16 +79,16 @@ if ($html !== false) {
             "Vizag" => "Andhra Pradesh",
             "W.Godavari" => "Andhra Pradesh",
             "Warangal" => "Telangana",
-            "Allahabad (CC)" => "Uttar Pradesh",
+            "Allahabad" => "Uttar Pradesh",
             "Bhopal" => "Madhya Pradesh",
-            "Indore (CC)" => "Madhya Pradesh",
-            "Kanpur (CC)" => "Uttar Pradesh",
-            "Luknow (CC)" => "Uttar Pradesh",
-            "Muzaffurpur (CC)" => "Bihar",
+            "Indore" => "Madhya Pradesh",
+            "Kanpur" => "Uttar Pradesh",
+            "Lucknow" => "Uttar Pradesh",
+            "Muzaffurpur" => "Bihar",
             "Nagpur" => "Maharashtra",
             "Patna" => "Bihar",
-            "Ranchi  (CC)" => "Jharkhand",
-            "Varanasi (CC)" => "Uttar Pradesh"
+            "Ranchi" => "Jharkhand",
+            "Varanasi" => "Uttar Pradesh"
         ];
 
         // Get today's date and day of the month
