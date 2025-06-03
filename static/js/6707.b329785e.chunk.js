@@ -1,0 +1,1 @@
+(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[6707],{6707:()=>{}}]);
