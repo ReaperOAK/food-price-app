@@ -76,22 +76,17 @@ if (!function_exists('deleteOldWebStories')) {
                 // Skip index.html
                 if (basename($storyFile) === 'index.html') {
                     continue;
-                }
-                  $filename = basename($storyFile, '.html');
+                }                $filename = basename($storyFile, '.html');
                 
-                // Extract city slug from filename - handle both new and old patterns
+                // Extract city slug from filename - handle current clean pattern
                 $citySlug = null;
                 
-                // New pattern: city-statecode--egg-rate.html (e.g., allahabad-cc--egg-rate.html)
-                if (preg_match('/^(.+)--egg-rate$/', $filename, $matches)) {
-                    $citySlug = $matches[1];
-                }
-                // Legacy pattern: city-egg-rate.html (e.g., allahabad-egg-rate.html)  
-                elseif (preg_match('/^(.+)-egg-rate$/', $filename, $matches)) {
+                // Current pattern: city-egg-rate.html (e.g., bangalore-egg-rate.html)  
+                if (preg_match('/^(.+)-egg-rate$/', $filename, $matches)) {
                     $citySlug = $matches[1];
                 }
                 
-                if ($citySlug) {                if ($citySlug) {
+                if ($citySlug) {if ($citySlug) {
                     // If the city is not in our active list, delete the story
                     if (!isset($activeCities[$citySlug])) {
                         if (unlink($storyFile)) {
@@ -127,76 +122,23 @@ if (!function_exists('deleteOldWebStories')) {
     }
 }
 
-// Helper function to generate city slug with state code for proper file naming
+// Helper function to generate city slug without state code for clean URLs
 if (!function_exists('generateCitySlug')) {
     function generateCitySlug($city, $state = null) {
-        // First, check if the city name contains a state code in parentheses like "Allahabad (CC)"
-        $stateCode = '';
+        // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)"
         $cleanCity = $city;
-        
         if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
             $cleanCity = trim($matches[1]);
-            $stateCode = strtolower($matches[2]);
-        } elseif ($state) {
-            // If no state code in city name, try to derive from state name
-            $stateCode = extractStateCodeFromStateName($state);
         }
         
-        // Generate the base city slug
+        // Generate the base city slug without state codes
         $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
         $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
         
-        // Add state code if available, using double dash pattern
-        if ($stateCode) {
-            $slug = $citySlug . '-' . $stateCode . '--egg-rate';
-        } else {
-            $slug = $citySlug . '-egg-rate';
-        }
+        // Generate clean slug without state codes
+        $slug = $citySlug . '-egg-rate';
         
         return $slug;
-    }
-}
-
-// Helper function to extract state code from state name
-if (!function_exists('extractStateCodeFromStateName')) {
-    function extractStateCodeFromStateName($stateName) {
-        // Common state name to code mappings based on the data patterns observed
-        $stateMapping = [
-            'chhattisgarh' => 'cc',
-            'odisha' => 'od', 
-            'orissa' => 'od',
-            'west bengal' => 'wb',
-            'andhra pradesh' => 'ap',
-            'telangana' => 'tg',
-            'tamil nadu' => 'tn',
-            'karnataka' => 'ka',
-            'kerala' => 'kl',
-            'maharashtra' => 'mh',
-            'gujarat' => 'gj',
-            'rajasthan' => 'rj',
-            'madhya pradesh' => 'mp',
-            'uttar pradesh' => 'up',
-            'bihar' => 'br',
-            'jharkhand' => 'jh',
-            'punjab' => 'pb',
-            'haryana' => 'hr',
-            'himachal pradesh' => 'hp',
-            'jammu and kashmir' => 'jk',
-            'uttarakhand' => 'uk',
-            'assam' => 'as',
-            'manipur' => 'mn',
-            'mizoram' => 'mz',
-            'nagaland' => 'nl',
-            'tripura' => 'tr',
-            'meghalaya' => 'ml',
-            'arunachal pradesh' => 'ar',
-            'sikkim' => 'sk',
-            'goa' => 'ga',
-            'delhi' => 'dl'
-        ];
-        
-        $stateLower = strtolower(trim($stateName));
-        return isset($stateMapping[$stateLower]) ? $stateMapping[$stateLower] : '';
     }
 }
 

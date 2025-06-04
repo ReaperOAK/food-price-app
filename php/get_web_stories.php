@@ -9,6 +9,26 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/config/db.php';
 
+// Helper function to generate city slug without state code for clean URLs
+if (!function_exists('generateCitySlug')) {
+    function generateCitySlug($city, $state = null) {
+        // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)"
+        $cleanCity = $city;
+        if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
+            $cleanCity = trim($matches[1]);
+        }
+        
+        // Generate the base city slug without state codes
+        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
+        $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
+        
+        // Generate clean slug without state codes
+        $slug = $citySlug . '-egg-rate';
+        
+        return $slug;
+    }
+}
+
 // Directory where web stories are stored with absolute path
 $basePath = dirname(dirname(__FILE__)); // Go up one level from php dir
 $storiesDir = $basePath . '/webstories';
