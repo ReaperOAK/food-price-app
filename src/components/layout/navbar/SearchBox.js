@@ -105,14 +105,19 @@ const SearchBox = memo(forwardRef(({
         noOptionsMessage={() => error ? "Error loading locations" : "No locations found"}
         isClearable
         isSearchable
-        components={customComponents}
-        // Performance optimizations
+        components={customComponents}        // Performance optimizations
         filterOption={(option, inputValue) => {
-          if (!inputValue) return true;          const searchValue = inputValue?.toLowerCase() || '';
-          return (
-            (option.label?.toLowerCase() || '').includes(searchValue) ||
-            (option.data?.state?.toLowerCase() || '').includes(searchValue)
-          );
+          if (!inputValue) return true;
+          
+          // Safely handle inputValue
+          const searchValue = (inputValue && typeof inputValue === 'string') ? inputValue.toLowerCase() : '';
+          if (!searchValue) return true;
+          
+          // Safely handle option properties
+          const labelText = (option?.label && typeof option.label === 'string') ? option.label.toLowerCase() : '';
+          const stateText = (option?.data?.state && typeof option.data.state === 'string') ? option.data.state.toLowerCase() : '';
+          
+          return labelText.includes(searchValue) || stateText.includes(searchValue);
         }}
         // Accessibility enhancements
         aria-invalid={error ? "true" : "false"}

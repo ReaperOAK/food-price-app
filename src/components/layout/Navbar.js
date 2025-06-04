@@ -157,15 +157,15 @@ const Navbar = memo(({
     }
     
     navigationLock.current = true;
-    
-    Promise.resolve()
-      .then(() => {
+      Promise.resolve().then(() => {
         setSelectedCity(city);
         setSelectedState('');
         return new Promise(resolve => setTimeout(resolve, 0));
       })
       .then(() => {
-        const path = `/${city?.toLowerCase?.() || ''}-egg-rate`;
+        // Safely handle city name conversion
+        const cityName = city && typeof city === 'string' ? city : '';
+        const path = cityName ? `/${cityName.toLowerCase()}-egg-rate` : '/';
         if (location.pathname !== path) {
           navigate(path, { replace: true });
         }

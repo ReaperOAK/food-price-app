@@ -15,19 +15,22 @@ const useLocationData = () => {
     try {
       const combinedOptions = [];
       const processedCities = new Set(); // Track processed cities
-      
-      // First process normal states and their cities
+        // First process normal states and their cities
       Object.entries(data).forEach(([state, cities]) => {
         if (state !== 'Unknown' && state !== 'special') {
           const cityOptions = cities.map(city => {
-            processedCities.add(city.toLowerCase() || '');
+            // Safely handle city name
+            const cityName = city && typeof city === 'string' ? city : '';
+            if (cityName) {
+              processedCities.add(cityName.toLowerCase());
+            }
             return {
-              value: city,
-              label: city,
+              value: cityName,
+              label: cityName,
               type: 'city',
               state: state
             };
-          });
+          }).filter(option => option.value); // Filter out empty city names
 
           if (cityOptions.length > 0) {
             combinedOptions.push({
@@ -36,24 +39,29 @@ const useLocationData = () => {
             });
           }
         }
-      });
-
-      // Process special category
+      });      // Process special category
       if (data.special?.length > 0) {
-        const specialOptions = data.special.map(item => ({
-          value: item,
-          label: item,
-          type: 'special'
-        }));
+        const specialOptions = data.special
+          .filter(item => item && typeof item === 'string')
+          .map(item => ({
+            value: item,
+            label: item,
+            type: 'special'
+          }));
         
-        combinedOptions.push({
-          label: 'Special',
-          options: specialOptions
-        });
-      }      // Process Unknown cities that haven't been included yet
+        if (specialOptions.length > 0) {
+          combinedOptions.push({
+            label: 'Special',
+            options: specialOptions
+          });
+        }
+      }// Process Unknown cities that haven't been included yet
       if (data.Unknown?.length > 0) {
         const unknownCities = data.Unknown
-          .filter(city => !processedCities.has(city?.toLowerCase() || ''))
+          .filter(city => {
+            const cityName = city && typeof city === 'string' ? city : '';
+            return cityName && !processedCities.has(cityName.toLowerCase());
+          })
           .map(city => ({
             value: city,
             label: city,
