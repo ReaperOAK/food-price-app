@@ -63,77 +63,26 @@ function formatImagePath($imagePath) {
     return '/images/webstories/' . $imagePath;
 }
 
-// Helper function to generate city slug with state code for proper file naming
+// Helper function to generate city slug without state code for clean URLs
 function generateCitySlug($city, $state = null) {
     debug_log("SLUG", "Generating slug for city: {$city}, state: {$state}");
     
-    // First, check if the city name contains a state code in parentheses like "Allahabad (CC)"
-    $stateCode = '';
+    // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)"
     $cleanCity = $city;
-    
     if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
         $cleanCity = trim($matches[1]);
-        $stateCode = strtolower($matches[2]);
-        debug_log("SLUG", "Extracted state code '{$stateCode}' from city name");
-    } elseif ($state) {
-        // If no state code in city name, try to derive from state name
-        $stateCode = extractStateCodeFromStateName($state);
+        debug_log("SLUG", "Removed state code from city name, using: {$cleanCity}");
     }
     
-    // Generate the base city slug
+    // Generate the base city slug without state codes
     $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
     $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
     
-    // Add state code if available, using double dash pattern
-    if ($stateCode) {
-        $slug = $citySlug . '-' . $stateCode . '--egg-rate';
-    } else {
-        $slug = $citySlug . '-egg-rate';
-    }
+    // Generate clean slug without state codes
+    $slug = $citySlug . '-egg-rate';
     
-    debug_log("SLUG", "Generated slug: {$slug}");
+    debug_log("SLUG", "Generated clean slug: {$slug}");
     return $slug;
-}
-
-// Helper function to extract state code from state name
-function extractStateCodeFromStateName($stateName) {
-    // Common state name to code mappings based on the data patterns observed
-    $stateMapping = [
-        'chhattisgarh' => 'cc',
-        'odisha' => 'od', 
-        'orissa' => 'od',
-        'west bengal' => 'wb',
-        'andhra pradesh' => 'ap',
-        'telangana' => 'tg',
-        'tamil nadu' => 'tn',
-        'karnataka' => 'ka',
-        'kerala' => 'kl',
-        'maharashtra' => 'mh',
-        'gujarat' => 'gj',
-        'rajasthan' => 'rj',
-        'madhya pradesh' => 'mp',
-        'uttar pradesh' => 'up',
-        'bihar' => 'br',
-        'jharkhand' => 'jh',
-        'punjab' => 'pb',
-        'haryana' => 'hr',
-        'himachal pradesh' => 'hp',
-        'jammu and kashmir' => 'jk',
-        'uttarakhand' => 'uk',
-        'assam' => 'as',
-        'manipur' => 'mn',
-        'mizoram' => 'mz',
-        'nagaland' => 'nl',
-        'tripura' => 'tr',
-        'meghalaya' => 'ml',
-        'arunachal pradesh' => 'ar',
-        'sikkim' => 'sk',
-        'goa' => 'ga',
-        'delhi' => 'dl'
-    ];
-    
-    $stateLower = strtolower(trim($stateName));
-    return isset($stateMapping[$stateLower]) ? $stateMapping[$stateLower] : '';
 }
 
 // Use a try-catch block around the entire script to catch any unexpected errors
@@ -550,19 +499,26 @@ try {
                 debug_log("SKIP", "Skipping {$city} - rate is too old");
                 continue;
             }
-            
-            // Replace template variables
+              // Replace template variables - using correct placeholders that match the template
             $story = $template;
             $story = str_replace('{{CITY_NAME}}', $city, $story);
             $story = str_replace('{{STATE_NAME}}', $state, $story);
-            $story = str_replace('{{RATE}}', number_format($rate, 2), $story);
+            $story = str_replace('{{EGG_RATE}}', number_format($rate, 2), $story); // Fixed: was {{RATE}}
+            $story = str_replace('{{CITY_SLUG}}', $citySlug, $story); // Added: missing placeholder
             $story = str_replace('{{DATE}}', date('F j, Y', strtotime($date)), $story);
+            $story = str_replace('{{ISO_DATE}}', date('c', strtotime($date)), $story); // Added: ISO date for schema
             
             // Format image paths for each page
             $coverImagePath = formatImagePath($coverImage);
             $trayPriceImagePath = formatImagePath($trayPriceImage);
             $ctaImagePath = formatImagePath($ctaImage);
             
+            // Replace image placeholders with correct names from template
+            $story = str_replace('{{COVER_BACKGROUND_IMAGE}}', $coverImagePath, $story);
+            $story = str_replace('{{TRAY_BACKGROUND_IMAGE}}', $trayPriceImagePath, $story);
+            $story = str_replace('{{CTA_BACKGROUND_IMAGE}}', $ctaImagePath, $story);
+            
+            // Legacy placeholder support (if any old templates still use these)
             $story = str_replace('{{COVER_IMAGE}}', $coverImagePath, $story);
             $story = str_replace('{{TRAY_PRICE_IMAGE}}', $trayPriceImagePath, $story);
             $story = str_replace('{{CTA_IMAGE}}', $ctaImagePath, $story);
