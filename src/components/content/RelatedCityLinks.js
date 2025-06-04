@@ -50,7 +50,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
           {relatedCities.map((cityData, index) => (
             <Link
               key={index}
-              to={`/${cityData.city.toLowerCase()||cityData.city}-egg-rate`}
+              to={`/${cityData.city.toLowerCase()||''}-egg-rate`}
               className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-600 
                          rounded-lg p-4 text-center hover:shadow-md transition-all duration-200 
                          hover:from-blue-100 hover:to-blue-200 dark:hover:from-gray-600 dark:hover:to-gray-500"
@@ -74,7 +74,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
             {relatedStates.map((state, index) => (
               <Link
                 key={index}
-                to={`/state/${(state.toLowerCase()||state).replace(/\s+/g, '-')}-egg-rate`}
+                to={`/state/${(state.toLowerCase()||'').replace(/\s+/g, '-')}-egg-rate`}
                 className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 
                            rounded-lg p-3 text-center hover:shadow-md transition-all duration-200 
                            hover:from-green-100 hover:to-green-200 dark:hover:from-green-800/30 dark:hover:to-green-700/30"
@@ -94,7 +94,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
         {selectedState && (
           <div className="mt-6 text-center">
             <Link
-              to={`/state/${(selectedState.toLowerCase()||selectedState).replace(/\s+/g, '-')}-egg-rate`}
+              to={`/state/${(selectedState.toLowerCase()||'').replace(/\s+/g, '-')}-egg-rate`}
               className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 
                          text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 
                          transition-all duration-200 shadow-md hover:shadow-lg"

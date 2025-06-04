@@ -121,7 +121,7 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
     'poultry prices india global'
   ];
     if (selectedCity) {
-    const cityLower = selectedCity.toLowerCase?.() || selectedCity;
+    const cityLower = selectedCity.toLowerCase?.() || '';
     const cityKeywords = [
       `necc egg rate ${cityLower}`,
       `${cityLower} egg rate today`,
@@ -152,7 +152,7 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       ...internationalKeywords
     ].join(', ');
   }else if (selectedState) {
-    const stateLower = selectedState.toLowerCase?.() || selectedState;
+    const stateLower = selectedState.toLowerCase?.() || '';
     return [
       `necc egg rate ${stateLower}`,
       `${stateLower} egg rate today`,

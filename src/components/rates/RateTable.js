@@ -199,7 +199,7 @@ const RateTable = ({
     "image": "https://todayeggrates.com/eggpic.webp",
     "priceRange": "₹₹",
     "telephone": "+91-XXXXXXXXXX",
-    "url": `https://todayeggrates.com/${selectedCity.toLowerCase()||selectedCity}-egg-rate`,
+    "url": `https://todayeggrates.com/${selectedCity.toLowerCase()||''}-egg-rate`,
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.8",
@@ -245,7 +245,7 @@ const RateTable = ({
     "image": "https://todayeggrates.com/eggpic.webp",
     "offers": {
       "@type": "Offer",
-      "url": `https://todayeggrates.com/${selectedCity.toLowerCase()||selectedCity}-egg-rate`,
+      "url": `https://todayeggrates.com/${selectedCity.toLowerCase()||''}-egg-rate`,
       "priceCurrency": "INR",
       "price": latestRate,
       "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],

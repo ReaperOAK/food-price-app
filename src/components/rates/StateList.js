@@ -59,7 +59,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
           {states.slice(i, i + 3).map(state => (
             <td key={state} className="px-6 py-4 text-center">
               <Link
-                to={`/state/${state.toLowerCase()||state}-egg-rate`}
+                to={`/state/${state.toLowerCase()||''}-egg-rate`}
                 className="inline-flex items-center justify-center w-full px-4 py-2 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
                 title={`Today's Egg Rate in ${state} - NECC Egg Price`}
                 aria-label={`View egg rates for ${state}`}
@@ -83,7 +83,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
           {cities.slice(i, i + 3).map(city => (
             <td key={city} className="px-6 py-4 text-center">
               <Link
-                to={`/${city.toLowerCase()||city}-egg-rate`}
+                to={`/${city.toLowerCase()||''}-egg-rate`}
                 className="inline-flex items-center justify-center w-full px-4 py-2 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
                 title={`Today's Egg Rate in ${city} - Latest NECC Egg Price`}
                 aria-label={`View egg rates for ${city}`}
@@ -118,7 +118,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
           {popularCities.map(({ name, state }) => (
             <Link 
               key={name}
-              to={`/${name.toLowerCase()||name}-egg-rate`}
+              to={`/${name.toLowerCase()||''}-egg-rate`}
               className="group flex flex-col items-center p-4 bg-white border border-blue-200 rounded-lg hover:border-blue-400 hover:shadow-md transition duration-200 dark:bg-gray-800 dark:border-blue-800 dark:hover:border-blue-600"
               title={`Check today's egg rate in ${name}, ${state}`}
             >
@@ -139,7 +139,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
           {popularStates.map(({ name, region }) => (
             <Link 
               key={name}
-              to={`/state/${name.toLowerCase()||name}-egg-rate`}
+              to={`/state/${name.toLowerCase()||''}-egg-rate`}
               className="group flex flex-col items-center p-4 bg-white border border-green-200 rounded-lg hover:border-green-400 hover:shadow-md transition duration-200 dark:bg-gray-800 dark:border-green-800 dark:hover:border-green-600"
               title={`Check today's egg rates in ${name}, ${region} India`}
             >

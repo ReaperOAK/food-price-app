@@ -53,7 +53,7 @@ const TableOfContents = memo(({ contentId, blogId, isSticky = false }) => {
       elements.forEach((element) => {
         if (!element.id) {
           const slugifiedText = (element.innerText
-            .toLowerCase()||element.innerText)
+            .toLowerCase()||'')
             .replace(/[^\w ]+/g, '')
             .replace(/ +/g, '-');
           element.id = `${blogId}-heading-${slugifiedText}`;

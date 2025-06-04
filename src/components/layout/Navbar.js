@@ -95,7 +95,7 @@ const Navbar = memo(({
   // Standardize city names
   const standardizeCityName = useCallback((cityName) => {
     if (!cityName) return '';
-    const lowerCityName = cityName.toLowerCase?.() || cityName;
+    const lowerCityName = cityName.toLowerCase?.() || '';
     if (lowerCityName === 'bangalore' || 
         lowerCityName === 'bangalore (cc)' || 
         lowerCityName === 'bengaluru (cc)' ||
@@ -121,7 +121,7 @@ const Navbar = memo(({
     setSelectedState(state || '');
     
     requestAnimationFrame(() => {
-      const path = `/${selectedCityName?.toLowerCase?.() || selectedCityName}-egg-rate`;
+      const path = `/${selectedCityName?.toLowerCase?.() || ''}-egg-rate`;
       if (location.pathname !== path) {
         navigate(path, { replace: true });
       }
@@ -165,7 +165,7 @@ const Navbar = memo(({
         return new Promise(resolve => setTimeout(resolve, 0));
       })
       .then(() => {
-        const path = `/${city?.toLowerCase?.() || city}-egg-rate`;
+        const path = `/${city?.toLowerCase?.() || ''}-egg-rate`;
         if (location.pathname !== path) {
           navigate(path, { replace: true });
         }
