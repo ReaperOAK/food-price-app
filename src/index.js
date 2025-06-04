@@ -7,14 +7,13 @@ import OptimizedImage from './components/common/OptimizedImage';
 // Enhanced loading component
 const LoadingFallback = () => (
   <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center animate-fade-in">
-      <div className="w-16 h-16 mb-4 mx-auto">        <OptimizedImage 
+    <div className="text-center animate-fade-in">      <div className="w-16 h-16 mb-4 mx-auto">        <OptimizedImage 
           src="/logo.webp"
           alt="Loading..."
           className="w-full h-full object-contain"
           width={64}
           height={64}
-          fetchpriority="high"
+          priority={true}
         />
       </div>
       <h2 className="text-xl font-semibold text-blue-600 mb-2 animate-slide-up">
