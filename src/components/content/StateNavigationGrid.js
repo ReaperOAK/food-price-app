@@ -34,7 +34,7 @@ const StateNavigationGrid = memo(({ selectedState }) => {
 
   // Filter out current state
   const otherStates = allStates.filter(state => 
-    state.name.toLowerCase().replace(/\s+/g, '-') !== selectedState?.toLowerCase().replace(/\s+/g, '-')
+    (state.name.toLowerCase()||state.name).replace(/\s+/g, '-') !== (selectedState?.toLowerCase()||selectedState).replace(/\s+/g, '-')
   );
 
   return (
@@ -57,7 +57,7 @@ const StateNavigationGrid = memo(({ selectedState }) => {
           {otherStates.filter(state => state.popular).map((state) => (
             <Link
               key={state.name}
-              to={`/state/${state.name.toLowerCase().replace(/\s+/g, '-')}-egg-rate`}
+              to={`/state/${(state.name.toLowerCase()||state.name).replace(/\s+/g, '-')}-egg-rate`}
               className="group bg-white dark:bg-gray-700 rounded-lg p-4 text-center hover:shadow-md 
                          transition-all duration-200 border border-blue-200 dark:border-gray-600 
                          hover:border-blue-400 dark:hover:border-blue-500 hover:scale-105"
@@ -83,7 +83,7 @@ const StateNavigationGrid = memo(({ selectedState }) => {
           {otherStates.filter(state => !state.popular).map((state) => (
             <Link
               key={state.name}
-              to={`/state/${state.name.toLowerCase().replace(/\s+/g, '-')}-egg-rate`}
+              to={`/state/${(state.name.toLowerCase()||state.name).replace(/\s+/g, '-')}-egg-rate`}
               className="group bg-white dark:bg-gray-700 rounded-md p-3 text-center hover:shadow-sm 
                          transition-all duration-200 border border-gray-200 dark:border-gray-600 
                          hover:border-gray-400 dark:hover:border-gray-500 hover:scale-102"

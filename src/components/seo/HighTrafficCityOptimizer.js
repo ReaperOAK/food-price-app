@@ -65,16 +65,16 @@ const HighTrafficCityOptimizer = memo(({ selectedCity, selectedState, todayRate,
 
   const getCitySpecificKeywords = () => {
     return [
-      `${selectedCity.toLowerCase()} egg rate live`,
-      `${selectedCity.toLowerCase()} necc rate breaking`,
-      `${selectedCity.toLowerCase()} egg price now`,
-      `${selectedCity.toLowerCase()} wholesale egg rate`,
-      `${selectedCity.toLowerCase()} egg market live`,
-      `${selectedCity.toLowerCase()} egg rate update`,
-      `${selectedCity.toLowerCase()} ${cityData.localContext.toLowerCase()} egg rate`,
-      ...cityData.majorMarkets.map(market => `${market.toLowerCase()} egg rate`),
-      `${selectedCity.toLowerCase()} egg rate comparison`,
-      `${selectedCity.toLowerCase()} egg price forecast`,
+      `${(selectedCity.toLowerCase()||selectedCity)} egg rate live`,
+      `${(selectedCity.toLowerCase()||selectedCity)} necc rate breaking`,
+      `${(selectedCity.toLowerCase()||selectedCity)} egg price now`,
+      `${(selectedCity.toLowerCase()||selectedCity)} wholesale egg rate`,
+      `${(selectedCity.toLowerCase()||selectedCity)} egg market live`,
+      `${(selectedCity.toLowerCase()||selectedCity)} egg rate update`,
+      `${(selectedCity.toLowerCase()||selectedCity)} ${(cityData.localContext.toLowerCase()||cityData.localContext)} egg rate`,
+      ...cityData.majorMarkets.map(market => `${(market.toLowerCase()||market)} egg rate`),
+      `${(selectedCity.toLowerCase()||selectedCity)} egg rate comparison`,
+      `${(selectedCity.toLowerCase()||selectedCity)} egg price forecast`,
       'live egg rates',
       'breaking egg prices',
       'urgent egg rate update'
@@ -115,7 +115,7 @@ const HighTrafficCityOptimizer = memo(({ selectedCity, selectedState, todayRate,
           },
           "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://todayeggrates.com/${selectedCity.toLowerCase()}`
+            "@id": `https://todayeggrates.com/${(selectedCity.toLowerCase()||selectedCity)}`
           },
           "liveBlogUpdate": [
             {
