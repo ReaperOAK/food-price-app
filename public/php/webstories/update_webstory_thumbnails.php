@@ -18,9 +18,20 @@ if (!function_exists('debug_log')) {
 // Helper function to generate city slug without state code for clean URLs
 if (!function_exists('generateCitySlug')) {
     function generateCitySlug($city, $state = null) {
-        // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)"
+        // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)" or "Agra (UP)"
         $cleanCity = $city;
+        
+        // Handle various patterns of state codes in city names:
+        // Pattern 1: "City (XX)" where XX is a 2-letter state code
         if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
+            $cleanCity = trim($matches[1]);
+        }
+        // Pattern 2: "City (State Name)" - remove full state name in parentheses
+        elseif (preg_match('/^(.+?)\s*\([^)]+\)$/', $city, $matches)) {
+            $cleanCity = trim($matches[1]);
+        }
+        // Pattern 3: Check if city name already has state code embedded (like "Agra UP")
+        elseif (preg_match('/^(.+?)\s+([A-Z]{2})$/', $city, $matches)) {
             $cleanCity = trim($matches[1]);
         }
         

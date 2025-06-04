@@ -67,11 +67,24 @@ function formatImagePath($imagePath) {
 function generateCitySlug($city, $state = null) {
     debug_log("SLUG", "Generating slug for city: {$city}, state: {$state}");
     
-    // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)"
+    // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)" or "Agra (UP)"
     $cleanCity = $city;
+    
+    // Handle various patterns of state codes in city names:
+    // Pattern 1: "City (XX)" where XX is a 2-letter state code
     if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
         $cleanCity = trim($matches[1]);
-        debug_log("SLUG", "Removed state code from city name, using: {$cleanCity}");
+        debug_log("SLUG", "Removed state code pattern (XX) from city name, using: {$cleanCity}");
+    }
+    // Pattern 2: "City (State Name)" - remove full state name in parentheses
+    elseif (preg_match('/^(.+?)\s*\([^)]+\)$/', $city, $matches)) {
+        $cleanCity = trim($matches[1]);
+        debug_log("SLUG", "Removed state name in parentheses from city name, using: {$cleanCity}");
+    }
+    // Pattern 3: Check if city name already has state code embedded (like "Agra UP")
+    elseif (preg_match('/^(.+?)\s+([A-Z]{2})$/', $city, $matches)) {
+        $cleanCity = trim($matches[1]);
+        debug_log("SLUG", "Removed embedded state code from city name, using: {$cleanCity}");
     }
     
     // Generate the base city slug without state codes
