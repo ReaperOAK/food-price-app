@@ -38,11 +38,10 @@ const MainPage = () => {
     const cleanParam = param.replace('-egg-rate', '');
     return nonCityPages.includes(cleanParam) ? '' : cleanParam;
   };
-
   // State management with initialization from URL
   const [selectedState, setSelectedState] = useState(() => stateParam?.replace('-egg-rate', '') || '');
   const [selectedCity, setSelectedCity] = useState(() => validateCityParam(cityParam));
-  const [showWebStories, setShowWebStories] = useState(false);
+  const [showWebStories, setShowWebStories] = useState(true);
   
   // Custom hooks for data fetching
   const { featuredWebStories, webStoriesLoading } = useWebStories(showWebStories);

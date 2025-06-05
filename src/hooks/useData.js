@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import { fetchWebStories, fetchRates, fetchSpecialRates, fetchStates, fetchCities, fetchStateForCity } from '../services/api';
 
+// Helper function to randomly select 3 stories
+const getRandomStories = (stories, count = 3) => {
+  if (!stories || stories.length === 0) return [];
+  if (stories.length <= count) return stories;
+  
+  const shuffled = [...stories].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
 export const useWebStories = (showWebStories) => {
   const [featuredWebStories, setFeaturedWebStories] = useState([]);
   const [webStoriesLoading, setWebStoriesLoading] = useState(false);
@@ -11,7 +20,8 @@ export const useWebStories = (showWebStories) => {
       try {
         setWebStoriesLoading(true);
         const data = await fetchWebStories();
-        setFeaturedWebStories(data.slice(0, 3));
+        // Use random selection instead of just taking first 3
+        setFeaturedWebStories(getRandomStories(data, 3));
       } catch (error) {
         console.error('Error fetching web stories:', error);
         setFeaturedWebStories([]);
