@@ -100,3 +100,31 @@
   Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
+
+# SEO Optimization for Better SERP Title Adoption
+<IfModule mod_headers.c>
+  # Add specific headers for SEO meta tag endpoints
+  <FilesMatch "generate_meta_tags\.php$">
+    Header set Content-Type "application/json; charset=utf-8"
+    Header set Cache-Control "public, max-age=3600"
+    Header set X-Robots-Tag "noindex"
+  </FilesMatch>
+  
+  # Add canonical link hints
+  Header add Link "</php/seo/generate_meta_tags.php>; rel=\"preload\"; as=\"fetch\"; crossorigin"
+  
+  # Additional SEO signals for better title adoption
+  <FilesMatch "\.html$">
+    Header set X-Title-Source "server-optimized"
+    Header set X-SEO-Optimized "true"
+  </FilesMatch>
+</IfModule>
+
+# Handle specific SEO routes
+<IfModule mod_rewrite.c>
+  # SEO optimization endpoint
+  RewriteRule ^seo-test/?$ /seo-optimized.html [L]
+  
+  # Meta tag generator with proper content type
+  RewriteRule ^api/meta/?$ /php/seo/generate_meta_tags.php [L,QSA]
+</IfModule>

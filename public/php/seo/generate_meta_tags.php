@@ -2,12 +2,15 @@
 /**
  * Server-side Meta Tag Generator for SEO
  * Generates proper meta tags with actual prices for search engines
+ * Updated to provide better SERP title adoption
  */
 
 header('Content-Type: application/json');
+header('Cache-Control: public, max-age=3600'); // Cache for 1 hour
 
-// Include database configuration
+// Include database configuration and SEO utilities
 require_once '../config/db.php';
+require_once 'seo_utils.php';
 
 try {
     // Get parameters
@@ -49,84 +52,58 @@ try {
         $stmt->bind_param("ss", $city, $state);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
-        
-        if ($result && $result['rate']) {
+          if ($result && $result['rate']) {
             $todayRate = floatval($result['rate']);
             $trayPrice = $todayRate * 30;
             
-            // Format prices
-            $formattedRate = number_format($todayRate, 2);
-            $formattedTrayPrice = number_format($trayPrice, 2);
-            
-            // Generate optimized title (under 60 characters) - remove redundant words
-            $cityName = ucfirst($city);
-            $title = "{$cityName} Egg Rate: ₹{$formattedRate}/egg | {$today}";
-            
-            // Truncate if too long
-            if (strlen($title) > 60) {
-                $title = substr($title, 0, 57) . '...';
-            }
-            $response['title'] = $title;
-            
-            // Generate optimized description (under 155 characters)
-            $description = "{$cityName} egg rate: ₹{$formattedRate}/egg, ₹{$formattedTrayPrice}/tray ({$today}). Live NECC prices & rates.";
-            if (strlen($description) > 155) {
-                $description = substr($description, 0, 152) . '...';
-            }
-            $response['description'] = $description;
-            
+            // Use optimized SEO functions
+            $response['title'] = generateOptimizedSeoTitle($city, $state, $todayRate);
+            $response['description'] = generateOptimizedSeoDescription($city, $state, $todayRate);
             $response['todayRate'] = $todayRate;
             $response['trayPrice'] = $trayPrice;
         } else {
-            // No data found, use fallback
-            $cityName = ucfirst($city);
-            $title = "{$cityName} Egg Rate Today - Live NECC Prices";
-            if (strlen($title) > 60) {
-                $title = substr($title, 0, 57) . '...';
-            }
-            $response['title'] = $title;
-            
-            $description = "Live egg rates {$cityName} ({$today}). Check NECC prices, wholesale & retail rates.";
-            if (strlen($description) > 155) {
-                $description = substr($description, 0, 152) . '...';
-            }
-            $response['description'] = $description;
+            // No data found, use fallback with default rate
+            $fallbackRate = 5.50;
+            $response['title'] = generateOptimizedSeoTitle($city, $state, null);
+            $response['description'] = generateOptimizedSeoDescription($city, $state, null);
+            $response['todayRate'] = 'N/A';
+            $response['trayPrice'] = 'N/A';
         }
+          } else if ($state) {
+        // State-specific query - get average rate for the state
+        $stmt = $conn->prepare("
+            SELECT AVG(rate) as avg_rate 
+            FROM egg_rates 
+            WHERE LOWER(state) = LOWER(?) 
+            AND date >= DATE_SUB(CURDATE(), INTERVAL 7 DAYS)
+        ");
+        $stmt->bind_param("s", $state);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
         
-    } else if ($state) {
-        // State-specific - use shorter format
-        $stateName = ucfirst($state);
+        $avgRate = $result && $result['avg_rate'] ? floatval($result['avg_rate']) : null;
         
-        // Handle long state names
-        $stateShortNames = [
-            'andhra-pradesh' => 'AP',
-            'arunachal-pradesh' => 'Arunachal',
-            'himachal-pradesh' => 'HP',
-            'jammu-and-kashmir' => 'J&K',
-            'madhya-pradesh' => 'MP',
-            'tamil-nadu' => 'TN',
-            'uttar-pradesh' => 'UP',
-            'west-bengal' => 'WB'
-        ];
-        
-        $shortStateName = isset($stateShortNames[$state]) ? $stateShortNames[$state] : $stateName;
-        
-        $title = "{$shortStateName} Egg Rate: Live Prices {$today}";
-        if (strlen($title) > 60) {
-            $title = substr($title, 0, 57) . '...';
-        }
-        $response['title'] = $title;
-        
-        $description = "Live egg rates {$stateName} ({$today}): NECC prices from major markets. Daily updates & rates.";
-        if (strlen($description) > 155) {
-            $description = substr($description, 0, 152) . '...';
-        }
-        $response['description'] = $description;
+        $response['title'] = generateOptimizedSeoTitle('', $state, $avgRate);
+        $response['description'] = generateOptimizedSeoDescription('', $state, $avgRate);
+        $response['todayRate'] = $avgRate ? number_format($avgRate, 2) : 'N/A';
+        $response['trayPrice'] = $avgRate ? number_format($avgRate * 30, 2) : 'N/A';
         
     } else {
-        // National/home page
-        $response['title'] = "🥚 India Egg Rates: Live NECC Prices | {$today}";
-        $response['description'] = "Live egg rates India ({$today}): NECC prices from 100+ cities. Compare today's rates & wholesale prices.";
+        // National/home page - get national average
+        $stmt = $conn->prepare("
+            SELECT AVG(rate) as avg_rate 
+            FROM egg_rates 
+            WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAYS)
+        ");
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        
+        $nationalAvg = $result && $result['avg_rate'] ? floatval($result['avg_rate']) : 5.50;
+        
+        $response['title'] = generateOptimizedSeoTitle('', '', $nationalAvg);
+        $response['description'] = generateOptimizedSeoDescription('', '', $nationalAvg);
+        $response['todayRate'] = number_format($nationalAvg, 2);
+        $response['trayPrice'] = number_format($nationalAvg * 30, 2);
     }
     
     echo json_encode($response);

@@ -1,9 +1,8 @@
 import { Helmet } from 'react-helmet';
-import { memo } from 'react';
+import React, { memo } from 'react';
 import DesktopOptimizer from '../seo/DesktopOptimizer';
 import InternationalSEO from '../seo/InternationalSEO'; 
 import HighTrafficCityOptimizer from '../seo/HighTrafficCityOptimizer';
-import { useServerSideMetaTags } from '../../hooks/useServerSideMetaTags';
 
 const HeadSection = memo(({
   getSeoTitle,
@@ -19,9 +18,6 @@ const HeadSection = memo(({
   todayRate,   // New prop for high-traffic city optimization
   trayPrice    // New prop for high-traffic city optimization
 }) => {
-  // Fetch server-side meta tags for better SEO
-  const serverMetaTags = useServerSideMetaTags(selectedCity, selectedState);
-  
   const canonicalUrl = `https://todayeggrates.com${
     location.pathname === '/' 
       ? '' 
@@ -29,10 +25,18 @@ const HeadSection = memo(({
         ? location.pathname.slice(0, -1) 
         : location.pathname
   }`;
-
-  // Use server-side meta tags if available, otherwise fallback to client-side
-  const finalTitle = serverMetaTags.title || getSeoTitle(selectedCity, selectedState, todayRate || eggRates?.[0]?.rate);
-  const finalDescription = serverMetaTags.description || getSeoDescription(selectedCity, selectedState, todayRate || eggRates?.[0]?.rate);
+  // Generate optimized SEO content
+  const currentRate = todayRate || eggRates?.[0]?.rate;
+  const seoTitle = getSeoTitle(selectedCity, selectedState, currentRate);
+  const seoDescription = getSeoDescription(selectedCity, selectedState, currentRate);
+  
+  // Ensure title length is optimal for SERP display (under 60 characters)
+  const optimizedTitle = seoTitle.length > 60 ? seoTitle.substring(0, 57) + '...' : seoTitle;
+  
+  // Force title update in DOM (helps with React Helmet timing issues)
+  React.useEffect(() => {
+    document.title = optimizedTitle;
+  }, [optimizedTitle]);
 
   return (
     <Helmet>
@@ -60,9 +64,7 @@ const HeadSection = memo(({
       <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
       <meta name="theme-color" content="#ffffff" />
       <meta name="format-detection" content="telephone=no" />
-      
-      {/* Desktop Performance Optimization */}
-      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+        {/* Desktop Performance Optimization */}
       <meta name="google" content="nositelinkssearchbox" />
       <meta name="msvalidate.01" content="verification-for-bing" />
       
@@ -76,14 +78,25 @@ const HeadSection = memo(({
       <meta name="news_keywords" content="NECC egg rate today, live egg prices, Indian egg market, poultry prices" />
       <meta name="article:publisher" content="https://todayeggrates.com" />
       <meta name="article:section" content="Agriculture & Food Prices" />
-      <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />      {/* SEO Meta Tags - Use server-side generated tags for better SEO */}
-      <title>{finalTitle}</title>
-      <meta name="description" content={finalDescription} />
+      <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />      {/* SEO Meta Tags - Optimized for better SERP title adoption */}
+      <title>{optimizedTitle}</title>
+      <meta name="description" content={seoDescription} />
       <meta name="keywords" content={getSeoKeywords(selectedCity, selectedState)} />
       <meta name="author" content="Today Egg Rates" />
       <link rel="canonical" href={canonicalUrl} />
       
-      {/* JSON-LD Structured Data */}
+      {/* Multiple title signals for better SERP adoption - Google needs confidence */}
+      <meta name="title" content={optimizedTitle} />
+      <meta property="article:title" content={optimizedTitle} />
+      <meta name="page-title" content={optimizedTitle} />
+      <meta name="dcterms.title" content={optimizedTitle} />
+      <meta name="application-name" content={optimizedTitle} />
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      
+      {/* Content freshness signals */}
+      <meta name="last-modified" content={new Date().toISOString()} />
+      <meta name="cache-control" content="public, max-age=3600" />
+        {/* JSON-LD Structured Data */}
       <script type="application/ld+json">
         {JSON.stringify(structuredData)}
       </script>
@@ -105,10 +118,39 @@ const HeadSection = memo(({
         })}
       </script>
       
+      {/* Enhanced WebPage schema with title emphasis */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": optimizedTitle,
+          "headline": optimizedTitle,
+          "description": seoDescription,
+          "url": canonicalUrl,
+          "dateModified": new Date().toISOString(),
+          "datePublished": new Date().toISOString(),
+          "inLanguage": "en-IN",
+          "isPartOf": {
+            "@type": "WebSite",
+            "name": "Today Egg Rates",
+            "url": "https://todayeggrates.com"
+          },
+          "mainEntity": currentRate ? {
+            "@type": "Product",
+            "name": "NECC Egg Rate",
+            "offers": {
+              "@type": "Offer",
+              "price": currentRate,
+              "priceCurrency": "INR"
+            }
+          } : undefined
+        })}
+      </script>
+      
       <meta property="article:modified_time" content={new Date().toISOString()} />      {/* OpenGraph Tags - Enhanced for International Audience */}
       <meta property="og:site_name" content="Today Egg Rates - NECC Egg Rate Today" />
-      <meta property="og:title" content={getSeoTitle(selectedCity, selectedState)} />
-      <meta property="og:description" content={getSeoDescription(selectedCity, selectedState)} />
+      <meta property="og:title" content={optimizedTitle} />
+      <meta property="og:description" content={seoDescription} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:type" content="website" />
       <meta property="og:image" content="https://todayeggrates.com/eggpic.webp" />
@@ -130,8 +172,8 @@ const HeadSection = memo(({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content="@todayeggrates" />
       <meta name="twitter:creator" content="@todayeggrates" />
-      <meta name="twitter:title" content={getSeoTitle(selectedCity, selectedState)} />
-      <meta name="twitter:description" content={getSeoDescription(selectedCity, selectedState)} />
+      <meta name="twitter:title" content={optimizedTitle} />
+      <meta name="twitter:description" content={seoDescription} />
       <meta name="twitter:image" content="https://todayeggrates.com/eggpic.webp" />
       <meta name="twitter:image:alt" content="NECC egg rate today, live egg prices and daily egg rate updates" />
       
