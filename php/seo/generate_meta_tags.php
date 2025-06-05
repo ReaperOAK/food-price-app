@@ -2,12 +2,15 @@
 /**
  * Server-side Meta Tag Generator for SEO
  * Generates proper meta tags with actual prices for search engines
+ * Updated to provide better SERP title adoption
  */
 
 header('Content-Type: application/json');
+header('Cache-Control: public, max-age=3600'); // Cache for 1 hour
 
-// Include database configuration
+// Include database configuration and SEO utilities
 require_once '../config/db.php';
+require_once 'seo_utils.php';
 
 try {
     // Get parameters
@@ -35,8 +38,7 @@ try {
         'todayRate' => 'N/A',
         'trayPrice' => 'N/A'
     ];
-    
-    // Fetch egg rate data using the existing connection
+      // Fetch egg rate data using the existing connection
     if ($city && $state) {
         // City-specific query
         $stmt = $conn->prepare("
@@ -50,38 +52,58 @@ try {
         $stmt->bind_param("ss", $city, $state);
         $stmt->execute();
         $result = $stmt->get_result()->fetch_assoc();
-        
-        if ($result && $result['rate']) {
+          if ($result && $result['rate']) {
             $todayRate = floatval($result['rate']);
             $trayPrice = $todayRate * 30;
             
-            // Format prices
-            $formattedRate = number_format($todayRate, 2);
-            $formattedTrayPrice = number_format($trayPrice, 2);
-            
-            // Generate optimized title (under 60 characters)
-            $response['title'] = "Today Egg Rate in " . ucfirst($city) . ": ₹{$formattedRate}/egg | {$today}";
-            
-            // Generate optimized description (150-160 characters)
-            $response['description'] = "Today egg rate " . ucfirst($city) . ": ₹{$formattedRate}/egg, ₹{$formattedTrayPrice}/tray ({$today}). Live NECC prices & market updates.";
-            
+            // Use optimized SEO functions
+            $response['title'] = generateOptimizedSeoTitle($city, $state, $todayRate);
+            $response['description'] = generateOptimizedSeoDescription($city, $state, $todayRate);
             $response['todayRate'] = $todayRate;
             $response['trayPrice'] = $trayPrice;
         } else {
-            // No data found, use fallback
-            $response['title'] = "Today Egg Rate in " . ucfirst($city) . " - Live NECC Prices ({$today})";
-            $response['description'] = "Live egg rates in " . ucfirst($city) . " ({$today}). Check today's NECC egg prices, wholesale & retail rates.";
+            // No data found, use fallback with default rate
+            $fallbackRate = 5.50;
+            $response['title'] = generateOptimizedSeoTitle($city, $state, null);
+            $response['description'] = generateOptimizedSeoDescription($city, $state, null);
+            $response['todayRate'] = 'N/A';
+            $response['trayPrice'] = 'N/A';
         }
+          } else if ($state) {
+        // State-specific query - get average rate for the state
+        $stmt = $conn->prepare("
+            SELECT AVG(rate) as avg_rate 
+            FROM egg_rates 
+            WHERE LOWER(state) = LOWER(?) 
+            AND date >= DATE_SUB(CURDATE(), INTERVAL 7 DAYS)
+        ");
+        $stmt->bind_param("s", $state);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
         
-    } else if ($state) {
-        // State-specific
-        $response['title'] = "Today Egg Rate in " . ucfirst($state) . ": Live Price Updates ({$today})";
-        $response['description'] = "Live egg rates " . ucfirst($state) . " ({$today}): NECC prices from major markets. Daily egg rate updates & wholesale prices.";
+        $avgRate = $result && $result['avg_rate'] ? floatval($result['avg_rate']) : null;
+        
+        $response['title'] = generateOptimizedSeoTitle('', $state, $avgRate);
+        $response['description'] = generateOptimizedSeoDescription('', $state, $avgRate);
+        $response['todayRate'] = $avgRate ? number_format($avgRate, 2) : 'N/A';
+        $response['trayPrice'] = $avgRate ? number_format($avgRate * 30, 2) : 'N/A';
         
     } else {
-        // National/home page
-        $response['title'] = "🥚 Today Egg Rate India: Live NECC Price List ({$today}) | Egg Rate Today";
-        $response['description'] = "Live egg rates India ({$today}): NECC prices from 100+ cities. Compare today's egg rates, daily prices & wholesale rates.";
+        // National/home page - get national average
+        $stmt = $conn->prepare("
+            SELECT AVG(rate) as avg_rate 
+            FROM egg_rates 
+            WHERE date >= DATE_SUB(CURDATE(), INTERVAL 3 DAYS)
+        ");
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        
+        $nationalAvg = $result && $result['avg_rate'] ? floatval($result['avg_rate']) : 5.50;
+        
+        $response['title'] = generateOptimizedSeoTitle('', '', $nationalAvg);
+        $response['description'] = generateOptimizedSeoDescription('', '', $nationalAvg);
+        $response['todayRate'] = number_format($nationalAvg, 2);
+        $response['trayPrice'] = number_format($nationalAvg * 30, 2);
     }
     
     echo json_encode($response);
