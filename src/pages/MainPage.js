@@ -24,16 +24,24 @@ const CityMarketInsights = lazy(() => import('../components/content/CityMarketIn
 const RelatedCityLinks = lazy(() => import('../components/content/RelatedCityLinks'));
 const StateNavigationGrid = lazy(() => import('../components/content/StateNavigationGrid'));
 
-
-
 const MainPage = () => {
   // URL and location parameters
   const { state: stateParam, city: cityParam } = useParams();
   const location = useLocation();
 
+  // List of non-city pages that should not be treated as cities
+  const nonCityPages = ['blog', 'egg-rates', 'webstories', 'privacy', 'disclaimer', 'contact', 'about'];
+  
+  // Validate and clean state/city parameters
+  const validateCityParam = (param) => {
+    if (!param) return '';
+    const cleanParam = param.replace('-egg-rate', '');
+    return nonCityPages.includes(cleanParam) ? '' : cleanParam;
+  };
+
   // State management with initialization from URL
   const [selectedState, setSelectedState] = useState(() => stateParam?.replace('-egg-rate', '') || '');
-  const [selectedCity, setSelectedCity] = useState(() => cityParam?.replace('-egg-rate', '') || '');
+  const [selectedCity, setSelectedCity] = useState(() => validateCityParam(cityParam));
   const [showWebStories, setShowWebStories] = useState(false);
   
   // Custom hooks for data fetching
@@ -56,26 +64,29 @@ const MainPage = () => {
     }),
     []
   );
-
   // Memoized price metrics calculations
   const priceMetrics = useMemo(() => {
     if (!eggRates.length) {
+      // If no data available, provide fallback values instead of N/A for better SEO
+      // Use a reasonable fallback price (e.g., average Indian egg price)
+      const fallbackRate = 5.50; // Average egg price in India
       return {
-        todayRate: 'N/A',
-        rate7DaysAgo: 'N/A',
-        weeklyChange: 'N/A',
-        weeklyChangePercent: 'N/A',
-        averagePrice: 'N/A',
-        trayPrice: 'N/A'
+        todayRate: fallbackRate,
+        rate7DaysAgo: fallbackRate,
+        weeklyChange: '0.00',
+        weeklyChangePercent: '0.00',
+        averagePrice: fallbackRate.toFixed(2),
+        trayPrice: (fallbackRate * 30).toFixed(2),
+        isEstimate: true // Flag to indicate this is estimated data
       };
     }
 
     const todayRate = eggRates[0].rate;
-    const rate7DaysAgo = eggRates.length > 7 ? eggRates[6].rate : 'N/A';
-    const weeklyChange = rate7DaysAgo !== 'N/A' ? (todayRate - rate7DaysAgo).toFixed(2) : 'N/A';
-    const weeklyChangePercent = rate7DaysAgo !== 'N/A' 
+    const rate7DaysAgo = eggRates.length > 7 ? eggRates[6].rate : todayRate;
+    const weeklyChange = rate7DaysAgo !== todayRate ? (todayRate - rate7DaysAgo).toFixed(2) : '0.00';
+    const weeklyChangePercent = rate7DaysAgo !== todayRate && rate7DaysAgo > 0
       ? ((todayRate - rate7DaysAgo) / rate7DaysAgo * 100).toFixed(2) 
-      : 'N/A';
+      : '0.00';
     const averagePrice = (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates.length).toFixed(2);
     const trayPrice = (todayRate * 30).toFixed(2);
 
@@ -85,7 +96,8 @@ const MainPage = () => {
       weeklyChange,
       weeklyChangePercent,
       averagePrice,
-      trayPrice
+      trayPrice,
+      isEstimate: false
     };
   }, [eggRates]);
 

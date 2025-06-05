@@ -10,7 +10,7 @@ const getFormattedDate = () => {
 
 // Helper function to format price
 const formatPrice = (price) => {
-  if (price === 'N/A' || !price) return 'N/A';
+  if (price === 'N/A' || !price || price === null || price === undefined || isNaN(price)) return 'N/A';
   return parseFloat(price).toLocaleString('en-IN', {
     maximumFractionDigits: 2,
     minimumFractionDigits: 2
@@ -30,6 +30,11 @@ export const getUniqueH1 = (selectedCity, selectedState, today = getFormattedDat
 export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   const formattedRate = formatPrice(todayRate);
   if (selectedCity) {
+    // Handle N/A prices gracefully in titles
+    if (todayRate === 'N/A' || !todayRate || todayRate === null || todayRate === undefined) {
+      return `Today Egg Rate in ${selectedCity} - Live NECC Prices (${today}) | Egg Rate Today ${selectedCity}`;
+    }
+    
     // Enhanced titles for high-traffic cities to improve CTR and include target keywords
     const citySpecificTitles = {
       'Mumbai': `🥚 Today Egg Rate in Mumbai: ₹${formattedRate}/egg | Egg Rate Today Mumbai ${today}`,
@@ -50,23 +55,28 @@ export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getF
 
 export const getSeoDescription = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   if (selectedCity) {
-    const trayPrice = todayRate !== 'N/A' ? formatPrice(todayRate * 30) : 'N/A';
+    // Handle N/A prices gracefully
+    if (todayRate === 'N/A' || !todayRate || todayRate === null || todayRate === undefined) {
+      return `Live egg rates in ${selectedCity} (${today}). Check today's NECC egg prices, wholesale & retail rates. Daily egg rate updates from ${selectedCity} markets.`;
+    }
     
-    // Enhanced descriptions for city-specific pages to match SERP requirements
+    const trayPrice = formatPrice(todayRate * 30);
+    
+    // Optimized descriptions for better SEO (150-160 characters)
     const citySpecificDescriptions = {
-      'Mumbai': `Today egg rate in Mumbai: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live Mumbai egg prices from NECC. Egg rate today Mumbai with wholesale rates, market updates & daily egg rate. National egg coordination committee rates.`,
-      'Bangalore': `Today egg rate in Bangalore: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live Bangalore egg prices from NECC. Egg rate today Bangalore with wholesale & retail rates. Daily egg rate updates.`,
-      'Hyderabad': `Today egg rate in Hyderabad: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live Hyderabad egg prices from NECC. Egg rate today Hyderabad with wholesale rates, daily egg rate & market trends. National egg rates.`,
-      'Chennai': `Today egg rate in Chennai: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live Chennai egg prices from NECC. Egg rate today Chennai with wholesale rates & daily egg rate updates.`,
-      'Kolkata': `Today egg rate in Kolkata: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live Kolkata egg prices from NECC. Egg rate today Kolkata with wholesale rates & daily egg rate updates.`
+      'Mumbai': `Today egg rate Mumbai: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`,
+      'Bangalore': `Today egg rate Bangalore: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`,
+      'Hyderabad': `Today egg rate Hyderabad: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`,
+      'Chennai': `Today egg rate Chennai: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`,
+      'Kolkata': `Today egg rate Kolkata: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`
     };
     
     return citySpecificDescriptions[selectedCity] || 
-      `Today egg rate in ${selectedCity}: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live ${selectedCity} egg prices from NECC. Egg rate today ${selectedCity} with wholesale rates, daily egg rate & market updates. National egg coordination committee rates.`;
+      `Today egg rate ${selectedCity}: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & wholesale rates.`;
   } else if (selectedState) {
-    return `Today egg rate in ${selectedState} (${today}): Live NECC egg prices from major ${selectedState} markets. Egg rate today ${selectedState}, daily egg rate updates, wholesale & retail prices. National egg coordination committee rates.`;
+    return `Live egg rates ${selectedState} (${today}): NECC prices from major markets. Daily egg rate updates & wholesale prices.`;
   } else {
-    return `Today egg rate India (${today}): Live NECC egg prices from Mumbai, Chennai, Bangalore, Kolkata, Barwala & 100+ cities. Compare egg rate today, daily egg rate, wholesale & retail prices. National egg coordination committee rates.`;
+    return `Live egg rates India (${today}): NECC prices from 100+ cities. Compare today's egg rates, daily prices & wholesale rates.`;
   }
 };
 

@@ -3,6 +3,7 @@ import { memo } from 'react';
 import DesktopOptimizer from '../seo/DesktopOptimizer';
 import InternationalSEO from '../seo/InternationalSEO'; 
 import HighTrafficCityOptimizer from '../seo/HighTrafficCityOptimizer';
+import { useServerSideMetaTags } from '../../hooks/useServerSideMetaTags';
 
 const HeadSection = memo(({
   getSeoTitle,
@@ -18,6 +19,9 @@ const HeadSection = memo(({
   todayRate,   // New prop for high-traffic city optimization
   trayPrice    // New prop for high-traffic city optimization
 }) => {
+  // Fetch server-side meta tags for better SEO
+  const serverMetaTags = useServerSideMetaTags(selectedCity, selectedState);
+  
   const canonicalUrl = `https://todayeggrates.com${
     location.pathname === '/' 
       ? '' 
@@ -25,6 +29,10 @@ const HeadSection = memo(({
         ? location.pathname.slice(0, -1) 
         : location.pathname
   }`;
+
+  // Use server-side meta tags if available, otherwise fallback to client-side
+  const finalTitle = serverMetaTags.title || getSeoTitle(selectedCity, selectedState, todayRate || eggRates?.[0]?.rate);
+  const finalDescription = serverMetaTags.description || getSeoDescription(selectedCity, selectedState, todayRate || eggRates?.[0]?.rate);
 
   return (
     <Helmet>
@@ -68,9 +76,9 @@ const HeadSection = memo(({
       <meta name="news_keywords" content="NECC egg rate today, live egg prices, Indian egg market, poultry prices" />
       <meta name="article:publisher" content="https://todayeggrates.com" />
       <meta name="article:section" content="Agriculture & Food Prices" />
-      <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />        {/* SEO Meta Tags */}
-      <title>{getSeoTitle(selectedCity, selectedState, todayRate || eggRates?.[0]?.rate)}</title>
-      <meta name="description" content={getSeoDescription(selectedCity, selectedState, todayRate || eggRates?.[0]?.rate)} />
+      <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />      {/* SEO Meta Tags - Use server-side generated tags for better SEO */}
+      <title>{finalTitle}</title>
+      <meta name="description" content={finalDescription} />
       <meta name="keywords" content={getSeoKeywords(selectedCity, selectedState)} />
       <meta name="author" content="Today Egg Rates" />
       <link rel="canonical" href={canonicalUrl} />

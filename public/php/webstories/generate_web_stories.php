@@ -517,6 +517,7 @@ try {
             $story = str_replace('{{CITY_NAME}}', $city, $story);
             $story = str_replace('{{STATE_NAME}}', $state, $story);
             $story = str_replace('{{EGG_RATE}}', number_format($rate, 2), $story); // Fixed: was {{RATE}}
+            $story = str_replace('{{TRAY_RATE}}', number_format(($rate*30), 2), $story); // Fixed: was {{RATE}}
             $story = str_replace('{{CITY_SLUG}}', $citySlug, $story); // Added: missing placeholder
             $story = str_replace('{{DATE}}', date('F j, Y', strtotime($date)), $story);
             $story = str_replace('{{ISO_DATE}}', date('c', strtotime($date)), $story); // Added: ISO date for schema
