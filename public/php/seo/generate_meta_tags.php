@@ -35,8 +35,7 @@ try {
         'todayRate' => 'N/A',
         'trayPrice' => 'N/A'
     ];
-    
-    // Fetch egg rate data using the existing connection
+      // Fetch egg rate data using the existing connection
     if ($city && $state) {
         // City-specific query
         $stmt = $conn->prepare("
@@ -59,29 +58,75 @@ try {
             $formattedRate = number_format($todayRate, 2);
             $formattedTrayPrice = number_format($trayPrice, 2);
             
-            // Generate optimized title (under 60 characters)
-            $response['title'] = "Today Egg Rate in " . ucfirst($city) . ": ₹{$formattedRate}/egg | {$today}";
+            // Generate optimized title (under 60 characters) - remove redundant words
+            $cityName = ucfirst($city);
+            $title = "{$cityName} Egg Rate: ₹{$formattedRate}/egg | {$today}";
             
-            // Generate optimized description (150-160 characters)
-            $response['description'] = "Today egg rate " . ucfirst($city) . ": ₹{$formattedRate}/egg, ₹{$formattedTrayPrice}/tray ({$today}). Live NECC prices & market updates.";
+            // Truncate if too long
+            if (strlen($title) > 60) {
+                $title = substr($title, 0, 57) . '...';
+            }
+            $response['title'] = $title;
+            
+            // Generate optimized description (under 155 characters)
+            $description = "{$cityName} egg rate: ₹{$formattedRate}/egg, ₹{$formattedTrayPrice}/tray ({$today}). Live NECC prices & rates.";
+            if (strlen($description) > 155) {
+                $description = substr($description, 0, 152) . '...';
+            }
+            $response['description'] = $description;
             
             $response['todayRate'] = $todayRate;
             $response['trayPrice'] = $trayPrice;
         } else {
             // No data found, use fallback
-            $response['title'] = "Today Egg Rate in " . ucfirst($city) . " - Live NECC Prices ({$today})";
-            $response['description'] = "Live egg rates in " . ucfirst($city) . " ({$today}). Check today's NECC egg prices, wholesale & retail rates.";
+            $cityName = ucfirst($city);
+            $title = "{$cityName} Egg Rate Today - Live NECC Prices";
+            if (strlen($title) > 60) {
+                $title = substr($title, 0, 57) . '...';
+            }
+            $response['title'] = $title;
+            
+            $description = "Live egg rates {$cityName} ({$today}). Check NECC prices, wholesale & retail rates.";
+            if (strlen($description) > 155) {
+                $description = substr($description, 0, 152) . '...';
+            }
+            $response['description'] = $description;
         }
         
     } else if ($state) {
-        // State-specific
-        $response['title'] = "Today Egg Rate in " . ucfirst($state) . ": Live Price Updates ({$today})";
-        $response['description'] = "Live egg rates " . ucfirst($state) . " ({$today}): NECC prices from major markets. Daily egg rate updates & wholesale prices.";
+        // State-specific - use shorter format
+        $stateName = ucfirst($state);
+        
+        // Handle long state names
+        $stateShortNames = [
+            'andhra-pradesh' => 'AP',
+            'arunachal-pradesh' => 'Arunachal',
+            'himachal-pradesh' => 'HP',
+            'jammu-and-kashmir' => 'J&K',
+            'madhya-pradesh' => 'MP',
+            'tamil-nadu' => 'TN',
+            'uttar-pradesh' => 'UP',
+            'west-bengal' => 'WB'
+        ];
+        
+        $shortStateName = isset($stateShortNames[$state]) ? $stateShortNames[$state] : $stateName;
+        
+        $title = "{$shortStateName} Egg Rate: Live Prices {$today}";
+        if (strlen($title) > 60) {
+            $title = substr($title, 0, 57) . '...';
+        }
+        $response['title'] = $title;
+        
+        $description = "Live egg rates {$stateName} ({$today}): NECC prices from major markets. Daily updates & rates.";
+        if (strlen($description) > 155) {
+            $description = substr($description, 0, 152) . '...';
+        }
+        $response['description'] = $description;
         
     } else {
         // National/home page
-        $response['title'] = "🥚 Today Egg Rate India: Live NECC Price List ({$today}) | Egg Rate Today";
-        $response['description'] = "Live egg rates India ({$today}): NECC prices from 100+ cities. Compare today's egg rates, daily prices & wholesale rates.";
+        $response['title'] = "🥚 India Egg Rates: Live NECC Prices | {$today}";
+        $response['description'] = "Live egg rates India ({$today}): NECC prices from 100+ cities. Compare today's rates & wholesale prices.";
     }
     
     echo json_encode($response);

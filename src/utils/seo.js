@@ -29,54 +29,107 @@ export const getUniqueH1 = (selectedCity, selectedState, today = getFormattedDat
 
 export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   const formattedRate = formatPrice(todayRate);
+  
+  // Helper function to truncate title if it exceeds 60 characters
+  const truncateTitle = (title, maxLength = 60) => {
+    if (title.length <= maxLength) return title;
+    return title.substring(0, maxLength - 3) + '...';
+  };
+  
+  // Helper function to get short state names for better SEO
+  const getShortStateName = (stateName) => {
+    const stateShortNames = {
+      'andhra-pradesh': 'AP',
+      'arunachal-pradesh': 'Arunachal',
+      'himachal-pradesh': 'HP',
+      'jammu-and-kashmir': 'J&K',
+      'madhya-pradesh': 'MP',
+      'tamil-nadu': 'TN',
+      'uttar-pradesh': 'UP',
+      'west-bengal': 'WB'
+    };
+    return stateShortNames[stateName] || stateName;
+  };
+  
   if (selectedCity) {
     // Handle N/A prices gracefully in titles
     if (todayRate === 'N/A' || !todayRate || todayRate === null || todayRate === undefined) {
-      return `Today Egg Rate in ${selectedCity} - Live NECC Prices (${today}) | Egg Rate Today ${selectedCity}`;
+      const title = `${selectedCity} Egg Rate Today - Live NECC Prices`;
+      return truncateTitle(title);
     }
     
-    // Enhanced titles for high-traffic cities to improve CTR and include target keywords
+    // Optimized titles for cities (under 60 chars)
     const citySpecificTitles = {
-      'Mumbai': `🥚 Today Egg Rate in Mumbai: ₹${formattedRate}/egg | Egg Rate Today Mumbai ${today}`,
-      'Bangalore': `🥚 Today Egg Rate in Bangalore: ₹${formattedRate}/egg | Egg Rate Today Bangalore ${today}`,
-      'Hyderabad': `🥚 Today Egg Rate in Hyderabad: ₹${formattedRate}/egg | Egg Rate Today Hyderabad ${today}`,
-      'Chennai': `🥚 Today Egg Rate in Chennai: ₹${formattedRate}/egg | Egg Rate Today Chennai ${today}`,
-      'Kolkata': `🥚 Today Egg Rate in Kolkata: ₹${formattedRate}/egg | Egg Rate Today Kolkata ${today}`
+      'Mumbai': `🥚 Mumbai Egg Rate: ₹${formattedRate}/egg | Today ${today}`,
+      'Bangalore': `🥚 Bangalore Egg Rate: ₹${formattedRate}/egg | ${today}`,
+      'Hyderabad': `🥚 Hyderabad Egg Rate: ₹${formattedRate}/egg | ${today}`,
+      'Chennai': `🥚 Chennai Egg Rate: ₹${formattedRate}/egg | ${today}`,
+      'Kolkata': `🥚 Kolkata Egg Rate: ₹${formattedRate}/egg | ${today}`,
+      'Delhi': `🥚 Delhi Egg Rate: ₹${formattedRate}/egg | ${today}`,
+      'Pune': `🥚 Pune Egg Rate: ₹${formattedRate}/egg | ${today}`
     };
     
-    return citySpecificTitles[selectedCity] || 
-      `Today Egg Rate in ${selectedCity}: ₹${formattedRate}/egg | Egg Rate Today ${selectedCity} ${today}`;
+    const customTitle = citySpecificTitles[selectedCity];
+    if (customTitle) {
+      return truncateTitle(customTitle);
+    }
+    
+    // Generic format for other cities (optimized for length)
+    const genericTitle = `${selectedCity} Egg Rate: ₹${formattedRate}/egg | ${today}`;
+    return truncateTitle(genericTitle);
+    
   } else if (selectedState) {
-    return `Today Egg Rate in ${selectedState}: Live Price Updates (${today}) | Egg Rate Today ${selectedState}`;
+    const shortStateName = getShortStateName(selectedState);
+    const stateTitle = `${shortStateName} Egg Rate: Live Prices ${today}`;
+    return truncateTitle(stateTitle);
+    
   } else {
-    return `🥚 Today Egg Rate India: Live NECC Price List (${today}) | Egg Rate Today & NECC Rates`;
+    return `🥚 India Egg Rates: Live NECC Prices | ${today}`;
   }
 };
 
 export const getSeoDescription = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
+  // Helper function to ensure description stays within 150-160 chars
+  const truncateDescription = (desc, maxLength = 155) => {
+    if (desc.length <= maxLength) return desc;
+    return desc.substring(0, maxLength - 3) + '...';
+  };
+  
   if (selectedCity) {
     // Handle N/A prices gracefully
     if (todayRate === 'N/A' || !todayRate || todayRate === null || todayRate === undefined) {
-      return `Live egg rates in ${selectedCity} (${today}). Check today's NECC egg prices, wholesale & retail rates. Daily egg rate updates from ${selectedCity} markets.`;
+      const desc = `Live egg rates ${selectedCity} (${today}). Check NECC prices, wholesale & retail rates. Daily updates from ${selectedCity} markets.`;
+      return truncateDescription(desc);
     }
     
     const trayPrice = formatPrice(todayRate * 30);
     
-    // Optimized descriptions for better SEO (150-160 characters)
+    // Optimized descriptions for better SEO (under 155 characters)
     const citySpecificDescriptions = {
-      'Mumbai': `Today egg rate Mumbai: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`,
-      'Bangalore': `Today egg rate Bangalore: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`,
-      'Hyderabad': `Today egg rate Hyderabad: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`,
-      'Chennai': `Today egg rate Chennai: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`,
-      'Kolkata': `Today egg rate Kolkata: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`
+      'Mumbai': `Mumbai egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily market updates.`,
+      'Bangalore': `Bangalore egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`,
+      'Hyderabad': `Hyderabad egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`,
+      'Chennai': `Chennai egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`,
+      'Kolkata': `Kolkata egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`,
+      'Delhi': `Delhi egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`
     };
     
-    return citySpecificDescriptions[selectedCity] || 
-      `Today egg rate ${selectedCity}: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & wholesale rates.`;
+    const customDesc = citySpecificDescriptions[selectedCity];
+    if (customDesc) {
+      return truncateDescription(customDesc);
+    }
+    
+    // Generic format for other cities
+    const genericDesc = `${selectedCity} egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & rates.`;
+    return truncateDescription(genericDesc);
+    
   } else if (selectedState) {
-    return `Live egg rates ${selectedState} (${today}): NECC prices from major markets. Daily egg rate updates & wholesale prices.`;
+    const stateDesc = `Live egg rates ${selectedState} (${today}): NECC prices from major markets. Daily updates & wholesale rates.`;
+    return truncateDescription(stateDesc);
+    
   } else {
-    return `Live egg rates India (${today}): NECC prices from 100+ cities. Compare today's egg rates, daily prices & wholesale rates.`;
+    const mainDesc = `Live egg rates India (${today}): NECC prices from 100+ cities. Compare today's egg rates & wholesale prices.`;
+    return truncateDescription(mainDesc);
   }
 };
 

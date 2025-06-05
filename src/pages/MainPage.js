@@ -360,7 +360,7 @@ const MainPage = () => {
                   </section>
                 )}
 
-                {/* Rate Table Section */}
+                {/* Default Table Section Seo */}
                 <section aria-label="City Table">
                   {!selectedCity && !selectedState ? (
                    <RateTable
