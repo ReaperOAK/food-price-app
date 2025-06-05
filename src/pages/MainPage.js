@@ -360,26 +360,34 @@ const MainPage = () => {
                   </section>
                 )}
 
-                {/* Default Table Section Seo */}
-                <section aria-label="City Table">
-                  {!selectedCity && !selectedState ? (
-                   <RateTable
-                      key="default-table"
-                      rates={eggRates}
-                      showPriceColumns={true}
-                      showChart={true}
-                      chartType="bar"
-                    />
-                  ) : (
-                    <RateTable
-                      key="default-table"
-                      rates={eggRates}
-                      showPriceColumns={true}
-                      showChart={true}
-                      chartType="bar"
-                    />
-                  )}
-                </section>
+                {/* All Cities SEO Table - Always show complete city links for SEO */}
+                {(selectedCity || selectedState) && eggRates.length > 0 && (
+                  <section aria-label="All Cities Egg Rates" className="mt-8">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
+                      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                        <h3 className="text-2xl font-bold text-gray-900 dark:text-white text-center">
+                          Egg Rates Across All Indian Cities
+                        </h3>
+                        <p className="text-gray-600 dark:text-gray-400 text-center mt-2">
+                          Compare today's egg prices in major cities across India
+                        </p>
+                      </div>
+                      <RateTable
+                        key="all-cities-seo-table"
+                        rates={[]} // Pass empty to get all cities data
+                        showPriceColumns={true}
+                        showChart={false}
+                        showDate={false}
+                        showState={true}
+                        showAdmin={false}
+                        showMarket={false}
+                        itemsPerPage={20}
+                        title="Complete City Coverage"
+                        description="Comprehensive egg rate information for all major Indian cities and states"
+                      />
+                    </div>
+                  </section>
+                )}
 
                 {/* State Navigation Grid - For state pages to link to all states */}
                 {selectedState && !selectedCity && (
