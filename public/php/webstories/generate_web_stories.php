@@ -90,9 +90,8 @@ function generateCitySlug($city, $state = null) {
     // Generate the base city slug without state codes
     $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
     $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
-    
-    // Generate clean slug without state codes
-    $slug = $citySlug . '-egg-rate';
+      // Generate clean slug without state codes
+    $slug = $citySlug;
     
     debug_log("SLUG", "Generated clean slug: {$slug}");
     return $slug;
@@ -249,10 +248,10 @@ try {
                 $city = $row['city'];
                 $state = $row['state'];
                 $rate = $row['rate'];
-                $date = $row['date'];
-                  debug_log("INDEX", "Adding index entry for {$city}, {$state}");
+                $date = $row['date'];                debug_log("INDEX", "Adding index entry for {$city}, {$state}");
                 $citySlug = generateCitySlug($city, $state);
-                $html .= "<li><a href='{$citySlug}.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
+                $citySlugWithSuffix = $citySlug . '-egg-rate';
+                $html .= "<li><a href='{$citySlugWithSuffix}.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
             }
             
             $html .= "</ul></body></html>";
@@ -500,38 +499,31 @@ try {
             $state = $row['state'];
             $rate = $row['rate'];
             $date = $row['date'];
-            
-            // Generate the proper city slug with state code
+              // Generate the proper city slug with state code
             $citySlug = generateCitySlug($city, $state);
+            $citySlugWithSuffix = $citySlug . '-egg-rate'; // For file naming and URLs
             
-            debug_log("STORY", "Processing city: {$city}, {$state}");
+            debug_log("STORY", "Processing city: {$city}, {$state} - Slug: {$citySlugWithSuffix}");
             
             // Skip if the rate is from more than 3 days ago
             if (strtotime($date) < strtotime('-3 days')) {
                 debug_log("SKIP", "Skipping {$city} - rate is too old");
                 continue;
             }
-            
-            // Assign random background images for each story page
+              // Assign random background images for each story page
             $coverImage = $backgroundImages[array_rand($backgroundImages)];
             $trayPriceImage = $backgroundImages[array_rand($backgroundImages)];
             $ctaImage = $backgroundImages[array_rand($backgroundImages)];
             
             debug_log("IMAGES", "Assigned images - Cover: {$coverImage}, Tray: {$trayPriceImage}, CTA: {$ctaImage}");
             
-            // Assign random background images for each page
-            $coverImage = $backgroundImages[array_rand($backgroundImages)];
-            $trayPriceImage = $backgroundImages[array_rand($backgroundImages)];
-            $ctaImage = $backgroundImages[array_rand($backgroundImages)];
-            
-            debug_log("IMAGES", "Selected images - Cover: {$coverImage}, Tray: {$trayPriceImage}, CTA: {$ctaImage}");
-              // Replace template variables - using correct placeholders that match the template
+            // Replace template variables - using correct placeholders that match the template
             $story = $template;
             $story = str_replace('{{CITY_NAME}}', $city, $story);
             $story = str_replace('{{STATE_NAME}}', $state, $story);
             $story = str_replace('{{EGG_RATE}}', number_format($rate, 2), $story); // Fixed: was {{RATE}}
             $story = str_replace('{{TRAY_RATE}}', number_format(($rate*30), 2), $story); // Fixed: was {{RATE}}
-            $story = str_replace('{{CITY_SLUG}}', $citySlug, $story); // Added: missing placeholder
+            $story = str_replace('{{CITY_SLUG}}', $citySlugWithSuffix, $story); // Added: missing placeholder
             $story = str_replace('{{DATE}}', date('F j, Y', strtotime($date)), $story);
             $story = str_replace('{{ISO_DATE}}', date('c', strtotime($date)), $story); // Added: ISO date for schema
             
@@ -548,9 +540,8 @@ try {
             // Legacy placeholder support (if any old templates still use these)
             $story = str_replace('{{COVER_IMAGE}}', $coverImagePath, $story);
             $story = str_replace('{{TRAY_PRICE_IMAGE}}', $trayPriceImagePath, $story);
-            $story = str_replace('{{CTA_IMAGE}}', $ctaImagePath, $story);
-              // Save web story
-            $storyPath = $storiesDir . '/' . $citySlug . '.html';
+            $story = str_replace('{{CTA_IMAGE}}', $ctaImagePath, $story);            // Save web story
+            $storyPath = $storiesDir . '/' . $citySlugWithSuffix . '.html';
             debug_log("SAVE", "Saving web story to {$storyPath}");
             
             if (file_put_contents($storyPath, $story) === false) {
