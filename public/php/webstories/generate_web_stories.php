@@ -495,8 +495,7 @@ try {
 
     if ($result && $result->num_rows > 0) {
         debug_log("PROCESS", "Found " . $result->num_rows . " cities to generate web stories for");
-        $storiesGenerated = 0;
-          while ($row = $result->fetch_assoc()) {
+        $storiesGenerated = 0;        while ($row = $result->fetch_assoc()) {
             $city = $row['city'];
             $state = $row['state'];
             $rate = $row['rate'];
@@ -512,6 +511,20 @@ try {
                 debug_log("SKIP", "Skipping {$city} - rate is too old");
                 continue;
             }
+            
+            // Assign random background images for each story page
+            $coverImage = $backgroundImages[array_rand($backgroundImages)];
+            $trayPriceImage = $backgroundImages[array_rand($backgroundImages)];
+            $ctaImage = $backgroundImages[array_rand($backgroundImages)];
+            
+            debug_log("IMAGES", "Assigned images - Cover: {$coverImage}, Tray: {$trayPriceImage}, CTA: {$ctaImage}");
+            
+            // Assign random background images for each page
+            $coverImage = $backgroundImages[array_rand($backgroundImages)];
+            $trayPriceImage = $backgroundImages[array_rand($backgroundImages)];
+            $ctaImage = $backgroundImages[array_rand($backgroundImages)];
+            
+            debug_log("IMAGES", "Selected images - Cover: {$coverImage}, Tray: {$trayPriceImage}, CTA: {$ctaImage}");
               // Replace template variables - using correct placeholders that match the template
             $story = $template;
             $story = str_replace('{{CITY_NAME}}', $city, $story);
