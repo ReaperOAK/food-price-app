@@ -3,7 +3,6 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://todayeggrates.com/sitemap.txt
 Sitemap: https://todayeggrates.com/sitemap.xml
 Sitemap: https://todayeggrates.com/webstories-sitemap.xml
 
