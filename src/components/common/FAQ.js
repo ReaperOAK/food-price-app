@@ -16,13 +16,11 @@ export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
   
   // Generate FAQ items based on data
   const faqItems = generateFaqList(selectedCity, selectedState, currentRate, trayPrice, formattedDate);
-  
-  const schema = {
+    const schema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": faqItems.map(faq => ({
       "@type": "Question",
-      "position": faqItems.indexOf(faq) + 1,
       "name": faq.question,
       "acceptedAnswer": {
         "@type": "Answer",
@@ -30,9 +28,6 @@ export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
       }
     }))
   };
-
-  // For backward compatibility, also include itemListElement
-  schema.itemListElement = schema.mainEntity;
   
   return schema;
 };
