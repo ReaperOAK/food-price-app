@@ -1,38 +1,57 @@
 import { Helmet } from 'react-helmet';
 import { memo } from 'react';
 
-const HighTrafficCityOptimizer = memo(({ selectedCity, selectedState, todayRate, trayPrice }) => {
-  // High-traffic cities that need CTR optimization based on search console data
-  const highTrafficCities = {
-    'Mumbai': {
-      impressions: 46557,
-      currentCTR: 0.22,
-      targetCTR: 1.5,
-      urgencyWords: ['LIVE NOW', 'Breaking', 'Just Updated'],
-      localContext: 'Financial Capital',
-      majorMarkets: ['Crawford Market', 'Dadar Market', 'Andheri Market']
-    },
-    'Bangalore': {
-      impressions: 43437,
-      currentCTR: 0.19,
-      targetCTR: 1.2,
-      urgencyWords: ['TECH HUB RATES', 'IT City Prices', 'Silicon Valley'],
-      localContext: 'IT Capital',
-      majorMarkets: ['KR Market', 'Yeshwantpur Market', 'Whitefield Market']
-    },
-    'Hyderabad': {
-      impressions: 17754,
-      currentCTR: 0.20,
-      targetCTR: 1.0,
-      urgencyWords: ['CYBERABAD LIVE', 'Pharma City', 'HITEC City'],
-      localContext: 'Pharma Hub',
-      majorMarkets: ['Begum Bazaar', 'Secunderabad Market', 'Gachibowli Market']
-    }
+// Renamed from UniversalCityOptimizer to UniversalCityOptimizer
+// Now provides equal SEO optimization for ALL cities, not just high-traffic ones
+const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, trayPrice }) => {
+  
+  // Universal city data generator - works for ANY city
+  const generateCityData = (city, state) => {
+    const commonUrgencyWords = ['LIVE NOW', 'Breaking', 'Just Updated', 'Fresh Rates', 'Latest Update'];
+    
+    // Universal local context mapping
+    const getLocalContext = (cityName) => {
+      const contexts = {
+        'Mumbai': 'Financial Capital',
+        'Bangalore': 'IT Capital', 
+        'Hyderabad': 'Pharma Hub',
+        'Chennai': 'Detroit of India',
+        'Kolkata': 'Cultural Capital',
+        'Delhi': 'National Capital',
+        'Pune': 'Oxford of East',
+        'Ahmedabad': 'Manchester of India',
+        'Jaipur': 'Pink City',
+        'Lucknow': 'City of Nawabs',
+        'Kanpur': 'Leather City',
+        'Nagpur': 'Orange City',
+        'Indore': 'Commercial Capital of MP',
+        'Patna': 'Capital of Bihar',
+        'Bhopal': 'City of Lakes',
+        'Guwahati': 'Gateway to Northeast'
+      };
+      return contexts[cityName] || `${cityName} Market Hub`;
+    };
+    
+    // Generate market names for any city
+    const generateMarkets = (cityName) => {
+      const commonMarketSuffixes = ['Market', 'Bazaar', 'Mandi', 'Trading Center'];
+      const areas = ['Main', 'Central', 'Old', 'New', 'Wholesale'];
+      
+      return areas.slice(0, 3).map(area => `${area} ${cityName} ${commonMarketSuffixes[Math.floor(Math.random() * commonMarketSuffixes.length)]}`);
+    };
+
+    return {
+      urgencyWords: commonUrgencyWords,
+      localContext: getLocalContext(city),
+      majorMarkets: generateMarkets(city),
+      targetCTR: 1.0, // Standard target for all cities
+      impressions: 1000 // Default value for tracking
+    };
   };
 
-  const cityData = highTrafficCities[selectedCity];
+  const cityData = generateCityData(selectedCity, selectedState);
   
-  if (!cityData || !selectedCity) return null;
+  if (!selectedCity) return null;
 
   const formatPrice = (price) => {
     if (price === 'N/A' || !price) return 'N/A';
@@ -203,6 +222,6 @@ const HighTrafficCityOptimizer = memo(({ selectedCity, selectedState, todayRate,
   );
 });
 
-HighTrafficCityOptimizer.displayName = 'HighTrafficCityOptimizer';
+UniversalCityOptimizer.displayName = 'UniversalCityOptimizer';
 
-export default HighTrafficCityOptimizer;
+export default UniversalCityOptimizer;

@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet';
 import React, { memo } from 'react';
 import DesktopOptimizer from '../seo/DesktopOptimizer';
 import InternationalSEO from '../seo/InternationalSEO'; 
-import HighTrafficCityOptimizer from '../seo/HighTrafficCityOptimizer';
+import UniversalCityOptimizer from '../seo/UniversalCityOptimizer';
 
 const HeadSection = memo(({
   getSeoTitle,
@@ -202,7 +202,7 @@ const HeadSection = memo(({
         selectedState={selectedState}
         todayRate={todayRate}
       />
-      <HighTrafficCityOptimizer
+      <UniversalCityOptimizer
         selectedCity={selectedCity}
         selectedState={selectedState} 
         todayRate={todayRate}

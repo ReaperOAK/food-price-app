@@ -222,7 +222,7 @@
             └── TableRow.js
         └── 📁seo
             └── DesktopOptimizer.js
-            └── HighTrafficCityOptimizer.js
+            └── UniversalCityOptimizer.js
             └── InternationalSEO.js
         └── 📁webstories
             └── WebStoriesList.js

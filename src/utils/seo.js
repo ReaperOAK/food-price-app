@@ -58,25 +58,9 @@ export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getF
       return truncateTitle(title);
     }
     
-    // Optimized titles for cities (under 60 chars)
-    const citySpecificTitles = {
-      'Mumbai': `🥚 Mumbai Egg Rate: ₹${formattedRate}/egg | Today ${today}`,
-      'Bangalore': `🥚 Bangalore Egg Rate: ₹${formattedRate}/egg | ${today}`,
-      'Hyderabad': `🥚 Hyderabad Egg Rate: ₹${formattedRate}/egg | ${today}`,
-      'Chennai': `🥚 Chennai Egg Rate: ₹${formattedRate}/egg | ${today}`,
-      'Kolkata': `🥚 Kolkata Egg Rate: ₹${formattedRate}/egg | ${today}`,
-      'Delhi': `🥚 Delhi Egg Rate: ₹${formattedRate}/egg | ${today}`,
-      'Pune': `🥚 Pune Egg Rate: ₹${formattedRate}/egg | ${today}`
-    };
-    
-    const customTitle = citySpecificTitles[selectedCity];
-    if (customTitle) {
-      return truncateTitle(customTitle);
-    }
-    
-    // Generic format for other cities (optimized for length)
-    const genericTitle = `${selectedCity} Egg Rate: ₹${formattedRate}/egg | ${today}`;
-    return truncateTitle(genericTitle);
+    // Centralized title format for ALL cities - no special treatment
+    const cityTitle = `${selectedCity} Egg Rate: ₹${formattedRate}/egg | ${today}`;
+    return truncateTitle(cityTitle);
     
   } else if (selectedState) {
     const shortStateName = getShortStateName(selectedState);
@@ -84,51 +68,70 @@ export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getF
     return truncateTitle(stateTitle);
     
   } else {
-    return `🥚 India Egg Rates: Live NECC Prices | ${today}`;
+    return `India Egg Rates: Live NECC Prices | ${today}`;
   }
 };
 
 export const getSeoDescription = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
-  // Helper function to ensure description stays within 150-160 chars
-  const truncateDescription = (desc, maxLength = 155) => {
+  // Helper function to ensure description stays within optimal 120-160 chars for SEO
+  const truncateDescription = (desc, maxLength = 160) => {
     if (desc.length <= maxLength) return desc;
     return desc.substring(0, maxLength - 3) + '...';
+  };
+  
+  // Helper function to get state context for cities
+  const getStateContext = (city) => {
+    const stateMapping = {
+      'Mumbai': 'Maharashtra',
+      'Pune': 'Maharashtra',
+      'Nagpur': 'Maharashtra',
+      'Bangalore': 'Karnataka',
+      'Mysore': 'Karnataka',
+      'Hyderabad': 'Telangana',
+      'Chennai': 'Tamil Nadu',
+      'Coimbatore': 'Tamil Nadu',
+      'Kolkata': 'West Bengal',
+      'Delhi': 'NCR',
+      'Gurgaon': 'NCR',
+      'Noida': 'NCR',
+      'Lucknow': 'Uttar Pradesh',
+      'Kanpur': 'Uttar Pradesh',
+      'Ahmedabad': 'Gujarat',
+      'Surat': 'Gujarat',
+      'Jaipur': 'Rajasthan',
+      'Indore': 'Madhya Pradesh',
+      'Bhopal': 'Madhya Pradesh',
+      'Patna': 'Bihar',
+      'Ranchi': 'Jharkhand',
+      'Bhubaneswar': 'Odisha',
+      'Guwahati': 'Assam',
+      'Chandigarh': 'Punjab',
+      'Thiruvananthapuram': 'Kerala',
+      'Kochi': 'Kerala'
+    };
+    return stateMapping[city] || selectedState || 'markets';
   };
   
   if (selectedCity) {
     // Handle N/A prices gracefully
     if (todayRate === 'N/A' || !todayRate || todayRate === null || todayRate === undefined) {
-      const desc = `Live egg rates ${selectedCity} (${today}). Check NECC prices, wholesale & retail rates. Daily updates from ${selectedCity} markets.`;
+      const desc = `Live egg rates ${selectedCity} (${today}). Check latest NECC prices, wholesale & retail rates. Daily market updates from ${selectedCity} egg markets. Compare rates across India.`;
       return truncateDescription(desc);
     }
     
     const trayPrice = formatPrice(todayRate * 30);
+    const stateContext = getStateContext(selectedCity);
     
-    // Optimized descriptions for better SEO (under 155 characters)
-    const citySpecificDescriptions = {
-      'Mumbai': `Mumbai egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily market updates.`,
-      'Bangalore': `Bangalore egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`,
-      'Hyderabad': `Hyderabad egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`,
-      'Chennai': `Chennai egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`,
-      'Kolkata': `Kolkata egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & daily rates.`,
-      'Delhi': `Delhi egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & market updates.`
-    };
-    
-    const customDesc = citySpecificDescriptions[selectedCity];
-    if (customDesc) {
-      return truncateDescription(customDesc);
-    }
-    
-    // Generic format for other cities
-    const genericDesc = `${selectedCity} egg rate: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices & rates.`;
-    return truncateDescription(genericDesc);
+    // Centralized comprehensive description for ALL cities - no special treatment
+    const cityDesc = `${selectedCity} egg rate today: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices, wholesale rates & market trends across ${stateContext}. Compare egg prices nationwide.`;
+    return truncateDescription(cityDesc);
     
   } else if (selectedState) {
-    const stateDesc = `Live egg rates ${selectedState} (${today}): NECC prices from major markets. Daily updates & wholesale rates.`;
+    const stateDesc = `Live egg rates ${selectedState} (${today}): Latest NECC prices from major markets. Daily updates, wholesale rates & price comparisons across all cities in ${selectedState}.`;
     return truncateDescription(stateDesc);
     
   } else {
-    const mainDesc = `Live egg rates India (${today}): NECC prices from 100+ cities. Compare today's egg rates & wholesale prices.`;
+    const mainDesc = `Live egg rates India (${today}): Latest NECC prices from 100+ cities. Compare today's egg rates, wholesale prices & market trends across all states. Daily NECC updates.`;
     return truncateDescription(mainDesc);
   }
 };
@@ -165,9 +168,7 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
     'egg suppliers',
     'poultry farms',
     'egg prices',
-    'daily egg',
-    'hyderabad today',
-    'egg rates in hyderabad'
+    'daily egg'
   ];
   
   // International SEO keywords for diaspora communities
@@ -183,8 +184,11 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
     'india egg export prices',
     'poultry prices india global'
   ];
-    if (selectedCity) {
+
+  if (selectedCity) {
     const cityLower = selectedCity.toLowerCase?.() || '';
+    
+    // Comprehensive keyword generation for ALL cities - no special treatment
     const cityKeywords = [
       `necc egg rate ${cityLower}`,
       `${cityLower} egg rate today`,
@@ -204,9 +208,15 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       `egg prices in ${cityLower}`,
       `daily egg in ${cityLower}`,
       `national egg ${cityLower}`,
-      // Add international variations for major cities
-      ...(cityLower === 'mumbai' || cityLower === 'bangalore' || cityLower === 'chennai' || cityLower === 'hyderabad' ? 
-        [`${cityLower} egg prices for nri`, `${cityLower} market rates international`] : [])
+      `${cityLower} egg market`,
+      `${cityLower} poultry market`,
+      `${cityLower} wholesale market`,
+      `${cityLower} market trends`,
+      `${cityLower} egg suppliers`,
+      `${cityLower} fresh eggs`,
+      // International keywords for ALL cities (not just major ones)
+      `${cityLower} egg prices for nri`,
+      `${cityLower} market rates international`
     ];
     
     return [
@@ -214,7 +224,8 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       ...baseKeywords,
       ...internationalKeywords
     ].join(', ');
-  }else if (selectedState) {
+    
+  } else if (selectedState) {
     const stateLower = selectedState.toLowerCase?.() || '';
     return [
       `necc egg rate ${stateLower}`,
@@ -228,9 +239,13 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
       `${stateLower} wholesale egg market`,
       `${stateLower} daily egg rate`,
       `${stateLower} necc rates`,
+      `${stateLower} market trends`,
+      `${stateLower} poultry market`,
+      `${stateLower} egg suppliers`,
       ...baseKeywords,
       ...internationalKeywords
     ].join(', ');
+    
   } else {
     return [
       'necc egg rate today',
