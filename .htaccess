@@ -8,6 +8,7 @@
 
   # Static files handler
   RewriteRule ^static/(css|js)/[^/]+\.(css|js|chunk\.js|chunk\.css)(\.gz)?$ static.php [L]
+
   # Force HTTPS
   RewriteCond %{HTTPS} off
   RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301,QSA]
@@ -15,18 +16,6 @@
   # Remove www
   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
   RewriteRule ^(.*)$ https://%1/$1 [R=301,L,QSA]
-  
-  # Serve prerendered pages to search engines for better SERP title adoption
-  RewriteCond %{HTTP_USER_AGENT} "bot|crawl|slurp|spider|mediapartners|facebookexternalhit|twitterbot|whatsapp" [NC]
-  RewriteCond %{REQUEST_METHOD} GET
-  RewriteCond %{DOCUMENT_ROOT}/prerendered%{REQUEST_URI}/index.html -f
-  RewriteRule ^(.*)$ /prerendered%{REQUEST_URI}/index.html [L]
-  
-  # Fallback for search engines - serve prerendered homepage if specific page not found
-  RewriteCond %{HTTP_USER_AGENT} "bot|crawl|slurp|spider|mediapartners|facebookexternalhit|twitterbot|whatsapp" [NC]
-  RewriteCond %{REQUEST_METHOD} GET
-  RewriteCond %{DOCUMENT_ROOT}/prerendered/index.html -f
-  RewriteRule ^(.*)$ /prerendered/index.html [L]
   # Handle /webstories route specially
   # If request is exactly /webstories (no trailing slash), serve React app
   RewriteRule ^webstories$ /index.html [L]
@@ -60,26 +49,6 @@
 
 # Set proper headers for static files
 <IfModule mod_headers.c>
-  # SEO and Search Engine Optimization Headers
-  Header always set X-Robots-Tag "index, follow, max-image-preview:large"
-  
-  # Better caching for dynamic content to help search engines
-  <FilesMatch "\.(html|htm)$">
-    Header set Cache-Control "public, max-age=1800, must-revalidate"
-    Header set X-Content-Type-Options "nosniff"
-    Header set X-Frame-Options "SAMEORIGIN"
-    # Help search engines understand dynamic content freshness
-    Header set Last-Modified "expr=%{TIME_YEAR}-%{TIME_MON}-%{TIME_DAY} %{TIME_HOUR}:%{TIME_MIN}:%{TIME_SEC} GMT"
-    Header set Expires "expr=%{REQUEST_TIME} + 1800"
-  </FilesMatch>
-  
-  # Help search engines understand dynamic content
-  Header always set X-Content-Type-Options "nosniff"
-  Header always set X-Frame-Options "SAMEORIGIN"
-  Header always set Referrer-Policy "strict-origin-when-cross-origin"
-  
-  # Force re-crawl for title updates
-  Header always set Vary "User-Agent"
   <FilesMatch "\.(css)$">
     Header set Content-Type "text/css; charset=utf-8"
     Header set X-Content-Type-Options "nosniff"
