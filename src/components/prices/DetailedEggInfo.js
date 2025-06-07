@@ -12,11 +12,11 @@ const DetailedEggInfo = memo(({ selectedCity, selectedState }) => {
       className="p-4 sm:p-6 mt-6 bg-white dark:bg-gray-900 rounded-lg shadow-lg" 
       aria-label="Today's Egg Rates and NECC Price Information"
     >
-      <div className="max-w-7xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">        
         <div className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-6 transform transition-transform hover:scale-[1.02]">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
             Egg Daily and Monthly Prices - {location}
-          </h1>
+          </h2>
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
             Our platform Today Egg rates provides the daily and monthly prices of egg throughout the different cities, states and areas of India. This Egg rate indicator is beneficial for both consumers and sellers in the Indian egg market. The daily or today's egg rate refers to the current price rates of the eggs. Users can scroll up to the previous day's price rates as well, limited to the current month. The egg rates depend on several factors such as production cost, transportation, egg quality, etc.
           </p>
