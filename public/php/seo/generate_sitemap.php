@@ -145,8 +145,8 @@ try {
 
 if ($cities_result && $cities_result->num_rows > 0) {
     // Create an array to track unique states
-    $unique_states = [];
-      while ($row = $cities_result->fetch_assoc()) {
+    $unique_states = [];    
+    while ($row = $cities_result->fetch_assoc()) {
         // Add city URL using new slug format
         $citySlug = generateCitySlug($row['city_name'], $row['state_name']);
         $url = $baseUrl . '/' . $citySlug;
@@ -210,11 +210,10 @@ if ($cities_result && $cities_result->num_rows > 0) {
     ];
     
     $unique_states = [];
-    
-    foreach ($fallback_cities as $city => $state) {
-        // Add city URL
-        $city_url = $city . '-egg-rate';
-        $url = $baseUrl . '/' . $city_url;
+      foreach ($fallback_cities as $city => $state) {
+        // Add city URL using generateCitySlug function for consistency
+        $citySlug = generateCitySlug($city, $state);
+        $url = $baseUrl . '/' . $citySlug;
         
         $xml .= '<url>' . PHP_EOL;
         $xml .= '  <loc>' . $url . '</loc>' . PHP_EOL;
