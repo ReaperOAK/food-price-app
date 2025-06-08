@@ -68,19 +68,20 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
       hour12: true 
     });
   };
-
   const getUrgentTitle = () => {
     const urgencyWord = cityData.urgencyWords[Math.floor(Math.random() * cityData.urgencyWords.length)];
     const currentTime = getCurrentTime();
-    return `🔴 ${urgencyWord}: ${selectedCity} Egg Rate ₹${formatPrice(todayRate)}/egg | Updated ${currentTime} | NECC Live`;
-  };
-  const getCompellingDescription = () => {
+    const safeTitle = `🔴 ${String(urgencyWord || '')}: ${String(selectedCity || '')} Egg Rate ₹${formatPrice(todayRate)}/egg | Updated ${currentTime} | NECC Live`;
+    return String(safeTitle);
+  };  const getCompellingDescription = () => {
     const currentTime = getCurrentTime();
     const priceChange = Math.random() > 0.5 ? '↗️ +₹0.50' : '↘️ -₹0.30'; // Simulated change
     const safeMarkets = (cityData.majorMarkets || []).filter(m => m && String(m).trim()).slice(0, 2);
-    
-    return `⚡ BREAKING: ${selectedCity} (${String(cityData.localContext || '')}) egg rates LIVE at ₹${formatPrice(todayRate)}/egg ${priceChange} | Tray: ₹${formatPrice(trayPrice)} | Updated ${currentTime} | Major markets: ${safeMarkets.join(', ')} | Get wholesale prices, trends & forecasts NOW!`;
-  };// Safe string conversion function to prevent toLowerCase errors
+      const safeDescription = `⚡ BREAKING: ${String(selectedCity || '')} (${String(cityData.localContext || '')}) egg rates LIVE at ₹${formatPrice(todayRate)}/egg ${priceChange} | Tray: ₹${formatPrice(trayPrice)} | Updated ${currentTime} | Major markets: ${safeMarkets.join(', ')} | Get wholesale prices, trends & forecasts NOW!`;
+    return String(safeDescription);
+  };
+
+  // Safe string conversion function to prevent toLowerCase errors
   const safeToLowerCase = (value) => {
     if (!value) return '';
     return String(value).toLowerCase();
@@ -112,25 +113,39 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
     
     return keywords;
   };
+  // Helper function to safely convert any value to string for React Helmet  // Helper function to safely convert any value to string for React Helmet
+  const safeStringify = (value) => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return String(value);
+    if (typeof value === 'boolean') return String(value);
+    if (Array.isArray(value)) return value.filter(Boolean).join(', ');
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value);
+      } catch (e) {
+        return String(value);
+      }
+    }
+    return String(value);
+  };
 
   return (
     <Helmet>
       {/* High-CTR meta tags for underperforming cities */}
       <meta name="city-performance-optimization" content="true" />
-      <meta name="target-ctr" content={cityData.targetCTR} />
-      <meta name="current-impressions" content={cityData.impressions} />
-      
-      {/* Urgent, compelling title */}
-      <meta name="urgent-title" content={getUrgentTitle()} />
-      <meta name="compelling-description" content={getCompellingDescription()} />
-      
-      {/* City-specific rich snippets */}
+      <meta name="target-ctr" content={safeStringify(cityData.targetCTR)} />
+      <meta name="current-impressions" content={safeStringify(cityData.impressions)} />
+        {/* Urgent, compelling title */}
+      <meta name="urgent-title" content={safeStringify(getUrgentTitle())} />
+      <meta name="compelling-description" content={safeStringify(getCompellingDescription())} />
+        {/* City-specific rich snippets */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "LiveBlogPosting",
-          "headline": `LIVE: ${selectedCity} Egg Rates - NECC Updates`,
-          "description": getCompellingDescription(),
+          "headline": safeStringify(`LIVE: ${selectedCity} Egg Rates - NECC Updates`),
+          "description": safeStringify(getCompellingDescription()),
           "datePublished": new Date().toISOString(),
           "dateModified": new Date().toISOString(),
           "author": {
@@ -146,47 +161,43 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
             }
           },          "mainEntityOfPage": {
             "@type": "WebPage",
-            "@id": `https://todayeggrates.com/${safeToLowerCase(selectedCity)}`
+            "@id": safeStringify(`https://todayeggrates.com/${safeToLowerCase(selectedCity)}`)
           },
           "liveBlogUpdate": [
             {
               "@type": "BlogPosting",
-              "headline": `${selectedCity} Egg Rate: ₹${formatPrice(todayRate)}/egg`,
+              "headline": safeStringify(`${selectedCity} Egg Rate: ₹${formatPrice(todayRate)}/egg`),
               "datePublished": new Date().toISOString(),
-              "articleBody": `Current NECC egg rate in ${selectedCity}: ₹${formatPrice(todayRate)} per piece, ₹${formatPrice(trayPrice)} per tray (30 pieces)`
+              "articleBody": safeStringify(`Current NECC egg rate in ${selectedCity}: ₹${formatPrice(todayRate)} per piece, ₹${formatPrice(trayPrice)} per tray (30 pieces)`)
             }
           ],
           "about": {
             "@type": "Place",
-            "name": selectedCity,
-            "description": `${cityData.localContext} of India`
+            "name": safeStringify(selectedCity),
+            "description": safeStringify(`${cityData.localContext} of India`)
           }
         })}
-      </script>
-
-      {/* Real-time price schema */}
+      </script>      {/* Real-time price schema */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "PriceSpecification",
-          "name": `${selectedCity} NECC Egg Rate - Live`,
-          "price": todayRate,
+          "name": safeStringify(`${selectedCity} NECC Egg Rate - Live`),
+          "price": safeStringify(todayRate),
           "priceCurrency": "INR",
           "validFrom": new Date().toISOString(),
           "validThrough": new Date(Date.now() + 3600000).toISOString(), // 1 hour validity
           "valueAddedTaxIncluded": false,
           "eligibleRegion": {
             "@type": "City",
-            "name": selectedCity,
+            "name": safeStringify(selectedCity),
             "containedInPlace": {
               "@type": "State",
-              "name": selectedState
+              "name": safeStringify(selectedState)
             }
           }
         })}
-      </script>
-
-      {/* FAQ schema for better SERP features */}
+      </script>      {/* FAQ schema for better SERP features */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
@@ -194,40 +205,40 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
           "mainEntity": [
             {
               "@type": "Question",
-              "name": `What is today's egg rate in ${selectedCity}?`,
+              "name": safeStringify(`What is today's egg rate in ${selectedCity}?`),
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": `Today's NECC egg rate in ${selectedCity} is ₹${formatPrice(todayRate)} per piece and ₹${formatPrice(trayPrice)} per tray (30 pieces). Updated at ${getCurrentTime()}.`
+                "text": safeStringify(`Today's NECC egg rate in ${selectedCity} is ₹${formatPrice(todayRate)} per piece and ₹${formatPrice(trayPrice)} per tray (30 pieces). Updated at ${getCurrentTime()}.`)
               }
             },
             {
               "@type": "Question", 
-              "name": `Where can I buy eggs at NECC rates in ${selectedCity}?`,
+              "name": safeStringify(`Where can I buy eggs at NECC rates in ${selectedCity}?`),
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": `Major wholesale markets in ${selectedCity} offering NECC rates: ${(cityData.majorMarkets || []).filter(m => m && String(m).trim()).join(', ')}. These markets follow official NECC pricing guidelines.`
+                "text": safeStringify(`Major wholesale markets in ${selectedCity} offering NECC rates: ${(cityData.majorMarkets || []).filter(m => m && String(m).trim()).join(', ')}. These markets follow official NECC pricing guidelines.`)
               }
             },
             {
               "@type": "Question",
-              "name": `How often are ${selectedCity} egg rates updated?`,
+              "name": safeStringify(`How often are ${selectedCity} egg rates updated?`),
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": `${selectedCity} egg rates are updated multiple times daily based on NECC announcements and market conditions. Check back regularly for the most current prices.`
+                "text": safeStringify(`${selectedCity} egg rates are updated multiple times daily based on NECC announcements and market conditions. Check back regularly for the most current prices.`)
               }
             }
           ]
         })}
-      </script>      {/* Enhanced keywords for CTR optimization */}
-      <meta name="ctr-keywords" content={getCitySpecificKeywords().filter(k => k).join(', ')} />
+      </script>{/* Enhanced keywords for CTR optimization */}
+      <meta name="ctr-keywords" content={safeStringify(getCitySpecificKeywords().filter(k => k).join(', '))} />
       
       {/* Social media CTR optimization */}
-      <meta property="og:title" content={getUrgentTitle()} />
-      <meta property="og:description" content={getCompellingDescription()} />
-      <meta name="twitter:title" content={getUrgentTitle()} />
-      <meta name="twitter:description" content={getCompellingDescription()} />
+      <meta property="og:title" content={safeStringify(getUrgentTitle())} />
+      <meta property="og:description" content={safeStringify(getCompellingDescription())} />
+      <meta name="twitter:title" content={safeStringify(getUrgentTitle())} />
+      <meta name="twitter:description" content={safeStringify(getCompellingDescription())} />
         {/* Rich results enhancement */}
-      <meta name="news_keywords" content={`${selectedCity}, egg rates, NECC, live prices, breaking news, ${String(cityData.localContext || '')}`} />
+      <meta name="news_keywords" content={safeStringify(`${selectedCity}, egg rates, NECC, live prices, breaking news, ${String(cityData.localContext || '')}`)} />
     </Helmet>
   );
 });
