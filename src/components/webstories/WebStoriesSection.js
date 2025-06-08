@@ -78,12 +78,12 @@ const WebStoriesSection = memo(({
                 key={story.slug}
                 to={`/webstory/${story.slug}`}
                 className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-1"
-                aria-label={`View web story about egg rates in ${story.city}, ${story.state}. Current rate: ₹${story.rate} per egg`}
+                aria-label={`View web story about egg rates in ${String(story.city || '')}, ${String(story.state || '')}. Current rate: ₹${String(story.rate || '')} per egg`}
               >
                 <div className="relative aspect-w-16 aspect-h-9">
                   <OptimizedImage 
                     src={story.thumbnail} 
-                    alt={`Fresh eggs in India rate visualization for ${story.city}, ${story.state} - Farm fresh eggs market analysis`}
+                    alt={`Fresh eggs in India rate visualization for ${String(story.city || '')}, ${String(story.state || '')} - Farm fresh eggs market analysis`}
                     className="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => { e.target.src = '/eggpic.webp' }}
                     width={400}
