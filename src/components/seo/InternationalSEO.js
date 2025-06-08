@@ -84,42 +84,39 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
       
       {/* International keywords */}
       <meta name="international-keywords" content={String(content.keywords?.join(', ') || '')} />
-      
-      {/* Currency-specific structured data */}
+        {/* Currency-specific structured data */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "PriceSpecification",
-          "name": `NECC Egg Rate for ${userCountry} Residents`,
-          "price": formatCurrency(todayRate, content.currency),
-          "priceCurrency": content.currency || 'USD',
+          "name": `NECC Egg Rate for ${String(userCountry || '')} Residents`,
+          "price": String(formatCurrency(todayRate, content.currency) || ''),
+          "priceCurrency": String(content.currency || 'USD'),
           "referenceQuantity": {
             "@type": "QuantitativeValue",
-            "value": 1,
+            "value": "1",
             "unitCode": "C62"
           },
-          "validFrom": new Date().toISOString(),
-          "validThrough": new Date(Date.now() + 24*60*60*1000).toISOString(),
+          "validFrom": String(new Date().toISOString()),
+          "validThrough": String(new Date(Date.now() + 24*60*60*1000).toISOString()),
           "eligibleRegion": {
             "@type": "Country",
-            "name": userCountry
+            "name": String(userCountry || '')
           }
         })}
-      </script>
-
-      {/* International audience schema */}
+      </script>      {/* International audience schema */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "WebPage",
-          "name": content.title,
-          "description": content.description,
+          "name": String(content.title || ''),
+          "description": String(content.description || ''),
           "audience": {
             "@type": "Audience",
             "audienceType": "Indian Diaspora",
             "geographicArea": {
               "@type": "Country",
-              "name": userCountry
+              "name": String(userCountry || '')
             }
           },
           "about": {
@@ -128,14 +125,12 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
             "description": "Current market rates for Indian agricultural products"
           }
         })}
-      </script>
-
-      {/* Hreflang for different regions */}
-      <link rel="alternate" hrefLang="en-ae" href={`https://todayeggrates.com${window.location.pathname}?region=uae`} />
-      <link rel="alternate" hrefLang="en-us" href={`https://todayeggrates.com${window.location.pathname}?region=usa`} />
-      <link rel="alternate" hrefLang="en-ca" href={`https://todayeggrates.com${window.location.pathname}?region=canada`} />
-      <link rel="alternate" hrefLang="en-au" href={`https://todayeggrates.com${window.location.pathname}?region=australia`} />
-      <link rel="alternate" hrefLang="en-in" href={`https://todayeggrates.com${window.location.pathname}`} />
+      </script>      {/* Hreflang for different regions */}
+      <link rel="alternate" hrefLang="en-ae" href={`https://todayeggrates.com${String(window?.location?.pathname || '')}?region=uae`} />
+      <link rel="alternate" hrefLang="en-us" href={`https://todayeggrates.com${String(window?.location?.pathname || '')}?region=usa`} />
+      <link rel="alternate" hrefLang="en-ca" href={`https://todayeggrates.com${String(window?.location?.pathname || '')}?region=canada`} />
+      <link rel="alternate" hrefLang="en-au" href={`https://todayeggrates.com${String(window?.location?.pathname || '')}?region=australia`} />
+      <link rel="alternate" hrefLang="en-in" href={`https://todayeggrates.com${String(window?.location?.pathname || '')}`} />
     </Helmet>
   );
 });
