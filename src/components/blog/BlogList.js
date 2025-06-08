@@ -24,20 +24,19 @@ const BlogList = ({ blogs, selectedCity, selectedState }) => {
     }
     return 'Latest Egg Rate Articles & Market Insights';
   }, [selectedCity, selectedState]);
-
   // Generate structured data for SEO
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     "itemListElement": sortedBlogs.map((blog, index) => ({
       "@type": "ListItem",
-      "position": index + 1,
+      "position": String(index + 1),
       "item": {
         "@type": "BlogPosting",
-        "headline": blog.title,
-        "description": blog.description,
+        "headline": String(blog.title || ''),
+        "description": String(blog.description || ''),
         "image": `https://todayeggrates.com${blog.image}`,
-        "datePublished": blog.uploadDate,
+        "datePublished": String(blog.uploadDate || ''),
         "url": `https://todayeggrates.com/blog/${blog.link}`,
         "author": {
           "@type": "Organization",

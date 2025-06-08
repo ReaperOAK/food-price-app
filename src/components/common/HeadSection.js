@@ -25,6 +25,23 @@ const HeadSection = memo(({
         ? location.pathname.slice(0, -1) 
         : location.pathname
   }`;
+  
+  // Safe stringify function to prevent React Helmet errors
+  const safeStringify = (value) => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    if (Array.isArray(value)) return value.map(item => safeStringify(item)).join(', ');
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value);
+      } catch (e) {
+        return String(value);
+      }
+    }
+    return String(value);
+  };
+  
   // Generate optimized SEO content
   const currentRate = todayRate || eggRates?.[0]?.rate;
   const seoTitle = getSeoTitle(selectedCity, selectedState, currentRate);
@@ -134,13 +151,12 @@ const HeadSection = memo(({
             "@type": "WebSite",
             "name": "Today Egg Rates",
             "url": "https://todayeggrates.com"
-          },
-          "mainEntity": currentRate ? {
+          },          "mainEntity": currentRate ? {
             "@type": "Product",
             "name": "NECC Egg Rate",
             "offers": {
               "@type": "Offer",
-              "price": currentRate,
+              "price": String(currentRate),
               "priceCurrency": "INR"
             }
           } : undefined

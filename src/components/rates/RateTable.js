@@ -183,13 +183,27 @@ const RateTable = ({
       month: 'long',
       day: 'numeric'
     });
-
   // Safe string conversion function to prevent toLowerCase errors
   const safeToLowerCase = (value) => {
     if (!value) return '';
     return String(value).toLowerCase();
   };
-  // Schema data - memoized local business schema
+
+  // Safe stringify function to prevent React Helmet errors
+  const safeStringify = (value) => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    if (Array.isArray(value)) return value.map(item => safeStringify(item)).join(', ');
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value);
+      } catch (e) {
+        return String(value);
+      }
+    }
+    return String(value);
+  };  // Schema data - memoized local business schema
   const localBusinessSchema = useMemo(() => selectedCity ? {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -197,8 +211,8 @@ const RateTable = ({
     "description": `Find today's egg rates in ${selectedCity}, ${selectedState}. Updated daily NECC egg prices and wholesale egg rates.`,
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": selectedCity,
-      "addressRegion": selectedState,
+      "addressLocality": String(selectedCity),
+      "addressRegion": String(selectedState),
       "addressCountry": "IN"
     },
     "image": "https://todayeggrates.com/eggpic.webp",    "priceRange": "₹₹",
@@ -233,15 +247,14 @@ const RateTable = ({
         "description": `Fresh eggs in ${selectedCity}, ${selectedState}`,
         "offers": {
           "@type": "Offer",
-          "price": latestRate,
+          "price": String(latestRate || 0),
           "priceCurrency": "INR",
           "availability": "https://schema.org/InStock",
           "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0]
         }
       }
     }
-  } : null, [selectedCity, selectedState, latestRate]);
-    const productSchema = useMemo(() => selectedCity ? {
+  } : null, [selectedCity, selectedState, latestRate]);    const productSchema = useMemo(() => selectedCity ? {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `Eggs in ${selectedCity}, ${selectedState}`,
@@ -250,7 +263,7 @@ const RateTable = ({
       "@type": "Offer",
       "url": `https://todayeggrates.com/${safeToLowerCase(selectedCity)}-egg-rate`,
       "priceCurrency": "INR",
-      "price": latestRate,
+      "price": String(latestRate || 0),
       "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
       "availability": "https://schema.org/InStock",
       "itemCondition": "https://schema.org/NewCondition"
