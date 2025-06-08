@@ -268,7 +268,7 @@ const Breadcrumb = memo(({ setSelectedCity, setSelectedState }) => {
               itemScope
               itemType="https://schema.org/ListItem"
             >              <meta itemProp="position" content={String(item.position)} />
-              <meta itemProp="item" content={`https://todayeggrates.com${item.path}`} />
+              <meta itemProp="item" content={`https://todayeggrates.com${String(item.path || '')}`} />
               <meta itemProp="name" content={String(item.name)} /><BreadcrumbItem
                 item={{
                   ...item,

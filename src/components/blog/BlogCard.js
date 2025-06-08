@@ -102,7 +102,7 @@ const BlogCard = ({ blog, priority = false }) => {
           </div>          {/* Hidden SEO metadata */}
           <meta itemProp="author" content="Today Egg Rates" />
           <meta itemProp="publisher" content="Today Egg Rates" />
-          <meta itemProp="url" content={`https://todayeggrates.com/blog/${blog.link}`} />
+          <meta itemProp="url" content={`https://todayeggrates.com/blog/${String(blog.link || '')}`} />
           {blog.tags && <meta itemProp="keywords" content={String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags)} />}
         </div>
       </Link>

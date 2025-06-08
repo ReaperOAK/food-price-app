@@ -123,18 +123,16 @@ const BlogPage = () => {
         "@type": "ImageObject",
         "url": "https://todayeggrates.com/logo.webp"
       }
-    },
-    "datePublished": formattedDate,
+    },    "datePublished": formattedDate,
     "dateModified": formattedDate,
-    "keywords": blog.tags ? blog.tags.join(', ') : 'egg rate, egg price, NECC egg rate'
+    "keywords": blog.tags ? String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags) : 'egg rate, egg price, NECC egg rate'
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      <HeadSection
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">      <HeadSection
         getSeoTitle={() => blog ? `${blog.title} - Today Egg Rates` : 'Blog - Today Egg Rates'}
         getSeoDescription={() => blog ? blog.description : 'View our collection of informative articles about egg rates and market trends across India'}
-        getSeoKeywords={() => blog ? blog.tags ? blog.tags.join(', ') : 'egg rate, egg price, NECC egg rate' : 'egg rates, egg market, egg industry news'}
+        getSeoKeywords={() => blog ? blog.tags ? String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags) : 'egg rate, egg price, NECC egg rate' : 'egg rates, egg market, egg industry news'}
         location={location}
         structuredData={articleSchema}
         generateFaqSchema={() => ({})}
