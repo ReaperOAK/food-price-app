@@ -25,8 +25,8 @@ const HeadSection = memo(({
         ? location.pathname.slice(0, -1) 
         : location.pathname
   }`;
-  
-  // Safe stringify function to prevent React Helmet errors
+    // Safe stringify function to prevent React Helmet errors
+  // eslint-disable-next-line no-unused-vars
   const safeStringify = (value) => {
     if (value === null || value === undefined) return '';
     if (typeof value === 'string') return value;
