@@ -99,13 +99,11 @@ const BlogCard = ({ blog, priority = false }) => {
                 />
               </svg>
             </span>
-          </div>
-
-          {/* Hidden SEO metadata */}
+          </div>          {/* Hidden SEO metadata */}
           <meta itemProp="author" content="Today Egg Rates" />
           <meta itemProp="publisher" content="Today Egg Rates" />
           <meta itemProp="url" content={`https://todayeggrates.com/blog/${blog.link}`} />
-          {blog.tags && <meta itemProp="keywords" content={blog.tags.join(', ')} />}
+          {blog.tags && <meta itemProp="keywords" content={String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags)} />}
         </div>
       </Link>
     </article>

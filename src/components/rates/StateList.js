@@ -32,7 +32,6 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
     { name: 'Punjab', region: 'North' },
     { name: 'Telangana', region: 'South' }
   ], []);
-
   // Generate schema markup for SEO
   const generateSchemaMarkup = useMemo(() => {
     return {
@@ -45,11 +44,11 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
         "itemListElement": [
           ...popularStates.map((state, index) => ({
             "@type": "ListItem",
-            "position": index + 1,
+            "position": String(index + 1),
             "item": {
               "@type": "Place",
-              "name": `${state.name} Egg Market`,
-              "description": `Check daily egg rates in ${state.name}, ${state.region} India`
+              "name": String(`${state.name} Egg Market`),
+              "description": String(`Check daily egg rates in ${state.name}, ${state.region} India`)
             }
           }))
         ]
