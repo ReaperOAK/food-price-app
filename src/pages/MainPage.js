@@ -101,7 +101,7 @@ const MainPage = () => {
     };
   }, [eggRates]);
 
-  // Memoized SEO data
+    // Memoized SEO data
   const structuredData = useMemo(() => ({
     "@context": "https://schema.org",
     "@type": "Product",
@@ -110,12 +110,14 @@ const MainPage = () => {
     "offers": {
       "@type": "AggregateOffer",
       "priceCurrency": "INR",
-      "lowPrice": priceMetrics.todayRate,
-      "highPrice": priceMetrics.trayPrice,
+      "lowPrice": String(priceMetrics.todayRate || 0),
+      "highPrice": String(priceMetrics.trayPrice || 0),
       "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
       "availability": "https://schema.org/InStock"
     }
-  }), [displayName, today, priceMetrics.todayRate, priceMetrics.trayPrice]);  // Update selectedState and selectedCity when URL parameters change
+  }), [displayName, today, priceMetrics.todayRate, priceMetrics.trayPrice]);
+
+  // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {
     const updateStateFromUrl = async () => {
       // Handle city parameter

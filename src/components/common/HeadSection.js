@@ -108,16 +108,15 @@ const HeadSection = memo(({
       <meta name="dcterms.title" content={safeStringify(optimizedTitle)} />
       <meta name="application-name" content={safeStringify(optimizedTitle)} />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-      
-      {/* Content freshness signals */}
-      <meta name="last-modified" content={new Date().toISOString()} />
+        {/* Content freshness signals */}
+      <meta name="last-modified" content={safeStringify(new Date().toISOString())} />
       <meta name="cache-control" content="public, max-age=3600" />
         {/* JSON-LD Structured Data */}
       <script type="application/ld+json">
-        {JSON.stringify(structuredData)}
+        {safeStringify(JSON.stringify(structuredData))}
       </script>
       <script type="application/ld+json">
-        {JSON.stringify(generateFaqSchema(selectedCity, selectedState, eggRates))}
+        {safeStringify(JSON.stringify(generateFaqSchema(selectedCity, selectedState, eggRates)))}
       </script>
       <script type="application/ld+json">
         {JSON.stringify({
@@ -325,9 +324,8 @@ const HeadSection = memo(({
           },
           "keywords": "eggs in india, farm fresh eggs, brown egg varieties, organic eggs, cage free eggs, fresh produce, local farms, village eggs, country eggs"
         })}
-      </script>
-      
-      <meta property="article:modified_time" content={new Date().toISOString()} />      {/* OpenGraph Tags - Enhanced for International Audience */}
+      </script>      
+      <meta property="article:modified_time" content={safeStringify(new Date().toISOString())} />      {/* OpenGraph Tags - Enhanced for International Audience */}
       <meta property="og:site_name" content="Today Egg Rates - NECC Egg Rate Today" />
       <meta property="og:title" content={safeStringify(optimizedTitle)} />
       <meta property="og:description" content={safeStringify(seoDescription)} />
@@ -341,7 +339,7 @@ const HeadSection = memo(({
       <meta property="og:locale:alternate" content="en_AU" />
       <meta property="og:locale:alternate" content="en_GB" />
       <meta property="og:image:alt" content="NECC egg rate today and live egg price updates" />
-      <meta property="og:updated_time" content={new Date().toISOString()} />
+      <meta property="og:updated_time" content={safeStringify(new Date().toISOString())} />
       <meta property="business:contact_data:street_address" content="Mumbai, India" />
       <meta property="business:contact_data:locality" content="Mumbai" />
       <meta property="business:contact_data:region" content="Maharashtra" />

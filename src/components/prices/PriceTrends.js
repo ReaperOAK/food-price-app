@@ -41,8 +41,7 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
   }, []);
 
   return (
-    <>      <Helmet>
-        <script type="application/ld+json">
+    <>      <Helmet>        <script type="application/ld+json">
           {JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Product",
@@ -50,14 +49,14 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
             "description": `Live egg prices and NECC rates in ${location}. Compare today's egg price, wholesale rates, and retail prices.`,
             "offers": {
               "@type": "AggregateOffer",
-              "lowPrice": todayRate,
-              "highPrice": todayRate + 0.45,
+              "lowPrice": String(todayRate || 0),
+              "highPrice": String((todayRate || 0) + 0.45),
               "priceCurrency": "INR",
               "offerCount": "4",
               "offers": [
                 {
                   "@type": "Offer",
-                  "price": todayRate,
+                  "price": String(todayRate || 0),
                   "priceCurrency": "INR",
                   "itemCondition": "https://schema.org/NewCondition",
                   "availability": "https://schema.org/InStock",
@@ -65,7 +64,7 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
                 },
                 {
                   "@type": "Offer",
-                  "price": todayRate + 0.35,
+                  "price": String((todayRate || 0) + 0.35),
                   "priceCurrency": "INR",
                   "itemCondition": "https://schema.org/NewCondition",
                   "availability": "https://schema.org/InStock",
