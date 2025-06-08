@@ -96,18 +96,17 @@ const HeadSection = memo(({
       <meta name="article:publisher" content="https://todayeggrates.com" />
       <meta name="article:section" content="Agriculture & Food Prices" />
       <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />      {/* SEO Meta Tags - Optimized for better SERP title adoption */}
-      <title>{optimizedTitle}</title>
-      <meta name="description" content={seoDescription} />
-      <meta name="keywords" content={getSeoKeywords(selectedCity, selectedState)} />
+      <title>{safeStringify(optimizedTitle)}</title>
+      <meta name="description" content={safeStringify(seoDescription)} />
+      <meta name="keywords" content={safeStringify(getSeoKeywords(selectedCity, selectedState))} />
       <meta name="author" content="Today Egg Rates" />
       <link rel="canonical" href={canonicalUrl} />
-      
-      {/* Multiple title signals for better SERP adoption - Google needs confidence */}
-      <meta name="title" content={optimizedTitle} />
-      <meta property="article:title" content={optimizedTitle} />
-      <meta name="page-title" content={optimizedTitle} />
-      <meta name="dcterms.title" content={optimizedTitle} />
-      <meta name="application-name" content={optimizedTitle} />
+        {/* Multiple title signals for better SERP adoption - Google needs confidence */}
+      <meta name="title" content={safeStringify(optimizedTitle)} />
+      <meta property="article:title" content={safeStringify(optimizedTitle)} />
+      <meta name="page-title" content={safeStringify(optimizedTitle)} />
+      <meta name="dcterms.title" content={safeStringify(optimizedTitle)} />
+      <meta name="application-name" content={safeStringify(optimizedTitle)} />
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
       
       {/* Content freshness signals */}
@@ -139,11 +138,10 @@ const HeadSection = memo(({
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "WebPage",
-          "name": optimizedTitle,
-          "headline": optimizedTitle,
-          "description": seoDescription,
-          "url": canonicalUrl,
+          "@type": "WebPage",          "name": safeStringify(optimizedTitle),
+          "headline": safeStringify(optimizedTitle),
+          "description": safeStringify(seoDescription),
+          "url": safeStringify(canonicalUrl),
           "dateModified": new Date().toISOString(),
           "datePublished": new Date().toISOString(),
           "inLanguage": "en-IN",
@@ -329,11 +327,11 @@ const HeadSection = memo(({
         })}
       </script>
       
-      <meta property="article:modified_time" content={new Date().toISOString()} />{/* OpenGraph Tags - Enhanced for International Audience */}
+      <meta property="article:modified_time" content={new Date().toISOString()} />      {/* OpenGraph Tags - Enhanced for International Audience */}
       <meta property="og:site_name" content="Today Egg Rates - NECC Egg Rate Today" />
-      <meta property="og:title" content={optimizedTitle} />
-      <meta property="og:description" content={seoDescription} />
-      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:title" content={safeStringify(optimizedTitle)} />
+      <meta property="og:description" content={safeStringify(seoDescription)} />
+      <meta property="og:url" content={safeStringify(canonicalUrl)} />
       <meta property="og:type" content="website" />
       <meta property="og:image" content="https://todayeggrates.com/eggpic.webp" />
       <meta property="og:image:width" content="1200" />
@@ -349,13 +347,12 @@ const HeadSection = memo(({
       <meta property="business:contact_data:region" content="Maharashtra" />
       <meta property="business:contact_data:postal_code" content="400001" />
       <meta property="business:contact_data:country_name" content="India" />
-      
-      {/* Twitter Tags */}
+        {/* Twitter Tags */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:site" content="@todayeggrates" />
       <meta name="twitter:creator" content="@todayeggrates" />
-      <meta name="twitter:title" content={optimizedTitle} />
-      <meta name="twitter:description" content={seoDescription} />
+      <meta name="twitter:title" content={safeStringify(optimizedTitle)} />
+      <meta name="twitter:description" content={safeStringify(seoDescription)} />
       <meta name="twitter:image" content="https://todayeggrates.com/eggpic.webp" />
       <meta name="twitter:image:alt" content="NECC egg rate today, live egg prices and daily egg rate updates" />
       
