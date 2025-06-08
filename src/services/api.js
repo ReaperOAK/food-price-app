@@ -8,16 +8,46 @@ export const fetchWebStories = async () => {
 };
 
 export const fetchRates = async (city, state) => {
-  const url = city && state
-    ? `/php/api/rates/get_rates.php?city=${city}&state=${state}`
-    : `/php/api/rates/get_latest_rates.php`;
+  try {
+    // Build URL with proper encoding and validation
+    let url;
+    if (city && state) {
+      // Encode parameters to handle special characters and spaces
+      const encodedCity = encodeURIComponent(city.trim());
+      const encodedState = encodeURIComponent(state.trim());
+      url = `/php/api/rates/get_rates.php?city=${encodedCity}&state=${encodedState}`;
+    } else {
+      url = `/php/api/rates/get_latest_rates.php`;
+    }
 
-  const response = await fetch(url);
-  const data = await response.json();
-  return data.map(item => ({
-    ...item,
-    rate: parseFloat(item.rate),
-  }));
+    console.log('Fetching rates from:', url); // Debug log
+    
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    
+    // Validate that we got an array
+    if (!Array.isArray(data)) {
+      console.warn('Expected array but got:', typeof data, data);
+      return [];
+    }
+    
+    // Transform and validate rate data
+    return data.map(item => {
+      const rate = parseFloat(item.rate);
+      return {
+        ...item,
+        rate: isNaN(rate) ? 0 : rate,
+      };
+    });
+  } catch (error) {
+    console.error('Error in fetchRates:', error);
+    throw error; // Re-throw to let the hook handle it
+  }
 };
 
 export const fetchSpecialRates = async () => {

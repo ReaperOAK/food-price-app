@@ -115,35 +115,47 @@ const MainPage = () => {
       "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
       "availability": "https://schema.org/InStock"
     }
-  }), [displayName, today, priceMetrics.todayRate, priceMetrics.trayPrice]);
-
-  // Update selectedState and selectedCity when URL parameters change
+  }), [displayName, today, priceMetrics.todayRate, priceMetrics.trayPrice]);  // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {
-    if (stateParam) {
-      const newState = stateParam.replace('-egg-rate', '');
-      if (selectedState !== newState) {
-        setSelectedState(newState);
-        loadCities(newState);
-        setSelectedCity('');
-      }
-    }
-    if (cityParam) {
-      const newCity = cityParam.replace('-egg-rate', '');
-      if (selectedCity !== newCity) {
-        setSelectedCity(newCity);
-        loadStateForCity(newCity).then(state => {
-          if (state) {
-            setSelectedState(state);
-            loadCities(state);
+    const updateStateFromUrl = async () => {
+      // Handle city parameter
+      if (cityParam) {
+        const newCity = validateCityParam(cityParam);
+        if (newCity && newCity !== selectedCity) {
+          setSelectedCity(newCity);
+          // Load state for the city
+          try {
+            const stateForCity = await loadStateForCity(newCity);
+            if (stateForCity && stateForCity !== selectedState) {
+              setSelectedState(stateForCity);
+              loadCities(stateForCity);
+            }
+          } catch (error) {
+            console.error('Error loading state for city:', error);
           }
-        });
+        }
       }
-    }
-    if (!stateParam && !cityParam && (selectedState || selectedCity)) {
-      setSelectedCity('');
-      setSelectedState('');
-    }
-  }, [stateParam, cityParam, loadStateForCity, loadCities, selectedState, selectedCity]);
+      // Handle state parameter (only if no city)
+      else if (stateParam) {
+        const newState = stateParam.replace('-egg-rate', '');
+        if (newState !== selectedState) {
+          setSelectedState(newState);
+          setSelectedCity(''); // Clear city when navigating to state
+          loadCities(newState);
+        }
+      }
+      // Handle home page (no parameters)
+      else if (!stateParam && !cityParam) {
+        if (selectedState || selectedCity) {
+          setSelectedCity('');
+          setSelectedState('');
+        }
+      }
+    };
+
+    updateStateFromUrl();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stateParam, cityParam, loadStateForCity, loadCities]); // Intentionally excluding selectedState and selectedCity to prevent circular dependencies
   
   // Loading skeleton component with content-visibility optimization
   const LoadingComponent = () => (

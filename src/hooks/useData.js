@@ -45,12 +45,27 @@ export const useRates = (selectedCity, selectedState) => {
     const loadRates = async () => {
       setLoading(true);
       try {
+        // Always fetch both rates and special rates
         const [ratesData, specialRatesData] = await Promise.all([
           fetchRates(selectedCity, selectedState),
           fetchSpecialRates()
         ]);
-        setEggRates(ratesData);
-        setSpecialRates(specialRatesData);
+        
+        // Update state only if data is valid
+        if (Array.isArray(ratesData)) {
+          setEggRates(ratesData);
+        } else {
+          console.warn('Invalid rates data received:', ratesData);
+          setEggRates([]);
+        }
+        
+        if (Array.isArray(specialRatesData)) {
+          setSpecialRates(specialRatesData);
+        } else {
+          console.warn('Invalid special rates data received:', specialRatesData);
+          setSpecialRates([]);
+        }
+        
       } catch (error) {
         console.error('Error fetching rates:', error);
         setEggRates([]);
@@ -60,6 +75,8 @@ export const useRates = (selectedCity, selectedState) => {
       }
     };
 
+    // Always load rates, even if selectedCity and selectedState are empty
+    // This ensures API calls are made consistently
     loadRates();
   }, [selectedCity, selectedState]);
 

@@ -104,7 +104,6 @@ const Navbar = memo(({
     }
     return cityName;
   }, []);
-
   const handleChange = useCallback((selectedOption) => {
     if (!selectedOption || navigationLock.current) return;
     
@@ -117,18 +116,23 @@ const Navbar = memo(({
       return;
     }
 
+    // Update state immediately to trigger API calls
     setSelectedCity(selectedCityName);
     setSelectedState(state || '');
     
+    // Navigate after state update
     requestAnimationFrame(() => {
       const path = `/${selectedCityName?.toLowerCase?.() || ''}-egg-rate`;
       if (location.pathname !== path) {
-        navigate(path, { replace: true });
+        navigate(path, { replace: false }); // Use replace: false to ensure proper navigation
       }
-      navigationLock.current = false;
+      
+      // Reset navigation lock after a short delay
+      setTimeout(() => {
+        navigationLock.current = false;
+      }, 100);
     });
-  }, [navigate, location.pathname, setSelectedCity, setSelectedState, standardizeCityName]);
-  const handleHomeClick = useCallback((e) => {
+  }, [navigate, location.pathname, setSelectedCity, setSelectedState, standardizeCityName]);  const handleHomeClick = useCallback((e) => {
     if (navigationLock.current) {
       e.preventDefault();
       return;
@@ -136,41 +140,46 @@ const Navbar = memo(({
     
     navigationLock.current = true;
     
-    // Set state to empty first and wait for it to take effect
-    Promise.resolve()
-      .then(() => {
-        setSelectedCity('');
-        setSelectedState('');
-        return new Promise(resolve => setTimeout(resolve, 0));
-      })
-      .then(() => {
-        if (location.pathname !== '/') {
-          navigate('/');
-        }
+    // Clear state immediately to trigger API calls
+    setSelectedCity('');
+    setSelectedState('');
+    
+    // Navigate after state update
+    requestAnimationFrame(() => {
+      if (location.pathname !== '/') {
+        navigate('/');
+      }
+      
+      // Reset navigation lock after a short delay
+      setTimeout(() => {
         navigationLock.current = false;
-      });
-  }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
-  const handleCityClick = useCallback((city, e) => {
+      }, 100);
+    });
+  }, [navigate, location.pathname, setSelectedCity, setSelectedState]);  const handleCityClick = useCallback((city, e) => {
     if (navigationLock.current || !city) {
       e?.preventDefault();
       return;
     }
     
     navigationLock.current = true;
-      Promise.resolve().then(() => {
-        setSelectedCity(city);
-        setSelectedState('');
-        return new Promise(resolve => setTimeout(resolve, 0));
-      })
-      .then(() => {
-        // Safely handle city name conversion
-        const cityName = city && typeof city === 'string' ? city : '';
-        const path = cityName ? `/${cityName.toLowerCase()}-egg-rate` : '/';
-        if (location.pathname !== path) {
-          navigate(path, { replace: true });
-        }
+    
+    // Update state immediately to trigger API calls
+    setSelectedCity(city);
+    setSelectedState('');
+    
+    // Navigate after state update
+    requestAnimationFrame(() => {
+      const cityName = city && typeof city === 'string' ? city : '';
+      const path = cityName ? `/${cityName.toLowerCase()}-egg-rate` : '/';
+      if (location.pathname !== path) {
+        navigate(path, { replace: false }); // Use replace: false to ensure proper navigation
+      }
+      
+      // Reset navigation lock after a short delay
+      setTimeout(() => {
         navigationLock.current = false;
-      });
+      }, 100);
+    });
   }, [navigate, location.pathname, setSelectedCity, setSelectedState]);
 
   const toggleMenu = useCallback(() => {
