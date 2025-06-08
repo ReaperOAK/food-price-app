@@ -73,19 +73,18 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
   const content = getLocalizedContent();
 
   return (
-    <Helmet>
-      {/* International SEO meta tags */}
-      <meta name="international-audience" content={userCountry} />
-      <meta name="target-country" content={userCountry} />
+    <Helmet>      {/* International SEO meta tags */}
+      <meta name="international-audience" content={String(userCountry || '')} />
+      <meta name="target-country" content={String(userCountry || '')} />
       <meta name="diaspora-content" content="true" />
       
       {/* Alternate titles and descriptions for international audience */}
-      <meta name="alternate-title" content={content.title} />
-      <meta name="alternate-description" content={content.description} />
+      <meta name="alternate-title" content={String(content.title || '')} />
+      <meta name="alternate-description" content={String(content.description || '')} />
       <meta name="geo.region" content={userCountry === 'United Arab Emirates' ? 'AE' : 'IN'} />
       
       {/* International keywords */}
-      <meta name="international-keywords" content={content.keywords.join(', ')} />
+      <meta name="international-keywords" content={String(content.keywords?.join(', ') || '')} />
       
       {/* Currency-specific structured data */}
       <script type="application/ld+json">
