@@ -74,23 +74,27 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
     const currentTime = getCurrentTime();
     return `🔴 ${urgencyWord}: ${selectedCity} Egg Rate ₹${formatPrice(todayRate)}/egg | Updated ${currentTime} | NECC Live`;
   };
-
   const getCompellingDescription = () => {
     const currentTime = getCurrentTime();
     const priceChange = Math.random() > 0.5 ? '↗️ +₹0.50' : '↘️ -₹0.30'; // Simulated change
+    const safeMarkets = (cityData.majorMarkets || []).filter(m => m && String(m).trim()).slice(0, 2);
     
-    return `⚡ BREAKING: ${selectedCity} (${cityData.localContext}) egg rates LIVE at ₹${formatPrice(todayRate)}/egg ${priceChange} | Tray: ₹${formatPrice(trayPrice)} | Updated ${currentTime} | Major markets: ${cityData.majorMarkets.slice(0,2).join(', ')} | Get wholesale prices, trends & forecasts NOW!`;
-  };  // Safe string conversion function to prevent toLowerCase errors
+    return `⚡ BREAKING: ${selectedCity} (${String(cityData.localContext || '')}) egg rates LIVE at ₹${formatPrice(todayRate)}/egg ${priceChange} | Tray: ₹${formatPrice(trayPrice)} | Updated ${currentTime} | Major markets: ${safeMarkets.join(', ')} | Get wholesale prices, trends & forecasts NOW!`;
+  };// Safe string conversion function to prevent toLowerCase errors
   const safeToLowerCase = (value) => {
     if (!value) return '';
     return String(value).toLowerCase();
   };
-
   const getCitySpecificKeywords = () => {
     const cityLower = safeToLowerCase(selectedCity);
     const contextLower = safeToLowerCase(cityData?.localContext);
     
-    return [
+    // Ensure all market keywords are valid strings
+    const marketKeywords = (cityData?.majorMarkets || [])
+      .filter(market => market && String(market).trim()) // Filter out null/undefined/empty values
+      .map(market => `${safeToLowerCase(market)} egg rate`);
+    
+    const keywords = [
       `${cityLower} egg rate live`,
       `${cityLower} necc rate breaking`,
       `${cityLower} egg price now`,
@@ -98,13 +102,15 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
       `${cityLower} egg market live`,
       `${cityLower} egg rate update`,
       `${cityLower} ${contextLower} egg rate`,
-      ...(cityData?.majorMarkets || []).map(market => `${safeToLowerCase(market)} egg rate`),
+      ...marketKeywords,
       `${cityLower} egg rate comparison`,
       `${cityLower} egg price forecast`,
       'live egg rates',
       'breaking egg prices',
       'urgent egg rate update'
-    ];
+    ].filter(keyword => keyword && String(keyword).trim()); // Filter out any empty or invalid keywords
+    
+    return keywords;
   };
 
   return (
@@ -199,7 +205,7 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
               "name": `Where can I buy eggs at NECC rates in ${selectedCity}?`,
               "acceptedAnswer": {
                 "@type": "Answer",
-                "text": `Major wholesale markets in ${selectedCity} offering NECC rates: ${cityData.majorMarkets.join(', ')}. These markets follow official NECC pricing guidelines.`
+                "text": `Major wholesale markets in ${selectedCity} offering NECC rates: ${(cityData.majorMarkets || []).filter(m => m && String(m).trim()).join(', ')}. These markets follow official NECC pricing guidelines.`
               }
             },
             {
@@ -212,19 +218,16 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
             }
           ]
         })}
-      </script>
-
-      {/* Enhanced keywords for CTR optimization */}
-      <meta name="ctr-keywords" content={getCitySpecificKeywords().join(', ')} />
+      </script>      {/* Enhanced keywords for CTR optimization */}
+      <meta name="ctr-keywords" content={getCitySpecificKeywords().filter(k => k).join(', ')} />
       
       {/* Social media CTR optimization */}
       <meta property="og:title" content={getUrgentTitle()} />
       <meta property="og:description" content={getCompellingDescription()} />
       <meta name="twitter:title" content={getUrgentTitle()} />
       <meta name="twitter:description" content={getCompellingDescription()} />
-      
-      {/* Rich results enhancement */}
-      <meta name="news_keywords" content={`${selectedCity}, egg rates, NECC, live prices, breaking news, ${cityData.localContext}`} />
+        {/* Rich results enhancement */}
+      <meta name="news_keywords" content={`${selectedCity}, egg rates, NECC, live prices, breaking news, ${String(cityData.localContext || '')}`} />
     </Helmet>
   );
 });
