@@ -19,56 +19,40 @@ const formatPrice = (price) => {
 
 export const getUniqueH1 = (selectedCity, selectedState, today = getFormattedDate()) => {
   if (selectedCity) {
-    return `Today Egg Rate in ${selectedCity} - Egg Rate Today ${selectedCity}`;
+    return `Today Egg Rate in ${selectedCity} - Eggs in India Price ${today}`;
   } else if (selectedState) {
-    return `${selectedState} Egg Rate Today - Today Egg Rate ${selectedState}`;
+    return `${selectedState} Egg Rate Today - Today Egg Rate Eggs in India`;
   } else {
-    return `India Egg Rates Today - NECC Live Price Updates`;
+    return `Eggs in India - Today Egg Rate NECC Live Updates`;
   }
 };
 
 export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   const formattedRate = formatPrice(todayRate);
   
-  // Helper function to truncate title if it exceeds 60 characters
-  const truncateTitle = (title, maxLength = 60) => {
+  // Helper function to truncate title if it exceeds 60 characters for better SERP display
+  const truncateTitle = (title, maxLength = 58) => {
     if (title.length <= maxLength) return title;
     return title.substring(0, maxLength - 3) + '...';
-  };
-  
-  // Helper function to get short state names for better SEO
-  const getShortStateName = (stateName) => {
-    const stateShortNames = {
-      'andhra-pradesh': 'AP',
-      'arunachal-pradesh': 'Arunachal',
-      'himachal-pradesh': 'HP',
-      'jammu-and-kashmir': 'J&K',
-      'madhya-pradesh': 'MP',
-      'tamil-nadu': 'TN',
-      'uttar-pradesh': 'UP',
-      'west-bengal': 'WB'
-    };
-    return stateShortNames[stateName] || stateName;
   };
   
   if (selectedCity) {
     // Handle N/A prices gracefully in titles
     if (todayRate === 'N/A' || !todayRate || todayRate === null || todayRate === undefined) {
-      const title = `${selectedCity} Egg Rate Today - Live NECC Prices`;
+      const title = `Today Egg Rate ${selectedCity} - Eggs in India Live`;
       return truncateTitle(title);
     }
     
-    // Centralized title format for ALL cities - no special treatment
-    const cityTitle = `${selectedCity} Egg Rate: ₹${formattedRate}/egg | ${today}`;
+    // Optimized title format with target keywords
+    const cityTitle = `Today Egg Rate ${selectedCity} ₹${formattedRate} | Eggs India`;
     return truncateTitle(cityTitle);
     
   } else if (selectedState) {
-    const shortStateName = getShortStateName(selectedState);
-    const stateTitle = `${shortStateName} Egg Rate: Live Prices ${today}`;
+    const stateTitle = `${selectedState} Egg Rate Today - Eggs in India Live`;
     return truncateTitle(stateTitle);
     
   } else {
-    return `India Egg Rates: Live NECC Prices | ${today}`;
+    return `Today Egg Rate India - Eggs in India NECC Live`;
   }
 };
 
@@ -78,8 +62,8 @@ export const getSeoDescription = (selectedCity, selectedState, todayRate, today 
     if (desc.length <= maxLength) return desc;
     return desc.substring(0, maxLength - 3) + '...';
   };
-  
-  // Helper function to get state context for cities
+  // Helper function to get state context for cities (future use)
+  /*
   const getStateContext = (city) => {
     const stateMapping = {
       'Mumbai': 'Maharashtra',
@@ -111,33 +95,31 @@ export const getSeoDescription = (selectedCity, selectedState, todayRate, today 
     };
     return stateMapping[city] || selectedState || 'markets';
   };
-  
-  if (selectedCity) {
+  */
+    if (selectedCity) {
     // Handle N/A prices gracefully
     if (todayRate === 'N/A' || !todayRate || todayRate === null || todayRate === undefined) {
-      const desc = `Live egg rates ${selectedCity} (${today}). Check latest NECC prices, wholesale & retail rates. Daily market updates from ${selectedCity} egg markets. Compare rates across India.`;
+      const desc = `Today egg rate in ${selectedCity} - Live NECC prices & market updates. Check eggs in India wholesale rates daily. Current market trends ${today}.`;
       return truncateDescription(desc);
     }
     
     const trayPrice = formatPrice(todayRate * 30);
-    const stateContext = getStateContext(selectedCity);
     
-    // Centralized comprehensive description for ALL cities - no special treatment
-    const cityDesc = `${selectedCity} egg rate today: ₹${formatPrice(todayRate)}/egg, ₹${trayPrice}/tray (${today}). Live NECC prices, wholesale rates & market trends across ${stateContext}. Compare egg prices nationwide.`;
+    // Optimized description with target keywords for better CTR
+    const cityDesc = `Today egg rate ${selectedCity}: ₹${formatPrice(todayRate)}/egg. Eggs in India market update ${today}. Live NECC prices, wholesale ₹${trayPrice}/tray rates.`;
     return truncateDescription(cityDesc);
     
   } else if (selectedState) {
-    const stateDesc = `Live egg rates ${selectedState} (${today}): Latest NECC prices from major markets. Daily updates, wholesale rates & price comparisons across all cities in ${selectedState}.`;
+    const stateDesc = `${selectedState} egg rate today - Live NECC prices & eggs in India market updates. Today egg rate from major cities ${today}. Daily wholesale rates.`;
     return truncateDescription(stateDesc);
     
   } else {
-    const mainDesc = `Live egg rates India (${today}): Latest NECC prices from 100+ cities. Compare today's egg rates, wholesale prices & market trends across all states. Daily NECC updates.`;
+    const mainDesc = `Today egg rate India - Live NECC prices from 100+ cities. Eggs in India market updates ${today}. Compare wholesale & retail rates nationwide.`;
     return truncateDescription(mainDesc);
   }
 };
 
-export const getSeoKeywords = (selectedCity, selectedState) => {
-  const baseKeywords = [
+export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeywords = [
     'necc egg rate',
     'necc rate',
     'egg rate today',
@@ -168,7 +150,27 @@ export const getSeoKeywords = (selectedCity, selectedState) => {
     'egg suppliers',
     'poultry farms',
     'egg prices',
-    'daily egg'
+    'daily egg',
+    // Enhanced semantic keywords from Semrush recommendations
+    'brown egg',
+    'fatty acids',
+    'farm fresh',
+    'organic eggs',
+    'free range eggs',
+    'protein rich',
+    'healthy breakfast',
+    'nutrition facts',
+    'cholesterol free',
+    'vitamin d',
+    'omega 3 eggs',
+    'cage free',
+    'local farms',
+    'fresh produce',
+    'eggs in india',
+    'indian eggs',
+    'desi eggs',
+    'country eggs',
+    'village eggs'
   ];
   
   // International SEO keywords for diaspora communities

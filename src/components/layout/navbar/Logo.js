@@ -14,10 +14,9 @@ const Logo = memo(() => {
       `}
       aria-label="Food Price App"
     >
-      {!hasError ? (
-        <OptimizedImage
+      {!hasError ? (        <OptimizedImage
           src="/logo.webp"
-          alt="Food Price App Logo"
+          alt="Today Egg Rates - Eggs in India Price Tracker"
           className="w-full h-full object-contain transform-gpu"
           width={192}
           height={64}
@@ -41,7 +40,7 @@ const Logo = memo(() => {
         <div className="flex items-center justify-center w-full h-full">
           <img
             src="/Favicon.ico"
-            alt="Food Price App Logo"
+            alt="Today Egg Rates - Eggs in India Price Tracker"
             className="w-8 h-8 object-contain"
             width={32}
             height={32}

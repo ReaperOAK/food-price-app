@@ -27,7 +27,7 @@ const EggRates = () => {
   return (
     <div>
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">Eggs and Egg Prices in Barwala, Hisar: A Comprehensive Overview</h1>
-      <OptimizedImage src="/desiegg.webp" alt="Egg Rates Banner" className="w-full mb-8 rounded-lg shadow-md" width={400} height={300} />
+      <OptimizedImage src="/desiegg.webp" alt="Fresh eggs in India market - Barwala egg rate today with farm fresh produce" className="w-full mb-8 rounded-lg shadow-md" width={400} height={300} />
       
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Introduction</h2>
@@ -80,31 +80,27 @@ const EggRates = () => {
           <li><b>Freshness:</b> Eggs from Barwala are delivered to local markets and stores within hours of being laid. This ensures unmatched freshness, which is crucial for taste and nutritional value.
           </li>
           <li><b>Nutritional Value:</b> Thanks to the balanced diets provided to the hens, Barwala's eggs are rich in high-quality protein, vitamins, and minerals. Some farms even produce omega-3 enriched eggs, catering to health-conscious consumers.</li>
-          <li><b>Affordability:</b> Despite their premium quality, Barwala's eggs remain affordable, making them a favorite among households and businesses alike.</li>
-        </ul>
-        <OptimizedImage src="/eggchicken.webp" alt="Egg Production" className="w-full mb-8 rounded-lg shadow-md" width={300} height={200} />
+          <li><b>Affordability:</b> Despite their premium quality, Barwala's eggs remain affordable, making them a favorite among households and businesses alike.</li>        </ul>
+        <OptimizedImage src="/eggchicken.webp" alt="Farm fresh eggs production in India - poultry farming with brown egg varieties" className="w-full mb-8 rounded-lg shadow-md" width={300} height={200} />
       </section>
       
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Seasonal Trends and eggs Price Fluctuations</h2>
         <p className="text-lg text-gray-600 mb-4">
-            Egg prices in Barwala tend to rise during the winter months due to increased demand for high-protein foods. Additionally, festivals and wedding seasons can also contribute to temporary price spikes. Conversely, prices may dip slightly during the summer when demand is relatively lower. Understanding these seasonal trends can help consumers plan their purchases more effectively.
-        </p>
-        <OptimizedImage src="/eggpic.webp" alt="Egg Price Chart" className="w-full mb-8 rounded-lg shadow-md" width={300} height={200} />
+            Egg prices in Barwala tend to rise during the winter months due to increased demand for high-protein foods. Additionally, festivals and wedding seasons can also contribute to temporary price spikes. Conversely, prices may dip slightly during the summer when demand is relatively lower. Understanding these seasonal trends can help consumers plan their purchases more effectively.        </p>
+        <OptimizedImage src="/eggpic.webp" alt="Eggs in India price chart - today egg rate trends and market analysis" className="w-full mb-8 rounded-lg shadow-md" width={300} height={200} />
       </section>
 
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Supporting Local Farmers</h2>
-        <p className="text-lg text-gray-600 mb-4">
-        Choosing eggs from Barwala not only ensures access to a superior product but also supports local farmers and their sustainable practices. By purchasing locally produced eggs, consumers contribute to the economic well-being of the community and encourage environmentally friendly farming methods.</p>
-        <OptimizedImage src="/eggpic.webp" alt="Egg Price Chart" className="w-full mb-8 rounded-lg shadow-md" width={300} height={200} />
+        <p className="text-lg text-gray-600 mb-4">        Choosing eggs from Barwala not only ensures access to a superior product but also supports local farmers and their sustainable practices. By purchasing locally produced eggs, consumers contribute to the economic well-being of the community and encourage environmentally friendly farming methods.</p>
+        <OptimizedImage src="/eggpic.webp" alt="Farm fresh eggs in India - supporting local farmers with sustainable egg production" className="w-full mb-8 rounded-lg shadow-md" width={300} height={200} />
       </section>
 
       <section className="mb-8">
         <h2 className="text-3xl font-semibold text-gray-700 mb-4">Visiting Barwala's Market</h2>
-        <p className="text-lg text-gray-600 mb-4">
-        If you're in or near Hisar, visiting Barwala's markets is a must. These bustling hubs offer a variety of fresh produce, including the famous eggs. Engaging with local vendors provides a glimpse into the hard work and dedication that goes into every carton of eggs sold.</p>
-        <OptimizedImage src="/eggpic.webp" alt="Egg Price Chart" className="w-full mb-8 rounded-lg shadow-md" width={300} height={200} />
+        <p className="text-lg text-gray-600 mb-4">        If you're in or near Hisar, visiting Barwala's markets is a must. These bustling hubs offer a variety of fresh produce, including the famous eggs. Engaging with local vendors provides a glimpse into the hard work and dedication that goes into every carton of eggs sold.</p>
+        <OptimizedImage src="/eggpic.webp" alt="Fresh eggs in India market - Barwala wholesale egg rates and local vendors" className="w-full mb-8 rounded-lg shadow-md" width={300} height={200} />
       </section>
 
       <section className="mb-8">

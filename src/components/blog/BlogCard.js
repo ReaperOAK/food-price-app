@@ -25,7 +25,7 @@ const BlogCard = ({ blog, priority = false }) => {
         <div className="relative aspect-w-16 aspect-h-9 overflow-hidden">
           <OptimizedImage
             src={blog.image}
-            alt={blog.title}
+            alt={`${blog.title} - Fresh eggs in India market insights and farm fresh eggs analysis`}
             className="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-300"
             width={600}
             height={338}

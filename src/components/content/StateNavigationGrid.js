@@ -41,12 +41,12 @@ const StateNavigationGrid = memo(({ selectedState }) => {
 
   return (
     <section className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-800 dark:to-gray-900 rounded-2xl p-8 shadow-lg">
-      <div className="text-center mb-8">
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-          Explore Egg Rates Across India
+      <div className="text-center mb-8">        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+          Farm Fresh Eggs in India Market Guide
         </h3>
         <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          Compare egg prices and market trends across different states. Get insights into regional variations and market dynamics.
+          Compare fresh eggs in India prices and organic eggs market trends across different states. 
+          Get insights into brown egg varieties, cage free eggs, and farm fresh eggs regional variations and market dynamics.
         </p>
       </div>
 

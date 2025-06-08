@@ -52,13 +52,12 @@ const PriceOverview = memo(({
               month: 'long',
               year: 'numeric'
             })}
-          </p>
-          <p className="relative text-center text-blue-200 text-base sm:text-lg">
+          </p>          <p className="relative text-center text-blue-200 text-base sm:text-lg">
             {selectedCity 
-              ? `Latest wholesale and retail prices for ${locationDescription}`
+              ? `Latest farm fresh eggs in India wholesale and retail prices for ${locationDescription}`
               : selectedState
-                ? `Compare rates across ${locationDescription} cities`
-                : 'Daily NECC rates from major Indian cities'
+                ? `Compare organic eggs and brown egg varieties rates across ${locationDescription} cities`
+                : 'Daily NECC fresh eggs in India rates from major Indian cities'
             }
           </p>
         </div>

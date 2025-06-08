@@ -15,18 +15,16 @@ const CityMarketInsights = memo(({ selectedCity, selectedState, todayRate, trayP
 
   // Generic market insights that apply to all cities
   const getMarketInsights = () => {
-    const insights = [
-      {
+    const insights = [      {
         title: `Egg Market Dynamics in ${selectedCity}`,
-        content: `The egg market in ${selectedCity}, ${selectedState} is influenced by various factors including local demand, transportation costs, and seasonal variations. Today's egg rate of ₹${formatPrice(todayRate)} per egg reflects current market conditions and NECC guidelines.`
+        content: `The egg market in ${selectedCity}, ${selectedState} is influenced by various factors including local demand, transportation costs, and seasonal variations. Today's egg rate of ₹${formatPrice(todayRate)} per egg reflects current market conditions and NECC guidelines. Fresh eggs in India markets offer brown egg varieties, farm fresh produce, and organic eggs with essential fatty acids and protein rich nutrition for healthy breakfast options.`
       },
       {
         title: `Wholesale vs Retail Prices`,
         content: `Wholesale egg rates in ${selectedCity} typically offer better value for bulk buyers. A tray of 30 eggs is priced at ₹${formatPrice(trayPrice)}, making it economical for restaurants, bakeries, and large families.`
-      },
-      {
+      },      {
         title: `Quality and Freshness Standards`,
-        content: `Eggs available in ${selectedCity} markets follow strict quality standards. Local vendors ensure freshness by maintaining proper storage conditions and quick turnover, guaranteeing consumers get the best value for their money.`
+        content: `Eggs available in ${selectedCity} markets follow strict quality standards. Local vendors ensure freshness by maintaining proper storage conditions and quick turnover, guaranteeing consumers get the best value for their money. Farm fresh eggs in India include desi eggs, village eggs, and free range eggs with higher vitamin D content and cholesterol free nutrition facts for health-conscious consumers.`
       },
       {
         title: `Seasonal Price Trends`,

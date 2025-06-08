@@ -11,12 +11,11 @@ const PriceTrendsWidget = memo(({ today, todayRate, rate7DaysAgo }) => {
       role="region" 
       aria-label="Price Trends Overview"
     >
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+      <div className="flex items-center justify-between mb-6">        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
           <svg className="w-6 h-6 mr-2 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
           </svg>
-          <span>Price Trends</span>
+          <span>Fresh Eggs in India Price Trends</span>
         </h2>
         <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Last 30 days</span>
       </div>
@@ -27,7 +26,7 @@ const PriceTrendsWidget = memo(({ today, todayRate, rate7DaysAgo }) => {
                        rounded-xl p-5 transform transition-all duration-300 hover:shadow-md hover:scale-102
                        hover:-translate-y-1 border border-blue-100 dark:border-blue-800">
           <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100">Today's Rate</h3>
+            <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100">Farm Fresh Eggs Rate</h3>
             <span className="text-xs text-blue-600 dark:text-blue-300" aria-label={`Price as of ${today}`}>
               {today}
             </span>

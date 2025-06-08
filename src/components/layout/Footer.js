@@ -84,9 +84,8 @@ const Footer = memo(() => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-8 mb-12">
           {/* Brand section */}
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-white dark:text-gray-100 mb-4">Today Egg Rates</h2>
-            <p className="text-gray-200 dark:text-gray-300 text-base sm:text-sm leading-relaxed max-w-xs">
-              Your trusted source for daily egg price updates across India. Get reliable, up-to-date information about egg rates in your city.
+            <h2 className="text-2xl font-bold text-white dark:text-gray-100 mb-4">Today Egg Rates</h2>            <p className="text-gray-200 dark:text-gray-300 text-base sm:text-sm leading-relaxed max-w-xs">
+              Your trusted source for daily egg price updates across India. Get reliable, up-to-date information about egg rates in your city. Fresh eggs in India, farm fresh produce, brown egg varieties, and organic eggs with nutrition facts for healthy breakfast choices.
             </p>
           </div>
 

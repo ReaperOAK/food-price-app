@@ -14,7 +14,7 @@ const EggRates = () => {
       <header className="relative mb-12">
         <OptimizedImage 
           src="/desiegg.webp" 
-          alt="Fresh eggs in a traditional Indian market setting" 
+          alt="Fresh eggs in India traditional market - farm fresh brown egg varieties with nutrition facts" 
           className="w-full h-[60vh] object-cover rounded-xl shadow-lg"
           width={1200}
           height={600}
@@ -30,9 +30,8 @@ const EggRates = () => {
       <section className="mb-12 max-w-prose mx-auto" aria-labelledby="introduction">
         <h2 id="introduction" className="text-2xl md:text-3xl font-semibold text-gray-700 dark:text-gray-200 mb-6">
           Introduction
-        </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-          Eggs are a staple food in many households across India. Understanding the factors that influence egg rates can help consumers make informed purchasing decisions and farmers optimize their production strategies.
+        </h2>        <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+          Eggs are a staple food in many households across India. Understanding the factors that influence egg rates can help consumers make informed purchasing decisions and farmers optimize their production strategies. Fresh eggs in India include farm fresh varieties, brown egg options, desi eggs, and organic eggs with essential fatty acids, protein rich nutrition, and vitamin D for healthy breakfast meals.
         </p>
       </section>
 
@@ -101,7 +100,7 @@ const EggRates = () => {
           <div className="relative">
             <OptimizedImage 
               src="/eggchicken.webp" 
-              alt="Modern poultry farm showing egg production facilities" 
+              alt="Modern poultry farm producing fresh eggs in India with cage free and organic options" 
               className="rounded-xl shadow-lg"
               width={600}
               height={400}
@@ -128,7 +127,7 @@ const EggRates = () => {
           <div className="relative">
             <OptimizedImage 
               src="/eggpic.webp" 
-              alt="Graph showing egg price trends over time" 
+              alt="Eggs in India price trends graph - market analysis and today egg rate patterns" 
               className="rounded-xl shadow-lg"
               width={600}
               height={400}

@@ -45,10 +45,9 @@ const DetailedEggInfo = memo(({ selectedCity, selectedState }) => {
           <div className="bg-gradient-to-r from-green-50 to-green-100 dark:from-gray-800 dark:to-gray-700 rounded-lg p-6 h-full">
             <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white mb-4">
               NECC-National Egg Coordination Committee
-            </h2>
-            <div className="space-y-4">
+            </h2>            <div className="space-y-4">
               <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-                Eggs are a fantastic addition to any meal, whether it's breakfast, lunch, or dinner! You can enjoy them scrambled or boiled, and they work wonderfully in dishes like Anda Bhurji or even Anda Ka Halwa. Just like us Indians, eggs can fit into a variety of recipes while keeping their special charm. If you're curious about egg prices in India, they change daily, as shared by the NECC (National Egg Coordination Committee). We make it easy for you to stay updated with the latest egg rates so you can continue enjoying your favorite egg dishes!
+                Eggs in India are a fantastic addition to any meal, whether it's a healthy breakfast, lunch, or dinner! You can enjoy fresh eggs scrambled or boiled, and they work wonderfully in dishes like Anda Bhurji or Anda Ka Halwa. Farm fresh eggs, including brown egg varieties and desi eggs, provide essential fatty acids, protein-rich nutrition, and vitamin D. Today egg rate in India changes daily as shared by NECC. We help you stay updated with the latest egg rate today for fresh eggs in India, including organic eggs and cage-free options from local farms.
               </p>
             </div>
           </div>

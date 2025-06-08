@@ -23,6 +23,7 @@ const PriceTrends = lazy(() => import('../components/prices/PriceTrends'));
 const CityMarketInsights = lazy(() => import('../components/content/CityMarketInsights'));
 const RelatedCityLinks = lazy(() => import('../components/content/RelatedCityLinks'));
 const StateNavigationGrid = lazy(() => import('../components/content/StateNavigationGrid'));
+const EggsIndiaContent = lazy(() => import('../components/seo/EggsIndiaContent'));
 
 const MainPage = () => {
   // URL and location parameters
@@ -325,6 +326,14 @@ const MainPage = () => {
                   <DetailedEggInfo 
                     selectedCity={selectedCity} 
                     selectedState={selectedState} 
+                  />
+                </section>
+
+                {/* Eggs in India Content Section - Enhanced SEO */}
+                <section aria-label="Comprehensive Guide to Eggs in India">
+                  <EggsIndiaContent 
+                    selectedCity={selectedCity}
+                    selectedState={selectedState}
                   />
                 </section>
 

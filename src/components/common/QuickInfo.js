@@ -98,8 +98,7 @@ const QuickInfo = memo(({
           <span className="text-sm text-gray-600 dark:text-gray-300">Tray (30):</span>
           <span className="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
             ₹{formatPrice(trayPrice)}
-          </span>
-        </div>
+          </span>        </div>
 
         <div className="flex justify-between items-center pt-1 border-t border-gray-100 dark:border-gray-700">
           <span className="text-sm text-gray-600 dark:text-gray-300">Weekly Change:</span>
@@ -123,6 +122,21 @@ const QuickInfo = memo(({
               </span>
             )}
           </div>
+        </div>
+        
+        {/* Mini FAQ with semantic keywords */}
+        <div className="pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
+          <details className="text-xs text-gray-600 dark:text-gray-400">
+            <summary className="cursor-pointer font-medium hover:text-gray-800 dark:hover:text-gray-200">
+              Fresh Eggs in India Info ℹ️
+            </summary>
+            <div className="mt-1 space-y-1">
+              <p>• Farm fresh eggs with protein rich content</p>
+              <p>• Brown egg varieties and organic eggs available</p>
+              <p>• Cage free eggs with omega 3 fatty acids</p>
+              <p>• Daily fresh produce from local farms</p>
+            </div>
+          </details>
         </div>
       </div>
     </div>

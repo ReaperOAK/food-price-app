@@ -54,21 +54,19 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
               className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-600 
                          rounded-lg p-4 text-center hover:shadow-md transition-all duration-200 
                          hover:from-blue-100 hover:to-blue-200 dark:hover:from-gray-600 dark:hover:to-gray-500"
-            >
-              <p className="font-medium text-gray-900 dark:text-white text-sm">
+            >              <p className="font-medium text-gray-900 dark:text-white text-sm">
                 {cityData.city}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                Egg Rate Today
+                Fresh Eggs in India
               </p>
             </Link>
           ))}
         </div>
 
         {/* State-level links */}
-        <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
-          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
-            Explore State-wise Egg Rates
+        <div className="border-t border-gray-200 dark:border-gray-600 pt-6">          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+            Explore Farm Fresh Eggs by State Markets
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {relatedStates.map((state, index) => (
@@ -78,12 +76,11 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
                 className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 
                            rounded-lg p-3 text-center hover:shadow-md transition-all duration-200 
                            hover:from-green-100 hover:to-green-200 dark:hover:from-green-800/30 dark:hover:to-green-700/30"
-              >
-                <p className="font-medium text-gray-900 dark:text-white text-xs">
+              >                <p className="font-medium text-gray-900 dark:text-white text-xs">
                   {state}
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                  State Rates
+                  Eggs in India
                 </p>
               </Link>
             ))}

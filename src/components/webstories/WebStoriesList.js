@@ -125,7 +125,7 @@ const WebStoriesList = () => {
                 <div className="relative aspect-w-16 aspect-h-9">
                   <OptimizedImage
                     src={story.thumbnail}
-                    alt={`Egg Rate visualization for ${story.city}, ${story.state}`}
+                    alt={`Fresh eggs in India rate visualization for ${story.city}, ${story.state} - Brown egg varieties and organic eggs pricing`}
                     className="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-105"
                     width={400}
                     height={225}

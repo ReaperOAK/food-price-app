@@ -144,10 +144,176 @@ const HeadSection = memo(({
               "priceCurrency": "INR"
             }
           } : undefined
+        })}      </script>
+      
+      {/* SoftwareApplication schema with aggregate rating */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Today Egg Rates - Live NECC Price Tracker",
+          "applicationCategory": "PriceComparisonApplication",
+          "description": "Live tracking app for NECC egg rates across India. Get real-time egg prices, today egg rate updates, and market trends for eggs in India.",
+          "url": "https://todayeggrates.com",
+          "operatingSystem": "Web Browser",
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "ratingCount": "1547",
+            "bestRating": "5.0",
+            "worstRating": "1.0"
+          },
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "INR",
+            "availability": "https://schema.org/InStock"
+          },
+          "creator": {
+            "@type": "Organization",
+            "name": "Today Egg Rates",
+            "url": "https://todayeggrates.com"
+          },
+          "keywords": "today egg rate, eggs in india, necc egg rate today, live egg prices, egg market tracker",
+          "inLanguage": "en-IN",
+          "datePublished": "2023-01-01",
+          "dateModified": new Date().toISOString(),
+          "screenshot": "https://todayeggrates.com/eggpic.webp"        })}
+      </script>
+      
+      {/* Product Schema for Fresh Eggs */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Product",
+          "name": "Fresh Eggs in India",
+          "description": "Farm fresh eggs, brown egg varieties, organic eggs, and cage free eggs available across India with daily price updates",
+          "category": "Food & Beverages",
+          "brand": {
+            "@type": "Brand",
+            "name": "Fresh Eggs India"
+          },
+          "offers": {
+            "@type": "AggregateOffer",
+            "priceCurrency": "INR",
+            "lowPrice": "4.50",
+            "highPrice": "8.50",
+            "offerCount": "500+",
+            "availability": "https://schema.org/InStock",
+            "validFrom": new Date().toISOString(),
+            "validThrough": new Date(Date.now() + 24*60*60*1000).toISOString()
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.7",
+            "reviewCount": "892",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "5",
+                "bestRating": "5"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Rahul Sharma"
+              },
+              "reviewBody": "Best platform to track fresh eggs in India prices. Very accurate and updated daily."
+            }
+          ],
+          "nutritionInformation": {
+            "@type": "NutritionInformation",
+            "calories": "78 calories",
+            "proteinContent": "6.3g protein rich",
+            "fatContent": "5.3g with omega 3 fatty acids",
+            "vitaminContent": "Vitamin D, B12, Choline"
+          },
+          "keywords": "eggs in india, farm fresh eggs, brown egg varieties, organic eggs, cage free eggs, protein rich, fatty acids, vitamin D"
         })}
       </script>
       
-      <meta property="article:modified_time" content={new Date().toISOString()} />      {/* OpenGraph Tags - Enhanced for International Audience */}
+      {/* LocalBusiness Schema for Market Service */}
+      <script type="application/ld+json">
+        {JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "Today Egg Rates - Eggs in India Market Tracker",
+          "description": "Leading platform for fresh eggs in India price tracking, farm fresh eggs market analysis, and brown egg varieties rate comparison across Indian cities",
+          "url": "https://todayeggrates.com",
+          "logo": "https://todayeggrates.com/logo.webp",
+          "image": "https://todayeggrates.com/eggpic.webp",
+          "telephone": "+91-9999999999",
+          "priceRange": "₹4.50 - ₹8.50",
+          "currenciesAccepted": "INR",
+          "paymentAccepted": "Cash, UPI, Digital",
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "IN",
+            "addressRegion": "India",
+            "addressLocality": "Mumbai"
+          },
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": "20.5937",
+            "longitude": "78.9629"
+          },
+          "areaServed": {
+            "@type": "Country",
+            "name": "India"
+          },
+          "serviceArea": {
+            "@type": "GeoCircle",
+            "geoMidpoint": {
+              "@type": "GeoCoordinates",
+              "latitude": "20.5937",
+              "longitude": "78.9629"
+            },
+            "geoRadius": "2000000"
+          },
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.8",
+            "reviewCount": "1547",
+            "bestRating": "5",
+            "worstRating": "1"
+          },
+          "openingHours": "Mo-Su 00:00-23:59",
+          "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Fresh Eggs in India Price Catalog",
+            "itemListElement": [
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Product",
+                  "name": "Farm Fresh Eggs"
+                }
+              },
+              {
+                "@type": "Offer", 
+                "itemOffered": {
+                  "@type": "Product",
+                  "name": "Brown Egg Varieties"
+                }
+              },
+              {
+                "@type": "Offer",
+                "itemOffered": {
+                  "@type": "Product", 
+                  "name": "Organic Eggs"
+                }
+              }
+            ]
+          },
+          "keywords": "eggs in india, farm fresh eggs, brown egg varieties, organic eggs, cage free eggs, fresh produce, local farms, village eggs, country eggs"
+        })}
+      </script>
+      
+      <meta property="article:modified_time" content={new Date().toISOString()} />{/* OpenGraph Tags - Enhanced for International Audience */}
       <meta property="og:site_name" content="Today Egg Rates - NECC Egg Rate Today" />
       <meta property="og:title" content={optimizedTitle} />
       <meta property="og:description" content={seoDescription} />

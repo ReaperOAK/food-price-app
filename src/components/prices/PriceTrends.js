@@ -92,22 +92,21 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
             <section aria-labelledby="market-analysis" className="space-y-6">              <h2 id="market-analysis" className="text-xl sm:text-2xl font-semibold text-gray-800 dark:text-gray-100">
                 {location}
               </h2>
-              
-              <div className="prose prose-lg dark:prose-invert max-w-none">
+                <div className="prose prose-lg dark:prose-invert max-w-none">
                 <p className="text-gray-600 dark:text-gray-300">
-                  As per the latest report, the egg rate in {location} has reached ₹{formatPrice(todayRate)} per piece. But this is not the highest price for eggs in the city in the last one year. The price of eggs has been on the rise in the city for the last few months. The rise in the price of eggs is due to the increase in the cost of chicken feed. The cost of chicken feed has gone up by 10% in the last few months. This has led to an increase in the price of eggs in {location}.
+                  As per the latest report, the today egg rate in {location} has reached ₹{formatPrice(todayRate)} per piece for fresh eggs in India. This reflects current market conditions for eggs in India including brown egg varieties and farm fresh produce. The price of eggs has been influenced by factors affecting the egg rate today including chicken feed costs, transportation, and seasonal demand for protein-rich foods.
                 </p>
                 
                 <p className="text-gray-600 dark:text-gray-300 mt-4">
-                  Egg prices in {location} have been on the rise in recent months, due to a variety of factors. The cost of feed, transportation, and labor have all increased, leading to higher prices at the farm gate. Consumers are now paying more for eggs, with the average price of a tray of eggs now exceeding ₹{formatPrice(todayRate * 30)}. This is a significant increase from just a few years ago, when a tray of eggs could be purchased for as little as ₹{formatPrice(todayRate * 30 - 20)}. The higher prices are having an impact on egg consumption in {location}, as many families are cutting back on their consumption of this staple food. While the current situation is difficult for consumers, it is important to remember that egg prices are still relatively low compared to other staples such as rice and wheat.
+                  Egg prices in {location} have been rising due to increased costs of feed, transportation, and labor. Today egg rate for a tray (30 pieces) is ₹{formatPrice(todayRate * 30)}, making eggs in India a valuable source of protein, fatty acids, and vitamin D. These fresh eggs from local farms provide essential nutrition including omega-3 fatty acids for healthy breakfast options.
                 </p>
 
                 <p className="text-gray-600 dark:text-gray-300 mt-4">
-                  The current egg price situation in {location} is not likely to change in the near future, as the cost of production is still high. However, as the industry adjusts to the new reality of higher prices, egg production is likely to increase, which could help to bring prices down over time. In the meantime, consumers will need to continue to pay more for their eggs.
+                  The current egg rate today in {location} reflects market dynamics for eggs in India. Farm fresh eggs, including brown egg varieties and organic eggs from cage-free environments, provide excellent nutrition facts with high protein content. Despite higher prices, eggs remain an affordable source of essential fatty acids and vitamin D compared to other protein-rich foods.
                 </p>
 
                 <p className="text-gray-600 dark:text-gray-300 mt-4">
-                  Poultry farmers in {location} said they are incurring losses as the cost of chicken feed accounts for around 60 percent of the total cost of production.
+                  Local poultry farms in {location} focus on producing quality eggs in India, including desi eggs and country eggs from village farms. Today egg rate reflects production costs where chicken feed accounts for 60% of expenses for fresh produce from these farm-to-table operations.
                 </p>
               </div>
 

@@ -28,9 +28,8 @@ const BlogContent1 = () => {
 
       {/* Introduction */}
       <section className="mb-12" aria-labelledby="introduction">
-        <h2 id="introduction" className="text-2xl md:text-3xl font-semibold text-gray-700 dark:text-gray-200 mb-6">Introduction</h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-          Eggs are a staple in many households across India, providing a rich source of protein and essential nutrients. Whether you're a consumer, retailer, or wholesaler, staying updated with the latest egg rates is crucial. In this blog, we'll explore the current egg rates in various cities, including Barwala, Hyderabad, Namakkal, Delhi, Mumbai, and more. We'll also delve into the factors influencing these rates and how they impact the market.
+        <h2 id="introduction" className="text-2xl md:text-3xl font-semibold text-gray-700 dark:text-gray-200 mb-6">Introduction</h2>        <p className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
+          Eggs are a staple in many households across India, providing a rich source of protein and essential nutrients. Whether you're a consumer, retailer, or wholesaler, staying updated with the latest egg rates is crucial. In this blog, we'll explore the current egg rates in various cities, including Barwala, Hyderabad, Namakkal, Delhi, Mumbai, and more. We'll also delve into the factors influencing these rates and how they impact the market. Fresh eggs in India offer farm fresh quality with brown egg varieties, desi eggs, and organic eggs rich in fatty acids, vitamin D, and protein for healthy breakfast nutrition.
         </p>
       </section>
 
@@ -90,9 +89,8 @@ const BlogContent1 = () => {
         <section className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300" aria-labelledby="mumbai-rate">
           <h2 id="mumbai-rate" className="text-xl md:text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-4">
             Mumbai Egg Rate
-          </h2>
-          <p className="text-gray-600 dark:text-gray-300">
-            Mumbai, the financial capital of India, sees a high demand for eggs due to its diverse population and culinary preferences. The egg rate today in Mumbai is ₹6.40 per egg. The rates are influenced by the cost of transportation and the city's high living costs.
+          </h2>          <p className="text-gray-600 dark:text-gray-300">
+            Mumbai, the financial capital of India, sees a high demand for eggs due to its diverse population and culinary preferences. The egg rate today in Mumbai is ₹6.40 per egg. The rates are influenced by the cost of transportation and the city's high living costs. Fresh eggs in India markets like Mumbai offer farm fresh produce including brown egg varieties with essential fatty acids, protein rich nutrition, and vitamin D for healthy breakfast options.
           </p>
         </section>
       </div>

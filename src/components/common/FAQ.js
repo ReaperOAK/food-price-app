@@ -33,20 +33,18 @@ export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
 };
 
 // Function to generate the FAQ list (used by both schema and component)
-export const generateFaqList = (selectedCity, selectedState, currentRate, trayPrice, formattedDate) => {
-  // Default FAQs that appear on all pages
+export const generateFaqList = (selectedCity, selectedState, currentRate, trayPrice, formattedDate) => {  // Default FAQs that appear on all pages
   const defaultFAQs = [
     {
       question: `What is today's egg rate in India?`,
-      answer: `Today's egg rates in India vary by location. The national average NECC egg rate today (${formattedDate}) is continuously monitored and updated. Our real-time egg price tracking system provides live wholesale and retail egg rates from the National Egg Coordination Committee (NECC) for all major cities. Visit our homepage for comprehensive egg price updates across India's wholesale markets.`
+      answer: `Today's egg rates in India vary by location. The national average NECC egg rate today (${formattedDate}) for fresh eggs in India is continuously monitored and updated. Our real-time egg price tracking system provides live wholesale and retail egg rates from the National Egg Coordination Committee (NECC) for all major cities. Eggs in India market includes farm fresh eggs, brown egg varieties, and organic eggs. Visit our homepage for comprehensive egg price updates across India's wholesale markets.`
     },
     {
       question: `What is NECC egg rate today?`,
       answer: `The official NECC (National Egg Coordination Committee) egg rate today is meticulously tracked and updated on our platform. NECC announces daily wholesale and retail egg prices for different zones including Namakkal, Chennai, Delhi, Mumbai, Kolkata, and other major markets. These NECC rates serve as the authoritative benchmark for egg prices across India's poultry industry.`
-    },
-    {
+    },    {
       question: `How are egg rates determined in India?`,
-      answer: `Egg rates in India are determined by the National Egg Coordination Committee (NECC) through a comprehensive analysis of multiple factors: current poultry feed costs, market demand-supply dynamics, seasonal variations, regional market conditions, and transportation costs. NECC egg prices are announced daily and serve as the standard reference for wholesale and retail egg rates across India's poultry markets.`
+      answer: `Egg rates in India are determined by the National Egg Coordination Committee (NECC) through a comprehensive analysis of multiple factors: current poultry feed costs, market demand-supply dynamics, seasonal variations, regional market conditions, and transportation costs. NECC egg prices are announced daily and serve as the standard reference for wholesale and retail egg rates across India's poultry markets. Fresh eggs in India, including brown egg varieties, desi eggs, and organic eggs, are priced based on quality and production methods.`
     },
     {
       question: `What is a peti of eggs and how much does it cost today?`,
@@ -55,18 +53,19 @@ export const generateFaqList = (selectedCity, selectedState, currentRate, trayPr
     {
       question: `Why do egg prices fluctuate in the Indian market?`,
       answer: `Egg prices in India's wholesale and retail markets fluctuate due to several key factors: seasonal demand variations, poultry feed costs, production levels, transportation expenses, regional festival demands, weather conditions affecting poultry farms, and any disease outbreaks impacting poultry. The National Egg Coordination Committee (NECC) monitors these market dynamics when establishing daily egg rates for different regions.`
-    },
-    {
+    },    {
       question: `What is the difference between farm eggs and NECC market eggs?`,
-      answer: `Farm eggs are sourced directly from local poultry producers without passing through the formal market system, while NECC market eggs are distributed through organized channels regulated by the National Egg Coordination Committee. NECC egg rates are standardized across wholesale markets, ensuring consistent pricing, while farm egg prices may vary based on local market conditions and direct-to-consumer sales.`
+      answer: `Farm fresh eggs are sourced directly from local poultry producers without passing through the formal market system, while NECC market eggs are distributed through organized channels regulated by the National Egg Coordination Committee. NECC egg rates are standardized across wholesale markets, ensuring consistent pricing, while farm egg prices may vary based on local market conditions and direct-to-consumer sales. Farm fresh eggs in India include desi eggs, country eggs, village eggs, and free range eggs with higher protein rich content and vitamin D. Brown egg varieties are particularly popular among health-conscious consumers seeking organic eggs and cage free options.`
     },
     {
       question: `How much does a wholesale tray of 30 eggs cost today in the Indian market?`,
-      answer: `The wholesale cost of a tray (30 eggs) varies across India's markets. Currently in major wholesale markets, prices range from ₹150 to ₹200 per tray based on NECC guidelines. Our website provides daily updated wholesale and retail egg rates specific to each city and state, helping you track market prices effectively.`
+      answer: `The wholesale cost of a tray (30 eggs) varies across India's markets. Currently in major wholesale markets, prices range from ₹150 to ₹200 per tray based on NECC guidelines. Our website provides daily updated wholesale and retail egg rates specific to each city and state, helping you track market prices effectively.`    },    {
+      question: `What types of eggs are available in India's markets?`,
+      answer: `Eggs in India markets offer diverse varieties including fresh eggs, farm fresh eggs, brown egg varieties, desi eggs, country eggs, village eggs, organic eggs, free range eggs, and cage free options. These eggs provide essential nutrition with protein rich content, fatty acids, vitamin D, and cholesterol free benefits. Farm fresh eggs from local farms across India maintain high nutrition facts standards, making them ideal for healthy breakfast meals. Many consumers prefer brown egg varieties and organic eggs for their superior taste and nutritional benefits.`
     },
     {
-      question: `What market factors affect egg rates in India?`,
-      answer: `Indian egg market rates are influenced by multiple factors: poultry feed costs, labor expenses, farm maintenance costs, seasonal wholesale demand patterns, transportation logistics, regional supply-demand dynamics, weather impacts on poultry farms, disease prevention measures, and government policies affecting the poultry industry. The NECC considers all these factors in determining daily egg rates.`
+      question: `What factors influence fresh eggs in India market rates and pricing trends?`,
+      answer: `Indian egg market rates are influenced by multiple factors: poultry feed costs, labor expenses, farm maintenance costs, seasonal wholesale demand patterns, transportation logistics, regional supply-demand dynamics, weather impacts on poultry farms, disease prevention measures, and government policies affecting the poultry industry. The NECC considers all these factors in determining daily egg rates. Fresh eggs in India, including brown egg varieties, organic eggs, and farm fresh produce, are also priced based on quality factors like fatty acids content, protein rich nutrition, and vitamin D levels. Market demand for cage free and free range eggs affects premium pricing for health-conscious consumers.`
     }
   ];
 

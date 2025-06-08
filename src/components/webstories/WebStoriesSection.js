@@ -83,7 +83,7 @@ const WebStoriesSection = memo(({
                 <div className="relative aspect-w-16 aspect-h-9">
                   <OptimizedImage 
                     src={story.thumbnail} 
-                    alt={`Egg Rate visualization for ${story.city}, ${story.state}`}
+                    alt={`Fresh eggs in India rate visualization for ${story.city}, ${story.state} - Farm fresh eggs market analysis`}
                     className="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => { e.target.src = '/eggpic.webp' }}
                     width={400}
