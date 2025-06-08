@@ -32,7 +32,12 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
       'EUR': '€'
     };
     return symbols[currency] || currency;
+  };  // Safe string conversion function to prevent toLowerCase errors
+  const safeToLowerCase = (value) => {
+    if (!value) return '';
+    return String(value).toLowerCase();
   };
+
   const getLocalizedContent = () => {
     const currency = userCountry === 'United Arab Emirates' ? 'AED' :
                     userCountry === 'United States' ? 'USD' :
@@ -49,11 +54,11 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
       title: `Indian NECC Egg Rates for ${userCountry} | ₹${todayRate} ≈ ${symbol}${convertedPrice}`,
       description: `Latest Indian egg prices for expats in ${userCountry}. NECC egg rate: ₹${todayRate}/egg (≈${symbol}${convertedPrice}). Stay updated with India market rates while abroad.`,
       keywords: [
-        `indian egg prices ${userCountry?.toLowerCase() || userCountry || ''}`,
-        `necc rates for nri ${userCountry?.toLowerCase() || userCountry || ''}`,
-        `indian food prices in ${userCountry?.toLowerCase() || userCountry || ''}`,
-        `egg rates india to ${currency?.toLowerCase() || currency || ''}`,
-        `indian market rates ${userCountry?.toLowerCase() || userCountry || ''}`,
+        `indian egg prices ${safeToLowerCase(userCountry)}`,
+        `necc rates for nri ${safeToLowerCase(userCountry)}`,
+        `indian food prices in ${safeToLowerCase(userCountry)}`,
+        `egg rates india to ${safeToLowerCase(currency)}`,
+        `indian market rates ${safeToLowerCase(userCountry)}`,
         'nri food price tracking',
         'indian agricultural prices abroad',
         'expat indian food costs'

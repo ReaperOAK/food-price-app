@@ -1,6 +1,12 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 
+// Safe string conversion function to prevent toLowerCase errors
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) => {
   if (!selectedCity) return null;
 
@@ -47,12 +53,11 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
         </h3>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          {relatedCities.map((cityData, index) => (
-            <Link
+          {relatedCities.map((cityData, index) => (            <Link
               key={index}
-              to={`/${cityData.city.toLowerCase()||''}-egg-rate`}
+              to={`/${safeToLowerCase(cityData.city)}-egg-rate`}
               className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-600 
-                         rounded-lg p-4 text-center hover:shadow-md transition-all duration-200 
+                         rounded-lg p-4 text-center hover:shadow-md transition-all duration-200
                          hover:from-blue-100 hover:to-blue-200 dark:hover:from-gray-600 dark:hover:to-gray-500"
             >              <p className="font-medium text-gray-900 dark:text-white text-sm">
                 {cityData.city}
@@ -69,11 +74,10 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
             Explore Farm Fresh Eggs by State Markets
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {relatedStates.map((state, index) => (
-              <Link
+            {relatedStates.map((state, index) => (              <Link
                 key={index}
-                to={`/state/${(state.toLowerCase()||'').replace(/\s+/g, '-')}-egg-rate`}
-                className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 
+                to={`/state/${safeToLowerCase(state).replace(/\s+/g, '-')}-egg-rate`}
+                className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20
                            rounded-lg p-3 text-center hover:shadow-md transition-all duration-200 
                            hover:from-green-100 hover:to-green-200 dark:hover:from-green-800/30 dark:hover:to-green-700/30"
               >                <p className="font-medium text-gray-900 dark:text-white text-xs">
@@ -89,9 +93,8 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
 
         {/* Current state link if viewing a city */}
         {selectedState && (
-          <div className="mt-6 text-center">
-            <Link
-              to={`/state/${(selectedState.toLowerCase()||'').replace(/\s+/g, '-')}-egg-rate`}
+          <div className="mt-6 text-center">            <Link
+              to={`/state/${safeToLowerCase(selectedState).replace(/\s+/g, '-')}-egg-rate`}
               className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 
                          text-white font-medium rounded-lg hover:from-green-600 hover:to-green-700 
                          transition-all duration-200 shadow-md hover:shadow-lg"

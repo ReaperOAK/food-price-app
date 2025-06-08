@@ -172,8 +172,7 @@ const RateTable = ({
   const previousRate = sortedRates[1]?.rate || latestRate;
   const rateChange = latestRate - previousRate;
   const percentageChange = previousRate ? (rateChange / previousRate) * 100 : 0;
-  const trayPrice = latestRate * 30;
-  const latestRateDate = sortedRates[0]?.date ? 
+  const trayPrice = latestRate * 30;  const latestRateDate = sortedRates[0]?.date ? 
     new Date(sortedRates[0].date).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -184,6 +183,12 @@ const RateTable = ({
       month: 'long',
       day: 'numeric'
     });
+
+  // Safe string conversion function to prevent toLowerCase errors
+  const safeToLowerCase = (value) => {
+    if (!value) return '';
+    return String(value).toLowerCase();
+  };
   // Schema data - memoized local business schema
   const localBusinessSchema = useMemo(() => selectedCity ? {
     "@context": "https://schema.org",
@@ -196,10 +201,9 @@ const RateTable = ({
       "addressRegion": selectedState,
       "addressCountry": "IN"
     },
-    "image": "https://todayeggrates.com/eggpic.webp",
-    "priceRange": "₹₹",
+    "image": "https://todayeggrates.com/eggpic.webp",    "priceRange": "₹₹",
     "telephone": "+91-XXXXXXXXXX",
-    "url": `https://todayeggrates.com/${selectedCity.toLowerCase()||''}-egg-rate`,
+    "url": `https://todayeggrates.com/${safeToLowerCase(selectedCity)}-egg-rate`,
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.8",
@@ -242,10 +246,9 @@ const RateTable = ({
     "@type": "Product",
     "name": `Eggs in ${selectedCity}, ${selectedState}`,
     "description": `Fresh eggs available in ${selectedCity}, ${selectedState}. Check today's egg price.`,
-    "image": "https://todayeggrates.com/eggpic.webp",
-    "offers": {
+    "image": "https://todayeggrates.com/eggpic.webp",    "offers": {
       "@type": "Offer",
-      "url": `https://todayeggrates.com/${selectedCity.toLowerCase()||''}-egg-rate`,
+      "url": `https://todayeggrates.com/${safeToLowerCase(selectedCity)}-egg-rate`,
       "priceCurrency": "INR",
       "price": latestRate,
       "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],

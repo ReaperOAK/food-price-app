@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef, useCallback, memo } from 'react';
 import { debounce } from 'lodash';
 
+// Safe string conversion function to prevent toLowerCase errors
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 // Create debounced function outside component to avoid recreation
 const createDebouncedProgress = (contentId, setScrollProgress) => 
   debounce(() => {
@@ -50,10 +56,8 @@ const TableOfContents = memo(({ contentId, blogId, isSticky = false }) => {
       
       const elements = contentElement.querySelectorAll('h2, h3');
       
-      elements.forEach((element) => {
-        if (!element.id) {
-          const slugifiedText = (element.innerText
-            .toLowerCase()||'')
+      elements.forEach((element) => {        if (!element.id) {
+          const slugifiedText = safeToLowerCase(element.innerText)
             .replace(/[^\w ]+/g, '')
             .replace(/ +/g, '-');
           element.id = `${blogId}-heading-${slugifiedText}`;

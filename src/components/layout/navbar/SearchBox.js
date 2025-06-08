@@ -1,6 +1,12 @@
 import React, { memo, useMemo, forwardRef } from 'react';
 import Select from 'react-select';
 
+// Safe string conversion function to prevent toLowerCase errors
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 const SearchBox = memo(forwardRef(({
   options,
   selectedCity,
@@ -17,15 +23,15 @@ const SearchBox = memo(forwardRef(({
   const selectedOption = useMemo(() => {
     if (!selectedCity && !selectedState) return null;
     
-    for (const group of options) {
-      // If it's a group (has options property)
-      if (group.options) {        const found = group.options.find(option => 
-          (option.value?.toLowerCase() || '') === (selectedCity?.toLowerCase() || '')
+    for (const group of options) {      // If it's a group (has options property)
+      if (group.options) {
+        const found = group.options.find(option => 
+          safeToLowerCase(option.value) === safeToLowerCase(selectedCity)
         );
         if (found) return found;
       }
       // If it's a direct option (from Unknown category)
-      else if ((group.value?.toLowerCase() || '') === (selectedCity?.toLowerCase() || '')) {
+      else if (safeToLowerCase(group.value) === safeToLowerCase(selectedCity)) {
         return group;
       }
     }
@@ -110,12 +116,12 @@ const SearchBox = memo(forwardRef(({
           if (!inputValue) return true;
           
           // Safely handle inputValue
-          const searchValue = (inputValue && typeof inputValue === 'string') ? inputValue.toLowerCase() : '';
+          const searchValue = safeToLowerCase(inputValue);
           if (!searchValue) return true;
           
           // Safely handle option properties
-          const labelText = (option?.label && typeof option.label === 'string') ? option.label.toLowerCase() : '';
-          const stateText = (option?.data?.state && typeof option.data.state === 'string') ? option.data.state.toLowerCase() : '';
+          const labelText = safeToLowerCase(option?.label);
+          const stateText = safeToLowerCase(option?.data?.state);
           
           return labelText.includes(searchValue) || stateText.includes(searchValue);
         }}
