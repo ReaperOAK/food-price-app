@@ -1,6 +1,12 @@
 import React, { memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
+// Safe string conversion helper
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 const TableRow = memo(({
   rate,
   index,
@@ -103,7 +109,7 @@ const TableRow = memo(({
     >
       {(!selectedCity && showMarket) && (
         <td className={baseCellClasses}>          <a 
-            href={`/${(rate?.city && typeof rate.city === 'string' ? rate.city.toLowerCase() : '')}-egg-rate`}
+            href={`/${safeToLowerCase(rate?.city)}-egg-rate`}
             className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
             aria-label={`View egg rates for ${rate.city}`}
           >

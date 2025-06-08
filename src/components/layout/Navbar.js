@@ -7,6 +7,12 @@ import NavigationLinks from './navbar/NavigationLinks';
 import SearchBox from './navbar/SearchBox';
 import useLocationData from './navbar/useLocationData';
 
+// Safe string conversion helper
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 const Navbar = memo(({ 
   setSelectedCity, 
   setSelectedState, 
@@ -91,11 +97,10 @@ const Navbar = memo(({
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [menuOpen]);
-
   // Standardize city names
   const standardizeCityName = useCallback((cityName) => {
     if (!cityName) return '';
-    const lowerCityName = cityName.toLowerCase?.() || '';
+    const lowerCityName = safeToLowerCase(cityName);
     if (lowerCityName === 'bangalore' || 
         lowerCityName === 'bangalore (cc)' || 
         lowerCityName === 'bengaluru (cc)' ||
@@ -119,10 +124,9 @@ const Navbar = memo(({
     // Update state immediately to trigger API calls
     setSelectedCity(selectedCityName);
     setSelectedState(state || '');
-    
-    // Navigate after state update
+      // Navigate after state update
     requestAnimationFrame(() => {
-      const path = `/${selectedCityName?.toLowerCase?.() || ''}-egg-rate`;
+      const path = `/${safeToLowerCase(selectedCityName)}-egg-rate`;
       if (location.pathname !== path) {
         navigate(path, { replace: false }); // Use replace: false to ensure proper navigation
       }
@@ -170,7 +174,7 @@ const Navbar = memo(({
     // Navigate after state update
     requestAnimationFrame(() => {
       const cityName = city && typeof city === 'string' ? city : '';
-      const path = cityName ? `/${cityName.toLowerCase()}-egg-rate` : '/';
+      const path = cityName ? `/${safeToLowerCase(cityName)}-egg-rate` : '/';
       if (location.pathname !== path) {
         navigate(path, { replace: false }); // Use replace: false to ensure proper navigation
       }

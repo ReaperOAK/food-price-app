@@ -1,6 +1,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import { fetchStatesAndCities } from '../../../services/api';
 
+// Safe string conversion helper
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 const useLocationData = () => {
   const [options, setOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -18,11 +24,10 @@ const useLocationData = () => {
         // First process normal states and their cities
       Object.entries(data).forEach(([state, cities]) => {
         if (state !== 'Unknown' && state !== 'special') {
-          const cityOptions = cities.map(city => {
-            // Safely handle city name
+          const cityOptions = cities.map(city => {            // Safely handle city name
             const cityName = city && typeof city === 'string' ? city : '';
             if (cityName) {
-              processedCities.add(cityName.toLowerCase());
+              processedCities.add(safeToLowerCase(cityName));
             }
             return {
               value: cityName,
@@ -57,10 +62,9 @@ const useLocationData = () => {
         }
       }// Process Unknown cities that haven't been included yet
       if (data.Unknown?.length > 0) {
-        const unknownCities = data.Unknown
-          .filter(city => {
+        const unknownCities = data.Unknown.filter(city => {
             const cityName = city && typeof city === 'string' ? city : '';
-            return cityName && !processedCities.has(cityName.toLowerCase());
+            return cityName && !processedCities.has(safeToLowerCase(cityName));
           })
           .map(city => ({
             value: city,

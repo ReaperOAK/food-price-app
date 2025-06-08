@@ -1,6 +1,12 @@
 import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 
+// Safe string conversion helper
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 const StateNavigationGrid = memo(({ selectedState }) => {
   // All states with their regions for better SEO
   const allStates = [
@@ -36,7 +42,7 @@ const StateNavigationGrid = memo(({ selectedState }) => {
     const stateName = state?.name && typeof state.name === 'string' ? state.name : '';
     const selectedStateName = selectedState && typeof selectedState === 'string' ? selectedState : '';
     
-    return stateName.toLowerCase().replace(/\s+/g, '-') !== selectedStateName.toLowerCase().replace(/\s+/g, '-');
+    return safeToLowerCase(stateName).replace(/\s+/g, '-') !== safeToLowerCase(selectedStateName).replace(/\s+/g, '-');
   });
 
   return (
@@ -57,7 +63,7 @@ const StateNavigationGrid = memo(({ selectedState }) => {
         </h4>        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
           {otherStates.filter(state => state.popular).map((state) => (            <Link
               key={state.name}
-              to={`/state/${(state?.name && typeof state.name === 'string' ? state.name.toLowerCase() : '').replace(/\s+/g, '-')}-egg-rate`}
+              to={`/state/${safeToLowerCase(state?.name).replace(/\s+/g, '-')}-egg-rate`}
               className="group bg-white dark:bg-gray-700 rounded-lg p-4 text-center hover:shadow-md 
                          transition-all duration-200 border border-blue-200 dark:border-gray-600 
                          hover:border-blue-400 dark:hover:border-blue-500 hover:scale-105"
@@ -81,7 +87,7 @@ const StateNavigationGrid = memo(({ selectedState }) => {
         </h4>        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
           {otherStates.filter(state => !state.popular).map((state) => (            <Link
               key={state.name}
-              to={`/state/${(state?.name && typeof state.name === 'string' ? state.name.toLowerCase() : '').replace(/\s+/g, '-')}-egg-rate`}
+              to={`/state/${safeToLowerCase(state?.name).replace(/\s+/g, '-')}-egg-rate`}
               className="group bg-white dark:bg-gray-700 rounded-md p-3 text-center hover:shadow-sm 
                          transition-all duration-200 border border-gray-200 dark:border-gray-600 
                          hover:border-gray-400 dark:hover:border-gray-500 hover:scale-102"

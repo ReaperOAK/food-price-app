@@ -1,5 +1,11 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
 
+// Safe string conversion helper
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 const OptimizedImage = memo(({ 
   src, 
   alt, 
@@ -166,7 +172,7 @@ const OptimizedImage = memo(({
           decoding={priority ? 'sync' : 'async'}
           sizes={getSizes()}
           srcSet={optimizedSrcSet(src)}
-          fetchpriority={priority ? 'high' : /hero|banner/.test(className.toLowerCase() || '') ? 'high' : 'auto'}
+          fetchpriority={priority ? 'high' : /hero|banner/.test(safeToLowerCase(className)) ? 'high' : 'auto'}
           onLoad={(e) => {
             setLoaded(true);
             if (imgRef.current) {

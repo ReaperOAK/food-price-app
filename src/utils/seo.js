@@ -1,3 +1,9 @@
+// Safe string conversion helper
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 // Helper function to get formatted date
 const getFormattedDate = () => {
   const date = new Date();
@@ -186,9 +192,8 @@ export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeyw
     'india egg export prices',
     'poultry prices india global'
   ];
-
   if (selectedCity) {
-    const cityLower = selectedCity.toLowerCase?.() || '';
+    const cityLower = safeToLowerCase(selectedCity);
     
     // Comprehensive keyword generation for ALL cities - no special treatment
     const cityKeywords = [
@@ -226,9 +231,8 @@ export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeyw
       ...baseKeywords,
       ...internationalKeywords
     ].join(', ');
-    
-  } else if (selectedState) {
-    const stateLower = selectedState.toLowerCase?.() || '';
+      } else if (selectedState) {
+    const stateLower = safeToLowerCase(selectedState);
     return [
       `necc egg rate ${stateLower}`,
       `${stateLower} egg rate today`,

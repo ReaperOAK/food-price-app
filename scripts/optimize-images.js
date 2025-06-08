@@ -13,7 +13,7 @@ sharp.concurrency(1); // Limit concurrency to prevent memory issues
 async function optimizeImage(inputPath) {
   const dir = path.dirname(inputPath);
   const ext = path.extname(inputPath);
-  const extLower = ext.toLowerCase() || '';
+  const extLower = ext ? String(ext).toLowerCase() : '';
   const basename = path.basename(inputPath, ext);
   
   try {

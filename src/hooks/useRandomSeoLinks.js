@@ -10,14 +10,20 @@ const getRandomItems = (array, count) => {
   return shuffled.slice(0, count);
 };
 
+// Safe string conversion helper
+const safeToLowerCase = (value) => {
+  if (!value) return '';
+  return String(value).toLowerCase();
+};
+
 // Helper function to format city name for URL
 const formatCityForUrl = (city) => {
-  return city.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
+  return safeToLowerCase(city).replace(/\s+/g, '-').replace(/[()]/g, '');
 };
 
 // Helper function to format state name for URL
 const formatStateForUrl = (state) => {
-  return state.toLowerCase().replace(/\s+/g, '-').replace(/[()]/g, '');
+  return safeToLowerCase(state).replace(/\s+/g, '-').replace(/[()]/g, '');
 };
 
 export const useRandomSeoLinks = (selectedCity, selectedState) => {
