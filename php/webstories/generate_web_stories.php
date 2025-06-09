@@ -546,10 +546,10 @@ try {
             
             // Replace all city-specific variables with actual data
             $story = str_replace('{{CITY_NAME}}', htmlspecialchars($city, ENT_QUOTES, 'UTF-8'), $story);
-            $story = str_replace('{{STATE_NAME}}', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'), $story);
-            $story = str_replace('{{EGG_RATE}}', number_format((float)$rate, 2), $story);
+            $story = str_replace('{{STATE_NAME}}', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'), $story);            $story = str_replace('{{EGG_RATE}}', number_format((float)$rate, 2), $story);
             $story = str_replace('{{TRAY_RATE}}', number_format(((float)$rate * 30), 2), $story);
             $story = str_replace('{{CITY_SLUG}}', $citySlugWithSuffix, $story);
+            $story = str_replace('{{CITY_SLUG_CLEAN}}', $citySlug, $story);
             $story = str_replace('{{DATE}}', date('F j, Y', strtotime($date)), $story);
             $story = str_replace('{{ISO_DATE}}', date('c', strtotime($date)), $story);
             
