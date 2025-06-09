@@ -9,23 +9,21 @@ header('Content-Type: application/json');
 
 require_once __DIR__ . '/config/db.php';
 
-// Helper function to generate city slug without state code for clean URLs
+// Helper function to generate city slug with -egg-rate-today suffix for consistency with sitemap
 if (!function_exists('generateCitySlug')) {
     function generateCitySlug($city, $state = null) {
-        // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)"
+        // Clean the city name by removing any state codes in parentheses
         $cleanCity = $city;
         if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
             $cleanCity = trim($matches[1]);
         }
         
-        // Generate the base city slug without state codes
+        // Generate base slug
         $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
-        $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
+        $citySlug = trim($citySlug, '-');
         
-        // Generate clean slug without state codes
-        $slug = $citySlug . '-egg-rate-today';
-        
-        return $slug;
+        // Add -egg-rate-today suffix for consistency with sitemap and SEO
+        return $citySlug . '-egg-rate-today';
     }
 }
 
@@ -103,20 +101,20 @@ if ($result->num_rows > 0) {
         // Skip if the rate is from more than 3 days ago
         if (strtotime($date) < strtotime('-3 days')) {
             continue;
-        }        // Create a URL-friendly city name
+        }        // Create a URL-friendly city name with full slug
         $citySlug = generateCitySlug($city, $state);
         
         // Format date for display
         $displayDate = date('F j, Y', strtotime($date));
         
-        // Check if the web story file exists
+        // Check if the web story file exists (files are stored with full suffix)
         $storyFilename = $storiesDir . '/' . $citySlug . '.html';
         if (file_exists($storyFilename)) {
             // Add to stories array
             $stories[] = [
                 'title' => "Egg Rate in $city, $state",
-                'slug' => $citySlug,
-                'thumbnail' => "/images/webstories/thumbnail-$citySlug.webp",
+                'slug' => $citySlug,  // Full slug for URL (e.g., agra-egg-rate-today)
+                'thumbnail' => "/images/webstories/thumbnail-$citySlug.webp",  // Full slug for thumbnail
                 'date' => $displayDate,
                 'rate' => $rate,
                 'city' => $city,

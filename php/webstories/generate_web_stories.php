@@ -90,10 +90,11 @@ function generateCitySlug($city, $state = null) {
     // Generate the base city slug without state codes
     $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
     $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
-      // Generate clean slug without state codes
-    $slug = $citySlug;
     
-    debug_log("SLUG", "Generated clean slug: {$slug}");
+    // Add -egg-rate-today suffix for consistency with sitemap and SEO
+    $slug = $citySlug . '-egg-rate-today';
+    
+    debug_log("SLUG", "Generated full slug: {$slug}");
     return $slug;
 }
 
@@ -253,10 +254,8 @@ try {
                 $city = $row['city'];
                 $state = $row['state'];
                 $rate = $row['rate'];
-                $date = $row['date'];                debug_log("INDEX", "Adding index entry for {$city}, {$state}");
-                $citySlug = generateCitySlug($city, $state);
-                $citySlugWithSuffix = $citySlug . '-egg-rate-today';
-                $html .= "<li><a href='{$citySlugWithSuffix}.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
+                $date = $row['date'];                debug_log("INDEX", "Adding index entry for {$city}, {$state}");                $citySlug = generateCitySlug($city, $state);
+                $html .= "<li><a href='{$citySlug}.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
             }
             
             $html .= "</ul></body></html>";
@@ -521,11 +520,9 @@ try {
                 continue;
             }
             
-            // Generate the proper city slug with state code
-            $citySlug = generateCitySlug($city, $state);
-            $citySlugWithSuffix = $citySlug . '-egg-rate-today'; // For file naming and URLs
+            // Generate the proper city slug with state code            $citySlug = generateCitySlug($city, $state);
             
-            debug_log("STORY", "Processing city: {$city}, {$state} - Rate: ₹{$rate} - Slug: {$citySlugWithSuffix}");
+            debug_log("STORY", "Processing city: {$city}, {$state} - Rate: ₹{$rate} - Slug: {$citySlug}");
             
             // Skip if the rate is from more than 7 days ago
             if (strtotime($date) < strtotime('-7 days')) {
@@ -547,8 +544,7 @@ try {
             // Replace all city-specific variables with actual data
             $story = str_replace('{{CITY_NAME}}', htmlspecialchars($city, ENT_QUOTES, 'UTF-8'), $story);
             $story = str_replace('{{STATE_NAME}}', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'), $story);            $story = str_replace('{{EGG_RATE}}', number_format((float)$rate, 2), $story);
-            $story = str_replace('{{TRAY_RATE}}', number_format(((float)$rate * 30), 2), $story);
-            $story = str_replace('{{CITY_SLUG}}', $citySlugWithSuffix, $story);
+            $story = str_replace('{{TRAY_RATE}}', number_format(((float)$rate * 30), 2), $story);            $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
             $story = str_replace('{{CITY_SLUG_CLEAN}}', $citySlug, $story);
             $story = str_replace('{{DATE}}', date('F j, Y', strtotime($date)), $story);
             $story = str_replace('{{ISO_DATE}}', date('c', strtotime($date)), $story);
@@ -576,14 +572,14 @@ try {
             $story = str_replace('{{COVER_IMAGE}}', $coverImagePath, $story);
             $story = str_replace('{{TRAY_PRICE_IMAGE}}', $trayPriceImagePath, $story);
             $story = str_replace('{{CTA_IMAGE}}', $ctaImagePath, $story);            // Save web story with unique content verification
-            $storyPath = $storiesDir . '/' . $citySlugWithSuffix . '.html';
+            $storyPath = $storiesDir . '/' . $citySlug . '.html';
             debug_log("SAVE", "Saving web story to {$storyPath}");
             
             // Verify the story contains unique city-specific content before saving
             $contentCheck = [
                 'city_in_title' => (strpos($story, htmlspecialchars($city, ENT_QUOTES, 'UTF-8')) !== false),
                 'rate_in_content' => (strpos($story, number_format((float)$rate, 2)) !== false),
-                'unique_slug' => (strpos($story, $citySlugWithSuffix) !== false)
+                'unique_slug' => (strpos($story, $citySlug) !== false)
             ];
             
             if (!$contentCheck['city_in_title'] || !$contentCheck['rate_in_content'] || !$contentCheck['unique_slug']) {
