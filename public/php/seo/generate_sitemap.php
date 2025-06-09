@@ -3,6 +3,22 @@
  * Generate XML sitemap for better SEO
  */
 
+// Clear any existing cache to ensure fresh data
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
+
+// Clear file cache if it exists
+$cacheDir = dirname(__DIR__) . '/cache';
+if (is_dir($cacheDir)) {
+    $cacheFiles = glob($cacheDir . '/*.json');
+    foreach ($cacheFiles as $file) {
+        if (strpos($file, 'sitemap') !== false || strpos($file, 'city') !== false) {
+            unlink($file);
+        }
+    }
+}
+
 // Include database connection
 require_once dirname(__DIR__) . '/config/db.php';
 
@@ -23,9 +39,9 @@ if (!isset($conn) || $conn->connect_error) {
     }
 }
 
-// Helper function to generate city slug without state code for clean URLs
-if (!function_exists('generateCitySlug')) {
-    function generateCitySlug($city, $state = null) {
+// Helper function to generate city slug with -egg-rate-today suffix for clean URLs
+if (!function_exists('generateCitySlugForSitemap')) {
+    function generateCitySlugForSitemap($city, $state = null) {
         // Debug: Log what we're processing
         error_log("SLUG_DEBUG: Processing city='$city', state='$state'");
         
@@ -53,10 +69,10 @@ if (!function_exists('generateCitySlug')) {
         $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
         $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
         
-        // Generate clean slug without state codes
+        // IMPORTANT: Always add the -egg-rate-today suffix
         $slug = $citySlug . '-egg-rate-today';
         
-        error_log("SLUG_DEBUG: Generated clean slug: $slug");
+        error_log("SLUG_DEBUG: Generated final slug with suffix: $slug");
         return $slug;
     }
 }
@@ -145,11 +161,12 @@ try {
 
 if ($cities_result && $cities_result->num_rows > 0) {
     // Create an array to track unique states
-    $unique_states = [];    
-    while ($row = $cities_result->fetch_assoc()) {
-        // Add city URL using new slug format
-        $citySlug = generateCitySlug($row['city_name'], $row['state_name']);
+    $unique_states = [];      while ($row = $cities_result->fetch_assoc()) {        // Add city URL using new slug format
+        $citySlug = generateCitySlugForSitemap($row['city_name'], $row['state_name']);
         $url = $baseUrl . '/' . $citySlug;
+        
+        // Debug: Log the generated URL
+        error_log("SITEMAP_DEBUG: Generated city URL: $url");
         
         $xml .= '<url>' . PHP_EOL;
         $xml .= '  <loc>' . $url . '</loc>' . PHP_EOL;
@@ -164,9 +181,8 @@ if ($cities_result && $cities_result->num_rows > 0) {
         // Track unique states
         if (!isset($unique_states[$row['state_name']])) {
             $unique_states[$row['state_name']] = true;
-            
-            // Add state URL
-            $state_url = 'state/' . strtolower(str_replace(' ', '-', $row['state_name'])) . '-egg-rate-today';
+              // Add state URL
+            $state_url = 'state/' . strtolower(str_replace(' ', '-', $row['state_name'])) . '-egg-rate';
             $state_full_url = $baseUrl . '/' . $state_url;
             
             $xml .= '<url>' . PHP_EOL;
@@ -209,11 +225,12 @@ if ($cities_result && $cities_result->num_rows > 0) {
         'chennai' => 'Tamil Nadu'
     ];
     
-    $unique_states = [];
-      foreach ($fallback_cities as $city => $state) {
-        // Add city URL using generateCitySlug function for consistency
-        $citySlug = generateCitySlug($city, $state);
+    $unique_states = [];      foreach ($fallback_cities as $city => $state) {        // Add city URL using generateCitySlugForSitemap function for consistency
+        $citySlug = generateCitySlugForSitemap($city, $state);
         $url = $baseUrl . '/' . $citySlug;
+        
+        // Debug: Log the generated fallback URL
+        error_log("SITEMAP_DEBUG: Generated fallback city URL: $url");
         
         $xml .= '<url>' . PHP_EOL;
         $xml .= '  <loc>' . $url . '</loc>' . PHP_EOL;
@@ -228,9 +245,8 @@ if ($cities_result && $cities_result->num_rows > 0) {
         // Track unique states
         if (!isset($unique_states[$state])) {
             $unique_states[$state] = true;
-            
-            // Add state URL
-            $state_url = 'state/' . strtolower(str_replace(' ', '-', $state)) . '-egg-rate-today';
+              // Add state URL
+            $state_url = 'state/' . strtolower(str_replace(' ', '-', $state)) . '-egg-rate';
             $state_full_url = $baseUrl . '/' . $state_url;
             
             $xml .= '<url>' . PHP_EOL;
