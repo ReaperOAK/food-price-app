@@ -38,6 +38,22 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
     return String(value).toLowerCase();
   };
 
+  // Safe string conversion for React Helmet
+  const safeStringify = (value) => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number') return String(value);
+    if (typeof value === 'boolean') return String(value);
+    if (Array.isArray(value)) return value.filter(Boolean).join(', ');
+    if (typeof value === 'object') {
+      try {
+        return JSON.stringify(value);
+      } catch (e) {
+        return String(value);
+      }
+    }
+    return String(value);
+  };
   const getLocalizedContent = () => {
     const currency = userCountry === 'United Arab Emirates' ? 'AED' :
                     userCountry === 'United States' ? 'USD' :
@@ -48,21 +64,20 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
                     userCountry === 'United Kingdom' ? 'GBP' : 'USD';
 
     const convertedPrice = formatCurrency(todayRate, currency);
-    const symbol = getCurrencySymbol(currency);
-
-    return {
-      title: `Indian NECC Egg Rates for ${userCountry} | ₹${todayRate} ≈ ${symbol}${convertedPrice}`,
-      description: `Latest Indian egg prices for expats in ${userCountry}. NECC egg rate: ₹${todayRate}/egg (≈${symbol}${convertedPrice}). Stay updated with India market rates while abroad.`,
+    const symbol = getCurrencySymbol(currency);    return {
+      title: `Indian NECC Egg Rates for ${userCountry || ''} | ₹${todayRate || 'N/A'} ≈ ${symbol}${convertedPrice}`,
+      description: `Latest Indian egg prices for expats in ${userCountry || ''}. NECC egg rate: ₹${todayRate || 'N/A'}/egg (≈${symbol}${convertedPrice}). Stay updated with India market rates while abroad.`,
       keywords: [
-        `indian egg prices ${safeToLowerCase(userCountry)}`,
-        `necc rates for nri ${safeToLowerCase(userCountry)}`,
-        `indian food prices in ${safeToLowerCase(userCountry)}`,
-        `egg rates india to ${safeToLowerCase(currency)}`,
-        `indian market rates ${safeToLowerCase(userCountry)}`,
+        `indian egg prices ${safeToLowerCase(userCountry || '')}`,
+        `necc rates for nri ${safeToLowerCase(userCountry || '')}`,
+        `indian food prices in ${safeToLowerCase(userCountry || '')}`,
+        `egg rates india to ${safeToLowerCase(currency || '')}`,
+        `indian market rates ${safeToLowerCase(userCountry || '')}`,
         'nri food price tracking',
         'indian agricultural prices abroad',
         'expat indian food costs'
-      ]
+      ].filter(Boolean), // Remove any empty strings
+      currency: currency
     };
   };
 
@@ -72,19 +87,17 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
 
   const content = getLocalizedContent();
 
-  return (
-    <Helmet>      {/* International SEO meta tags */}
-      <meta name="international-audience" content={String(userCountry || '')} />
-      <meta name="target-country" content={String(userCountry || '')} />
+  return (    <Helmet>      {/* International SEO meta tags */}
+      <meta name="international-audience" content={safeStringify(userCountry)} />
+      <meta name="target-country" content={safeStringify(userCountry)} />
       <meta name="diaspora-content" content="true" />
         {/* Alternate titles and descriptions for international audience */}
-      <meta name="alternate-title" content={String(content.title || '')} />
-      <meta name="alternate-description" content={String(content.description || '')} />
-      <meta name="geo.region" content={String(userCountry === 'United Arab Emirates' ? 'AE' : 'IN')} />
+      <meta name="alternate-title" content={safeStringify(content.title)} />
+      <meta name="alternate-description" content={safeStringify(content.description)} />
+      <meta name="geo.region" content={safeStringify(userCountry === 'United Arab Emirates' ? 'AE' : 'IN')} />
       
       {/* International keywords */}
-      <meta name="international-keywords" content={String(content.keywords?.join(', ') || '')} />
-        {/* Currency-specific structured data */}
+      <meta name="international-keywords" content={safeStringify(content.keywords?.join(', '))} />{/* Currency-specific structured data */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
@@ -104,7 +117,7 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
             "name": String(userCountry || '')
           }
         })}
-      </script>      {/* International audience schema */}
+      </script>{/* International audience schema */}
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
