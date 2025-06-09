@@ -280,14 +280,13 @@
 - Generates thumbnail images for each story
 - Creates an index page for all web stories
 
-### 🖼️ `update_webstory_thumbnails.php` - Update Thumbnails for Web Stories
+### 🖼️ `update_webstory_thumbnails_simple.php` - Process Web Stories (Simplified)
 
-- Generates or updates thumbnail images for web stories
-- Creates consistent branded imagery for all city stories
-- Displays city name, state, and latest egg rate on the thumbnail
-- Updates webstory HTML with references to thumbnails in meta tags
-- Checks daily for updates and only regenerates thumbnails when needed
-- Cleans up unused thumbnails for removed webstories
+- Simplified webstory processing without thumbnail generation
+- Uses random existing images (1.webp to 20.webp) for thumbnails instead of generating city-specific ones
+- Eliminates GD library dependency and image optimization complexity
+- Checks for webstory file existence and processes them accordingly
+- Much faster and more reliable than the previous thumbnail generation approach
 
 ### 🗑️ `delete_old_webstories.php` - Delete Outdated Web Stories
 

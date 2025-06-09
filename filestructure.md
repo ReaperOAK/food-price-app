@@ -136,7 +136,7 @@
             └── delete_old_webstories.php
             └── generate_web_stories.php
             └── generate_webstories_sitemap.php
-            └── update_webstory_thumbnails.php
+            └── update_webstory_thumbnails_simple.php
     └── 📁reports
         └── Countries.csv
         └── Dates.csv
