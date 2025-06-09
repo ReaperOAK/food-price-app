@@ -469,12 +469,11 @@ if ($result && $result->num_rows > 0) {    while ($row = $result->fetch_assoc())
                 imagestring($thumbnailImage, $rateFont, $rateX, 15, $rateText, $rateColor);
             } else {
                 debug_log("RATE", "No rate found for {$city}, {$state}");
-            }
-              // Save the thumbnail
+            }            // Save the thumbnail
             $thumbnailPath = $imageDir . '/thumbnail-' . $citySlugWithSuffix . '.webp';
             debug_log("SAVE", "Saving thumbnail to {$thumbnailPath}");
             
-            $saveResult = imagejpeg($thumbnailImage, $thumbnailPath, 90);
+            $saveResult = imagewebp($thumbnailImage, $thumbnailPath, 90);
             
             // Clean up
             imagedestroy($sourceImage);
