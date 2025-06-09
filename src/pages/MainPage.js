@@ -202,31 +202,32 @@ const MainPage = () => {
   if (loading) {
     return <LoadingComponent />;
   }
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">      <HeadSection
-        getSeoTitle={getSeoTitle}
-        getSeoDescription={getSeoDescription}
-        getSeoKeywords={getSeoKeywords}
-        location={location}
-        structuredData={structuredData}
-        generateFaqSchema={generateFaqSchema}
-        selectedCity={selectedCity}
-        selectedState={selectedState}
-        eggRates={eggRates}
-        todayRate={priceMetrics.todayRate}
-        trayPrice={priceMetrics.trayPrice}
-      />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
+      {!loading && (
+        <HeadSection
+          getSeoTitle={getSeoTitle}
+          getSeoDescription={getSeoDescription}
+          getSeoKeywords={getSeoKeywords}
+          location={location}
+          structuredData={structuredData}
+          generateFaqSchema={generateFaqSchema}
+          selectedCity={selectedCity}
+          selectedState={selectedState}
+          eggRates={eggRates}
+          todayRate={priceMetrics.todayRate}
+          trayPrice={priceMetrics.trayPrice}
+        />
+      )}
       
       <Navbar
         selectedState={selectedState}
         setSelectedState={setSelectedState}
         selectedCity={selectedCity}
         setSelectedCity={setSelectedCity}
-      />
-
-      <main className="container mx-auto px-4 w-full max-w-7xl">
-        <Breadcrumb />
+      />      <main className="container mx-auto px-4 w-full max-w-7xl">
+        {/* Only render Breadcrumb when not loading to prevent React Helmet errors */}
+        {!loading && <Breadcrumb />}
         
         <div id="home" className="py-8 space-y-8">
           <section 
@@ -361,18 +362,17 @@ const MainPage = () => {
                       trayPrice={priceMetrics.trayPrice}
                     />
                   </section>
-                )}
-
-                {/* Blog Section */}
+                )}                {/* Blog Section */}
                 {blogs.length > 0 && (
                   <section aria-label="Related Blog Posts">
                     <BlogList 
                       blogs={blogs} 
                       selectedCity={selectedCity} 
                       selectedState={selectedState} 
+                      loading={loading}
                     />
                   </section>
-                )}                {/* Related City Links Section - Universal SEO linking */}
+                )}{/* Related City Links Section - Universal SEO linking */}
                 {selectedCity && cities.length > 0 && (
                   <section aria-label="Compare Rates in Other Cities">
                     <RelatedCityLinks 

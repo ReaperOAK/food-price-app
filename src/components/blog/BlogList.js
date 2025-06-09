@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import BlogCard from './BlogCard';
 import { useInView } from 'react-intersection-observer';
 
-const BlogList = ({ blogs, selectedCity, selectedState }) => {
+const BlogList = ({ blogs, selectedCity, selectedState, loading = false }) => {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
@@ -89,17 +89,19 @@ const BlogList = ({ blogs, selectedCity, selectedState }) => {
     }
   }), []);
 
-  return (
-    <section 
+  return (    <section 
       ref={ref} 
       className={`py-12 px-4 max-w-7xl mx-auto transition-opacity duration-1000 ${inView ? 'opacity-100' : 'opacity-0'}`}
       aria-labelledby="blog-list-heading"
     >
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(schemaData)}
-        </script>
-      </Helmet>
+      {/* Only render Helmet when not loading to prevent React Helmet errors */}
+      {!loading && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(schemaData)}
+          </script>
+        </Helmet>
+      )}
       
       <h2 
         id="blog-list-heading" 

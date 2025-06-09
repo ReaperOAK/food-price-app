@@ -85,19 +85,21 @@ const WebStoriesList = () => {
       <Footer />
     </div>
   );
-
   const renderContent = () => (
     <div className="bg-gray-50 min-h-screen flex flex-col">
-      <HeadSection
-        getSeoTitle={() => "Egg Rate Web Stories - Live Price Updates | Today Egg Rates"}
-        getSeoDescription={() => "View our collection of web stories featuring live egg rates from cities across India. Get daily price updates, market trends, and regional comparisons in an engaging visual format."}
-        getSeoKeywords={() => "egg rate web stories, egg price updates, live egg rates, city egg prices, daily egg updates, egg market trends"}
-        location={location}
-        structuredData={generateStoriesSchema()}
-        generateFaqSchema={() => ({})}
-        selectedCity={selectedCity}
-        selectedState={selectedState}
-      />
+      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
+      {!loading && (
+        <HeadSection
+          getSeoTitle={() => "Egg Rate Web Stories - Live Price Updates | Today Egg Rates"}
+          getSeoDescription={() => "View our collection of web stories featuring live egg rates from cities across India. Get daily price updates, market trends, and regional comparisons in an engaging visual format."}
+          getSeoKeywords={() => "egg rate web stories, egg price updates, live egg rates, city egg prices, daily egg updates, egg market trends"}
+          location={location}
+          structuredData={generateStoriesSchema()}
+          generateFaqSchema={() => ({})}
+          selectedCity={selectedCity}
+          selectedState={selectedState}
+        />
+      )}
       <Navbar
         selectedState={selectedState}
         setSelectedState={setSelectedState}

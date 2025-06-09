@@ -122,18 +122,21 @@ const WebStoryViewer = () => {
       </div>
       <Footer />
     </div>
-  );
-  const renderContent = () => (
-    <div className="bg-gray-50 min-h-screen flex flex-col">      <HeadSection
-        getSeoTitle={() => storyData ? `Egg Rate in ${String(storyData.city || '')}, ${String(storyData.state || '')} - Web Story | Today Egg Rates` : 'Web Story | Today Egg Rates'}
-        getSeoDescription={() => storyData ? `View current egg rates and market updates for ${String(storyData.city || '')}, ${String(storyData.state || '')}. Price: ₹${String(storyData.rate || '')} (Updated: ${String(storyData.date || '')})` : 'Web Story Not Found'}
-        getSeoKeywords={() => storyData ? `egg rate ${String(storyData.city || '')}, ${String(storyData.state || '')} egg price, egg market ${String(storyData.city || '')}` : 'egg rates, egg prices'}
-        location={location}
-        structuredData={generateStorySchema()}
-        generateFaqSchema={() => ({})}
-        selectedCity={selectedCity}
-        selectedState={selectedState}
-      />
+  );  const renderContent = () => (
+    <div className="bg-gray-50 min-h-screen flex flex-col">
+      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
+      {!loading && (
+        <HeadSection
+          getSeoTitle={() => storyData ? `Egg Rate in ${String(storyData.city || '')}, ${String(storyData.state || '')} - Web Story | Today Egg Rates` : 'Web Story | Today Egg Rates'}
+          getSeoDescription={() => storyData ? `View current egg rates and market updates for ${String(storyData.city || '')}, ${String(storyData.state || '')}. Price: ₹${String(storyData.rate || '')} (Updated: ${String(storyData.date || '')})` : 'Web Story Not Found'}
+          getSeoKeywords={() => storyData ? `egg rate ${String(storyData.city || '')}, ${String(storyData.state || '')} egg price, egg market ${String(storyData.city || '')}` : 'egg rates, egg prices'}
+          location={location}
+          structuredData={generateStorySchema()}
+          generateFaqSchema={() => ({})}
+          selectedCity={selectedCity}
+          selectedState={selectedState}
+        />
+      )}
       <Navbar
         selectedState={selectedState}
         setSelectedState={setSelectedState}

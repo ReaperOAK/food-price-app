@@ -127,16 +127,19 @@ const BlogPage = () => {
     "dateModified": formattedDate,
     "keywords": blog.tags ? String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags) : 'egg rate, egg price, NECC egg rate'
   };
-
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">      <HeadSection
-        getSeoTitle={() => blog ? `${blog.title} - Today Egg Rates` : 'Blog - Today Egg Rates'}
-        getSeoDescription={() => blog ? blog.description : 'View our collection of informative articles about egg rates and market trends across India'}
-        getSeoKeywords={() => blog ? blog.tags ? String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags) : 'egg rate, egg price, NECC egg rate' : 'egg rates, egg market, egg industry news'}
-        location={location}
-        structuredData={articleSchema}
-        generateFaqSchema={() => ({})}
-      />
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
+      {!isLoading && (
+        <HeadSection
+          getSeoTitle={() => blog ? `${blog.title} - Today Egg Rates` : 'Blog - Today Egg Rates'}
+          getSeoDescription={() => blog ? blog.description : 'View our collection of informative articles about egg rates and market trends across India'}
+          getSeoKeywords={() => blog ? blog.tags ? String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags) : 'egg rate, egg price, NECC egg rate' : 'egg rates, egg market, egg industry news'}
+          location={location}
+          structuredData={articleSchema}
+          generateFaqSchema={() => ({})}
+        />
+      )}
       
       <Navbar />
       
@@ -274,15 +277,13 @@ const BlogPage = () => {
             )}
           </article>
         </div>
-      </main>
-
-      {/* More Articles */}
+      </main>      {/* More Articles */}
       <section className="bg-gray-50 dark:bg-gray-900/50 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-8">
             More Articles
           </h2>
-          <BlogList blogs={otherBlogs} />
+          <BlogList blogs={otherBlogs} loading={isLoading} />
         </div>
       </section>
       
