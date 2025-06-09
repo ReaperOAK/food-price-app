@@ -103,9 +103,7 @@ if ($result->num_rows > 0) {
         // Skip if the rate is from more than 3 days ago
         if (strtotime($date) < strtotime('-3 days')) {
             continue;
-        }
-        
-        // Create a URL-friendly city name
+        }        // Create a URL-friendly city name
         $citySlug = generateCitySlug($city, $state);
         
         // Format date for display
