@@ -255,7 +255,7 @@ try {
                 $rate = $row['rate'];
                 $date = $row['date'];                debug_log("INDEX", "Adding index entry for {$city}, {$state}");
                 $citySlug = generateCitySlug($city, $state);
-                $citySlugWithSuffix = $citySlug . '-egg-rate';
+                $citySlugWithSuffix = $citySlug . '-egg-rate-today';
                 $html .= "<li><a href='{$citySlugWithSuffix}.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
             }
             
@@ -523,7 +523,7 @@ try {
             
             // Generate the proper city slug with state code
             $citySlug = generateCitySlug($city, $state);
-            $citySlugWithSuffix = $citySlug . '-egg-rate'; // For file naming and URLs
+            $citySlugWithSuffix = $citySlug . '-egg-rate-today'; // For file naming and URLs
             
             debug_log("STORY", "Processing city: {$city}, {$state} - Rate: ₹{$rate} - Slug: {$citySlugWithSuffix}");
             

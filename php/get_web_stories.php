@@ -23,7 +23,7 @@ if (!function_exists('generateCitySlug')) {
         $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
         
         // Generate clean slug without state codes
-        $slug = $citySlug . '-egg-rate';
+        $slug = $citySlug . '-egg-rate-today';
         
         return $slug;
     }
