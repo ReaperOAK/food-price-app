@@ -399,12 +399,11 @@ const RateTable = ({
                 isLoading={isLoading}
               />
             </div>
-          )}
-
-          <div className="mt-6">
+          )}          <div className="mt-6">
             <MarketInfo
               selectedCity={selectedCity}
               selectedState={selectedState || 'India'}
+              isLoading={isLoading}
             />
           </div>
         </div>

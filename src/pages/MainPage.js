@@ -217,6 +217,7 @@ const MainPage = () => {
           eggRates={eggRates}
           todayRate={priceMetrics.todayRate}
           trayPrice={priceMetrics.trayPrice}
+          isLoading={loading}
         />
       )}
       
@@ -277,14 +278,13 @@ const MainPage = () => {
                       chartType="bar"
                     />
                   )}
-                </section>
-
-                {/* Price Trends Section */}
+                </section>                {/* Price Trends Section */}
                 <section aria-label="Price Trends Analysis">
                   <PriceTrends 
                     selectedCity={selectedCity} 
                     selectedState={selectedState} 
                     eggRates={eggRates} 
+                    isLoading={loading}
                   />
                 </section>
 
@@ -312,12 +312,14 @@ const MainPage = () => {
                   <section aria-label="Quick Price Information">
                     <QuickInfo {...priceMetrics} />
                   </section>
-                )}
-
-                {/* State List Section */}
+                )}                {/* State List Section */}
                 {states.length > 0 && (
                   <section aria-label="States and Cities">
-                    <StateList states={states} cities={cities} />
+                    <StateList 
+                      states={states} 
+                      cities={cities} 
+                      isLoading={loading}
+                    />
                   </section>
                 )}
                 

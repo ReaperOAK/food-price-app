@@ -152,14 +152,16 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
       </section>
     );
   };
-
   return (
     <>
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(generateSchemaMarkup)}
-        </script>
-      </Helmet>
+      {/* Only render Helmet when not loading to prevent React Helmet errors */}
+      {!isLoading && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(generateSchemaMarkup)}
+          </script>
+        </Helmet>
+      )}
 
       <main className="p-4 sm:p-6 mt-6 bg-gradient-to-br from-gray-50 to-white rounded-lg shadow-lg max-w-7xl mx-auto dark:from-gray-900 dark:to-gray-800">
         <h2 className="text-center bg-gradient-to-r from-yellow-100 to-yellow-50 rounded-lg w-full p-6 mt-4 text-2xl sm:text-3xl font-bold text-gray-800 dark:from-yellow-900 dark:to-yellow-800 dark:text-gray-100">

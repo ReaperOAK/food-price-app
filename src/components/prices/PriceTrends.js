@@ -2,7 +2,7 @@ import { formatPrice } from '../../utils/formatters';
 import { memo, useMemo } from 'react';
 import { Helmet } from 'react-helmet';
 
-const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
+const PriceTrends = memo(({ selectedCity, selectedState, eggRates, isLoading = false }) => {
   const location = selectedCity || selectedState || 'your area';
   
   // Memoize calculations for performance
@@ -39,42 +39,46 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates }) => {
       day: 'numeric'
     });
   }, []);
-
   return (
-    <>      <Helmet>        <script type="application/ld+json">
-          {JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Product",
-            "name": `Egg Rates in ${location}`,
-            "description": `Live egg prices and NECC rates in ${location}. Compare today's egg price, wholesale rates, and retail prices.`,
-            "offers": {
-              "@type": "AggregateOffer",
-              "lowPrice": String(todayRate || 0),
-              "highPrice": String((todayRate || 0) + 0.45),
-              "priceCurrency": "INR",
-              "offerCount": "4",
-              "offers": [
-                {
-                  "@type": "Offer",
-                  "price": String(todayRate || 0),
-                  "priceCurrency": "INR",
-                  "itemCondition": "https://schema.org/NewCondition",
-                  "availability": "https://schema.org/InStock",
-                  "name": "NECC Wholesale Rate"
-                },
-                {
-                  "@type": "Offer",
-                  "price": String((todayRate || 0) + 0.35),
-                  "priceCurrency": "INR",
-                  "itemCondition": "https://schema.org/NewCondition",
-                  "availability": "https://schema.org/InStock",
-                  "name": "Retail Rate"
-                }
-              ]
-            }
-          })}
-        </script>
-      </Helmet>
+    <>
+      {/* Only render Helmet when not loading to prevent React Helmet errors */}
+      {!isLoading && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Product",
+              "name": `Egg Rates in ${location}`,
+              "description": `Live egg prices and NECC rates in ${location}. Compare today's egg price, wholesale rates, and retail prices.`,
+              "offers": {
+                "@type": "AggregateOffer",
+                "lowPrice": String(todayRate || 0),
+                "highPrice": String((todayRate || 0) + 0.45),
+                "priceCurrency": "INR",
+                "offerCount": "4",
+                "offers": [
+                  {
+                    "@type": "Offer",
+                    "price": String(todayRate || 0),
+                    "priceCurrency": "INR",
+                    "itemCondition": "https://schema.org/NewCondition",
+                    "availability": "https://schema.org/InStock",
+                    "name": "NECC Wholesale Rate"
+                  },
+                  {
+                    "@type": "Offer",
+                    "price": String((todayRate || 0) + 0.35),
+                    "priceCurrency": "INR",
+                    "itemCondition": "https://schema.org/NewCondition",
+                    "availability": "https://schema.org/InStock",
+                    "name": "Retail Rate"
+                  }
+                ]
+              }
+            })}
+          </script>
+        </Helmet>
+      )}
 
       <div className="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
         <div className="bg-white dark:bg-gray-800 shadow-lg rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl">          

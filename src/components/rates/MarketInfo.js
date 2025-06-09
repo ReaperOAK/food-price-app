@@ -35,16 +35,18 @@ const MarketInfo = memo(({ selectedCity, selectedState, isLoading = false }) => 
       </div>
     );
   }
-
   return (
     <>
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(marketSchema)}
-        </script>
-      </Helmet>
+      {/* Only render Helmet when not loading to prevent React Helmet errors */}
+      {!isLoading && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(marketSchema)}
+          </script>
+        </Helmet>
+      )}
 
-      <section 
+      <section
         className="mt-8 bg-gradient-to-br from-blue-50 to-white dark:from-gray-800 dark:to-gray-900 
                    p-4 sm:p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300 
                    border border-blue-100 dark:border-gray-700"

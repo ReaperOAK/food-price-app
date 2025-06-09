@@ -37,8 +37,7 @@ const Disclaimer = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      <HeadSection
+    <div className="bg-gray-50 min-h-screen flex flex-col">      <HeadSection
         getSeoTitle={() => pageTitle}
         getSeoDescription={() => pageDescription}
         getSeoKeywords={() => "egg rates, disclaimer, terms of service, egg price accuracy"}
@@ -48,6 +47,7 @@ const Disclaimer = () => {
         selectedCity={selectedCity}
         selectedState={selectedState}
         eggRates={[]}
+        isLoading={false}
       />
 
       <Navbar

@@ -123,8 +123,7 @@ const WebStoryViewer = () => {
       <Footer />
     </div>
   );  const renderContent = () => (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
+    <div className="bg-gray-50 min-h-screen flex flex-col">      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
       {!loading && (
         <HeadSection
           getSeoTitle={() => storyData ? `Egg Rate in ${String(storyData.city || '')}, ${String(storyData.state || '')} - Web Story | Today Egg Rates` : 'Web Story | Today Egg Rates'}
@@ -135,6 +134,7 @@ const WebStoryViewer = () => {
           generateFaqSchema={() => ({})}
           selectedCity={selectedCity}
           selectedState={selectedState}
+          isLoading={loading}
         />
       )}
       <Navbar

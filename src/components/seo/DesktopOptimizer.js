@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import { memo, useEffect } from 'react';
 
-const DesktopOptimizer = memo(() => {
+const DesktopOptimizer = memo(({ isLoading = false }) => {
   useEffect(() => {
     // Desktop-specific performance optimizations
     if (window.innerWidth >= 1024) {
@@ -27,9 +27,10 @@ const DesktopOptimizer = memo(() => {
           import('../prices/DetailedEggInfo.js');
           import('../prices/PriceTrends.js');
         });
-      }
-    }
+      }    }
   }, []);
+
+  if (isLoading) return null;
 
   return (
     <Helmet>

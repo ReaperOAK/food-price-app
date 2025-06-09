@@ -30,8 +30,7 @@ const TOS = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      <HeadSection
+    <div className="bg-gray-50 min-h-screen flex flex-col">      <HeadSection
         getSeoTitle={() => pageTitle}
         getSeoDescription={() => pageDescription}
         getSeoKeywords={() => "terms of service, terms and conditions, user agreement, legal terms"}
@@ -41,6 +40,7 @@ const TOS = () => {
         selectedCity={selectedCity}
         selectedState={selectedState}
         eggRates={[]}
+        isLoading={false}
       />
 
       <Navbar

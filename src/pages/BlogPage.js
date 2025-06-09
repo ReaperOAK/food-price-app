@@ -128,8 +128,7 @@ const BlogPage = () => {
     "keywords": blog.tags ? String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags) : 'egg rate, egg price, NECC egg rate'
   };
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
-      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
       {!isLoading && (
         <HeadSection
           getSeoTitle={() => blog ? `${blog.title} - Today Egg Rates` : 'Blog - Today Egg Rates'}
@@ -138,6 +137,7 @@ const BlogPage = () => {
           location={location}
           structuredData={articleSchema}
           generateFaqSchema={() => ({})}
+          isLoading={isLoading}
         />
       )}
       

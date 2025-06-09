@@ -86,8 +86,7 @@ const WebStoriesList = () => {
     </div>
   );
   const renderContent = () => (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
-      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
+    <div className="bg-gray-50 min-h-screen flex flex-col">      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
       {!loading && (
         <HeadSection
           getSeoTitle={() => "Egg Rate Web Stories - Live Price Updates | Today Egg Rates"}
@@ -98,6 +97,7 @@ const WebStoriesList = () => {
           generateFaqSchema={() => ({})}
           selectedCity={selectedCity}
           selectedState={selectedState}
+          isLoading={loading}
         />
       )}
       <Navbar

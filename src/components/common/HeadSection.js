@@ -16,7 +16,8 @@ const HeadSection = memo(({
   eggRates,
   userCountry, // New prop for international optimization
   todayRate,   // New prop for high-traffic city optimization
-  trayPrice    // New prop for high-traffic city optimization
+  trayPrice,   // New prop for high-traffic city optimization
+  isLoading = false // New prop for conditional rendering
 }) => {
   const canonicalUrl = `https://todayeggrates.com${
     location.pathname === '/' 
@@ -370,9 +371,8 @@ const HeadSection = memo(({
       <meta name="mobile-web-app-capable" content="yes" />      {/* Security Headers */}
       <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
       <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
-      
-      {/* Performance and SEO Optimization Components */}
-      <DesktopOptimizer />
+        {/* Performance and SEO Optimization Components */}
+      <DesktopOptimizer isLoading={isLoading} />
       <InternationalSEO 
         userCountry={userCountry}
         selectedCity={selectedCity}
@@ -384,6 +384,7 @@ const HeadSection = memo(({
         selectedState={selectedState} 
         todayRate={todayRate}
         trayPrice={trayPrice}
+        isLoading={isLoading}
       />
     </Helmet>
   );

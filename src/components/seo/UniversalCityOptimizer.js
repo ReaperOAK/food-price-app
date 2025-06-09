@@ -3,7 +3,7 @@ import { memo } from 'react';
 
 // Renamed from UniversalCityOptimizer to UniversalCityOptimizer
 // Now provides equal SEO optimization for ALL cities, not just high-traffic ones
-const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, trayPrice }) => {
+const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, trayPrice, isLoading = false }) => {
   
   // Universal city data generator - works for ANY city
   const generateCityData = (city, state) => {
@@ -48,10 +48,9 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
       impressions: 1000 // Default value for tracking
     };
   };
-
   const cityData = generateCityData(selectedCity, selectedState);
   
-  if (!selectedCity) return null;
+  if (!selectedCity || isLoading) return null;
 
   const formatPrice = (price) => {
     if (price === 'N/A' || !price) return 'N/A';
