@@ -67,7 +67,7 @@ $scripts = [
     
     // Web stories generation and maintenance
     ["$baseDir/webstories/generate_web_stories.php", "Generate web stories"],
-    ["$baseDir/webstories/update_webstory_thumbnails.php", "Update web story thumbnails"],
+    ["$baseDir/webstories/update_webstory_thumbnails_simple.php", "Process web stories (simplified - no thumbnail generation)"],
     ["$baseDir/webstories/delete_old_webstories.php", "Delete old web stories"],
     
     // SEO tools

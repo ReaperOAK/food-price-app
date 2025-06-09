@@ -639,13 +639,12 @@ try {
         
         debug_log("COMPLETE", "Generated {$storiesGenerated} web stories successfully");
         echo "Generated {$storiesGenerated} web stories successfully.<br>";
-        
-        // Set flag to prevent connection closure in update_webstory_thumbnails.php
+          // Set flag to prevent connection closure in update_webstory_thumbnails_simple.php
         $suppressConnectionClose = true;
 
-        // Include thumbnail generation script
-        debug_log("THUMBNAILS", "Including thumbnail generation script");
-        include_once __DIR__ . '/update_webstory_thumbnails.php';
+        // Include simplified webstory processing script (no thumbnail generation)
+        debug_log("THUMBNAILS", "Including simplified webstory processing script");
+        include_once __DIR__ . '/update_webstory_thumbnails_simple.php';
 
         debug_log("COMPLETE", "Generation process completed");
         // Close connection at the very end
