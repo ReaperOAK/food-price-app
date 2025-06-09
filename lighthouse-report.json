@@ -4691,7 +4691,7 @@
                 "width": 162,
                 "height": 30
               },
-              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/maharashtra-egg-rate\">",
+              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/maharashtra-egg-rate-today\">",
               "nodeLabel": "Maharashtra Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
             }
@@ -4710,7 +4710,7 @@
                 "width": 154,
                 "height": 30
               },
-              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/tamil nadu-egg-rate\">",
+              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/tamil nadu-egg-rate-today\">",
               "nodeLabel": "Tamil Nadu Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
             }
@@ -4729,7 +4729,7 @@
                 "width": 146,
                 "height": 30
               },
-              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/karnataka-egg-rate\">",
+              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/karnataka-egg-rate-today\">",
               "nodeLabel": "Karnataka Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
             }
@@ -4748,7 +4748,7 @@
                 "width": 161,
                 "height": 30
               },
-              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/west bengal-egg-rate\">",
+              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/west bengal-egg-rate-today\">",
               "nodeLabel": "West Bengal Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
             }
@@ -4767,7 +4767,7 @@
                 "width": 136,
                 "height": 30
               },
-              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/haryana-egg-rate\">",
+              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/haryana-egg-rate-today\">",
               "nodeLabel": "Haryana Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
             }
@@ -4786,7 +4786,7 @@
                 "width": 123,
                 "height": 30
               },
-              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/kerala-egg-rate\">",
+              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/kerala-egg-rate-today\">",
               "nodeLabel": "Kerala Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
             }
@@ -4805,7 +4805,7 @@
                 "width": 127,
                 "height": 30
               },
-              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/punjab-egg-rate\">",
+              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/punjab-egg-rate-today\">",
               "nodeLabel": "Punjab Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
             }
@@ -4824,7 +4824,7 @@
                 "width": 147,
                 "height": 30
               },
-              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/telangana-egg-rate\">",
+              "snippet": "<a class=\"px-3 py-1 bg-white border border-green-200 rounded-full text-sm text-green…\" href=\"/state/telangana-egg-rate-today\">",
               "nodeLabel": "Telangana Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 10.5pt (14px), font weight: normal). Expected contrast ratio of 4.5:1"
             }
@@ -4843,7 +4843,7 @@
                 "width": 93,
                 "height": 69
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/andhra pradesh-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/andhra pradesh-egg-rate-today\">",
               "nodeLabel": "Andhra Pradesh Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -4885,7 +4885,7 @@
                 "width": 81,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/assam-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/assam-egg-rate-today\">",
               "nodeLabel": "Assam Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -4927,7 +4927,7 @@
                 "width": 72,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/bihar-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/bihar-egg-rate-today\">",
               "nodeLabel": "Bihar Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -4969,7 +4969,7 @@
                 "width": 87,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/chandigarh-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/chandigarh-egg-rate-today\">",
               "nodeLabel": "Chandigarh Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5011,7 +5011,7 @@
                 "width": 96,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/chhattisgarh-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/chhattisgarh-egg-rate-today\">",
               "nodeLabel": "Chhattisgarh Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5053,7 +5053,7 @@
                 "width": 72,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/delhi-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/delhi-egg-rate-today\">",
               "nodeLabel": "Delhi Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5095,7 +5095,7 @@
                 "width": 62,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/goa-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/goa-egg-rate-today\">",
               "nodeLabel": "Goa Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5137,7 +5137,7 @@
                 "width": 88,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/gujarat-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/gujarat-egg-rate-today\">",
               "nodeLabel": "Gujarat Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5179,7 +5179,7 @@
                 "width": 67,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/haryana-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/haryana-egg-rate-today\">",
               "nodeLabel": "Haryana Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5221,7 +5221,7 @@
                 "width": 93,
                 "height": 69
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/himachal pradesh-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/himachal pradesh-egg-rate-today\">",
               "nodeLabel": "Himachal Pradesh Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5263,7 +5263,7 @@
                 "width": 94,
                 "height": 69
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/jammu and kashmir-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/jammu and kashmir-egg-rate-today\">",
               "nodeLabel": "Jammu and Kashmir Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5305,7 +5305,7 @@
                 "width": 79,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/jharkhand-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/jharkhand-egg-rate-today\">",
               "nodeLabel": "Jharkhand Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5347,7 +5347,7 @@
                 "width": 76,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/karnataka-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/karnataka-egg-rate-today\">",
               "nodeLabel": "Karnataka Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5389,7 +5389,7 @@
                 "width": 80,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/kerala-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/kerala-egg-rate-today\">",
               "nodeLabel": "Kerala Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5431,7 +5431,7 @@
                 "width": 67,
                 "height": 69
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/madhya pradesh-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/madhya pradesh-egg-rate-today\">",
               "nodeLabel": "Madhya Pradesh Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5473,7 +5473,7 @@
                 "width": 95,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/maharashtra-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/maharashtra-egg-rate-today\">",
               "nodeLabel": "Maharashtra Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5515,7 +5515,7 @@
                 "width": 67,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/manipur-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/manipur-egg-rate-today\">",
               "nodeLabel": "Manipur Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5557,7 +5557,7 @@
                 "width": 67,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/odisha-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/odisha-egg-rate-today\">",
               "nodeLabel": "Odisha Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5599,7 +5599,7 @@
                 "width": 87,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/puducherry-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/puducherry-egg-rate-today\">",
               "nodeLabel": "Puducherry Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5641,7 +5641,7 @@
                 "width": 85,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/punjab-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/punjab-egg-rate-today\">",
               "nodeLabel": "Punjab Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5683,7 +5683,7 @@
                 "width": 73,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/rajasthan-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/rajasthan-egg-rate-today\">",
               "nodeLabel": "Rajasthan Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5725,7 +5725,7 @@
                 "width": 84,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/special-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/special-egg-rate-today\">",
               "nodeLabel": "special Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5767,7 +5767,7 @@
                 "width": 86,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/tamil nadu-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/tamil nadu-egg-rate-today\">",
               "nodeLabel": "Tamil Nadu Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5809,7 +5809,7 @@
                 "width": 76,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/telangana-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/telangana-egg-rate-today\">",
               "nodeLabel": "Telangana Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5851,7 +5851,7 @@
                 "width": 93,
                 "height": 69
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/uttar pradesh-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/uttar pradesh-egg-rate-today\">",
               "nodeLabel": "Uttar Pradesh Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5893,7 +5893,7 @@
                 "width": 94,
                 "height": 45
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/uttarakhand-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/uttarakhand-egg-rate-today\">",
               "nodeLabel": "Uttarakhand Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },
@@ -5935,7 +5935,7 @@
                 "width": 67,
                 "height": 69
               },
-              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/west bengal-egg-rate\">",
+              "snippet": "<a class=\"text-green-600 font-bold hover:underline transition duration-200\" href=\"/state/west bengal-egg-rate-today\">",
               "nodeLabel": "West Bengal Egg Rate",
               "explanation": "Fix any of the following:\n  Element has insufficient color contrast of 3.29 (foreground color: #16a34a, background color: #ffffff, font size: 12.0pt (16px), font weight: bold). Expected contrast ratio of 4.5:1"
             },

@@ -78,14 +78,14 @@ export const useRandomSeoLinks = (selectedCity, selectedState) => {
   const formattedCities = randomCities.map(({ city, state }) => ({
     name: city,
     state: state,
-    url: `/${formatCityForUrl(city)}-egg-rate`,
+    url: `/${formatCityForUrl(city)}-egg-rate-today`,
     displayName: `${city} Rates`
   }));
 
   // Format states for display
   const formattedStates = randomStates.map(state => ({
     name: state,
-    url: `/state/${formatStateForUrl(state)}-egg-rate`,
+    url: `/state/${formatStateForUrl(state)}-egg-rate-today`,
     displayName: state
   }));
 

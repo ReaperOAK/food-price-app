@@ -54,7 +54,7 @@ if (!function_exists('generateCitySlug')) {
         $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
         
         // Generate clean slug without state codes
-        $slug = $citySlug . '-egg-rate';
+        $slug = $citySlug . '-egg-rate-today';
         
         error_log("SLUG_DEBUG: Generated clean slug: $slug");
         return $slug;
@@ -166,7 +166,7 @@ if ($cities_result && $cities_result->num_rows > 0) {
             $unique_states[$row['state_name']] = true;
             
             // Add state URL
-            $state_url = 'state/' . strtolower(str_replace(' ', '-', $row['state_name'])) . '-egg-rate';
+            $state_url = 'state/' . strtolower(str_replace(' ', '-', $row['state_name'])) . '-egg-rate-today';
             $state_full_url = $baseUrl . '/' . $state_url;
             
             $xml .= '<url>' . PHP_EOL;
@@ -230,7 +230,7 @@ if ($cities_result && $cities_result->num_rows > 0) {
             $unique_states[$state] = true;
             
             // Add state URL
-            $state_url = 'state/' . strtolower(str_replace(' ', '-', $state)) . '-egg-rate';
+            $state_url = 'state/' . strtolower(str_replace(' ', '-', $state)) . '-egg-rate-today';
             $state_full_url = $baseUrl . '/' . $state_url;
             
             $xml .= '<url>' . PHP_EOL;

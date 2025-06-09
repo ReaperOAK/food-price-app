@@ -63,7 +63,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
         <tr key={i} className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
           {states.slice(i, i + 3).map(state => (
             <td key={state} className="px-6 py-4 text-center">              <Link
-                to={`/state/${safeToLowerCase(state)}-egg-rate`}
+                to={`/state/${safeToLowerCase(state)}-egg-rate-today`}
                 className="inline-flex items-center justify-center w-full px-4 py-2 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
                 title={`Today's Egg Rate in ${state} - NECC Egg Price`}
                 aria-label={`View egg rates for ${state}`}
@@ -86,7 +86,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
         <tr key={i} className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
           {cities.slice(i, i + 3).map(city => (
             <td key={city} className="px-6 py-4 text-center">              <Link
-                to={`/${safeToLowerCase(city)}-egg-rate`}
+                to={`/${safeToLowerCase(city)}-egg-rate-today`}
                 className="inline-flex items-center justify-center w-full px-4 py-2 text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 dark:bg-blue-900 dark:text-blue-100 dark:hover:bg-blue-800"
                 title={`Today's Egg Rate in ${city} - Latest NECC Egg Price`}
                 aria-label={`View egg rates for ${city}`}
@@ -120,7 +120,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {popularCities.map(({ name, state }) => (            <Link 
               key={name}
-              to={`/${safeToLowerCase(name)}-egg-rate`}
+              to={`/${safeToLowerCase(name)}-egg-rate-today`}
               className="group flex flex-col items-center p-4 bg-white border border-blue-200 rounded-lg hover:border-blue-400 hover:shadow-md transition duration-200 dark:bg-gray-800 dark:border-blue-800 dark:hover:border-blue-600"
               title={`Check today's egg rate in ${name}, ${state}`}
             >
@@ -140,7 +140,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
           {popularStates.map(({ name, region }) => (            <Link 
               key={name}
-              to={`/state/${safeToLowerCase(name)}-egg-rate`}
+              to={`/state/${safeToLowerCase(name)}-egg-rate-today`}
               className="group flex flex-col items-center p-4 bg-white border border-green-200 rounded-lg hover:border-green-400 hover:shadow-md transition duration-200 dark:bg-gray-800 dark:border-green-800 dark:hover:border-green-600"
               title={`Check today's egg rates in ${name}, ${region} India`}
             >

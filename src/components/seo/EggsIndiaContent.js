@@ -104,25 +104,25 @@ const EggsIndiaContent = memo(({ selectedCity, selectedState }) => {
                 </h4>
                 <div className="space-y-2">
                   <Link 
-                    to="/mumbai-egg-rate" 
+                    to="/mumbai-egg-rate-today" 
                     className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                   >
                     → Mumbai fresh eggs in India market rates
                   </Link>
                   <Link 
-                    to="/delhi-egg-rate" 
+                    to="/delhi-egg-rate-today" 
                     className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                   >
                     → Delhi farm fresh eggs pricing today
                   </Link>
                   <Link 
-                    to="/bangalore-egg-rate" 
+                    to="/bangalore-egg-rate-today" 
                     className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                   >
                     → Bangalore organic eggs in India rates
                   </Link>
                   <Link 
-                    to="/kolkata-egg-rate" 
+                    to="/kolkata-egg-rate-today" 
                     className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                   >
                     → Kolkata brown egg varieties pricing
@@ -136,25 +136,25 @@ const EggsIndiaContent = memo(({ selectedCity, selectedState }) => {
                 </h4>
                 <div className="space-y-2">
                   <Link 
-                    to="/maharashtra-egg-rate" 
+                    to="/maharashtra-egg-rate-today" 
                     className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                   >
                     → Maharashtra eggs in India market analysis
                   </Link>
                   <Link 
-                    to="/tamil-nadu-egg-rate" 
+                    to="/tamil-nadu-egg-rate-today" 
                     className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                   >
                     → Tamil Nadu cage free eggs pricing
                   </Link>
                   <Link 
-                    to="/uttar-pradesh-egg-rate" 
+                    to="/uttar-pradesh-egg-rate-today" 
                     className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                   >
                     → UP fresh produce eggs market rates
                   </Link>
                   <Link 
-                    to="/bihar-egg-rate" 
+                    to="/bihar-egg-rate-today" 
                     className="block text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
                   >
                     → Bihar village eggs and country eggs rates
@@ -196,28 +196,28 @@ const EggsIndiaContent = memo(({ selectedCity, selectedState }) => {
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <Link 
-                to="/mumbai-egg-rate" 
+                to="/mumbai-egg-rate-today" 
                 className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
                 title="Mumbai eggs in India - today egg rate"
               >
                 Mumbai Rates
               </Link>
               <Link 
-                to="/delhi-egg-rate" 
+                to="/delhi-egg-rate-today" 
                 className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
                 title="Delhi eggs in India - fresh egg prices"
               >
                 Delhi Rates
               </Link>
               <Link 
-                to="/bangalore-egg-rate" 
+                to="/bangalore-egg-rate-today" 
                 className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
                 title="Bangalore eggs in India - farm fresh rates"
               >
                 Bangalore Rates
               </Link>
               <Link 
-                to="/chennai-egg-rate" 
+                to="/chennai-egg-rate-today" 
                 className="text-blue-600 dark:text-blue-400 hover:underline text-sm"
                 title="Chennai eggs in India - brown egg varieties"
               >

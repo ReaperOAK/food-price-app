@@ -6,10 +6,10 @@ const formatSegmentName = (segment, index) => {
   if (!segment) return '';
   
   try {
-    if (typeof segment === 'string' && segment.includes('-egg-rate')) {
+    if (typeof segment === 'string' && segment.includes('-egg-rate-today')) {
       // Safely handle case where segment might be undefined/null
-      return segment.replace('-egg-rate', '').charAt(0).toUpperCase() + 
-             segment.slice(1).replace('-egg-rate', '') + ' Egg Rate';
+      return segment.replace('-egg-rate-today', '').charAt(0).toUpperCase() + 
+             segment.slice(1).replace('-egg-rate-today', '') + ' Egg Rate';
     }
     
     const specialCases = {
@@ -77,8 +77,8 @@ const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
           const lastSegment = pathSegments[pathSegments.length - 1];
           
           // Handle egg rate pages
-          if (lastSegment?.includes('-egg-rate')) {
-            const cityName = lastSegment.replace('-egg-rate', '');
+          if (lastSegment?.includes('-egg-rate-today')) {
+            const cityName = lastSegment.replace('-egg-rate-today', '');
             if (cityName) {
               await Promise.resolve()
                 .then(() => {

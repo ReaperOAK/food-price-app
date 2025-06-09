@@ -61,30 +61,30 @@ const NavigationLinks = memo(({ handleHomeClick, handleCityClick }) => (
       </NavLink>
       
       {/* Popular Cities - existing and new */}
-      <NavLink to="/mumbai-egg-rate" onClick={(e) => handleCityClick('Mumbai', e)} className="lg:block xl:block">
+      <NavLink to="/mumbai-egg-rate-today" onClick={(e) => handleCityClick('Mumbai', e)} className="lg:block xl:block">
         Mumbai
       </NavLink>
-      <NavLink to="/kolkata-egg-rate" onClick={(e) => handleCityClick('Kolkata', e)} className="lg:block xl:block">
+      <NavLink to="/kolkata-egg-rate-today" onClick={(e) => handleCityClick('Kolkata', e)} className="lg:block xl:block">
         Kolkata
       </NavLink>
-      <NavLink to="/lucknow-egg-rate" onClick={(e) => handleCityClick('Lucknow', e)} className="lg:hidden xl:block">
+      <NavLink to="/lucknow-egg-rate-today" onClick={(e) => handleCityClick('Lucknow', e)} className="lg:hidden xl:block">
         Lucknow
       </NavLink>
-      <NavLink to="/barwala-egg-rate" onClick={(e) => handleCityClick('Barwala', e)} className="lg:hidden xl:block">
+      <NavLink to="/barwala-egg-rate-today" onClick={(e) => handleCityClick('Barwala', e)} className="lg:hidden xl:block">
         Barwala
       </NavLink>
-      <NavLink to="/hyderabad-egg-rate" onClick={(e) => handleCityClick('Hyderabad', e)} className="lg:hidden xl:block">
+      <NavLink to="/hyderabad-egg-rate-today" onClick={(e) => handleCityClick('Hyderabad', e)} className="lg:hidden xl:block">
         Hyderabad
       </NavLink>
-      <NavLink to="/chennai-egg-rate" onClick={(e) => handleCityClick('Chennai', e)} className="lg:hidden xl:block">
+      <NavLink to="/chennai-egg-rate-today" onClick={(e) => handleCityClick('Chennai', e)} className="lg:hidden xl:block">
         Chennai
       </NavLink>
       
       {/* Add orphan city links - hidden on smaller screens */}
-      <NavLink to="/delhi-egg-rate" onClick={(e) => handleCityClick('Delhi', e)} className="hidden xl:block">
+      <NavLink to="/delhi-egg-rate-today" onClick={(e) => handleCityClick('Delhi', e)} className="hidden xl:block">
         Delhi
       </NavLink>
-      <NavLink to="/bengaluru-egg-rate" onClick={(e) => handleCityClick('Bengaluru', e)} className="hidden xl:block">
+      <NavLink to="/bengaluru-egg-rate-today" onClick={(e) => handleCityClick('Bengaluru', e)} className="hidden xl:block">
         Bengaluru
       </NavLink>
       
@@ -102,18 +102,18 @@ const NavigationLinks = memo(({ handleHomeClick, handleCityClick }) => (
         
         <div className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
           <div className="p-2 grid grid-cols-2 gap-1">
-            <NavLink to="/state/maharashtra-egg-rate" className="text-xs px-2 py-1">Maharashtra</NavLink>
-            <NavLink to="/state/uttar-pradesh-egg-rate" className="text-xs px-2 py-1">Uttar Pradesh</NavLink>
-            <NavLink to="/state/west-bengal-egg-rate" className="text-xs px-2 py-1">West Bengal</NavLink>
-            <NavLink to="/state/tamil-nadu-egg-rate" className="text-xs px-2 py-1">Tamil Nadu</NavLink>
-            <NavLink to="/state/karnataka-egg-rate" className="text-xs px-2 py-1">Karnataka</NavLink>
-            <NavLink to="/state/telangana-egg-rate" className="text-xs px-2 py-1">Telangana</NavLink>
-            <NavLink to="/state/gujarat-egg-rate" className="text-xs px-2 py-1">Gujarat</NavLink>
-            <NavLink to="/state/rajasthan-egg-rate" className="text-xs px-2 py-1">Rajasthan</NavLink>
-            <NavLink to="/state/andhra-pradesh-egg-rate" className="text-xs px-2 py-1">Andhra Pradesh</NavLink>
-            <NavLink to="/state/madhya-pradesh-egg-rate" className="text-xs px-2 py-1">Madhya Pradesh</NavLink>
-            <NavLink to="/state/haryana-egg-rate" className="text-xs px-2 py-1">Haryana</NavLink>
-            <NavLink to="/state/punjab-egg-rate" className="text-xs px-2 py-1">Punjab</NavLink>
+            <NavLink to="/state/maharashtra-egg-rate-today" className="text-xs px-2 py-1">Maharashtra</NavLink>
+            <NavLink to="/state/uttar-pradesh-egg-rate-today" className="text-xs px-2 py-1">Uttar Pradesh</NavLink>
+            <NavLink to="/state/west-bengal-egg-rate-today" className="text-xs px-2 py-1">West Bengal</NavLink>
+            <NavLink to="/state/tamil-nadu-egg-rate-today" className="text-xs px-2 py-1">Tamil Nadu</NavLink>
+            <NavLink to="/state/karnataka-egg-rate-today" className="text-xs px-2 py-1">Karnataka</NavLink>
+            <NavLink to="/state/telangana-egg-rate-today" className="text-xs px-2 py-1">Telangana</NavLink>
+            <NavLink to="/state/gujarat-egg-rate-today" className="text-xs px-2 py-1">Gujarat</NavLink>
+            <NavLink to="/state/rajasthan-egg-rate-today" className="text-xs px-2 py-1">Rajasthan</NavLink>
+            <NavLink to="/state/andhra-pradesh-egg-rate-today" className="text-xs px-2 py-1">Andhra Pradesh</NavLink>
+            <NavLink to="/state/madhya-pradesh-egg-rate-today" className="text-xs px-2 py-1">Madhya Pradesh</NavLink>
+            <NavLink to="/state/haryana-egg-rate-today" className="text-xs px-2 py-1">Haryana</NavLink>
+            <NavLink to="/state/punjab-egg-rate-today" className="text-xs px-2 py-1">Punjab</NavLink>
           </div>
         </div>
       </div>

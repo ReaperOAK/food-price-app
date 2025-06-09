@@ -40,7 +40,7 @@ if (!function_exists('generateCitySlug')) {
         $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
         
         // Generate clean slug without state codes
-        $slug = $citySlug . '-egg-rate';
+        $slug = $citySlug . '-egg-rate-today';
         
         return $slug;
     }
@@ -278,7 +278,7 @@ if ($result && $result->num_rows > 0) {
         $webstoryFile = null;
         $possiblePatterns = [
             $webstoriesDir . '/' . $citySlug . '.html',
-            $webstoriesDir . '/' . $citySlug . '-egg-rate.html', // Legacy pattern
+            $webstoriesDir . '/' . $citySlug . '-egg-rate-today.html', // Legacy pattern
             $webstoriesDir . '/' . $citySlug . '_egg_rate.html',
             $webstoriesDir . '/egg-rate-' . $citySlug . '.html'
         ];

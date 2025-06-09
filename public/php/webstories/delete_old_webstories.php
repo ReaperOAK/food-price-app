@@ -81,8 +81,8 @@ if (!function_exists('deleteOldWebStories')) {
                 // Extract city slug from filename - handle current clean pattern
                 $citySlug = null;
                 
-                // Current pattern: city-egg-rate.html (e.g., bangalore-egg-rate.html)  
-                if (preg_match('/^(.+)-egg-rate$/', $filename, $matches)) {
+                // Current pattern: city-egg-rate-today.html (e.g., bangalore-egg-rate-today.html)  
+                if (preg_match('/^(.+)-egg-rate-today$/', $filename, $matches)) {
                     $citySlug = $matches[1];
                 }
                 
@@ -136,7 +136,7 @@ if (!function_exists('generateCitySlug')) {
         $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
         
         // Generate clean slug without state codes
-        $slug = $citySlug . '-egg-rate';
+        $slug = $citySlug . '-egg-rate-today';
         
         return $slug;
     }

@@ -35,11 +35,11 @@ const MainPage = () => {
   // Validate and clean state/city parameters
   const validateCityParam = (param) => {
     if (!param) return '';
-    const cleanParam = param.replace('-egg-rate', '');
+    const cleanParam = param.replace('-egg-rate-today', '');
     return nonCityPages.includes(cleanParam) ? '' : cleanParam;
   };
   // State management with initialization from URL
-  const [selectedState, setSelectedState] = useState(() => stateParam?.replace('-egg-rate', '') || '');
+  const [selectedState, setSelectedState] = useState(() => stateParam?.replace('-egg-rate-today', '') || '');
   const [selectedCity, setSelectedCity] = useState(() => validateCityParam(cityParam));
   const [showWebStories, setShowWebStories] = useState(true);
   
@@ -121,7 +121,7 @@ const MainPage = () => {
       }
       // Handle state parameter (only if no city)
       else if (stateParam) {
-        const newState = stateParam.replace('-egg-rate', '');
+        const newState = stateParam.replace('-egg-rate-today', '');
         if (newState !== selectedState) {
           setSelectedState(newState);
           setSelectedCity(''); // Clear city when navigating to state

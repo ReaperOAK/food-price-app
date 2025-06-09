@@ -44,7 +44,7 @@ const PriceOverview = memo(({
           <h1 
             className="relative text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-center mb-4 tracking-tight"
           >
-            {getUniqueH1(selectedCity, selectedState)}
+            {getUniqueH1(selectedCity, selectedState, todayRate)}
           </h1>
           <p className="relative text-center text-blue-100 text-lg sm:text-xl font-medium mb-2">
             Updated {new Date().toLocaleDateString('en-IN', { 

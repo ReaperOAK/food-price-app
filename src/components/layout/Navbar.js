@@ -126,7 +126,7 @@ const Navbar = memo(({
     setSelectedState(state || '');
       // Navigate after state update
     requestAnimationFrame(() => {
-      const path = `/${safeToLowerCase(selectedCityName)}-egg-rate`;
+      const path = `/${safeToLowerCase(selectedCityName)}-egg-rate-today`;
       if (location.pathname !== path) {
         navigate(path, { replace: false }); // Use replace: false to ensure proper navigation
       }
@@ -174,7 +174,7 @@ const Navbar = memo(({
     // Navigate after state update
     requestAnimationFrame(() => {
       const cityName = city && typeof city === 'string' ? city : '';
-      const path = cityName ? `/${safeToLowerCase(cityName)}-egg-rate` : '/';
+      const path = cityName ? `/${safeToLowerCase(cityName)}-egg-rate-today` : '/';
       if (location.pathname !== path) {
         navigate(path, { replace: false }); // Use replace: false to ensure proper navigation
       }

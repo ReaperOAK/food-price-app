@@ -49,43 +49,43 @@ const BlogList = ({ blogs, selectedCity, selectedState, loading = false }) => {
   // Memoize resource links for better performance - Enhanced with orphan pages
   const resourceLinks = useMemo(() => ({
     popularCities: {
-      'Mumbai': '/mumbai-egg-rate',
-      'Delhi': '/delhi-egg-rate',
-      'Hyderabad': '/hyderabad-egg-rate',
-      'Barwala': '/barwala-egg-rate',
-      'Bengaluru': '/bengaluru-egg-rate',
-      'Chennai': '/chennai-egg-rate',
-      'Kolkata': '/kolkata-egg-rate',
-      'Lucknow': '/lucknow-egg-rate',
-      'Kanpur': '/kanpur-(cc)-egg-rate',
-      'Varanasi': '/varanasi-(cc)-egg-rate',
-      'Allahabad': '/allahabad-(cc)-egg-rate',
-      'Muzaffurpur': '/muzaffurpur-(cc)-egg-rate',
-      'Ranchi': '/ranchi--(cc)-egg-rate',
-      'Indore': '/indore-(cc)-egg-rate',
-      'Brahmapur': '/brahmapur-(od)-egg-rate'
+      'Mumbai': '/mumbai-egg-rate-today',
+      'Delhi': '/delhi-egg-rate-today',
+      'Hyderabad': '/hyderabad-egg-rate-today',
+      'Barwala': '/barwala-egg-rate-today',
+      'Bengaluru': '/bengaluru-egg-rate-today',
+      'Chennai': '/chennai-egg-rate-today',
+      'Kolkata': '/kolkata-egg-rate-today',
+      'Lucknow': '/lucknow-egg-rate-today',
+      'Kanpur': '/kanpur-(cc)-egg-rate-today',
+      'Varanasi': '/varanasi-(cc)-egg-rate-today',
+      'Allahabad': '/allahabad-(cc)-egg-rate-today',
+      'Muzaffurpur': '/muzaffurpur-(cc)-egg-rate-today',
+      'Ranchi': '/ranchi--(cc)-egg-rate-today',
+      'Indore': '/indore-(cc)-egg-rate-today',
+      'Brahmapur': '/brahmapur-(od)-egg-rate-today'
     },
-    majorStates: {      'Maharashtra': '/state/maharashtra-egg-rate',
-      'Uttar Pradesh': '/state/uttar-pradesh-egg-rate',
-      'West Bengal': '/state/west-bengal-egg-rate',
-      'Tamil Nadu': '/state/tamil-nadu-egg-rate',
-      'Karnataka': '/state/karnataka-egg-rate',
-      'Telangana': '/state/telangana-egg-rate',
-      'Gujarat': '/state/gujarat-egg-rate',
-      'Rajasthan': '/state/rajasthan-egg-rate',
-      'Andhra Pradesh': '/state/andhra-pradesh-egg-rate',
-      'Madhya Pradesh': '/state/madhya-pradesh-egg-rate',
-      'Haryana': '/state/haryana-egg-rate',
-      'Punjab': '/state/punjab-egg-rate'
+    majorStates: {      'Maharashtra': '/state/maharashtra-egg-rate-today',
+      'Uttar Pradesh': '/state/uttar-pradesh-egg-rate-today',
+      'West Bengal': '/state/west-bengal-egg-rate-today',
+      'Tamil Nadu': '/state/tamil-nadu-egg-rate-today',
+      'Karnataka': '/state/karnataka-egg-rate-today',
+      'Telangana': '/state/telangana-egg-rate-today',
+      'Gujarat': '/state/gujarat-egg-rate-today',
+      'Rajasthan': '/state/rajasthan-egg-rate-today',
+      'Andhra Pradesh': '/state/andhra-pradesh-egg-rate-today',
+      'Madhya Pradesh': '/state/madhya-pradesh-egg-rate-today',
+      'Haryana': '/state/haryana-egg-rate-today',
+      'Punjab': '/state/punjab-egg-rate-today'
     },
     marketResources: {
       'Egg Rate Web Stories': '/webstories',
       'Barwala Market Analysis': '/blog/egg-rate-barwala',
       'Understanding Today\'s Egg Rates': '/blog/blog-1',
       'Egg Rate Trends in India': '/blog/blog-2',
-      'Delhi Egg Market': '/delhi-egg-rate',
-      'Kerala Egg Rates': '/state/kerala-egg-rate',
-      'Bihar Egg Market': '/state/bihar-egg-rate'
+      'Delhi Egg Market': '/delhi-egg-rate-today',
+      'Kerala Egg Rates': '/state/kerala-egg-rate-today',
+      'Bihar Egg Market': '/state/bihar-egg-rate-today'
     }
   }), []);
 

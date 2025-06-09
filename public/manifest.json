@@ -38,21 +38,21 @@
       "name": "Mumbai Egg Rate",
       "short_name": "Mumbai",
       "description": "Check today's egg rate in Mumbai",
-      "url": "/mumbai-egg-rate",
+      "url": "/mumbai-egg-rate-today",
       "icons": [{ "src": "eggpic.webp", "sizes": "192x192" }]
     },
     {
       "name": "Chennai Egg Rate",
       "short_name": "Chennai",
       "description": "Check today's egg rate in Chennai",
-      "url": "/chennai-egg-rate",
+      "url": "/chennai-egg-rate-today",
       "icons": [{ "src": "eggpic.webp", "sizes": "192x192" }]
     },
     {
       "name": "Bangalore Egg Rate",
       "short_name": "Bangalore",
       "description": "Check today's egg rate in Bangalore",
-      "url": "/bangalore-egg-rate",
+      "url": "/bangalore-egg-rate-today",
       "icons": [{ "src": "eggpic.webp", "sizes": "192x192" }]
     }
   ],

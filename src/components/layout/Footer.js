@@ -45,23 +45,23 @@ const legalLinks = [
 
 // Enhanced city and state links for orphan page linking
 const popularCityLinks = [
-  { name: "Mumbai", path: "/mumbai-egg-rate" },
-  { name: "Delhi", path: "/delhi-egg-rate" },
-  { name: "Bengaluru", path: "/bengaluru-egg-rate" },
-  { name: "Chennai", path: "/chennai-egg-rate" },
-  { name: "Hyderabad", path: "/hyderabad-egg-rate" },
-  { name: "Kolkata", path: "/kolkata-egg-rate" },
-  { name: "Lucknow", path: "/lucknow-egg-rate" },
-  { name: "Kanpur", path: "/kanpur-(cc)-egg-rate" }
+  { name: "Mumbai", path: "/mumbai-egg-rate-today" },
+  { name: "Delhi", path: "/delhi-egg-rate-today" },
+  { name: "Bengaluru", path: "/bengaluru-egg-rate-today" },
+  { name: "Chennai", path: "/chennai-egg-rate-today" },
+  { name: "Hyderabad", path: "/hyderabad-egg-rate-today" },
+  { name: "Kolkata", path: "/kolkata-egg-rate-today" },
+  { name: "Lucknow", path: "/lucknow-egg-rate-today" },
+  { name: "Kanpur", path: "/kanpur-(cc)-egg-rate-today" }
 ];
 
 const popularStateLinks = [
-  { name: "Maharashtra", path: "/state/maharashtra-egg-rate" },
-  { name: "Uttar Pradesh", path: "/state/uttar-pradesh-egg-rate" },
-  { name: "West Bengal", path: "/state/west-bengal-egg-rate" },
-  { name: "Tamil Nadu", path: "/state/tamil-nadu-egg-rate" },
-  { name: "Karnataka", path: "/state/karnataka-egg-rate" },
-  { name: "Telangana", path: "/state/telangana-egg-rate" }
+  { name: "Maharashtra", path: "/state/maharashtra-egg-rate-today" },
+  { name: "Uttar Pradesh", path: "/state/uttar-pradesh-egg-rate-today" },
+  { name: "West Bengal", path: "/state/west-bengal-egg-rate-today" },
+  { name: "Tamil Nadu", path: "/state/tamil-nadu-egg-rate-today" },
+  { name: "Karnataka", path: "/state/karnataka-egg-rate-today" },
+  { name: "Telangana", path: "/state/telangana-egg-rate-today" }
 ];
 
 const Footer = memo(() => {

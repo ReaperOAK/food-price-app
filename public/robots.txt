@@ -21,14 +21,14 @@ Crawl-delay: 1
 Host: https://todayeggrates.com
 
 # Priority pages - allow more frequent crawling
-Allow: /mumbai-egg-rate
-Allow: /chennai-egg-rate
-Allow: /bangalore-egg-rate
-Allow: /kolkata-egg-rate
-Allow: /barwala-egg-rate
-Allow: /siliguri-egg-rate
-Allow: /durgapur-egg-rate
-Allow: /hyderabad-egg-rate
+Allow: /mumbai-egg-rate-today
+Allow: /chennai-egg-rate-today
+Allow: /bangalore-egg-rate-today
+Allow: /kolkata-egg-rate-today
+Allow: /barwala-egg-rate-today
+Allow: /siliguri-egg-rate-today
+Allow: /durgapur-egg-rate-today
+Allow: /hyderabad-egg-rate-today
 
 # Disallow duplicate content
 Disallow: /build/

@@ -63,7 +63,7 @@ const StateNavigationGrid = memo(({ selectedState }) => {
         </h4>        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
           {otherStates.filter(state => state.popular).map((state) => (            <Link
               key={state.name}
-              to={`/state/${safeToLowerCase(state?.name).replace(/\s+/g, '-')}-egg-rate`}
+              to={`/state/${safeToLowerCase(state?.name).replace(/\s+/g, '-')}-egg-rate-today`}
               className="group bg-white dark:bg-gray-700 rounded-lg p-4 text-center hover:shadow-md 
                          transition-all duration-200 border border-blue-200 dark:border-gray-600 
                          hover:border-blue-400 dark:hover:border-blue-500 hover:scale-105"
@@ -87,7 +87,7 @@ const StateNavigationGrid = memo(({ selectedState }) => {
         </h4>        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
           {otherStates.filter(state => !state.popular).map((state) => (            <Link
               key={state.name}
-              to={`/state/${safeToLowerCase(state?.name).replace(/\s+/g, '-')}-egg-rate`}
+              to={`/state/${safeToLowerCase(state?.name).replace(/\s+/g, '-')}-egg-rate-today`}
               className="group bg-white dark:bg-gray-700 rounded-md p-3 text-center hover:shadow-sm 
                          transition-all duration-200 border border-gray-200 dark:border-gray-600 
                          hover:border-gray-400 dark:hover:border-gray-500 hover:scale-102"

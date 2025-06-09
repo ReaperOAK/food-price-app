@@ -4,11 +4,11 @@ import DesktopOptimizer from '../seo/DesktopOptimizer';
 import InternationalSEO from '../seo/InternationalSEO'; 
 import UniversalCityOptimizer from '../seo/UniversalCityOptimizer';
 import { 
-  getSimplifiedSeoTitle, 
-  getSimplifiedSeoDescription, 
-  getSimplifiedSeoKeywords,
-  getSimplifiedStructuredData 
-} from '../../utils/simplifiedSEO';
+  getSeoTitle, 
+  getSeoDescription, 
+  getSeoKeywords,
+  getStructuredData 
+} from '../../utils/seo';
 
 const HeadSection = memo(({
   location,
@@ -42,15 +42,14 @@ const HeadSection = memo(({
       }
     }
     return String(value);
-  };
-    // Generate simplified, static SEO content that doesn't change daily
-  const seoTitle = getSimplifiedSeoTitle(selectedCity, selectedState);
-  const seoDescription = getSimplifiedSeoDescription(selectedCity, selectedState);
-  const seoKeywords = getSimplifiedSeoKeywords(selectedCity, selectedState);
-  const simplifiedStructuredData = getSimplifiedStructuredData(selectedCity, selectedState, location);
+  };    // Generate dynamic SEO content with today's rates and dates
+  const seoTitle = getSeoTitle(selectedCity, selectedState, todayRate);
+  const seoDescription = getSeoDescription(selectedCity, selectedState, todayRate);
+  const seoKeywords = getSeoKeywords(selectedCity, selectedState, todayRate);
+  const structuredData = getStructuredData(selectedCity, selectedState, todayRate, trayPrice);
   
   // Ensure title length is optimal for SERP display (under 60 characters)
-  const optimizedTitle = seoTitle.length > 60 ? seoTitle.substring(0, 57) + '...' : seoTitle;
+  const optimizedTitle = seoTitle;
     // Force title update in DOM (helps with React Helmet timing issues)
   React.useEffect(() => {
     if (!isLoading) {
@@ -117,9 +116,8 @@ const HeadSection = memo(({
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         {/* Content freshness signals */}
       <meta name="last-modified" content={safeStringify(new Date().toISOString())} />
-      <meta name="cache-control" content="public, max-age=3600" />      {/* JSON-LD Structured Data - Simplified for SEO consistency */}
-      <script type="application/ld+json">
-        {safeStringify(JSON.stringify(simplifiedStructuredData))}
+      <meta name="cache-control" content="public, max-age=3600" />      {/* JSON-LD Structured Data - Simplified for SEO consistency */}      <script type="application/ld+json">
+        {safeStringify(JSON.stringify(structuredData))}
       </script>
       <script type="application/ld+json">
         {JSON.stringify({
@@ -140,8 +138,8 @@ const HeadSection = memo(({
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "WebPage",          "name": safeStringify(optimizedTitle),
-          "headline": safeStringify(optimizedTitle),
+          "@type": "WebPage",          "name": safeStringify(seoTitle),
+          "headline": safeStringify(seoTitle),
           "description": safeStringify(seoDescription),
           "url": safeStringify(canonicalUrl),
           "dateModified": new Date().toISOString(),

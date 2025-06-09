@@ -23,13 +23,18 @@ const formatPrice = (price) => {
   });
 };
 
-export const getUniqueH1 = (selectedCity, selectedState, today = getFormattedDate()) => {
+export const getUniqueH1 = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
+  const formattedRate = formatPrice(todayRate);
+  
   if (selectedCity) {
+    if (todayRate && todayRate !== 'N/A' && !isNaN(todayRate)) {
+      return `Today Egg Rate in ${selectedCity} - ₹${formattedRate} (${today})`;
+    }
     return `Today Egg Rate in ${selectedCity} - Eggs in India Price ${today}`;
   } else if (selectedState) {
-    return `${selectedState} Egg Rate Today - Today Egg Rate Eggs in India`;
+    return `${selectedState} Egg Rate Today - Today Egg Rate Eggs in India ${today}`;
   } else {
-    return `Eggs in India - Today Egg Rate NECC Live Updates`;
+    return `Eggs in India - Today Egg Rate NECC Live Updates ${today}`;
   }
 };
 
@@ -125,7 +130,11 @@ export const getSeoDescription = (selectedCity, selectedState, todayRate, today 
   }
 };
 
-export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeywords = [
+export const getSeoKeywords = (selectedCity, selectedState, todayRate) => {
+  const today = getFormattedDate();
+  const formattedRate = formatPrice(todayRate);
+  
+  const baseKeywords = [
     'necc egg rate',
     'necc rate',
     'egg rate today',
@@ -194,8 +203,7 @@ export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeyw
   ];
   if (selectedCity) {
     const cityLower = safeToLowerCase(selectedCity);
-    
-    // Comprehensive keyword generation for ALL cities - no special treatment
+      // Comprehensive keyword generation for ALL cities - no special treatment
     const cityKeywords = [
       `necc egg rate ${cityLower}`,
       `${cityLower} egg rate today`,
@@ -226,14 +234,33 @@ export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeyw
       `${cityLower} market rates international`
     ];
     
+    // Add date and rate specific keywords if rate is available
+    if (todayRate && todayRate !== 'N/A' && !isNaN(todayRate)) {
+      cityKeywords.push(
+        `${cityLower} egg rate ₹${formattedRate}`,
+        `egg rate ${cityLower} ${today}`,
+        `${cityLower} egg price ${today}`,
+        `necc rate ${cityLower} ${formattedRate}`,
+        `today ${today} egg rate ${cityLower}`,
+        `${cityLower} egg ${today} price`
+      );
+    }
+    
+    // Add today's date keywords
+    cityKeywords.push(
+      `${cityLower} egg rate ${today}`,
+      `${today} egg rate ${cityLower}`,
+      `${cityLower} ${today} rates`
+    );
+    
     return [
       ...cityKeywords,
       ...baseKeywords,
       ...internationalKeywords
     ].join(', ');
-      } else if (selectedState) {
+    } else if (selectedState) {
     const stateLower = safeToLowerCase(selectedState);
-    return [
+    const stateKeywords = [
       `necc egg rate ${stateLower}`,
       `${stateLower} egg rate today`,
       `today egg rate in ${stateLower}`,
@@ -248,12 +275,21 @@ export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeyw
       `${stateLower} market trends`,
       `${stateLower} poultry market`,
       `${stateLower} egg suppliers`,
+      // Date-specific state keywords
+      `${stateLower} egg rate ${today}`,
+      `${today} egg rate ${stateLower}`,
+      `${stateLower} ${today} rates`,
+      `egg prices ${stateLower} ${today}`
+    ];
+    
+    return [
+      ...stateKeywords,
       ...baseKeywords,
       ...internationalKeywords
     ].join(', ');
-    
-  } else {
-    return [
+      } else {
+    // National level keywords with today's date
+    const nationalKeywords = [
       'necc egg rate today',
       'necc egg rate india',
       'today egg rate',
@@ -274,6 +310,18 @@ export const getSeoKeywords = (selectedCity, selectedState) => {  const baseKeyw
       'necc egg',
       'egg rate',
       'necc rates',
+      // Date-specific national keywords
+      `egg rate india ${today}`,
+      `necc rate ${today}`,
+      `today ${today} egg rate`,
+      `india egg prices ${today}`,
+      `${today} necc rates`,
+      `egg market india ${today}`,
+      `${today} egg rate india`
+    ];
+    
+    return [
+      ...nationalKeywords,
       ...baseKeywords,
       ...internationalKeywords
     ].join(', ');
@@ -348,7 +396,7 @@ export const generateStructuredData = (selectedCity, selectedState, todayRate, t
       "sameAs": "https://en.wikipedia.org/wiki/India"
     },
     "category": "Agricultural Commodity Prices",
-    "keywords": getSeoKeywords(selectedCity, selectedState),
+    "keywords": getSeoKeywords(selectedCity, selectedState, todayRate),
     "dateModified": new Date().toISOString(),
     "datePublished": new Date().toISOString(),
     "review": {
@@ -372,3 +420,6 @@ export const generateStructuredData = (selectedCity, selectedState, todayRate, t
     }
   };
 };
+
+// Export alias for consistency with imports
+export const getStructuredData = generateStructuredData;
