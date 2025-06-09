@@ -67,29 +67,47 @@ function formatImagePath($imagePath) {
 function generateCitySlug($city, $state = null) {
     debug_log("SLUG", "Generating slug for city: {$city}, state: {$state}");
     
+    // Validate input - if city is empty or null, return a default
+    if (empty($city) || !is_string($city)) {
+        debug_log("SLUG", "Invalid city name provided, returning default slug");
+        return 'unknown-city-egg-rate-today';
+    }
+    
     // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)" or "Agra (UP)"
-    $cleanCity = $city;
+    $cleanCity = trim($city);
     
     // Handle various patterns of state codes in city names:
     // Pattern 1: "City (XX)" where XX is a 2-letter state code
-    if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
+    if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $cleanCity, $matches)) {
         $cleanCity = trim($matches[1]);
         debug_log("SLUG", "Removed state code pattern (XX) from city name, using: {$cleanCity}");
     }
     // Pattern 2: "City (State Name)" - remove full state name in parentheses
-    elseif (preg_match('/^(.+?)\s*\([^)]+\)$/', $city, $matches)) {
+    elseif (preg_match('/^(.+?)\s*\([^)]+\)$/', $cleanCity, $matches)) {
         $cleanCity = trim($matches[1]);
         debug_log("SLUG", "Removed state name in parentheses from city name, using: {$cleanCity}");
     }
     // Pattern 3: Check if city name already has state code embedded (like "Agra UP")
-    elseif (preg_match('/^(.+?)\s+([A-Z]{2})$/', $city, $matches)) {
+    elseif (preg_match('/^(.+?)\s+([A-Z]{2})$/', $cleanCity, $matches)) {
         $cleanCity = trim($matches[1]);
         debug_log("SLUG", "Removed embedded state code from city name, using: {$cleanCity}");
+    }
+    
+    // Validate cleaned city name
+    if (empty($cleanCity)) {
+        debug_log("SLUG", "City name became empty after cleaning, using original");
+        $cleanCity = $city;
     }
     
     // Generate the base city slug without state codes
     $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
     $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
+    
+    // Final validation - ensure we have a valid slug
+    if (empty($citySlug)) {
+        debug_log("SLUG", "Generated slug is empty, using fallback");
+        $citySlug = 'unknown-city';
+    }
     
     // Add -egg-rate-today suffix for consistency with sitemap and SEO
     $slug = $citySlug . '-egg-rate-today';
@@ -249,12 +267,18 @@ try {
             // Generate HTML for index file
             $html = "<!DOCTYPE html><html><head><title>Web Stories Index</title></head><body>";
             $html .= "<h1>Web Stories Index</h1><ul>";
-            
-            while ($row = $result->fetch_assoc()) {
+              while ($row = $result->fetch_assoc()) {
                 $city = $row['city'];
                 $state = $row['state'];
                 $rate = $row['rate'];
                 $date = $row['date'];                debug_log("INDEX", "Adding index entry for {$city}, {$state}");                $citySlug = generateCitySlug($city, $state);
+                
+                // Validate slug generation for index
+                if (empty($citySlug) || !is_string($citySlug)) {
+                    debug_log("INDEX", "Failed to generate slug for {$city}, {$state} - skipping");
+                    continue;
+                }
+                
                 $html .= "<li><a href='{$citySlug}.html'>{$city}, {$state} - {$rate} ({$date})</a></li>";
             }
             
@@ -520,7 +544,14 @@ try {
                 continue;
             }
             
-            // Generate the proper city slug with state code            $citySlug = generateCitySlug($city, $state);
+            // Generate the proper city slug with state code
+            $citySlug = generateCitySlug($city, $state);
+            
+            // Additional validation to ensure slug was generated properly
+            if (empty($citySlug) || !is_string($citySlug)) {
+                debug_log("ERROR", "Failed to generate valid slug for city: {$city}, state: {$state}");
+                continue;
+            }
             
             debug_log("STORY", "Processing city: {$city}, {$state} - Rate: ₹{$rate} - Slug: {$citySlug}");
             
