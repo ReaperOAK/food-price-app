@@ -15,31 +15,21 @@ if (!function_exists('debug_log')) {
     }
 }
 
-// Helper function to generate city slug without state code for clean URLs
+// Helper function to generate city slug with -egg-rate-today suffix for consistency with sitemap
 if (!function_exists('generateCitySlug')) {
     function generateCitySlug($city, $state = null) {
-        // Clean the city name by removing any state codes in parentheses like "Allahabad (CC)" or "Agra (UP)"
+        // Clean the city name by removing any state codes in parentheses
         $cleanCity = $city;
-        
-        // Handle various patterns of state codes in city names:
-        // Pattern 1: "City (XX)" where XX is a 2-letter state code
         if (preg_match('/^(.+?)\s*\(([A-Z]{2})\)$/', $city, $matches)) {
             $cleanCity = trim($matches[1]);
         }
-        // Pattern 2: "City (State Name)" - remove full state name in parentheses
-        elseif (preg_match('/^(.+?)\s*\([^)]+\)$/', $city, $matches)) {
-            $cleanCity = trim($matches[1]);
-        }
-        // Pattern 3: Check if city name already has state code embedded (like "Agra UP")
-        elseif (preg_match('/^(.+?)\s+([A-Z]{2})$/', $city, $matches)) {
-            $cleanCity = trim($matches[1]);
-        }
-          // Generate the base city slug without state codes
-        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
-        $citySlug = trim($citySlug, '-'); // Remove leading/trailing dashes
         
-        // Return just the base slug (without -egg-rate-today suffix)
-        return $citySlug;
+        // Generate base slug
+        $citySlug = strtolower(preg_replace('/[^a-zA-Z0-9]+/', '-', $cleanCity));
+        $citySlug = trim($citySlug, '-');
+        
+        // Add -egg-rate-today suffix for consistency with sitemap and SEO
+        return $citySlug . '-egg-rate-today';
     }
 }
 
@@ -263,29 +253,18 @@ $errorCities = 0;
 
 debug_log("PROCESS", "Beginning processing of " . ($result ? $result->num_rows : 0) . " cities");
 
-if ($result && $result->num_rows > 0) {    while ($row = $result->fetch_assoc()) {        $city = $row['city'];
+if ($result && $result->num_rows > 0) {    while ($row = $result->fetch_assoc()) {
+        $city = $row['city'];
         $state = $row['state'];
-        $citySlug = generateCitySlug($city, $state); // This returns the base slug (e.g., "agra")
-        $citySlugWithSuffix = $citySlug . '-egg-rate-today'; // Full slug for filenames (e.g., "agra-egg-rate-today")
+        $citySlug = generateCitySlug($city, $state);
         
         debug_log("CITY", "Processing city: {$city}, {$state}", [
-            "baseSlug" => $citySlug,
-            "fullSlug" => $citySlugWithSuffix
+            "citySlug" => $citySlug
         ]);
-          // Check if we need to update the thumbnail
-        // The webstory files are named with the full slug format (e.g., agra-egg-rate-today.html)
-        $webstoryFile = $webstoriesDir . '/' . $citySlugWithSuffix . '.html';
         
-        if (!file_exists($webstoryFile)) {
-            debug_log("SKIP", "No webstory file found for {$city} at {$webstoryFile}");
-            $skippedCities++;
-            continue;
-        }
-        
-        debug_log("FILES", "Found webstory file: {$webstoryFile}");
-
-        // Use the full city slug for thumbnail naming to match get_web_stories.php expectations
-        $thumbnailFile = $imageDir . '/thumbnail-' . $citySlugWithSuffix . '.webp';
+        // Check webstory and thumbnail files - both use the full slug format
+        $webstoryFile = $webstoriesDir . '/' . $citySlug . '.html';
+        $thumbnailFile = $imageDir . '/thumbnail-' . $citySlug . '.webp';
         
         debug_log("FILES", "Checking files", [
             "webstoryFile" => $webstoryFile,
@@ -470,7 +449,7 @@ if ($result && $result->num_rows > 0) {    while ($row = $result->fetch_assoc())
             } else {
                 debug_log("RATE", "No rate found for {$city}, {$state}");
             }            // Save the thumbnail
-            $thumbnailPath = $imageDir . '/thumbnail-' . $citySlugWithSuffix . '.webp';
+            $thumbnailPath = $imageDir . '/thumbnail-' . $citySlug . '.webp';
             debug_log("SAVE", "Saving thumbnail to {$thumbnailPath}");
             
             $saveResult = imagewebp($thumbnailImage, $thumbnailPath, 90);
@@ -497,7 +476,7 @@ if ($result && $result->num_rows > 0) {    while ($row = $result->fetch_assoc())
                     throw new Exception("Failed to read webstory file: {$webstoryFile}");
                 }
                 
-                $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlugWithSuffix . '.webp';
+                $thumbnailUrl = '/images/webstories/thumbnail-' . $citySlug . '.webp';
                 
                 // Improved pattern matching for the amp-story tag to avoid creating multiple nested tags
                 // We'll search for the entire amp-story opening tag and replace just the poster-portrait-src attribute
@@ -524,7 +503,7 @@ if ($result && $result->num_rows > 0) {    while ($row = $result->fetch_assoc())
                 }
                   // Update or add meta image tag
                 $metaPattern = '/<meta property="og:image" content="[^"]*"/';
-                $metaReplacement = '<meta property="og:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlugWithSuffix . '.webp"';
+                $metaReplacement = '<meta property="og:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlug . '.webp"';
                 
                 if (preg_match($metaPattern, $webstoryContent)) {
                     $webstoryContent = preg_replace($metaPattern, $metaReplacement, $webstoryContent);
@@ -538,7 +517,7 @@ if ($result && $result->num_rows > 0) {    while ($row = $result->fetch_assoc())
                 }
                   // Also update Twitter card image
                 $twitterPattern = '/<meta name="twitter:image" content="[^"]*"/';
-                $twitterReplacement = '<meta name="twitter:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlugWithSuffix . '.webp"';
+                $twitterReplacement = '<meta name="twitter:image" content="https://todayeggrates.com/images/webstories/thumbnail-' . $citySlug . '.webp"';
                 
                 if (preg_match($twitterPattern, $webstoryContent)) {
                     $webstoryContent = preg_replace($twitterPattern, $twitterReplacement, $webstoryContent);
