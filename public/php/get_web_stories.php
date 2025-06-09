@@ -110,11 +110,15 @@ if ($result->num_rows > 0) {
         // Check if the web story file exists (files are stored with full suffix)
         $storyFilename = $storiesDir . '/' . $citySlug . '.html';
         if (file_exists($storyFilename)) {
+            // Use a random image from 1.webp to 20.webp for thumbnail
+            $randomImageNum = rand(1, 20);
+            $randomThumbnail = "/images/webstories/$randomImageNum.webp";
+            
             // Add to stories array
             $stories[] = [
                 'title' => "Egg Rate in $city, $state",
                 'slug' => $citySlug,  // Full slug for URL (e.g., agra-egg-rate-today)
-                'thumbnail' => "/images/webstories/thumbnail-$citySlug.webp",  // Full slug for thumbnail
+                'thumbnail' => $randomThumbnail,  // Random existing image
                 'date' => $displayDate,
                 'rate' => $rate,
                 'city' => $city,

@@ -115,17 +115,23 @@ const OptimizedImage = memo(({
     }
     return '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw';
   }, [className, sizes]);
-
   const optimizedSrcSet = useCallback((src) => {
     const isWebStory = src.includes('/webstories/');
-    const basePath = isWebStory ? '/webstories/optimized/' : '/optimized/';
+    
+    // For webstory thumbnails, don't use optimized versions since they may not exist
+    // Just return the original src
+    if (isWebStory) {
+      return src;
+    }
+    
+    const basePath = '/optimized/';
     const sizes = [300, 600, 900];
     
     return sizes
       .map(size => {
         const optimizedSrc = src
           .replace('.webp', `-${size}.webp`)
-          .replace(isWebStory ? '/webstories/' : '/', basePath);
+          .replace('/', basePath);
         return `${optimizedSrc} ${size}w`;
       })
       .concat(`${src} 1200w`)
@@ -151,8 +157,7 @@ const OptimizedImage = memo(({
                    transition-colors duration-200`}
         aria-hidden="true"
       />
-      
-      {!error && imageLoaded && (
+        {!error && imageLoaded && (
         <img
           ref={imgRef}
           src={src}
@@ -171,7 +176,7 @@ const OptimizedImage = memo(({
           loading={priority ? 'eager' : 'lazy'}
           decoding={priority ? 'sync' : 'async'}
           sizes={getSizes()}
-          srcSet={optimizedSrcSet(src)}
+          {...(!src.includes('/webstories/') && { srcSet: optimizedSrcSet(src) })}
           fetchpriority={priority ? 'high' : /hero|banner/.test(safeToLowerCase(className)) ? 'high' : 'auto'}
           onLoad={(e) => {
             setLoaded(true);
