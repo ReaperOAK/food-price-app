@@ -40,28 +40,7 @@ const WebStoryViewer = () => {
   }, [slug]);
 
   useEffect(() => {
-    fetchStoryData();
-  }, [fetchStoryData]);  const generateStorySchema = () => {
-    if (!storyData) return {};
-    
-    return {
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": `Egg Rate in ${String(storyData.city || '')}, ${String(storyData.state || '')}`,
-      "description": `Current egg rate in ${String(storyData.city || '')}, ${String(storyData.state || '')}: ₹${String(storyData.rate || '')} (Updated: ${String(storyData.date || '')})`,
-      "image": `https://todayeggrates.com${String(storyData.thumbnail || '')}`,
-      "datePublished": String(storyData.date || ''),
-      "dateModified": String(storyData.date || ''),
-      "publisher": {
-        "@type": "Organization",
-        "name": "Today Egg Rates",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://todayeggrates.com/logo.webp"
-        }
-      }
-    };
-  };
+    fetchStoryData();  }, [fetchStoryData]);
 
   const renderLoadingState = () => (
     <div className="bg-gray-50 min-h-screen flex flex-col" role="alert" aria-busy="true">
@@ -126,14 +105,10 @@ const WebStoryViewer = () => {
     <div className="bg-gray-50 min-h-screen flex flex-col">      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
       {!loading && (
         <HeadSection
-          getSeoTitle={() => storyData ? `Egg Rate in ${String(storyData.city || '')}, ${String(storyData.state || '')} - Web Story | Today Egg Rates` : 'Web Story | Today Egg Rates'}
-          getSeoDescription={() => storyData ? `View current egg rates and market updates for ${String(storyData.city || '')}, ${String(storyData.state || '')}. Price: ₹${String(storyData.rate || '')} (Updated: ${String(storyData.date || '')})` : 'Web Story Not Found'}
-          getSeoKeywords={() => storyData ? `egg rate ${String(storyData.city || '')}, ${String(storyData.state || '')} egg price, egg market ${String(storyData.city || '')}` : 'egg rates, egg prices'}
           location={location}
-          structuredData={generateStorySchema()}
-          generateFaqSchema={() => ({})}
-          selectedCity={selectedCity}
-          selectedState={selectedState}
+          selectedCity={storyData?.city || 'Web Story'}
+          selectedState={storyData?.state || ''}
+          eggRates={[]}
           isLoading={loading}
         />
       )}

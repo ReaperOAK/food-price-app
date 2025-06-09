@@ -289,9 +289,9 @@ const RateTable = ({
       );
     }
 
-    return (
+      return (
       <>
-        {selectedCity && (
+        {selectedCity && !isLoading && (
           <Helmet>
             {localBusinessSchema && (
               <script type="application/ld+json">

@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet';
 import { memo, useEffect } from 'react';
-
+// seo
 const DesktopOptimizer = memo(({ isLoading = false }) => {
   useEffect(() => {
     // Desktop-specific performance optimizations

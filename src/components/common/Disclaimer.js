@@ -20,32 +20,11 @@ const Disclaimer = () => {
   const { city, state } = useParams();
   const location = useLocation();
   const [selectedState, setSelectedState] = useState(state || '');
-  const [selectedCity, setSelectedCity] = useState(city || '');
-
-  const pageTitle = "Disclaimer | Today Egg Rates";
-  const pageDescription = "Important disclaimer about egg prices and rates information provided on TodayEggRates.com. Learn about our data accuracy, limitations, and terms of use.";
-
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": pageTitle,
-    "description": pageDescription,
-    "publisher": {
-      "@type": "Organization",
-      "name": "Today Egg Rates"
-    }
-  };
-
-  return (
+  const [selectedCity, setSelectedCity] = useState(city || '');  return (
     <div className="bg-gray-50 min-h-screen flex flex-col">      <HeadSection
-        getSeoTitle={() => pageTitle}
-        getSeoDescription={() => pageDescription}
-        getSeoKeywords={() => "egg rates, disclaimer, terms of service, egg price accuracy"}
         location={location}
-        structuredData={structuredData}
-        generateFaqSchema={() => ({})}
-        selectedCity={selectedCity}
-        selectedState={selectedState}
+        selectedCity="Disclaimer"
+        selectedState=""
         eggRates={[]}
         isLoading={false}
       />
@@ -55,10 +34,8 @@ const Disclaimer = () => {
         setSelectedState={setSelectedState}
         setSelectedCity={setSelectedCity}
         selectedCity={selectedCity}
-      />
-
-      <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
-        <Breadcrumb />
+      />      <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
+        <Breadcrumb isLoading={false} />
         
         <header className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">

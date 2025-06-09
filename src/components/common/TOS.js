@@ -11,34 +11,13 @@ const TOS = () => {
   const location = useLocation();
   const [selectedState, setSelectedState] = useState(state || '');
   const [selectedCity, setSelectedCity] = useState(city || '');
-
-
   const lastUpdated = '2025-05-29';
-  const pageTitle = 'Terms of Service - Today Egg Rates';
-  const pageDescription = 'Terms of Service for Today Egg Rates - Your trusted source for daily egg prices across India. Read our terms and conditions of use.';
-
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": pageTitle,
-    "description": pageDescription,
-    "dateModified": new Date().toISOString(),
-    "publisher": {
-      "@type": "Organization",
-      "name": "Today Egg Rates"
-    }
-  };
 
   return (
     <div className="bg-gray-50 min-h-screen flex flex-col">      <HeadSection
-        getSeoTitle={() => pageTitle}
-        getSeoDescription={() => pageDescription}
-        getSeoKeywords={() => "terms of service, terms and conditions, user agreement, legal terms"}
         location={location}
-        structuredData={structuredData}
-        generateFaqSchema={() => ({})}
-        selectedCity={selectedCity}
-        selectedState={selectedState}
+        selectedCity="Terms of Service"
+        selectedState=""
         eggRates={[]}
         isLoading={false}
       />
@@ -48,10 +27,8 @@ const TOS = () => {
         setSelectedState={setSelectedState}
         setSelectedCity={setSelectedCity}
         selectedCity={selectedCity}
-      />
-
-      <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
-        <Breadcrumb />
+      />      <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
+        <Breadcrumb isLoading={false} />
         
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           <div className="lg:col-span-1">

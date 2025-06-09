@@ -5,9 +5,8 @@ import Breadcrumb from '../components/layout/Breadcrumb';
 import LoadingSkeleton from '../components/common/LoadingSkeleton';
 import HeadSection from '../components/common/HeadSection';
 import PriceOverview from '../components/prices/PriceOverview';
-import { getUniqueH1, getSeoTitle, getSeoDescription, getSeoKeywords } from '../utils/seo';
+import { getUniqueH1 } from '../utils/seo';
 import { useWebStories, useRates, useLocations, useBlogs } from '../hooks/useData';
-import { generateFaqSchema } from '../components/common/FAQ';
 
 // Lazy load non-critical components
 const RateTable = lazy(() => import('../components/rates/RateTable'));
@@ -98,24 +97,7 @@ const MainPage = () => {
       averagePrice,
       trayPrice,
       isEstimate: false
-    };
-  }, [eggRates]);
-
-    // Memoized SEO data
-  const structuredData = useMemo(() => ({
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": `Eggs in ${displayName}`,
-    "description": `Latest egg rates in ${displayName}. Check today's egg prices updated on ${today}. Single egg price: ₹${priceMetrics.todayRate}, Tray (30 eggs) price: ₹${priceMetrics.trayPrice}`,
-    "offers": {
-      "@type": "AggregateOffer",
-      "priceCurrency": "INR",
-      "lowPrice": String(priceMetrics.todayRate || 0),
-      "highPrice": String(priceMetrics.trayPrice || 0),
-      "priceValidUntil": new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0],
-      "availability": "https://schema.org/InStock"
-    }
-  }), [displayName, today, priceMetrics.todayRate, priceMetrics.trayPrice]);
+    };  }, [eggRates]);
 
   // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {
@@ -206,12 +188,7 @@ const MainPage = () => {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
       {!loading && (
         <HeadSection
-          getSeoTitle={getSeoTitle}
-          getSeoDescription={getSeoDescription}
-          getSeoKeywords={getSeoKeywords}
           location={location}
-          structuredData={structuredData}
-          generateFaqSchema={generateFaqSchema}
           selectedCity={selectedCity}
           selectedState={selectedState}
           eggRates={eggRates}
@@ -228,7 +205,7 @@ const MainPage = () => {
         setSelectedCity={setSelectedCity}
       />      <main className="container mx-auto px-4 w-full max-w-7xl">
         {/* Only render Breadcrumb when not loading to prevent React Helmet errors */}
-        {!loading && <Breadcrumb />}
+        {!loading && <Breadcrumb isLoading={loading} />}
         
         <div id="home" className="py-8 space-y-8">
           <section 

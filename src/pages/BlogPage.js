@@ -29,11 +29,9 @@ const BlogPage = () => {
   
   const { ref, inView } = useInView({
     triggerOnce: true,
-    threshold: 0.1,
-  });
+    threshold: 0.1,  });
   
-  // Format dates for schema and display
-  const formattedDate = blog ? new Date(blog.uploadDate).toISOString() : new Date().toISOString();
+  // Format dates for display
   const displayDate = blog ? new Date(blog.uploadDate).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
@@ -97,55 +95,24 @@ const BlogPage = () => {
           Back to Blog List
         </Link>
       </div>
-    );
-  }
+    );  }
 
-  // Article schema for SEO
-  const articleSchema = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `https://todayeggrates.com/blog/${blog.link}`
-    },
-    "headline": blog.title,
-    "description": blog.description,
-    "image": `https://todayeggrates.com${blog.image}`,
-    "author": {
-      "@type": "Organization",
-      "name": "Today Egg Rates",
-      "url": "https://todayeggrates.com"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "Today Egg Rates",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://todayeggrates.com/logo.webp"
-      }
-    },    "datePublished": formattedDate,
-    "dateModified": formattedDate,
-    "keywords": blog.tags ? String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags) : 'egg rate, egg price, NECC egg rate'
-  };
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
       {!isLoading && (
         <HeadSection
-          getSeoTitle={() => blog ? `${blog.title} - Today Egg Rates` : 'Blog - Today Egg Rates'}
-          getSeoDescription={() => blog ? blog.description : 'View our collection of informative articles about egg rates and market trends across India'}
-          getSeoKeywords={() => blog ? blog.tags ? String(Array.isArray(blog.tags) ? blog.tags.join(', ') : blog.tags) : 'egg rate, egg price, NECC egg rate' : 'egg rates, egg market, egg industry news'}
           location={location}
-          structuredData={articleSchema}
-          generateFaqSchema={() => ({})}
+          selectedCity={blog?.title || 'Blog'}
+          selectedState=""
+          eggRates={[]}
           isLoading={isLoading}
         />
       )}
       
       <Navbar />
-      
-      <main className="flex-grow">
+        <main className="flex-grow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Breadcrumb />
+          <Breadcrumb isLoading={isLoading} />
           
           <article ref={ref} className={`mt-8 transition-opacity duration-1000 ${inView ? 'opacity-100' : 'opacity-0'}`}>
             <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">

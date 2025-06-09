@@ -24,36 +24,15 @@ const PrivacyPolicy = () => {
   const { city, state } = useParams();
   const location = useLocation();
   const [selectedState, setSelectedState] = useState(state || '');
-  const [selectedCity, setSelectedCity] = useState(city || '');
+  const [selectedCity, setSelectedCity] = useState(city || '');  const lastUpdated = "May 29, 2025";
 
-  const lastUpdated = "May 29, 2025";
-  const pageTitle = "Privacy Policy | Today Egg Rates";
-  const pageDescription = "Learn how Today Egg Rates collects, uses, and protects your personal information. Our comprehensive privacy policy explains your rights and our data handling practices.";
-
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": pageTitle,
-    "description": pageDescription,
-    "dateModified": new Date().toISOString(),
-    "publisher": {
-      "@type": "Organization",
-      "name": "Today Egg Rates"
-    }
-  };
-
-  return (
-    <div className="bg-gray-50 min-h-screen flex flex-col">
+  return (<div className="bg-gray-50 min-h-screen flex flex-col">
       <HeadSection
-        getSeoTitle={() => pageTitle}
-        getSeoDescription={() => pageDescription}
-        getSeoKeywords={() => "privacy policy, data protection, personal information, cookies policy, data security"}
         location={location}
-        structuredData={structuredData}
-        generateFaqSchema={() => ({})}
-        selectedCity={selectedCity}
-        selectedState={selectedState}
+        selectedCity="Privacy Policy"
+        selectedState=""
         eggRates={[]}
+        isLoading={false}
       />
 
       <Navbar
@@ -61,10 +40,8 @@ const PrivacyPolicy = () => {
         setSelectedState={setSelectedState}
         setSelectedCity={setSelectedCity}
         selectedCity={selectedCity}
-      />
-
-      <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
-        <Breadcrumb />
+      />      <main className="flex-grow container mx-auto px-4 py-6 max-w-4xl">
+        <Breadcrumb isLoading={false} />
         
         <div className="lg:grid lg:grid-cols-4 lg:gap-8">
           <div className="lg:col-span-1">

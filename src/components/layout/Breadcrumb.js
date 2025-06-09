@@ -154,7 +154,7 @@ const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
   );
 });
 
-const Breadcrumb = memo(({ setSelectedCity, setSelectedState }) => {
+const Breadcrumb = memo(({ setSelectedCity, setSelectedState, isLoading = false }) => {
   const location = useLocation();
     const { pathSegments, items, schema } = useMemo(() => {
     try {
@@ -234,21 +234,22 @@ const Breadcrumb = memo(({ setSelectedCity, setSelectedState }) => {
     scrollbar-thin
     scrollbar-thumb-gray-300
     dark:scrollbar-thumb-gray-600
-    scrollbar-track-transparent
-  `.trim(), []);
+    scrollbar-track-transparent  `.trim(), []);
 
   // Skip rendering if we're on the homepage or if there's an error
-  if (pathSegments.length === 0 || !schema) {
+  if (pathSegments.length === 0 || !schema || isLoading) {
     return null;
   }
   
   return (
     <>
-      <Helmet>
-        <script type="application/ld+json">
-          {JSON.stringify(schema)}
-        </script>
-      </Helmet>
+      {!isLoading && (
+        <Helmet>
+          <script type="application/ld+json">
+            {JSON.stringify(schema)}
+          </script>
+        </Helmet>
+      )}
       
       <nav 
         className={containerClasses}

@@ -89,14 +89,10 @@ const WebStoriesList = () => {
     <div className="bg-gray-50 min-h-screen flex flex-col">      {/* Only render HeadSection when not loading to prevent React Helmet errors */}
       {!loading && (
         <HeadSection
-          getSeoTitle={() => "Egg Rate Web Stories - Live Price Updates | Today Egg Rates"}
-          getSeoDescription={() => "View our collection of web stories featuring live egg rates from cities across India. Get daily price updates, market trends, and regional comparisons in an engaging visual format."}
-          getSeoKeywords={() => "egg rate web stories, egg price updates, live egg rates, city egg prices, daily egg updates, egg market trends"}
           location={location}
-          structuredData={generateStoriesSchema()}
-          generateFaqSchema={() => ({})}
-          selectedCity={selectedCity}
-          selectedState={selectedState}
+          selectedCity="Web Stories"
+          selectedState=""
+          eggRates={[]}
           isLoading={loading}
         />
       )}
@@ -181,27 +177,6 @@ const WebStoriesList = () => {
       <Footer />
     </div>
   );
-
-  const generateStoriesSchema = () => {
-    return {
-      "@context": "https://schema.org",
-      "@type": "ItemList",
-      "itemListElement": webStories.map((story, index) => ({
-        "@type": "ListItem",
-        "position": index + 1,
-        "item": {
-          "@type": "Article",
-          "headline": story.title,
-          "description": `Current egg rate in ${story.city}, ${story.state}: ₹${story.rate}`,
-          "image": `https://todayeggrates.com${story.thumbnail}`,
-          "datePublished": story.date,
-          "dateModified": story.date,
-          "url": `https://todayeggrates.com/webstory/${story.slug}`
-        }
-      }))
-    };
-  };
-
   if (loading) return renderLoadingState();
   if (error) return renderError();
   return renderContent();

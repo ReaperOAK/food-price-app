@@ -3,14 +3,15 @@ import React, { memo } from 'react';
 import DesktopOptimizer from '../seo/DesktopOptimizer';
 import InternationalSEO from '../seo/InternationalSEO'; 
 import UniversalCityOptimizer from '../seo/UniversalCityOptimizer';
+import { 
+  getSimplifiedSeoTitle, 
+  getSimplifiedSeoDescription, 
+  getSimplifiedSeoKeywords,
+  getSimplifiedStructuredData 
+} from '../../utils/simplifiedSEO';
 
 const HeadSection = memo(({
-  getSeoTitle,
-  getSeoDescription,
-  getSeoKeywords,
   location,
-  structuredData,
-  generateFaqSchema,
   selectedCity,
   selectedState,
   eggRates,
@@ -42,19 +43,25 @@ const HeadSection = memo(({
     }
     return String(value);
   };
-  
-  // Generate optimized SEO content
-  const currentRate = todayRate || eggRates?.[0]?.rate;
-  const seoTitle = getSeoTitle(selectedCity, selectedState, currentRate);
-  const seoDescription = getSeoDescription(selectedCity, selectedState, currentRate);
+    // Generate simplified, static SEO content that doesn't change daily
+  const seoTitle = getSimplifiedSeoTitle(selectedCity, selectedState);
+  const seoDescription = getSimplifiedSeoDescription(selectedCity, selectedState);
+  const seoKeywords = getSimplifiedSeoKeywords(selectedCity, selectedState);
+  const simplifiedStructuredData = getSimplifiedStructuredData(selectedCity, selectedState, location);
   
   // Ensure title length is optimal for SERP display (under 60 characters)
   const optimizedTitle = seoTitle.length > 60 ? seoTitle.substring(0, 57) + '...' : seoTitle;
-  
-  // Force title update in DOM (helps with React Helmet timing issues)
+    // Force title update in DOM (helps with React Helmet timing issues)
   React.useEffect(() => {
-    document.title = optimizedTitle;
-  }, [optimizedTitle]);
+    if (!isLoading) {
+      document.title = optimizedTitle;
+    }
+  }, [optimizedTitle, isLoading]);
+
+  // Don't render Helmet if data is still loading
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <Helmet>
@@ -96,10 +103,9 @@ const HeadSection = memo(({
       <meta name="news_keywords" content="NECC egg rate today, live egg prices, Indian egg market, poultry prices" />
       <meta name="article:publisher" content="https://todayeggrates.com" />
       <meta name="article:section" content="Agriculture & Food Prices" />
-      <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />      {/* SEO Meta Tags - Optimized for better SERP title adoption */}
-      <title>{safeStringify(optimizedTitle)}</title>
+      <meta name="article:tag" content="NECC rates, egg prices, poultry market, agricultural commodities" />      {/* SEO Meta Tags - Simplified static approach for better search engine trust */}      <title>{safeStringify(optimizedTitle)}</title>
       <meta name="description" content={safeStringify(seoDescription)} />
-      <meta name="keywords" content={safeStringify(getSeoKeywords(selectedCity, selectedState))} />
+      <meta name="keywords" content={safeStringify(seoKeywords)} />
       <meta name="author" content="Today Egg Rates" />
       <link rel="canonical" href={canonicalUrl} />
         {/* Multiple title signals for better SERP adoption - Google needs confidence */}
@@ -111,13 +117,9 @@ const HeadSection = memo(({
       <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         {/* Content freshness signals */}
       <meta name="last-modified" content={safeStringify(new Date().toISOString())} />
-      <meta name="cache-control" content="public, max-age=3600" />
-        {/* JSON-LD Structured Data */}
+      <meta name="cache-control" content="public, max-age=3600" />      {/* JSON-LD Structured Data - Simplified for SEO consistency */}
       <script type="application/ld+json">
-        {safeStringify(JSON.stringify(structuredData))}
-      </script>
-      <script type="application/ld+json">
-        {safeStringify(JSON.stringify(generateFaqSchema(selectedCity, selectedState, eggRates)))}
+        {safeStringify(JSON.stringify(simplifiedStructuredData))}
       </script>
       <script type="application/ld+json">
         {JSON.stringify({
@@ -144,21 +146,12 @@ const HeadSection = memo(({
           "url": safeStringify(canonicalUrl),
           "dateModified": new Date().toISOString(),
           "datePublished": new Date().toISOString(),
-          "inLanguage": "en-IN",
-          "isPartOf": {
+          "inLanguage": "en-IN",          "isPartOf": {
             "@type": "WebSite",
             "name": "Today Egg Rates",
             "url": "https://todayeggrates.com"
-          },          "mainEntity": currentRate ? {
-            "@type": "Product",
-            "name": "NECC Egg Rate",
-            "offers": {
-              "@type": "Offer",
-              "price": String(currentRate),
-              "priceCurrency": "INR"
-            }
-          } : undefined
-        })}      </script>
+          }
+        })}</script>
       
       {/* SoftwareApplication schema with aggregate rating */}
       <script type="application/ld+json">
