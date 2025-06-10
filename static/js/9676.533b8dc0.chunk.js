@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[9676],{9676:(e,p,o)=>{o.d(p,{$:()=>c});const c=e=>"N/A"===e||null===e||void 0===e?"N/A":"number"===typeof e?e.toFixed(2):e}}]);
