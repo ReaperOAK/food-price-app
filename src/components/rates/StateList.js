@@ -1,7 +1,8 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useMemo, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
+import { fetchStatesAndCities } from '../../services/api';
 
 // Safe string conversion function to prevent toLowerCase errors
 const safeToLowerCase = (value) => {
@@ -10,30 +11,72 @@ const safeToLowerCase = (value) => {
 };
 
 const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
-  // Define popular city and state lists for SEO enhancements with their regions
-  const popularCities = useMemo(() => [
-    { name: 'Mumbai', state: 'Maharashtra' },
-    { name: 'Chennai', state: 'Tamil Nadu' },
-    { name: 'Bangalore', state: 'Karnataka' },
-    { name: 'Kolkata', state: 'West Bengal' },
-    { name: 'Barwala', state: 'Haryana' },
-    { name: 'Siliguri', state: 'West Bengal' },
-    { name: 'Hyderabad', state: 'Telangana' },
-    { name: 'Durgapur', state: 'West Bengal' }
-  ], []);
+  // State for API-driven dynamic data
+  const [apiData, setApiData] = useState({ allCities: [], allStates: [] });
+  const [dataLoading, setDataLoading] = useState(true);
 
-  const popularStates = useMemo(() => [
-    { name: 'Maharashtra', region: 'West' },
-    { name: 'Tamil Nadu', region: 'South' },
-    { name: 'Karnataka', region: 'South' },
-    { name: 'West Bengal', region: 'East' },
-    { name: 'Haryana', region: 'North' },
-    { name: 'Kerala', region: 'South' },
-    { name: 'Punjab', region: 'North' },
-    { name: 'Telangana', region: 'South' }
-  ], []);
-  // Generate schema markup for SEO
+  // Fetch API data to replace hardcoded lists
+  useEffect(() => {
+    const fetchApiData = async () => {
+      try {
+        setDataLoading(true);
+        const data = await fetchStatesAndCities();
+        
+        // Extract all cities with their states from API
+        const allCities = [];
+        const allStates = Object.keys(data).filter(state => 
+          state !== 'Unknown' && state !== 'special'
+        );
+
+        Object.entries(data).forEach(([state, cities]) => {
+          if (state !== 'Unknown' && state !== 'special' && Array.isArray(cities)) {
+            cities.forEach(city => {
+              if (city && typeof city === 'string') {
+                allCities.push({ name: city, state });
+              }
+            });
+          }
+        });
+
+        setApiData({ allCities, allStates });
+      } catch (error) {
+        console.error('Error fetching API data for StateList:', error);
+        // Fallback to some default data if API fails
+        setApiData({ 
+          allCities: [
+            { name: 'Mumbai', state: 'Maharashtra' },
+            { name: 'Delhi', state: 'Delhi' },
+            { name: 'Bangalore', state: 'Karnataka' },
+            { name: 'Chennai', state: 'Tamil Nadu' },
+            { name: 'Hyderabad', state: 'Telangana' },
+            { name: 'Kolkata', state: 'West Bengal' }
+          ], 
+          allStates: ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'West Bengal']
+        });
+      } finally {
+        setDataLoading(false);
+      }
+    };
+
+    fetchApiData();
+  }, []);
+
+  // Get randomized subset of cities for display (12-16 cities per load)
+  const displayCities = useMemo(() => {
+    if (apiData.allCities.length === 0) return [];
+    const shuffled = [...apiData.allCities].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 16);
+  }, [apiData.allCities]);
+
+  // Get randomized subset of states for display (8-10 states per load)  
+  const displayStates = useMemo(() => {
+    if (apiData.allStates.length === 0) return [];
+    const shuffled = [...apiData.allStates].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, 10);
+  }, [apiData.allStates]);  // Generate schema markup for SEO
   const generateSchemaMarkup = useMemo(() => {
+    if (displayStates.length === 0) return {};
+    
     return {
       "@context": "https://schema.org",
       "@type": "WebPage",
@@ -42,19 +85,19 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
       "mainEntity": {
         "@type": "ItemList",
         "itemListElement": [
-          ...popularStates.map((state, index) => ({
+          ...displayStates.map((state, index) => ({
             "@type": "ListItem",
             "position": String(index + 1),
             "item": {
               "@type": "Place",
-              "name": String(`${state.name} Egg Market`),
-              "description": String(`Check daily egg rates in ${state.name}, ${state.region} India`)
+              "name": String(`${state} Egg Market`),
+              "description": String(`Check daily egg rates in ${state} India`)
             }
           }))
         ]
       }
     };
-  }, [popularStates]);
+  }, [displayStates]);
 
   const renderStateTableRows = () => {
     const rows = [];
@@ -112,13 +155,15 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
       </div>
     </div>
   );
-
   const renderPopularCities = () => {
+    const popularCities = displayCities.slice(0, 8); // Get first 8 cities from dynamic data
+    
     return (
       <section className="mt-6 p-6 bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-sm dark:from-gray-800 dark:to-gray-900" aria-labelledby="popular-cities-heading">
         <h3 id="popular-cities-heading" className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Popular City Egg Rates</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {popularCities.map(({ name, state }) => (            <Link 
+          {popularCities.map(({ name, state }) => (
+            <Link 
               key={name}
               to={`/${safeToLowerCase(name)}-egg-rate-today`}
               className="group flex flex-col items-center p-4 bg-white border border-blue-200 rounded-lg hover:border-blue-400 hover:shadow-md transition duration-200 dark:bg-gray-800 dark:border-blue-800 dark:hover:border-blue-600"
@@ -134,18 +179,21 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
   };
 
   const renderPopularStates = () => {
+    const popularStates = displayStates.slice(0, 6); // Get first 6 states from dynamic data
+    
     return (
       <section className="mt-6 p-6 bg-gradient-to-br from-green-50 to-white rounded-lg shadow-sm dark:from-gray-800 dark:to-gray-900" aria-labelledby="popular-states-heading">
         <h3 id="popular-states-heading" className="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Popular State Egg Rates</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-          {popularStates.map(({ name, region }) => (            <Link 
-              key={name}
-              to={`/state/${safeToLowerCase(name)}-egg-rate-today`}
+          {popularStates.map((state) => (
+            <Link 
+              key={state}
+              to={`/state/${safeToLowerCase(state)}-egg-rate-today`}
               className="group flex flex-col items-center p-4 bg-white border border-green-200 rounded-lg hover:border-green-400 hover:shadow-md transition duration-200 dark:bg-gray-800 dark:border-green-800 dark:hover:border-green-600"
-              title={`Check today's egg rates in ${name}, ${region} India`}
+              title={`Check today's egg rates in ${state} India`}
             >
-              <span className="text-lg font-semibold text-green-700 group-hover:text-green-800 dark:text-green-400 dark:group-hover:text-green-300">{name}</span>
-              <span className="text-sm text-gray-600 mt-1 dark:text-gray-400">{region} India</span>
+              <span className="text-lg font-semibold text-green-700 group-hover:text-green-800 dark:text-green-400 dark:group-hover:text-green-300">{state}</span>
+              <span className="text-sm text-gray-600 mt-1 dark:text-gray-400">India</span>
             </Link>
           ))}
         </div>
@@ -153,9 +201,8 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
     );
   };
   return (
-    <>
-      {/* Only render Helmet when not loading to prevent React Helmet errors */}
-      {!isLoading && (
+    <>      {/* Only render Helmet when not loading to prevent React Helmet errors */}
+      {!isLoading && !dataLoading && Object.keys(generateSchemaMarkup).length > 0 && (
         <Helmet>
           <script type="application/ld+json">
             {JSON.stringify(generateSchemaMarkup)}
@@ -167,8 +214,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
         <h2 className="text-center bg-gradient-to-r from-yellow-100 to-yellow-50 rounded-lg w-full p-6 mt-4 text-2xl sm:text-3xl font-bold text-gray-800 dark:from-yellow-900 dark:to-yellow-800 dark:text-gray-100">
           Daily Egg Price in Mandi - National Wholesale Market Rate
         </h2>
-        
-        {isLoading ? renderLoadingSkeleton() : (
+          {(isLoading || dataLoading) ? renderLoadingSkeleton() : (
           <>
             {renderPopularCities()}
             {renderPopularStates()}

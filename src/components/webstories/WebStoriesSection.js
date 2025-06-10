@@ -1,6 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
+import { fetchStatesAndCities } from '../../services/api';
 
 const WebStoriesSection = memo(({
   showWebStories,
@@ -8,6 +9,41 @@ const WebStoriesSection = memo(({
   webStoriesLoading,
   featuredWebStories
 }) => {
+  const [apiData, setApiData] = useState({ cities: [], states: [] });
+  const [apiDataLoading, setApiDataLoading] = useState(false);
+
+  // Fetch API data for related cities linking
+  useEffect(() => {
+    const fetchApiData = async () => {
+      if (apiData.cities.length === 0) {
+        try {
+          setApiDataLoading(true);
+          const data = await fetchStatesAndCities();
+          setApiData(data);
+        } catch (error) {
+          console.error('Error fetching states and cities:', error);
+          // Fallback data in case API fails
+          setApiData({
+            cities: ['Mumbai', 'Delhi', 'Kolkata', 'Chennai', 'Bengaluru', 'Hyderabad', 'Pune', 'Ahmedabad'],
+            states: ['Maharashtra', 'Delhi', 'West Bengal', 'Tamil Nadu', 'Karnataka', 'Telangana']
+          });
+        } finally {
+          setApiDataLoading(false);
+        }
+      }
+    };
+    
+    fetchApiData();
+  }, [apiData.cities.length]);
+
+  // Memoized random cities for better performance and orphan page coverage
+  const randomCities = useMemo(() => {
+    if (apiData.cities.length === 0) return [];
+    return apiData.cities
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 8);
+  }, [apiData.cities]);
+
   const buttonLabel = webStoriesLoading ? 'Loading Stories...' : (showWebStories ? 'Hide Stories' : 'Show Stories');
 
   return (
@@ -131,9 +167,53 @@ const WebStoriesSection = memo(({
             </svg>
             <p className="text-xl font-semibold text-gray-800 mb-2">No Stories Available</p>
             <p className="text-gray-600">Check back later for updates on egg prices and market trends.</p>
-          </div>
-        )}
+          </div>        )}
       </div>
+
+      {/* Related Cities for Orphan Page Linking */}
+      {showWebStories && !apiDataLoading && randomCities.length > 0 && (
+        <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+            Discover Egg Rates in More Cities
+          </h3>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            Explore comprehensive egg rate information and web stories from cities across India
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+            {randomCities.map((city) => (
+              <Link
+                key={city}
+                to={`/${city.toLowerCase().replace(/\s+/g, '-')}-egg-rate-today`}
+                className="bg-gradient-to-r from-indigo-50 to-indigo-100 dark:from-gray-700 dark:to-gray-600 
+                           rounded-lg p-3 text-center hover:shadow-md transition-all duration-200
+                           hover:from-indigo-100 hover:to-indigo-200 dark:hover:from-gray-600 dark:hover:to-gray-500
+                           border border-indigo-200 dark:border-gray-600 group"
+              >
+                <p className="font-medium text-gray-900 dark:text-white text-sm group-hover:text-indigo-700 dark:group-hover:text-indigo-300">
+                  {city}
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  View Stories
+                </p>
+              </Link>
+            ))}
+          </div>
+          
+          {/* Link to full web stories list */}
+          <div className="mt-6 text-center">
+            <Link
+              to="/webstories"
+              className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 
+                         transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              View All Web Stories
+            </Link>
+          </div>
+        </div>
+      )}
     </section>
   );
 });

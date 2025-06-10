@@ -1,5 +1,6 @@
-import { memo } from 'react';
+import { memo, useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { fetchStatesAndCities } from '../../services/api';
 
 // Safe string conversion function to prevent toLowerCase errors
 const safeToLowerCase = (value) => {
@@ -8,40 +9,85 @@ const safeToLowerCase = (value) => {
 };
 
 const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) => {
-  if (!selectedCity) return null;
+  const [apiData, setApiData] = useState({ allCities: [], allStates: [] });
+  const [loading, setLoading] = useState(true);
+
+  // Fetch dynamic data from API to replace hardcoded lists
+  useEffect(() => {
+    const fetchApiData = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchStatesAndCities();
+        
+        // Extract all cities with their states from API
+        const allCities = [];
+        const allStates = Object.keys(data).filter(state => 
+          state !== 'Unknown' && state !== 'special'
+        );
+
+        Object.entries(data).forEach(([state, cities]) => {
+          if (state !== 'Unknown' && state !== 'special' && Array.isArray(cities)) {
+            cities.forEach(city => {
+              if (city && typeof city === 'string') {
+                allCities.push({ city, state });
+              }
+            });
+          }
+        });
+
+        setApiData({ allCities, allStates });
+      } catch (error) {
+        console.error('Error fetching API data for RelatedCityLinks:', error);
+        // Fallback to basic data if API fails
+        setApiData({ 
+          allCities: [
+            { city: 'Mumbai', state: 'Maharashtra' },
+            { city: 'Delhi', state: 'Delhi' },
+            { city: 'Bangalore', state: 'Karnataka' },
+            { city: 'Chennai', state: 'Tamil Nadu' },
+            { city: 'Hyderabad', state: 'Telangana' },
+            { city: 'Kolkata', state: 'West Bengal' }
+          ], 
+          allStates: ['Maharashtra', 'Delhi', 'Karnataka', 'Tamil Nadu', 'Telangana', 'West Bengal']
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchApiData();
+  }, []);
 
   // Get related cities from the same state or nearby popular cities
-  const getRelatedCities = () => {
-    const sameCities = allCities
-      .filter(city => city.state === selectedState && city.city !== selectedCity)
+  const getRelatedCities = useMemo(() => {
+    if (apiData.allCities.length === 0) return [];
+    
+    const sameCities = apiData.allCities
+      .filter(cityData => cityData.state === selectedState && cityData.city !== selectedCity)
       .slice(0, 4);
     
-    // Enhanced popular cities list including orphan pages
-    const popularCities = [
-      'Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Hyderabad', 'Kolkata',
-      'Lucknow', 'Kanpur', 'Varanasi', 'Allahabad', 'Muzaffurpur', 
-      'Ranchi', 'Indore', 'Brahmapur'
-    ].filter(city => city !== selectedCity)
-     .slice(0, 8 - sameCities.length);
+    // Get random cities from different states to fill remaining slots
+    const otherCities = apiData.allCities
+      .filter(cityData => cityData.city !== selectedCity && cityData.state !== selectedState)
+      .sort(() => 0.5 - Math.random()) // Randomize
+      .slice(0, 8 - sameCities.length);
     
-    return [...sameCities, ...popularCities.map(city => ({ city, state: 'Various' }))];
-  };
+    return [...sameCities, ...otherCities];
+  }, [apiData.allCities, selectedCity, selectedState]);
 
-  // Get related states for cross-linking
-  const getRelatedStates = () => {
-    const majorStates = [
-      'Maharashtra', 'Uttar Pradesh', 'West Bengal', 'Tamil Nadu', 'Karnataka', 
-      'Telangana', 'Gujarat', 'Rajasthan', 'Andhra Pradesh', 'Madhya Pradesh',
-      'Haryana', 'Punjab', 'Bihar', 'Kerala', 'Odisha', 'Jharkhand'
-    ];
+  // Get related states for cross-linking  
+  const getRelatedStates = useMemo(() => {
+    if (apiData.allStates.length === 0) return [];
     
-    return majorStates
+    return apiData.allStates
       .filter(state => state !== selectedState)
+      .sort(() => 0.5 - Math.random()) // Randomize states
       .slice(0, 6);
-  };
+  }, [apiData.allStates, selectedState]);
+  if (!selectedCity || loading) return null;
 
-  const relatedCities = getRelatedCities();
-  const relatedStates = getRelatedStates();
+  const relatedCities = getRelatedCities;
+  const relatedStates = getRelatedStates;
 
   if (relatedCities.length === 0) return null;
 
@@ -53,13 +99,15 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
         </h3>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          {relatedCities.map((cityData, index) => (            <Link
+          {relatedCities.map((cityData, index) => (
+            <Link
               key={index}
               to={`/${safeToLowerCase(cityData.city)}-egg-rate-today`}
               className="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-gray-700 dark:to-gray-600 
                          rounded-lg p-4 text-center hover:shadow-md transition-all duration-200
                          hover:from-blue-100 hover:to-blue-200 dark:hover:from-gray-600 dark:hover:to-gray-500"
-            >              <p className="font-medium text-gray-900 dark:text-white text-sm">
+            >
+              <p className="font-medium text-gray-900 dark:text-white text-sm">
                 {cityData.city}
               </p>
               <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
@@ -70,17 +118,20 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
         </div>
 
         {/* State-level links */}
-        <div className="border-t border-gray-200 dark:border-gray-600 pt-6">          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+        <div className="border-t border-gray-200 dark:border-gray-600 pt-6">
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
             Explore Farm Fresh Eggs by State Markets
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            {relatedStates.map((state, index) => (              <Link
+            {relatedStates.map((state, index) => (
+              <Link
                 key={index}
                 to={`/state/${safeToLowerCase(state).replace(/\s+/g, '-')}-egg-rate-today`}
                 className="bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20
                            rounded-lg p-3 text-center hover:shadow-md transition-all duration-200 
                            hover:from-green-100 hover:to-green-200 dark:hover:from-green-800/30 dark:hover:to-green-700/30"
-              >                <p className="font-medium text-gray-900 dark:text-white text-xs">
+              >
+                <p className="font-medium text-gray-900 dark:text-white text-xs">
                   {state}
                 </p>
                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
