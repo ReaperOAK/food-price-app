@@ -13,11 +13,10 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
     'GBP': 0.0095,
     'EUR': 0.011
   };
-
   const formatCurrency = (price, currency) => {
     if (!price || price === 'N/A') return 'N/A';
     const convertedPrice = parseFloat(price) * (currencyRates[currency] || 1);
-    return convertedPrice?.toFixed(2);
+    return typeof convertedPrice === 'number' ? convertedPrice.toFixed(2) : 'N/A';
   };
 
   const getCurrencySymbol = (currency) => {

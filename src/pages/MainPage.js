@@ -64,8 +64,7 @@ const MainPage = () => {
       year: 'numeric'
     }),
     []
-  );
-  // Memoized price metrics calculations
+  );  // Memoized price metrics calculations
   const priceMetrics = useMemo(() => {
     if (!eggRates?.length) {
       // If no data available, provide fallback values instead of N/A for better SEO
@@ -76,20 +75,21 @@ const MainPage = () => {
         rate7DaysAgo: fallbackRate,
         weeklyChange: '0.00',
         weeklyChangePercent: '0.00',
-        averagePrice: fallbackRate?.toFixed(2),
-        trayPrice: (fallbackRate * 30)?.toFixed(2),
+        averagePrice: fallbackRate.toFixed(2),
+        trayPrice: (fallbackRate * 30).toFixed(2),
         isEstimate: true // Flag to indicate this is estimated data
       };
     }
 
-    const todayRate = eggRates[0].rate;
-    const rate7DaysAgo = eggRates?.length > 7 ? eggRates[6].rate : todayRate;
-    const weeklyChange = rate7DaysAgo !== todayRate ? (todayRate - rate7DaysAgo)?.toFixed(2) : '0.00';
+    const todayRate = parseFloat(eggRates[0].rate) || 0;
+    const rate7DaysAgo = eggRates?.length > 7 ? (parseFloat(eggRates[6].rate) || 0) : todayRate;
+    const weeklyChange = rate7DaysAgo !== todayRate ? (todayRate - rate7DaysAgo).toFixed(2) : '0.00';
     const weeklyChangePercent = rate7DaysAgo !== todayRate && rate7DaysAgo > 0
-      ? ((todayRate - rate7DaysAgo) / rate7DaysAgo * 100)?.toFixed(2) 
+      ? ((todayRate - rate7DaysAgo) / rate7DaysAgo * 100).toFixed(2) 
       : '0.00';
-    const averagePrice = (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates?.length)?.toFixed(2);
-    const trayPrice = (todayRate * 30)?.toFixed(2);
+    const totalSum = eggRates.reduce((sum, rate) => sum + (parseFloat(rate.rate) || 0), 0);
+    const averagePrice = eggRates.length > 0 ? (totalSum / eggRates.length).toFixed(2) : '0.00';
+    const trayPrice = (todayRate * 30).toFixed(2);
 
     return {
       todayRate,
@@ -99,7 +99,8 @@ const MainPage = () => {
       averagePrice,
       trayPrice,
       isEstimate: false
-    };  }, [eggRates]);
+    };
+  }, [eggRates]);
 
   // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {

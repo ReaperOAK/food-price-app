@@ -35,11 +35,10 @@ const RateSummary = memo(({
   };
 
   const priceChangeClasses = `text-xl sm:text-2xl font-bold ${getPriceChangeColor(rateChange)}`;
-  
-  // Format rate change for screen readers
+    // Format rate change for screen readers
   const rateChangeText = rateChange === 0 
     ? 'Price unchanged' 
-    : `Price ${rateChange > 0 ? 'increased' : 'decreased'} by ₹${Math.abs(rateChange)?.toFixed(2)} (${Math.abs(percentageChange)?.toFixed(1)}%)`;
+    : `Price ${rateChange > 0 ? 'increased' : 'decreased'} by ₹${(typeof rateChange === 'number' ? Math.abs(rateChange).toFixed(2) : '0.00')} (${(typeof percentageChange === 'number' ? Math.abs(percentageChange).toFixed(1) : '0.0')}%)`;
 
   return (
     <div 
@@ -54,11 +53,10 @@ const RateSummary = memo(({
         Last Updated: {latestRateDate}
       </time>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className={cardClasses}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">        <div className={cardClasses}>
           <div className={labelClasses}>Current Rate</div>
-          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Current rate: ₹${latestRate?.toFixed(2)}`}>
-            ₹{latestRate?.toFixed(2)}
+          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Current rate: ₹${typeof latestRate === 'number' ? latestRate.toFixed(2) : '0.00'}`}>
+            ₹{typeof latestRate === 'number' ? latestRate.toFixed(2) : '0.00'}
             <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">per piece</span>
           </div>
         </div>
@@ -74,18 +72,17 @@ const RateSummary = memo(({
         >
           <div className={labelClasses}>Price Change</div>
           <div 
-            className={priceChangeClasses}
-            aria-label={rateChangeText}
+            className={priceChangeClasses}          aria-label={rateChangeText}
           >
-            {rateChange > 0 ? '+' : ''}{rateChange?.toFixed(2)}
-            <span className="text-sm ml-1">({percentageChange > 0 ? '+' : ''}{percentageChange?.toFixed(1)}%)</span>
+            {rateChange > 0 ? '+' : ''}{typeof rateChange === 'number' ? rateChange.toFixed(2) : '0.00'}
+            <span className="text-sm ml-1">({percentageChange > 0 ? '+' : ''}{typeof percentageChange === 'number' ? percentageChange.toFixed(1) : '0.0'}%)</span>
           </div>
         </div>
 
         <div className={cardClasses}>
           <div className={labelClasses}>Tray Price</div>
-          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Tray price: ₹${trayPrice?.toFixed(2)}`}>
-            ₹{trayPrice?.toFixed(2)}
+          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Tray price: ₹${typeof trayPrice === 'number' ? trayPrice.toFixed(2) : '0.00'}`}>
+            ₹{typeof trayPrice === 'number' ? trayPrice.toFixed(2) : '0.00'}
             <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">(30 eggs)</span>
           </div>
         </div>

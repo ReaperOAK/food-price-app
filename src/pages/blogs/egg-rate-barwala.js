@@ -19,10 +19,12 @@ const EggRates = () => {
       })
       .catch(error => {
         console.error('Error fetching egg rates:', error);
-        setIsLoading(false);
-      });
+        setIsLoading(false);      });
   }, []);
-  const todayRate = eggRates?.length > 0 ? parseFloat(eggRates[0].rate)?.toFixed(2) : 'N/A';
+  
+  const todayRate = eggRates?.length > 0 ? 
+    (typeof parseFloat(eggRates[0].rate) === 'number' ? parseFloat(eggRates[0].rate).toFixed(2) : 'N/A') : 
+    'N/A';
 
   return (
     <div>

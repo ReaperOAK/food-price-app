@@ -81,10 +81,9 @@ const TableRow = memo(({
       </button>
     );
   };
-
   const renderPriceCell = (amount, tooltip) => (
     <td className={`${baseCellClasses} text-right`} title={tooltip}>
-      <span className="font-medium">₹{amount?.toFixed(2)}</span>
+      <span className="font-medium">₹{typeof amount === 'number' ? amount.toFixed(2) : '0.00'}</span>
     </td>
   );
 
@@ -140,9 +139,8 @@ const TableRow = memo(({
             step: "0.01",
             min: "0",
             'aria-label': 'Edit rate per piece'
-          })
-        ) : (
-          <span className="font-medium">₹{parseFloat(rate.rate)?.toFixed(2)}</span>
+          })        ) : (
+          <span className="font-medium">₹{typeof rate.rate === 'number' ? rate.rate.toFixed(2) : (typeof parseFloat(rate.rate) === 'number' ? parseFloat(rate.rate).toFixed(2) : '0.00')}</span>
         )}
       </td>
 

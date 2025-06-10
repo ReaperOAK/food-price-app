@@ -161,10 +161,9 @@ const PriceChart = ({
         },
         bodyFont: {
           size: 13,
-        },
-        callbacks: {
+        },        callbacks: {
           label: (context) => {
-            const value = context.raw?.toFixed(2);
+            const value = typeof context.raw === 'number' ? context.raw.toFixed(2) : '0.00';
             return `₹${value} per piece`;
           },
           title: (context) => {
