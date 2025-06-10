@@ -5,7 +5,7 @@ import { useInView } from 'react-intersection-observer';
 export const generateFaqSchema = (selectedCity, selectedState, eggRates) => {
   // We only need currentRate and trayPrice for the FAQ schema
   const currentRate = eggRates?.length > 0 ? eggRates[0].rate : 'N/A';
-  const trayPrice = currentRate !== 'N/A' ? (currentRate * 30)?.tofixed(2) : 'N/A';
+  const trayPrice = currentRate !== 'N/A' ? (currentRate * 30)?.toFixed(2) : 'N/A';
   
   // Format date for display
   const formattedDate = new Date().toLocaleDateString('en-US', {
@@ -172,7 +172,7 @@ const FAQ = memo(({ selectedCity, selectedState, eggRates }) => {
     const rate = eggRates?.length > 0 ? eggRates[0].rate : 'N/A';
     return {
       currentRate: rate,
-      trayPrice: rate !== 'N/A' ? (rate * 30)?.tofixed(2) : 'N/A',
+      trayPrice: rate !== 'N/A' ? (rate * 30)?.toFixed(2) : 'N/A',
       formattedDate: new Date().toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'long',

@@ -14,9 +14,9 @@ const PriceTrends = memo(({ selectedCity, selectedState, eggRates, isLoading = f
   } = useMemo(() => {
     const todayRate = eggRates?.length > 0 ? eggRates[0].rate : 'N/A';
     const rate7DaysAgo = eggRates?.length > 7 ? eggRates[6].rate : 'N/A';
-    const weeklyChange = eggRates?.length > 7 ? (eggRates[0].rate - eggRates[6].rate)?.tofixed(2) : 'N/A';
-    const weeklyChangePercent = eggRates?.length > 7 ? ((eggRates[0].rate - eggRates[6].rate) / eggRates[6].rate * 100)?.tofixed(2) : 'N/A';
-    const averagePrice = eggRates?.length > 0 ? (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates?.length)?.tofixed(2) : 'N/A';
+    const weeklyChange = eggRates?.length > 7 ? (eggRates[0].rate - eggRates[6].rate)?.toFixed(2) : 'N/A';
+    const weeklyChangePercent = eggRates?.length > 7 ? ((eggRates[0].rate - eggRates[6].rate) / eggRates[6].rate * 100)?.toFixed(2) : 'N/A';
+    const averagePrice = eggRates?.length > 0 ? (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates?.length)?.toFixed(2) : 'N/A';
     const isPositiveChange = weeklyChange !== 'N/A' && parseFloat(weeklyChange) > 0;
     const monthlyTrend = eggRates?.length > 30 ? eggRates.slice(0, 30).map(rate => rate.rate) : [];
     

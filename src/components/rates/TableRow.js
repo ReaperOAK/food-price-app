@@ -84,7 +84,7 @@ const TableRow = memo(({
 
   const renderPriceCell = (amount, tooltip) => (
     <td className={`${baseCellClasses} text-right`} title={tooltip}>
-      <span className="font-medium">₹{amount?.tofixed(2)}</span>
+      <span className="font-medium">₹{amount?.toFixed(2)}</span>
     </td>
   );
 
@@ -142,7 +142,7 @@ const TableRow = memo(({
             'aria-label': 'Edit rate per piece'
           })
         ) : (
-          <span className="font-medium">₹{parseFloat(rate.rate)?.tofixed(2)}</span>
+          <span className="font-medium">₹{parseFloat(rate.rate)?.toFixed(2)}</span>
         )}
       </td>
 
