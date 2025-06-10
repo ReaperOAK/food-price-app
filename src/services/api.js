@@ -113,11 +113,32 @@ export const fetchRatesForDays = async (city, state, days) => {
 };
 
 export const fetchAllRates = async (date) => {
-  const response = await fetch(`/php/api/rates/get_all_rates.php?date=${date}`);
-  if (!response.ok) {
-    throw new Error('Failed to fetch all rates');
+  try {
+    const response = await fetch(`/php/api/rates/get_all_rates.php?date=${date}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch all rates');
+    }
+    
+    const data = await response.json();
+    
+    // Validate that we got an array
+    if (!Array.isArray(data)) {
+      console.warn('Expected array but got:', typeof data, data);
+      return [];
+    }
+    
+    // Transform and validate rate data (same as fetchRates)
+    return data.map(item => {
+      const rate = parseFloat(item.rate);
+      return {
+        ...item,
+        rate: isNaN(rate) ? 0 : rate,
+      };
+    });
+  } catch (error) {
+    console.error('Error in fetchAllRates:', error);
+    throw error;
   }
-  return response.json();
 };
 
 export const updateMultipleRates = async (payload) => {
