@@ -164,7 +164,7 @@ const PriceChart = ({
         },
         callbacks: {
           label: (context) => {
-            const value = context.raw.toFixed(2);
+            const value = context.raw?.tofixed(2);
             return `₹${value} per piece`;
           },
           title: (context) => {
@@ -191,7 +191,7 @@ const PriceChart = ({
           display: false
         },
         ticks: {
-          callback: (value) => `₹${Number(value).toFixed(2)}`,
+          callback: (value) => `₹${Number(value)?.tofixed(2)}`,
           color: '#6b7280',
           font: {
             size: 11,

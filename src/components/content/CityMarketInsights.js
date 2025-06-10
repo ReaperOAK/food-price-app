@@ -10,7 +10,7 @@ const CityMarketInsights = memo(({ selectedCity, selectedState, todayRate, trayP
 
   const formatPrice = (price) => {
     if (price === 'N/A' || !price) return 'N/A';
-    return parseFloat(price).toFixed(2);
+    return parseFloat(price)?.tofixed(2);
   };
 
   // Generic market insights that apply to all cities

@@ -76,20 +76,20 @@ const MainPage = () => {
         rate7DaysAgo: fallbackRate,
         weeklyChange: '0.00',
         weeklyChangePercent: '0.00',
-        averagePrice: fallbackRate.toFixed(2),
-        trayPrice: (fallbackRate * 30).toFixed(2),
+        averagePrice: fallbackRate?.tofixed(2),
+        trayPrice: (fallbackRate * 30)?.tofixed(2),
         isEstimate: true // Flag to indicate this is estimated data
       };
     }
 
     const todayRate = eggRates[0].rate;
     const rate7DaysAgo = eggRates?.length > 7 ? eggRates[6].rate : todayRate;
-    const weeklyChange = rate7DaysAgo !== todayRate ? (todayRate - rate7DaysAgo).toFixed(2) : '0.00';
+    const weeklyChange = rate7DaysAgo !== todayRate ? (todayRate - rate7DaysAgo)?.tofixed(2) : '0.00';
     const weeklyChangePercent = rate7DaysAgo !== todayRate && rate7DaysAgo > 0
-      ? ((todayRate - rate7DaysAgo) / rate7DaysAgo * 100).toFixed(2) 
+      ? ((todayRate - rate7DaysAgo) / rate7DaysAgo * 100)?.tofixed(2) 
       : '0.00';
-    const averagePrice = (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates?.length).toFixed(2);
-    const trayPrice = (todayRate * 30).toFixed(2);
+    const averagePrice = (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates?.length)?.tofixed(2);
+    const trayPrice = (todayRate * 30)?.tofixed(2);
 
     return {
       todayRate,

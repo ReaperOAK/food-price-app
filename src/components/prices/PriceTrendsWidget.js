@@ -2,7 +2,7 @@ import { formatPrice } from '../../utils/formatters';
 import { memo } from 'react';
 
 const PriceTrendsWidget = memo(({ today, todayRate, rate7DaysAgo }) => {
-  const weeklyChange = rate7DaysAgo !== 'N/A' ? ((todayRate - rate7DaysAgo) / rate7DaysAgo * 100).toFixed(2) : 'N/A';
+  const weeklyChange = rate7DaysAgo !== 'N/A' ? ((todayRate - rate7DaysAgo) / rate7DaysAgo * 100)?.tofixed(2) : 'N/A';
   const isPositiveChange = weeklyChange !== 'N/A' && parseFloat(weeklyChange) > 0;
 
   return (

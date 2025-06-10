@@ -17,7 +17,7 @@ const InternationalSEO = memo(({ userCountry, selectedCity, selectedState, today
   const formatCurrency = (price, currency) => {
     if (!price || price === 'N/A') return 'N/A';
     const convertedPrice = parseFloat(price) * (currencyRates[currency] || 1);
-    return convertedPrice.toFixed(2);
+    return convertedPrice?.tofixed(2);
   };
 
   const getCurrencySymbol = (currency) => {

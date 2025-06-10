@@ -39,7 +39,7 @@ const RateSummary = memo(({
   // Format rate change for screen readers
   const rateChangeText = rateChange === 0 
     ? 'Price unchanged' 
-    : `Price ${rateChange > 0 ? 'increased' : 'decreased'} by ₹${Math.abs(rateChange).toFixed(2)} (${Math.abs(percentageChange).toFixed(1)}%)`;
+    : `Price ${rateChange > 0 ? 'increased' : 'decreased'} by ₹${Math.abs(rateChange)?.tofixed(2)} (${Math.abs(percentageChange)?.tofixed(1)}%)`;
 
   return (
     <div 
@@ -57,8 +57,8 @@ const RateSummary = memo(({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className={cardClasses}>
           <div className={labelClasses}>Current Rate</div>
-          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Current rate: ₹${latestRate.toFixed(2)}`}>
-            ₹{latestRate.toFixed(2)}
+          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Current rate: ₹${latestRate?.tofixed(2)}`}>
+            ₹{latestRate?.tofixed(2)}
             <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">per piece</span>
           </div>
         </div>
@@ -77,15 +77,15 @@ const RateSummary = memo(({
             className={priceChangeClasses}
             aria-label={rateChangeText}
           >
-            {rateChange > 0 ? '+' : ''}{rateChange.toFixed(2)}
-            <span className="text-sm ml-1">({percentageChange > 0 ? '+' : ''}{percentageChange.toFixed(1)}%)</span>
+            {rateChange > 0 ? '+' : ''}{rateChange?.tofixed(2)}
+            <span className="text-sm ml-1">({percentageChange > 0 ? '+' : ''}{percentageChange?.tofixed(1)}%)</span>
           </div>
         </div>
 
         <div className={cardClasses}>
           <div className={labelClasses}>Tray Price</div>
-          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Tray price: ₹${trayPrice.toFixed(2)}`}>
-            ₹{trayPrice.toFixed(2)}
+          <div className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100" aria-label={`Tray price: ₹${trayPrice?.tofixed(2)}`}>
+            ₹{trayPrice?.tofixed(2)}
             <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">(30 eggs)</span>
           </div>
         </div>
