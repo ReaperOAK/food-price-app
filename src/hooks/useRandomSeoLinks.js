@@ -6,7 +6,7 @@ const getRandomItems = (array, count) => {
   if (!array || array?.length === 0) return [];
   if (array?.length <= count) return array;
   
-  const shuffled = [...array].sort(() => 0.5 - Math.random());
+  const shuffled = [...array]?.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
 

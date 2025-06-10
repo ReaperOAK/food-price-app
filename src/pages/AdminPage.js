@@ -274,7 +274,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
 
   const sortedEggRates = useMemo(() => {
     let sortableRates = [...eggRates];
-    sortableRates.sort((a, b) => {
+    sortableRates?.sort((a, b) => {
       if (sortConfig.key === 'rate') {
         return sortConfig.direction === 'ascending' 
           ? parseFloat(a.rate) - parseFloat(b.rate)

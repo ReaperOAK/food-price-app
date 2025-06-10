@@ -64,14 +64,14 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
   // Get randomized subset of cities for display (12-16 cities per load)
   const displayCities = useMemo(() => {
     if (apiData.allCities?.length === 0) return [];
-    const shuffled = [...apiData.allCities].sort(() => 0.5 - Math.random());
+    const shuffled = [...apiData.allCities]?.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 16);
   }, [apiData.allCities]);
 
   // Get randomized subset of states for display (8-10 states per load)  
   const displayStates = useMemo(() => {
     if (apiData.allStates?.length === 0) return [];
-    const shuffled = [...apiData.allStates].sort(() => 0.5 - Math.random());
+    const shuffled = [...apiData.allStates]?.sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 10);
   }, [apiData.allStates]);  // Generate schema markup for SEO
   const generateSchemaMarkup = useMemo(() => {

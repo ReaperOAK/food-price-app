@@ -69,7 +69,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
     // Get random cities from different states to fill remaining slots
     const otherCities = apiData.allCities
       .filter(cityData => cityData.city !== selectedCity && cityData.state !== selectedState)
-      .sort(() => 0.5 - Math.random()) // Randomize
+      ?.sort(() => 0.5 - Math.random()) // Randomize
       .slice(0, 8 - sameCities?.length);
     
     return [...sameCities, ...otherCities];
@@ -81,7 +81,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
     
     return apiData.allStates
       .filter(state => state !== selectedState)
-      .sort(() => 0.5 - Math.random()) // Randomize states
+      ?.sort(() => 0.5 - Math.random()) // Randomize states
       .slice(0, 6);
   }, [apiData.allStates, selectedState]);
   if (!selectedCity || loading) return null;

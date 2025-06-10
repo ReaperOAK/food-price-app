@@ -6,7 +6,7 @@ const getRandomStories = (stories, count = 3) => {
   if (!stories || stories?.length === 0) return [];
   if (stories?.length <= count) return stories;
   
-  const shuffled = [...stories].sort(() => 0.5 - Math.random());
+  const shuffled = [...stories]?.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);
 };
 

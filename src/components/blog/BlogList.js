@@ -13,7 +13,7 @@ const BlogList = ({ blogs, selectedCity, selectedState, loading = false }) => {
 
   // Memoize sorted blogs to prevent unnecessary re-sorts
   const sortedBlogs = useMemo(() => 
-    [...blogs].sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))
+    [...blogs]?.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))
   , [blogs]);
 
   const contextHeading = useMemo(() => {

@@ -40,7 +40,7 @@ const WebStoriesSection = memo(({
   const randomCities = useMemo(() => {
     if (apiData.cities?.length === 0) return [];
     return apiData.cities
-      .sort(() => 0.5 - Math.random())
+      ?.sort(() => 0.5 - Math.random())
       .slice(0, 8);
   }, [apiData.cities]);
 
