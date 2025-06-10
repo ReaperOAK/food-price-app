@@ -61,12 +61,11 @@ const TableHeader = memo(({
       </div>
     </th>
   );
-
   return (
     <tr>
-      {(!selectedCity && showMarket) && renderHeaderCell(
+      {showMarket && renderHeaderCell(
         'city',
-        showSpecialRates ? 'Market Location' : 'Market',
+        showSpecialRates ? 'Market Location' : (selectedCity ? 'City' : 'Market'),
         true,
         'Sort markets alphabetically'
       )}

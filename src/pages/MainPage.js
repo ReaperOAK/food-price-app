@@ -7,7 +7,7 @@ import HeadSection from '../components/common/HeadSection';
 import PriceOverview from '../components/prices/PriceOverview';
 import { getUniqueH1 } from '../utils/seo';
 import { useWebStories, useRates, useLocations, useBlogs } from '../hooks/useData';
-import { fetchAllRates } from '../services/api';
+import { fetchRates } from '../services/api';
 
 // Lazy load non-critical components
 const RateTable = lazy(() => import('../components/rates/RateTable'));
@@ -141,14 +141,13 @@ const MainPage = () => {
     };    updateStateFromUrl();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateParam, cityParam, loadStateForCity, loadCities]); // Intentionally excluding selectedState and selectedCity to prevent circular dependencies
-
   // Fetch all rates data for SEO table
   useEffect(() => {
     const fetchAllRatesData = async () => {
       try {
         setAllRatesLoading(true);
-        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
-        const data = await fetchAllRates(today);
+        // Use fetchRates without parameters to get latest rates per city (no duplicates)
+        const data = await fetchRates(null, null);
         setAllRates(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching all rates:', error);
@@ -404,7 +403,7 @@ const MainPage = () => {
                         showDate={false}
                         showState={true}
                         showAdmin={false}
-                        showMarket={false}
+                        showMarket={true}
                         itemsPerPage={20}
                         isLoading={allRatesLoading}
                         title="Complete City Coverage"
