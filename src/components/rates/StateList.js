@@ -63,19 +63,19 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
 
   // Get randomized subset of cities for display (12-16 cities per load)
   const displayCities = useMemo(() => {
-    if (apiData.allCities.length === 0) return [];
+    if (apiData.allCities?.length === 0) return [];
     const shuffled = [...apiData.allCities].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 16);
   }, [apiData.allCities]);
 
   // Get randomized subset of states for display (8-10 states per load)  
   const displayStates = useMemo(() => {
-    if (apiData.allStates.length === 0) return [];
+    if (apiData.allStates?.length === 0) return [];
     const shuffled = [...apiData.allStates].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, 10);
   }, [apiData.allStates]);  // Generate schema markup for SEO
   const generateSchemaMarkup = useMemo(() => {
-    if (displayStates.length === 0) return {};
+    if (displayStates?.length === 0) return {};
     
     return {
       "@context": "https://schema.org",
@@ -101,7 +101,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
 
   const renderStateTableRows = () => {
     const rows = [];
-    for (let i = 0; i < states.length; i += 3) {
+    for (let i = 0; i < states?.length; i += 3) {
       rows.push(
         <tr key={i} className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
           {states.slice(i, i + 3).map(state => (
@@ -124,7 +124,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
 
   const renderCityTableRows = () => {
     const rows = [];
-    for (let i = 0; i < cities.length; i += 3) {
+    for (let i = 0; i < cities?.length; i += 3) {
       rows.push(
         <tr key={i} className="bg-white border-b hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
           {cities.slice(i, i + 3).map(city => (
@@ -202,7 +202,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
   };
   return (
     <>      {/* Only render Helmet when not loading to prevent React Helmet errors */}
-      {!isLoading && !dataLoading && Object.keys(generateSchemaMarkup).length > 0 && (
+      {!isLoading && !dataLoading && Object.keys(generateSchemaMarkup)?.length > 0 && (
         <Helmet>
           <script type="application/ld+json">
             {JSON.stringify(generateSchemaMarkup)}
@@ -224,7 +224,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
               <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800">
                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" role="table">
                   <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {states.length > 0 ? renderStateTableRows() : (
+                    {states?.length > 0 ? renderStateTableRows() : (
                       <tr>
                         <td className="px-6 py-4 text-center text-gray-700 dark:text-gray-300" colSpan="3">No data available</td>
                       </tr>
@@ -234,7 +234,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
               </div>
             </section>
 
-            {cities.length > 0 && (
+            {cities?.length > 0 && (
               <section className="mt-8" aria-labelledby="city-rates-heading">
                 <h2 id="city-rates-heading" className="text-2xl font-bold mb-6 text-center text-gray-800 dark:text-gray-100">City-wise Egg Rates</h2>
                 <div className="overflow-x-auto bg-white rounded-lg shadow dark:bg-gray-800">

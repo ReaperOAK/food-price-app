@@ -184,7 +184,7 @@ const BlogPage = () => {
                     </div>
                     
                     {/* Tags */}
-                    {blog.tags && blog.tags.length > 0 && (
+                    {blog.tags && blog.tags?.length > 0 && (
                       <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
                         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                           Related Topics
@@ -207,7 +207,7 @@ const BlogPage = () => {
             </div>
 
             {/* Related Articles */}
-            {relatedBlogs.length > 0 && (
+            {relatedBlogs?.length > 0 && (
               <section className="mt-12 max-w-4xl mx-auto">
                 <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6">
                   Related Articles

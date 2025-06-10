@@ -3,8 +3,8 @@ import { fetchWebStories, fetchRates, fetchSpecialRates, fetchStates, fetchCitie
 
 // Helper function to randomly select 3 stories
 const getRandomStories = (stories, count = 3) => {
-  if (!stories || stories.length === 0) return [];
-  if (stories.length <= count) return stories;
+  if (!stories || stories?.length === 0) return [];
+  if (stories?.length <= count) return stories;
   
   const shuffled = [...stories].sort(() => 0.5 - Math.random());
   return shuffled.slice(0, count);

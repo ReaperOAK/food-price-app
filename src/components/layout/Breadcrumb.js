@@ -74,7 +74,7 @@ const BreadcrumbItem = memo(({ item, isLast, showSeparator }) => {
         } else {
           // Handle other paths
           const pathSegments = path.split('/').filter(Boolean);
-          const lastSegment = pathSegments[pathSegments.length - 1];
+          const lastSegment = pathSegments[pathSegments?.length - 1];
           
           // Handle egg rate pages
           if (lastSegment?.includes('-egg-rate-today')) {
@@ -166,7 +166,7 @@ const Breadcrumb = memo(({ setSelectedCity, setSelectedState, isLoading = false 
         .split('/')
         .filter(segment => segment !== '' && segment != null);
       
-      if (segments.length === 0) {
+      if (segments?.length === 0) {
         return { pathSegments: [], items: [], schema: null };
       }
 
@@ -237,7 +237,7 @@ const Breadcrumb = memo(({ setSelectedCity, setSelectedState, isLoading = false 
     scrollbar-track-transparent  `.trim(), []);
 
   // Skip rendering if we're on the homepage or if there's an error
-  if (pathSegments.length === 0 || !schema || isLoading) {
+  if (pathSegments?.length === 0 || !schema || isLoading) {
     return null;
   }
   
@@ -276,8 +276,8 @@ const Breadcrumb = memo(({ setSelectedCity, setSelectedState, isLoading = false 
                   onStateChange: setSelectedState,
                   onCityChange: setSelectedCity
                 }}
-                isLast={index === items.length - 1}
-                showSeparator={index < items.length - 1}
+                isLast={index === items?.length - 1}
+                showSeparator={index < items?.length - 1}
               />
             </li>
           ))}

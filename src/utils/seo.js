@@ -43,7 +43,7 @@ export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getF
   
   // Helper function to truncate title if it exceeds 60 characters for better SERP display
   const truncateTitle = (title, maxLength = 58) => {
-    if (title.length <= maxLength) return title;
+    if (title?.length <= maxLength) return title;
     return title.substring(0, maxLength - 3) + '...';
   };
   
@@ -70,7 +70,7 @@ export const getSeoTitle = (selectedCity, selectedState, todayRate, today = getF
 export const getSeoDescription = (selectedCity, selectedState, todayRate, today = getFormattedDate()) => {
   // Helper function to ensure description stays within optimal 120-160 chars for SEO
   const truncateDescription = (desc, maxLength = 160) => {
-    if (desc.length <= maxLength) return desc;
+    if (desc?.length <= maxLength) return desc;
     return desc.substring(0, maxLength - 3) + '...';
   };
   // Helper function to get state context for cities (future use)

@@ -77,7 +77,7 @@ const PriceChart = ({
   }
 
   // Empty state
-  if (!data || data.length === 0) {
+  if (!data || data?.length === 0) {
     return (
       <div className="w-full h-[350px] bg-white dark:bg-gray-800 rounded-lg flex items-center justify-center shadow-sm text-center p-4 border border-gray-100 dark:border-gray-700" role="alert" aria-label="No data available">
         <div className="flex flex-col items-center space-y-2">

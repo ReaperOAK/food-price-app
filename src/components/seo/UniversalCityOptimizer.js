@@ -37,7 +37,7 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
       const commonMarketSuffixes = ['Market', 'Bazaar', 'Mandi', 'Trading Center'];
       const areas = ['Main', 'Central', 'Old', 'New', 'Wholesale'];
       
-      return areas.slice(0, 3).map(area => `${area} ${cityName} ${commonMarketSuffixes[Math.floor(Math.random() * commonMarketSuffixes.length)]}`);
+      return areas.slice(0, 3).map(area => `${area} ${cityName} ${commonMarketSuffixes[Math.floor(Math.random() * commonMarketSuffixes?.length)]}`);
     };
 
     return {
@@ -68,7 +68,7 @@ const UniversalCityOptimizer = memo(({ selectedCity, selectedState, todayRate, t
     });
   };
   const getUrgentTitle = () => {
-    const urgencyWord = cityData.urgencyWords[Math.floor(Math.random() * cityData.urgencyWords.length)];
+    const urgencyWord = cityData.urgencyWords[Math.floor(Math.random() * cityData.urgencyWords?.length)];
     const currentTime = getCurrentTime();
     const safeTitle = `🔴 ${String(urgencyWord || '')}: ${String(selectedCity || '')} Egg Rate ₹${formatPrice(todayRate)}/egg | Updated ${currentTime} | NECC Live`;
     return String(safeTitle);

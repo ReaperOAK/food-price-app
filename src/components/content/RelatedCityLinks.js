@@ -60,7 +60,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
 
   // Get related cities from the same state or nearby popular cities
   const getRelatedCities = useMemo(() => {
-    if (apiData.allCities.length === 0) return [];
+    if (apiData.allCities?.length === 0) return [];
     
     const sameCities = apiData.allCities
       .filter(cityData => cityData.state === selectedState && cityData.city !== selectedCity)
@@ -70,14 +70,14 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
     const otherCities = apiData.allCities
       .filter(cityData => cityData.city !== selectedCity && cityData.state !== selectedState)
       .sort(() => 0.5 - Math.random()) // Randomize
-      .slice(0, 8 - sameCities.length);
+      .slice(0, 8 - sameCities?.length);
     
     return [...sameCities, ...otherCities];
   }, [apiData.allCities, selectedCity, selectedState]);
 
   // Get related states for cross-linking  
   const getRelatedStates = useMemo(() => {
-    if (apiData.allStates.length === 0) return [];
+    if (apiData.allStates?.length === 0) return [];
     
     return apiData.allStates
       .filter(state => state !== selectedState)
@@ -89,7 +89,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
   const relatedCities = getRelatedCities;
   const relatedStates = getRelatedStates;
 
-  if (relatedCities.length === 0) return null;
+  if (relatedCities?.length === 0) return null;
 
   return (
     <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">

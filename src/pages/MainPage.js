@@ -65,7 +65,7 @@ const MainPage = () => {
   );
   // Memoized price metrics calculations
   const priceMetrics = useMemo(() => {
-    if (!eggRates.length) {
+    if (!eggRates?.length) {
       // If no data available, provide fallback values instead of N/A for better SEO
       // Use a reasonable fallback price (e.g., average Indian egg price)
       const fallbackRate = 5.50; // Average egg price in India
@@ -81,12 +81,12 @@ const MainPage = () => {
     }
 
     const todayRate = eggRates[0].rate;
-    const rate7DaysAgo = eggRates.length > 7 ? eggRates[6].rate : todayRate;
+    const rate7DaysAgo = eggRates?.length > 7 ? eggRates[6].rate : todayRate;
     const weeklyChange = rate7DaysAgo !== todayRate ? (todayRate - rate7DaysAgo).toFixed(2) : '0.00';
     const weeklyChangePercent = rate7DaysAgo !== todayRate && rate7DaysAgo > 0
       ? ((todayRate - rate7DaysAgo) / rate7DaysAgo * 100).toFixed(2) 
       : '0.00';
-    const averagePrice = (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates.length).toFixed(2);
+    const averagePrice = (eggRates.reduce((sum, rate) => sum + rate.rate, 0) / eggRates?.length).toFixed(2);
     const trayPrice = (todayRate * 30).toFixed(2);
 
     return {
@@ -290,7 +290,7 @@ const MainPage = () => {
                     <QuickInfo {...priceMetrics} />
                   </section>
                 )}                {/* State List Section */}
-                {states.length > 0 && (
+                {states?.length > 0 && (
                   <section aria-label="States and Cities">
                     <StateList 
                       states={states} 
@@ -301,7 +301,7 @@ const MainPage = () => {
                 )}
                 
                 {/* Special Rates Section */}
-                {specialRates.length > 0 && (
+                {specialRates?.length > 0 && (
                   <section aria-label="Special Market Rates">
                     <RateTable
                       key="special-rates"
@@ -342,7 +342,7 @@ const MainPage = () => {
                     />
                   </section>
                 )}                {/* Blog Section */}
-                {blogs.length > 0 && (
+                {blogs?.length > 0 && (
                   <section aria-label="Related Blog Posts">
                     <BlogList 
                       blogs={blogs} 
@@ -352,7 +352,7 @@ const MainPage = () => {
                     />
                   </section>
                 )}{/* Related City Links Section - Universal SEO linking */}
-                {selectedCity && cities.length > 0 && (
+                {selectedCity && cities?.length > 0 && (
                   <section aria-label="Compare Rates in Other Cities">
                     <RelatedCityLinks 
                       selectedCity={selectedCity}
@@ -363,7 +363,7 @@ const MainPage = () => {
                 )}
 
                 {/* All Cities SEO Table - Always show complete city links for SEO */}
-                {(selectedCity || selectedState) && eggRates.length > 0 && (
+                {(selectedCity || selectedState) && eggRates?.length > 0 && (
                   <section aria-label="All Cities Egg Rates" className="mt-8">
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                       <div className="p-6 border-b border-gray-200 dark:border-gray-700">

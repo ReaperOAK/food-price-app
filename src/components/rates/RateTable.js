@@ -38,7 +38,7 @@ const RateTable = ({
   // Fetch API data for related cities linking
   useEffect(() => {
     const fetchApiData = async () => {
-      if (apiData.cities.length === 0) {
+      if (apiData.cities?.length === 0) {
         try {
           setApiDataLoading(true);
           const data = await fetchStatesAndCities();
@@ -57,7 +57,7 @@ const RateTable = ({
     };
     
     fetchApiData();
-  }, [apiData.cities.length]);
+  }, [apiData.cities?.length]);
 
   // Constants for fixed dimensions to prevent CLS (Cumulative Layout Shift)
   const TABLE_MIN_HEIGHT = '400px';
@@ -125,7 +125,7 @@ const RateTable = ({
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = sortedRates.slice(indexOfFirstItem, indexOfLastItem);
-  const pages = Array.from({ length: Math.ceil(rates.length / itemsPerPage) }, (_, i) => i + 1);
+  const pages = Array.from({ length: Math.ceil(rates?.length / itemsPerPage) }, (_, i) => i + 1);
   const requestSort = useCallback((key) => {
     if (externalHandleSort) {
       externalHandleSort(key);
@@ -308,7 +308,7 @@ const RateTable = ({
       return renderLoadingSkeleton();
     }
 
-    if (!rates || rates.length === 0) {
+    if (!rates || rates?.length === 0) {
       return (
         <div className={`${tableClasses} flex items-center justify-center p-8`}>
           <p className="text-gray-500 dark:text-gray-400">No data available</p>
@@ -345,7 +345,7 @@ const RateTable = ({
             </div>
           )}
 
-          {!showSpecialRates && chartData.length > 0 && (
+          {!showSpecialRates && chartData?.length > 0 && (
             <div className="bg-white dark:bg-gray-800 rounded-t-lg">
               <RateSummary 
                 latestRate={latestRate}
@@ -429,7 +429,7 @@ const RateTable = ({
           )}
 
           {/* Related Cities Section for Orphan Page Linking */}
-          {!apiDataLoading && apiData.cities.length > 0 && (
+          {!apiDataLoading && apiData.cities?.length > 0 && (
             <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 Explore Egg Rates in Other Cities

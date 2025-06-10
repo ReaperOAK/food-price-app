@@ -224,7 +224,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
   };
 
   const handleCopyPreviousRates = async () => {
-    if (selectedOptions.length === 0) {
+    if (selectedOptions?.length === 0) {
       alert('Please select at least one city');
       return;
     }
@@ -249,7 +249,7 @@ const AdminPage = ({ setIsAuthenticated }) => {
         date: today
       })).filter(item => item.rate !== '');
 
-      if (newPayload.length === 0) {
+      if (newPayload?.length === 0) {
         alert('No previous rates found for selected cities');
         return;
       }

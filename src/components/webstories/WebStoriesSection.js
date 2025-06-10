@@ -15,7 +15,7 @@ const WebStoriesSection = memo(({
   // Fetch API data for related cities linking
   useEffect(() => {
     const fetchApiData = async () => {
-      if (apiData.cities.length === 0) {
+      if (apiData.cities?.length === 0) {
         try {
           setApiDataLoading(true);
           const data = await fetchStatesAndCities();
@@ -34,11 +34,11 @@ const WebStoriesSection = memo(({
     };
     
     fetchApiData();
-  }, [apiData.cities.length]);
+  }, [apiData.cities?.length]);
 
   // Memoized random cities for better performance and orphan page coverage
   const randomCities = useMemo(() => {
-    if (apiData.cities.length === 0) return [];
+    if (apiData.cities?.length === 0) return [];
     return apiData.cities
       .sort(() => 0.5 - Math.random())
       .slice(0, 8);
@@ -107,7 +107,7 @@ const WebStoriesSection = memo(({
               </div>
             ))}
           </div>
-        ) : featuredWebStories.length > 0 ? (
+        ) : featuredWebStories?.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredWebStories.map((story) => (
               <Link 
@@ -171,7 +171,7 @@ const WebStoriesSection = memo(({
       </div>
 
       {/* Related Cities for Orphan Page Linking */}
-      {showWebStories && !apiDataLoading && randomCities.length > 0 && (
+      {showWebStories && !apiDataLoading && randomCities?.length > 0 && (
         <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
             Discover Egg Rates in More Cities

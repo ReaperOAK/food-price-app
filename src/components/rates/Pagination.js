@@ -24,17 +24,17 @@ const Pagination = ({ currentPage, setCurrentPage, pages, isLoading = false }) =
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'ArrowLeft' && currentPage > 1) {
       setCurrentPage(currentPage - 1);
-    } else if (e.key === 'ArrowRight' && currentPage < pages.length) {
+    } else if (e.key === 'ArrowRight' && currentPage < pages?.length) {
       setCurrentPage(currentPage + 1);
     }
-  }, [currentPage, pages.length, setCurrentPage]);
+  }, [currentPage, pages?.length, setCurrentPage]);
 
   const paginationInfo = useMemo(() => {
-    const totalPages = pages.length;
+    const totalPages = pages?.length;
     const startItem = ((currentPage - 1) * 10) + 1;
     const endItem = Math.min(currentPage * 10, totalPages * 10);
     return `Page ${currentPage} of ${totalPages} (Items ${startItem}-${endItem})`;
-  }, [currentPage, pages.length]);
+  }, [currentPage, pages?.length]);
 
   if (isLoading) {
     return (
@@ -71,8 +71,8 @@ const Pagination = ({ currentPage, setCurrentPage, pages, isLoading = false }) =
           const isCurrentPage = currentPage === number;
           const isNearCurrentPage = Math.abs(currentPage - number) <= 2;
           
-          if (!isNearCurrentPage && number !== 1 && number !== pages.length) {
-            if (number === 2 || number === pages.length - 1) {
+          if (!isNearCurrentPage && number !== 1 && number !== pages?.length) {
+            if (number === 2 || number === pages?.length - 1) {
               return (
                 <span 
                   key={number} 
@@ -99,7 +99,7 @@ const Pagination = ({ currentPage, setCurrentPage, pages, isLoading = false }) =
           );
         })}
 
-        {currentPage < pages.length && (
+        {currentPage < pages?.length && (
           <PageButton
             onClick={() => setCurrentPage(currentPage + 1)}
             ariaLabel="Go to next page"

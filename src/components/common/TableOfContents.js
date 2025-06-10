@@ -109,7 +109,7 @@ const TableOfContents = memo(({ contentId, blogId, isSticky = false }) => {
         debounce((mutations) => {
           const shouldUpdate = mutations.some(mutation => 
             mutation.type === 'childList' && 
-            (mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0)
+            (mutation.addedNodes?.length > 0 || mutation.removedNodes?.length > 0)
           );
           
           if (shouldUpdate) {
@@ -169,7 +169,7 @@ const TableOfContents = memo(({ contentId, blogId, isSticky = false }) => {
     }
   }, [scrollToHeading]);
 
-  if (headings.length === 0) return null;
+  if (headings?.length === 0) return null;
 
   return (
     <nav

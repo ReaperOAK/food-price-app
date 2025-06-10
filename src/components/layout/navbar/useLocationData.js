@@ -37,7 +37,7 @@ const useLocationData = () => {
             };
           }).filter(option => option.value); // Filter out empty city names
 
-          if (cityOptions.length > 0) {
+          if (cityOptions?.length > 0) {
             combinedOptions.push({
               label: state,
               options: cityOptions
@@ -54,7 +54,7 @@ const useLocationData = () => {
             type: 'special'
           }));
         
-        if (specialOptions.length > 0) {
+        if (specialOptions?.length > 0) {
           combinedOptions.push({
             label: 'Special',
             options: specialOptions
@@ -72,7 +72,7 @@ const useLocationData = () => {
             type: 'city'
           }));
 
-        if (unknownCities.length > 0) {
+        if (unknownCities?.length > 0) {
           combinedOptions.push({
             label: 'Other Cities',
             options: unknownCities
