@@ -182,7 +182,7 @@ if ($cities_result && $cities_result->num_rows > 0) {
         if (!isset($unique_states[$row['state_name']])) {
             $unique_states[$row['state_name']] = true;
               // Add state URL
-            $state_url = 'state/' . strtolower(str_replace(' ', '-', $row['state_name'])) . '-egg-rate';
+            $state_url = 'state/' . strtolower(str_replace(' ', '-', $row['state_name'])) . '-egg-rate-today';
             $state_full_url = $baseUrl . '/' . $state_url;
             
             $xml .= '<url>' . PHP_EOL;
@@ -246,7 +246,7 @@ if ($cities_result && $cities_result->num_rows > 0) {
         if (!isset($unique_states[$state])) {
             $unique_states[$state] = true;
               // Add state URL
-            $state_url = 'state/' . strtolower(str_replace(' ', '-', $state)) . '-egg-rate';
+            $state_url = 'state/' . strtolower(str_replace(' ', '-', $state)) . '-egg-rate-today';
             $state_full_url = $baseUrl . '/' . $state_url;
             
             $xml .= '<url>' . PHP_EOL;
