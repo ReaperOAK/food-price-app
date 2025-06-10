@@ -1,9 +1,9 @@
 {
   "files": {
     "main-84781932.js": "/static/js/main-84781932.cc28701a.js",
-    "runtime.js": "/static/js/runtime.eed73baf.js",
+    "runtime.js": "/static/js/runtime.ddae780b.js",
     "static/js/7302.b89100b0.chunk.js": "/static/js/7302.b89100b0.chunk.js",
-    "static/js/7370.89e30dfc.chunk.js": "/static/js/7370.89e30dfc.chunk.js",
+    "static/js/7370.19f3cba9.chunk.js": "/static/js/7370.19f3cba9.chunk.js",
     "static/js/6215.967c3197.chunk.js": "/static/js/6215.967c3197.chunk.js",
     "static/js/410.ecffe6b1.chunk.js": "/static/js/410.ecffe6b1.chunk.js",
     "legal-privacy.js": "/static/js/legal-privacy.60f82fd2.chunk.js",
@@ -12,7 +12,7 @@
     "login-page.js": "/static/js/login-page.e0683622.chunk.js",
     "webstories-list.js": "/static/js/webstories-list.41eb8ed6.chunk.js",
     "webstory-viewer.js": "/static/js/webstory-viewer.1b4fde0b.chunk.js",
-    "static/js/3600.9741bbe9.chunk.js": "/static/js/3600.9741bbe9.chunk.js",
+    "static/js/3600.a24ae519.chunk.js": "/static/js/3600.a24ae519.chunk.js",
     "static/js/4539.feb28e54.chunk.js": "/static/js/4539.feb28e54.chunk.js",
     "static/js/4543.d22bafdd.chunk.js": "/static/js/4543.d22bafdd.chunk.js",
     "static/js/6846.07e7b66a.chunk.js": "/static/js/6846.07e7b66a.chunk.js",
@@ -64,7 +64,7 @@
     "static/js/1024.4c775b44.chunk.js": "/static/js/1024.4c775b44.chunk.js",
     "static/js/2164.9e8eb8a1.chunk.js": "/static/js/2164.9e8eb8a1.chunk.js",
     "static/js/5907.0d46fc36.chunk.js": "/static/js/5907.0d46fc36.chunk.js",
-    "static/js/348.424ae1db.chunk.js": "/static/js/348.424ae1db.chunk.js",
+    "static/js/348.128c76fe.chunk.js": "/static/js/348.128c76fe.chunk.js",
     "static/js/7136.c7f4e2a9.chunk.js": "/static/js/7136.c7f4e2a9.chunk.js",
     "static/js/2313.35fa67a1.chunk.js": "/static/js/2313.35fa67a1.chunk.js",
     "static/js/3536.e355990d.chunk.js": "/static/js/3536.e355990d.chunk.js",
@@ -102,7 +102,7 @@
     "index.html": "/index.html"
   },
   "entrypoints": [
-    "static/js/runtime.eed73baf.js",
+    "static/js/runtime.ddae780b.js",
     "static/js/core-8b4dd223.16c53f64.js",
     "static/js/core-e5bca7e4.3b24e67e.js",
     "static/js/core-8f67ea0a.e21fcd68.js",
