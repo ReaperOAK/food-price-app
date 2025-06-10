@@ -7,6 +7,7 @@ import HeadSection from '../components/common/HeadSection';
 import PriceOverview from '../components/prices/PriceOverview';
 import { getUniqueH1 } from '../utils/seo';
 import { useWebStories, useRates, useLocations, useBlogs } from '../hooks/useData';
+import { fetchAllRates } from '../services/api';
 
 // Lazy load non-critical components
 const RateTable = lazy(() => import('../components/rates/RateTable'));
@@ -37,11 +38,12 @@ const MainPage = () => {
     if (!param) return '';
     const cleanParam = param.replace('-egg-rate-today', '');
     return nonCityPages.includes(cleanParam) ? '' : cleanParam;
-  };
-  // State management with initialization from URL
+  };  // State management with initialization from URL
   const [selectedState, setSelectedState] = useState(() => stateParam?.replace('-egg-rate-today', '') || '');
   const [selectedCity, setSelectedCity] = useState(() => validateCityParam(cityParam));
   const [showWebStories, setShowWebStories] = useState(true);
+  const [allRates, setAllRates] = useState([]);
+  const [allRatesLoading, setAllRatesLoading] = useState(false);
   
   // Custom hooks for data fetching
   const { featuredWebStories, webStoriesLoading } = useWebStories(showWebStories);
@@ -135,11 +137,31 @@ const MainPage = () => {
           setSelectedState('');
         }
       }
-    };
-
-    updateStateFromUrl();
+    };    updateStateFromUrl();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stateParam, cityParam, loadStateForCity, loadCities]); // Intentionally excluding selectedState and selectedCity to prevent circular dependencies
+
+  // Fetch all rates data for SEO table
+  useEffect(() => {
+    const fetchAllRatesData = async () => {
+      try {
+        setAllRatesLoading(true);
+        const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        const data = await fetchAllRates(today);
+        setAllRates(Array.isArray(data) ? data : []);
+      } catch (error) {
+        console.error('Error fetching all rates:', error);
+        setAllRates([]); // Set empty array on error
+      } finally {
+        setAllRatesLoading(false);
+      }
+    };
+
+    // Only fetch all rates when we're on a city or state page
+    if (selectedCity || selectedState) {
+      fetchAllRatesData();
+    }
+  }, [selectedCity, selectedState]);
   
   // Loading skeleton component with content-visibility optimization
   const LoadingComponent = () => (
@@ -373,10 +395,9 @@ const MainPage = () => {
                         <p className="text-gray-600 dark:text-gray-400 text-center mt-2">
                           Compare today's egg prices in major cities across India
                         </p>
-                      </div>
-                      <RateTable
+                      </div>                      <RateTable
                         key="all-cities-seo-table"
-                        rates={[]} // Pass empty to get all cities data
+                        rates={allRates}
                         showPriceColumns={true}
                         showChart={false}
                         showDate={false}
@@ -384,6 +405,7 @@ const MainPage = () => {
                         showAdmin={false}
                         showMarket={false}
                         itemsPerPage={20}
+                        isLoading={allRatesLoading}
                         title="Complete City Coverage"
                         description="Comprehensive egg rate information for all major Indian cities and states"
                       />

@@ -1,5 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo, useCallback } from 'react';
 import PriceChart from './PriceChart';
 import { Helmet } from 'react-helmet';
 import TableHeader from './TableHeader';
@@ -7,7 +6,6 @@ import RateSummary from './RateSummary';
 import TableRow from './TableRow';
 import Pagination from './Pagination';
 import MarketInfo from './MarketInfo';
-import { fetchStatesAndCities } from '../../services/api';
 
 const RateTable = ({ 
   rates = [], 
@@ -32,33 +30,6 @@ const RateTable = ({
   const [editingRate, setEditingRate] = useState(null);
   const [editedRate, setEditedRate] = useState({});
   const [hoveredRow, setHoveredRow] = useState(null);
-  const [apiData, setApiData] = useState({ cities: [], states: [] });
-  const [apiDataLoading, setApiDataLoading] = useState(false);
-
-  // Fetch API data for related cities linking
-  useEffect(() => {
-    const fetchApiData = async () => {
-      if (apiData.cities?.length === 0) {
-        try {
-          setApiDataLoading(true);
-          const data = await fetchStatesAndCities();
-          setApiData(data);
-        } catch (error) {
-          console.error('Error fetching states and cities:', error);
-          // Fallback data in case API fails
-          setApiData({
-            cities: ['Mumbai', 'Delhi', 'Kolkata', 'Chennai', 'Bengaluru', 'Hyderabad'],
-            states: ['Maharashtra', 'Delhi', 'West Bengal', 'Tamil Nadu', 'Karnataka', 'Telangana']
-          });
-        } finally {
-          setApiDataLoading(false);
-        }
-      }
-    };
-    
-    fetchApiData();
-  }, [apiData.cities?.length]);
-
   // Constants for fixed dimensions to prevent CLS (Cumulative Layout Shift)
   const TABLE_MIN_HEIGHT = '400px';
   const ROW_HEIGHT = '48px';
@@ -425,66 +396,7 @@ const RateTable = ({
                 title={selectedCity ? `${selectedCity} Egg Price Trend` : 'Egg Rates by City'}
                 isLoading={isLoading}
               />
-            </div>
-          )}
-
-          {/* Related Cities Section for Orphan Page Linking */}
-          {!apiDataLoading && apiData.cities?.length > 0 && (
-            <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                Explore Egg Rates in Other Cities
-              </h3>
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
-                {apiData.cities
-                  .filter(city => city !== selectedCity) // Exclude current city
-                  .sort(() => 0.5 - Math.random()) // Randomize order
-                  .slice(0, 12) // Show 12 random cities
-                  .map((city) => (
-                    <Link
-                      key={city}
-                      to={`/${city.toLowerCase().replace(/\s+/g, '-')}-egg-rate-today`}
-                      className="bg-gradient-to-r from-amber-50 to-amber-100 dark:from-gray-700 dark:to-gray-600 
-                                 rounded-lg p-3 text-center hover:shadow-md transition-all duration-200
-                                 hover:from-amber-100 hover:to-amber-200 dark:hover:from-gray-600 dark:hover:to-gray-500
-                                 border border-amber-200 dark:border-gray-600 group"
-                    >
-                      <p className="font-medium text-gray-900 dark:text-white text-sm group-hover:text-amber-700 dark:group-hover:text-amber-300">
-                        {city}
-                      </p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        View Rates
-                      </p>
-                    </Link>
-                  ))}
-              </div>
-              
-              {/* States Section */}
-              <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-                <h4 className="text-md font-medium text-gray-800 dark:text-gray-200 mb-3">
-                  Browse by State
-                </h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                  {apiData.states
-                    .filter(state => state !== selectedState) // Exclude current state
-                    .sort(() => 0.5 - Math.random()) // Randomize order
-                    .slice(0, 8) // Show 8 random states
-                    .map((state) => (
-                      <Link
-                        key={state}
-                        to={`/state/${state.toLowerCase().replace(/\s+/g, '-')}-egg-rate-today`}
-                        className="bg-green-50 dark:bg-gray-700 rounded-md p-2 text-center hover:bg-green-100 
-                                   dark:hover:bg-gray-600 transition-colors duration-200 text-sm
-                                   border border-green-200 dark:border-gray-600"
-                      >
-                        <span className="text-green-700 dark:text-green-300 font-medium">
-                          {state}
-                        </span>
-                      </Link>
-                    ))}
-                </div>
-              </div>
-            </div>
-          )}
+            </div>          )}
 
           <div className="mt-6">
             <MarketInfo
@@ -499,7 +411,6 @@ const RateTable = ({
     // Data and loading states
     isLoading, rates, selectedCity, selectedState, showSpecialRates, chartData,
     latestRate, latestRateDate, rateChange, percentageChange, trayPrice,
-    apiData, apiDataLoading,
     
     // UI states and editing
     currentItems, currentPage, editedRate, editingRate, hoveredRow,
