@@ -29,7 +29,7 @@ if (!function_exists('generateCitySlug')) {
 
 // Directory where web stories are stored with absolute path
 $basePath = dirname(dirname(__FILE__)); // Go up one level from php dir
-$storiesDir = $basePath . '/webstories';
+$storiesDir = $basePath . '/ampstory';
 
 // Get limit parameter if provided
 $limit = isset($_GET['limit']) ? intval($_GET['limit']) : null;
@@ -108,11 +108,10 @@ if ($result->num_rows > 0) {
         $displayDate = date('F j, Y', strtotime($date));
         
         // Check if the web story file exists (files are stored with full suffix)
-        $storyFilename = $storiesDir . '/' . $citySlug . '.html';
-        if (file_exists($storyFilename)) {
+        $storyFilename = $storiesDir . '/' . $citySlug . '.html';        if (file_exists($storyFilename)) {
             // Use a random image from 1.webp to 20.webp for thumbnail
             $randomImageNum = rand(1, 20);
-            $randomThumbnail = "/images/webstories/$randomImageNum.webp";
+            $randomThumbnail = "/images/ampstory/$randomImageNum.webp";
             
             // Add to stories array
             $stories[] = [

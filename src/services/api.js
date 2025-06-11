@@ -85,7 +85,7 @@ export const fetchStatesAndCities = async (signal) => {
 };
 
 export const checkWebStoryFileExists = async (slug) => {
-  const response = await fetch(`/webstories/${slug}.html`, { 
+  const response = await fetch(`/ampstory/${slug}.html`, { 
     method: 'HEAD',
     headers: {
       'Accept': 'text/html',

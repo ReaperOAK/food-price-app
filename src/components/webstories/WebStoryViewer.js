@@ -118,9 +118,8 @@ const WebStoryViewer = () => {
         setSelectedCity={setSelectedCity}
         selectedCity={selectedCity}
       />
-      <div className="flex-grow relative w-full" style={{ height: 'calc(100vh - 144px)' }}>
-        <iframe 
-          src={`/webstories/${slug}.html`}
+      <div className="flex-grow relative w-full" style={{ height: 'calc(100vh - 144px)' }}>        <iframe 
+          src={`/ampstory/${slug}.html`}
           title={storyData ? storyData.title : `Web Story - ${slug}`}
           className="w-full h-full absolute inset-0 border-none"
           allowFullScreen

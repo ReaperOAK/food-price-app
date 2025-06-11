@@ -192,11 +192,10 @@ if ($cities_result && $cities_result->num_rows > 0) {
             $xml .= '  <priority>0.8</priority>' . PHP_EOL;
             $xml .= '</url>' . PHP_EOL;
             
-            $txt .= $state_full_url . PHP_EOL;
-            $state_count++;
+            $txt .= $state_full_url . PHP_EOL;        $state_count++;
         }
           // Also add the webstory URL for this city if it exists
-        $webstory_path = $basePath . '/webstories/' . $citySlug . '.html';
+        $webstory_path = $basePath . '/ampstory/' . $citySlug . '.html';
         if (file_exists($webstory_path)) {
             $webstory_url = $baseUrl . '/webstory/' . $citySlug;
             

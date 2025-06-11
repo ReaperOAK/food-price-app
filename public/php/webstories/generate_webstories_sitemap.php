@@ -65,8 +65,7 @@ function generateWebStoriesSitemap($existingConn = null) {
                 echo '    <changefreq>weekly</changefreq>' . PHP_EOL;
                 echo '    <priority>0.8</priority>' . PHP_EOL;
                 echo '  </url>' . PHP_EOL;
-            }
-        } else {
+            }        } else {
             // If no web stories found, add a placeholder URL
             echo '  <url>' . PHP_EOL;
             echo '    <loc>' . htmlspecialchars($base_url . '/webstories') . '</loc>' . PHP_EOL;

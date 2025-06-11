@@ -114,9 +114,8 @@ const OptimizedImage = memo(({
       return `(max-width: 640px) ${percentage}vw, (max-width: 768px) ${percentage * 0.8}vw, ${percentage * 0.6}vw`;
     }
     return '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw';
-  }, [className, sizes]);
-  const optimizedSrcSet = useCallback((src) => {
-    const isWebStory = src.includes('/webstories/');
+  }, [className, sizes]);  const optimizedSrcSet = useCallback((src) => {
+    const isWebStory = src.includes('/ampstory/');
     
     // For webstory thumbnails, don't use optimized versions since they may not exist
     // Just return the original src
@@ -173,10 +172,9 @@ const OptimizedImage = memo(({
             motion-reduce:transition-none
             dark:brightness-90
           `}
-          loading={priority ? 'eager' : 'lazy'}
-          decoding={priority ? 'sync' : 'async'}
+          loading={priority ? 'eager' : 'lazy'}          decoding={priority ? 'sync' : 'async'}
           sizes={getSizes()}
-          {...(!src.includes('/webstories/') && { srcSet: optimizedSrcSet(src) })}
+          {...(!src.includes('/ampstory/') && { srcSet: optimizedSrcSet(src) })}
           fetchpriority={priority ? 'high' : /hero|banner/.test(safeToLowerCase(className)) ? 'high' : 'auto'}
           onLoad={(e) => {
             setLoaded(true);

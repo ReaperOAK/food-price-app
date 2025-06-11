@@ -64,8 +64,7 @@ $scripts = [
     
     // Database maintenance
     ["$baseDir/database/maintenance/archive_old_data.php", "Archive old data"],
-    
-    // Web stories generation and maintenance
+      // Web stories generation and maintenance
     ["$baseDir/webstories/generate_web_stories.php", "Generate web stories"],
     ["$baseDir/webstories/update_webstory_thumbnails_simple.php", "Process web stories (simplified - no thumbnail generation)"],
     ["$baseDir/webstories/delete_old_webstories.php", "Delete old web stories"],

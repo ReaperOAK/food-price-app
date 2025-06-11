@@ -24,8 +24,8 @@ if (!isset($conn) || $conn->connect_error) {
 
 // Configuration with absolute paths
 $basePath = dirname(dirname(dirname(__FILE__))); // Go up to the public folder
-$storiesDir = $basePath . '/webstories';
-$imageDir = $basePath . '/images/webstories';
+$storiesDir = $basePath . '/ampstory';
+$imageDir = $basePath . '/images/ampstory';
 $daysToKeep = 3; // Number of days to keep web stories
 
 /**
