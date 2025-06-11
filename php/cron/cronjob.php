@@ -66,13 +66,13 @@ $scripts = [
     ["$baseDir/database/maintenance/archive_old_data.php", "Archive old data"],
     
     // Web stories generation and maintenance
-    ["$baseDir/webstories/generate_web_stories.php", "Generate web stories"],
-    ["$baseDir/webstories/update_webstory_thumbnails_simple.php", "Process web stories (simplified - no thumbnail generation)"],
-    ["$baseDir/webstories/delete_old_webstories.php", "Delete old web stories"],
+    ["$baseDir/ampstory/generate_web_stories.php", "Generate web stories"],
+    ["$baseDir/ampstory/update_webstory_thumbnails_simple.php", "Process web stories (simplified - no thumbnail generation)"],
+    ["$baseDir/ampstory/delete_old_webstories.php", "Delete old web stories"],
     
     // SEO tools
     ["$baseDir/seo/generate_sitemap.php", "Generate main sitemap"],
-    ["$baseDir/webstories/generate_webstories_sitemap.php", "Generate web stories sitemap"]
+    ["$baseDir/ampstory/generate_webstories_sitemap.php", "Generate web stories sitemap"]
 ];
 
 // Log start of cron run
