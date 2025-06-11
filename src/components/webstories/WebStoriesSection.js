@@ -1,13 +1,13 @@
 import React, { memo, useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import OptimizedImage from '../common/OptimizedImage';
+import WebStoriesCarousel from './WebStoriesCarousel';
 import { fetchStatesAndCities } from '../../services/api';
 
 const WebStoriesSection = memo(({
   showWebStories,
   setShowWebStories,
   webStoriesLoading,
-  featuredWebStories
+  allWebStories
 }) => {
   const [apiData, setApiData] = useState({ cities: [], states: [] });
   const [apiDataLoading, setApiDataLoading] = useState(false);
@@ -45,19 +45,18 @@ const WebStoriesSection = memo(({
   }, [apiData.cities]);
 
   const buttonLabel = webStoriesLoading ? 'Loading Stories...' : (showWebStories ? 'Hide Stories' : 'Show Stories');
-
   return (
     <section className="mt-10 px-4 sm:px-6 lg:px-8" aria-labelledby="webstories-heading">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <h2 id="webstories-heading" className="text-2xl font-semibold text-gray-800 dark:text-gray-100 tracking-tight">
-          Featured Web Stories
+          Web Stories - All Cities ({allWebStories?.length || 0})
         </h2>
         <button
           onClick={() => setShowWebStories(!showWebStories)}
           className="w-full sm:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:bg-indigo-800 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:active:bg-indigo-700 transition-all duration-200 flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           disabled={webStoriesLoading}
           aria-expanded={showWebStories}
-          aria-controls="stories-grid"
+          aria-controls="stories-carousel"
         >
           {webStoriesLoading ? (
             <>
@@ -86,7 +85,7 @@ const WebStoriesSection = memo(({
       </div>
 
       <div 
-        id="stories-grid"
+        id="stories-carousel"
         className={`transition-all duration-500 ease-in-out ${
           showWebStories ? 'opacity-100 max-h-[2000px]' : 'opacity-0 max-h-0 overflow-hidden'
         }`}
@@ -96,78 +95,20 @@ const WebStoriesSection = memo(({
             {[...Array(6)].map((_, index) => (
               <div 
                 key={index} 
-                className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden animate-pulse"
                 role="presentation"
               >
-                <div className="h-48 bg-gray-200"></div>
+                <div className="h-40 bg-gray-200 dark:bg-gray-700"></div>
                 <div className="p-4 space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
                 </div>
               </div>
             ))}
           </div>
-        ) : featuredWebStories?.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredWebStories.map((story) => (
-              <Link 
-                key={story.slug}
-                to={`/webstory/${story.slug}`}
-                className="group bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500 transition-all duration-200 transform hover:-translate-y-1"
-                aria-label={`View web story about egg rates in ${String(story.city || '')}, ${String(story.state || '')}. Current rate: ₹${String(story.rate || '')} per egg`}
-              >
-                <div className="relative aspect-w-16 aspect-h-9">
-                  <OptimizedImage 
-                    src={story.thumbnail} 
-                    alt={`Fresh eggs in India rate visualization for ${String(story.city || '')}, ${String(story.state || '')} - Farm fresh eggs market analysis`}
-                    className="w-full h-48 object-cover transform transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => { e.target.src = '/eggpic.webp' }}
-                    width={400}
-                    height={225}
-                    loading="lazy"
-                  />
-                  <div 
-                    className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-60 group-hover:opacity-40 transition-opacity duration-300"
-                    aria-hidden="true"
-                  ></div>
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <p className="text-white text-sm font-medium">
-                      {story.date}
-                    </p>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors duration-200 line-clamp-2">
-                    {story.title}
-                  </h3>
-                  <div className="flex justify-between items-center mt-3">
-                    <p className="text-indigo-600 font-bold">₹{story.rate} per egg</p>
-                    <p className="text-sm text-gray-600">
-                      {story.city}, {story.state}
-                    </p>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
         ) : (
-          <div 
-            className="text-center p-8 bg-white rounded-lg shadow-md"
-            role="alert"
-            aria-live="polite"
-          >
-            <svg 
-              className="w-16 h-16 mx-auto text-gray-400 mb-4" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-            </svg>
-            <p className="text-xl font-semibold text-gray-800 mb-2">No Stories Available</p>
-            <p className="text-gray-600">Check back later for updates on egg prices and market trends.</p>
-          </div>        )}
+          <WebStoriesCarousel webStories={allWebStories} />
+        )}
       </div>
 
       {/* Related Cities for Orphan Page Linking */}

@@ -20,6 +20,14 @@ const blogs = [
     description: 'A comprehensive guide to understanding the factors that influence egg prices in India.',
     uploadDate: '2024-10-03',
   },
+  {
+    link: 'ajmer-egg-rate-today',
+    image: '/eggrate2.webp',
+    title: 'Ajmer Egg Rate Today: Current Prices and Market Trends',
+    description:
+      "Whether you're a business owner or a daily consumer, keeping track of the Ajmer egg rate today helps manage costs and stay informed. The Papaak egg rate Ajmer and NECC egg rate are both essential benchmarks.",
+    uploadDate: '2025-06-06',
+  },
   // Add more blog objects as needed
 ];
 

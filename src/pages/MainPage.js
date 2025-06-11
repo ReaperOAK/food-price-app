@@ -44,9 +44,8 @@ const MainPage = () => {
   const [showWebStories, setShowWebStories] = useState(true);
   const [allRates, setAllRates] = useState([]);
   const [allRatesLoading, setAllRatesLoading] = useState(false);
-  
-  // Custom hooks for data fetching
-  const { featuredWebStories, webStoriesLoading } = useWebStories(showWebStories);
+    // Custom hooks for data fetching
+  const { allWebStories, webStoriesLoading } = useWebStories(showWebStories);
   const { eggRates, specialRates, loading } = useRates(selectedCity, selectedState);
   const { states, cities, loadCities, loadStateForCity } = useLocations();
   const { blogs } = useBlogs();
@@ -288,12 +287,11 @@ const MainPage = () => {
                 </section>
 
                 {/* Web Stories Section */}
-                <section aria-label="Featured Stories">
-                  <WebStoriesSection 
+                <section aria-label="Featured Stories">                  <WebStoriesSection 
                     showWebStories={showWebStories}
                     setShowWebStories={setShowWebStories}
                     webStoriesLoading={webStoriesLoading}
-                    featuredWebStories={featuredWebStories}
+                    allWebStories={allWebStories}
                   />
                 </section>
 

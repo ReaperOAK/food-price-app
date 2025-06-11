@@ -1,17 +1,8 @@
 import { useState, useEffect } from 'react';
 import { fetchWebStories, fetchRates, fetchSpecialRates, fetchStates, fetchCities, fetchStateForCity } from '../services/api';
 
-// Helper function to randomly select 3 stories
-const getRandomStories = (stories, count = 3) => {
-  if (!stories || stories?.length === 0) return [];
-  if (stories?.length <= count) return stories;
-  
-  const shuffled = [...stories]?.sort(() => 0.5 - Math.random());
-  return shuffled.slice(0, count);
-};
-
 export const useWebStories = (showWebStories) => {
-  const [featuredWebStories, setFeaturedWebStories] = useState([]);
+  const [allWebStories, setAllWebStories] = useState([]);
   const [webStoriesLoading, setWebStoriesLoading] = useState(false);
 
   useEffect(() => {
@@ -20,11 +11,11 @@ export const useWebStories = (showWebStories) => {
       try {
         setWebStoriesLoading(true);
         const data = await fetchWebStories();
-        // Use random selection instead of just taking first 3
-        setFeaturedWebStories(getRandomStories(data, 3));
+        // Return all web stories for carousel display
+        setAllWebStories(data || []);
       } catch (error) {
         console.error('Error fetching web stories:', error);
-        setFeaturedWebStories([]);
+        setAllWebStories([]);
       } finally {
         setWebStoriesLoading(false);
       }
@@ -33,7 +24,7 @@ export const useWebStories = (showWebStories) => {
     handleFetchWebStories();
   }, [showWebStories]);
 
-  return { featuredWebStories, webStoriesLoading };
+  return { allWebStories, webStoriesLoading };
 };
 
 export const useRates = (selectedCity, selectedState) => {

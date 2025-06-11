@@ -82,6 +82,7 @@ const BlogList = ({ blogs, selectedCity, selectedState, loading = false }) => {
       'Egg Rate Web Stories': '/webstories',
       'Barwala Market Analysis': '/blog/egg-rate-barwala',
       'Understanding Today\'s Egg Rates': '/blog/blog-1',
+      'Ajmer Egg Market': '/ajmer-egg-rate-today',
       'Egg Rate Trends in India': '/blog/blog-2',
       'Delhi Egg Market': '/delhi-egg-rate-today',
       'Kerala Egg Rates': '/state/kerala-egg-rate-today',
