@@ -196,7 +196,7 @@ if ($cities_result && $cities_result->num_rows > 0) {
             $state_count++;
         }
           // Also add the webstory URL for this city if it exists
-        $webstory_path = $basePath . '/ampstory/' . $citySlug . '.html';
+        $webstory_path = $basePath . '/webstories/' . $citySlug . '.html';
         if (file_exists($webstory_path)) {
             $webstory_url = $baseUrl . '/webstory/' . $citySlug;
             
