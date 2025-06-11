@@ -6,8 +6,8 @@ ini_set('error_log', dirname(dirname(__FILE__)) . '/error.log');
 
 // Set up server paths - this is where we'll find our assets in production
 $serverRoot = dirname(dirname(dirname(__FILE__))); // Go up to the public folder
-$webstoriesPath = $serverRoot . '/webstories';
-$webstoriesImagesPath = $serverRoot . '/images/webstories';
+$webstoriesPath = $serverRoot . '/ampstory';
+$webstoriesImagesPath = $serverRoot . '/images/ampstory';
 $templatePath = $serverRoot . '/templates/webstory_template.html';
 
 // Create directories if they don't exist
@@ -38,29 +38,27 @@ function debug_log($step, $message, $data = null) {
 function formatImagePath($imagePath) {
     // Strip any leading slashes if they exist
     $imagePath = ltrim($imagePath, '/');
-    
-    // Remove any duplicate path segments
-    if (preg_match('#(^|/)images/webstories/.*#', $imagePath)) {
-        // Extract just the filename by finding the last occurrence of images/webstories/
-        $pattern = '#.*images/webstories/([^/]+)$#';
+      // Remove any duplicate path segments
+    if (preg_match('#(^|/)images/ampstory/.*#', $imagePath)) {
+        // Extract just the filename by finding the last occurrence of images/ampstory/
+        $pattern = '#.*images/ampstory/([^/]+)$#';
         if (preg_match($pattern, $imagePath, $matches)) {
             $filename = $matches[1];
-            return '/images/webstories/' . $filename;
+            return '/images/ampstory/' . $filename;
         }
-    }
-    
+    }    
     // If it's just a filename without path, add the path
     if (strpos($imagePath, '/') === false) {
-        return '/images/webstories/' . $imagePath;
+        return '/images/ampstory/' . $imagePath;
     }
     
     // For other cases, ensure it has the correct prefix
-    if (strpos($imagePath, 'images/webstories/') === 0) {
+    if (strpos($imagePath, 'images/ampstory/') === 0) {
         return '/' . $imagePath;
     }
     
     // Default case - add the standard path
-    return '/images/webstories/' . $imagePath;
+    return '/images/ampstory/' . $imagePath;
 }
 
 // Helper function to generate city slug without state code for clean URLs
@@ -143,12 +141,10 @@ try {
         debug_log("DB", "New database connection created successfully");
     } else {
         debug_log("DB", "Using existing database connection");
-    }
-
-    // Verify all required directories exist and are writable
+    }    // Verify all required directories exist and are writable
     $requiredDirs = [
-        $serverRoot . '/webstories',
-        $serverRoot . '/images/webstories',
+        $serverRoot . '/ampstory',
+        $serverRoot . '/images/ampstory',
         $serverRoot . '/templates'
     ];
 
@@ -296,11 +292,9 @@ try {
 
     // Include the function to delete old web stories, we're using require_once to avoid duplicate declarations
     debug_log("INCLUDES", "Including delete_old_webstories.php");
-    require_once __DIR__ . '/delete_old_webstories.php';
-
-    // Create or check necessary directories
-    $buildWebstoriesPath = $serverRoot . '/webstories';
-    $buildImagesPath = $serverRoot . '/images/webstories';
+    require_once __DIR__ . '/delete_old_webstories.php';    // Create or check necessary directories
+    $buildWebstoriesPath = $serverRoot . '/ampstory';
+    $buildImagesPath = $serverRoot . '/images/ampstory';
 
     foreach ([$buildWebstoriesPath, $buildImagesPath] as $dir) {
         if (!file_exists($dir)) {

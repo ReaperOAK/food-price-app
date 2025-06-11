@@ -38,8 +38,8 @@ debug_log("START", "Beginning simplified webstory processing (no thumbnail gener
 // Configuration with absolute paths
 $serverRoot = dirname(dirname(dirname(__FILE__))); // Go up to the public folder
 $basePath = $serverRoot;
-$webstoriesDir = $basePath . '/webstories';
-$buildWebstoriesDir = $basePath . '/build/webstories';
+$webstoriesDir = $basePath . '/ampstory';
+$buildWebstoriesDir = $basePath . '/build/ampstory';
 
 debug_log("CONFIG", "Configuration initialized", [
     "basePath" => $basePath,
