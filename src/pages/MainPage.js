@@ -6,7 +6,7 @@ import LoadingSkeleton from '../components/common/LoadingSkeleton';
 import HeadSection from '../components/common/HeadSection';
 import PriceOverview from '../components/prices/PriceOverview';
 import { getUniqueH1 } from '../utils/seo';
-import { useWebStories, useRates, useLocations, useBlogs } from '../hooks/useData';
+import { useWebStories, useLocationAwareRates, useLocations, useBlogs } from '../hooks/useData';
 import { fetchRates } from '../services/api';
 
 // Lazy load non-critical components
@@ -46,7 +46,7 @@ const MainPage = () => {
   const [allRatesLoading, setAllRatesLoading] = useState(false);
     // Custom hooks for data fetching
   const { allWebStories, webStoriesLoading } = useWebStories(showWebStories);
-  const { eggRates, specialRates, loading } = useRates(selectedCity, selectedState);
+  const { eggRates, specialRates, loading, locationReady } = useLocationAwareRates(selectedCity, selectedState);
   const { states, cities, loadCities, loadStateForCity } = useLocations();
   const { blogs } = useBlogs();
 
@@ -143,24 +143,16 @@ const MainPage = () => {
   }, [stateParam, cityParam, loadStateForCity, loadCities]); // Intentionally excluding selectedState and selectedCity to prevent circular dependencies  // Fetch all rates data for SEO table
   useEffect(() => {
     const fetchAllRatesData = async () => {
+      // Don't fetch if we're waiting for location data to be resolved
+      if ((selectedCity || selectedState) && !locationReady) {
+        return;
+      }
+
       try {
         setAllRatesLoading(true);
-        // When on a city or state page, wait for location data to be available
-        // before making API calls
-        if (selectedCity || selectedState) {
-          // For city pages, wait until we have both city and state
-          if (selectedCity && !selectedState) {
-            // Wait for state to be loaded for the city
-            return;
-          }
-          // Use fetchRates with the selected city/state to get specific rates
-          const data = await fetchRates(selectedCity, selectedState);
-          setAllRates(Array.isArray(data) ? data : []);
-        } else {
-          // For home page, get general latest rates
-          const data = await fetchRates(null, null);
-          setAllRates(Array.isArray(data) ? data : []);
-        }
+        // Use fetchRates with the selected city/state to get specific rates
+        const data = await fetchRates(selectedCity, selectedState);
+        setAllRates(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching all rates:', error);
         setAllRates([]); // Set empty array on error
@@ -169,9 +161,9 @@ const MainPage = () => {
       }
     };
 
-    // Always fetch all rates, but with proper location context
+    // Fetch rates once location data is ready
     fetchAllRatesData();
-  }, [selectedCity, selectedState]);
+  }, [selectedCity, selectedState, locationReady]);
   
   // Loading skeleton component with content-visibility optimization
   const LoadingComponent = () => (

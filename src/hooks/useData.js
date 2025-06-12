@@ -124,3 +124,6 @@ export const useBlogs = () => {
 
   return { blogs };
 };
+
+// Export the location-aware rates hook
+export { useLocationAwareRates } from './useLocationAwareRates';
