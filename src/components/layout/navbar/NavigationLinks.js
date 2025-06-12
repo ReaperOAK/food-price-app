@@ -96,14 +96,16 @@ const NavigationLinks = memo(({ handleHomeClick, handleCityClick }) => (
       <NavLink to="/bengaluru-egg-rate-today" onClick={(e) => handleCityClick('Bengaluru', e)} 
                className="hidden 2xl:block flex-shrink-0">
         Bengaluru
-      </NavLink>
-      
-      {/* State Links Dropdown for orphan states */}
-      <div className="relative group hidden lg:block flex-shrink-0">
-        <button className="group relative inline-flex items-center px-2 xl:px-3 py-2 text-sm font-medium rounded-lg
-                          text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 
-                          hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 
-                          focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap">
+      </NavLink>      {/* State Links Dropdown for orphan states */}
+      <div className="relative group hidden lg:block flex-shrink-0" role="menuitem">
+        <button 
+          className="group relative inline-flex items-center px-2 xl:px-3 py-2 text-sm font-medium rounded-lg
+                     text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 
+                     hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 
+                     focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
+          role="menuitem"
+          aria-haspopup="true"
+          aria-expanded="false">
           States
           <svg className="ml-1 w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
