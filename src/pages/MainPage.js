@@ -24,7 +24,6 @@ const CityMarketInsights = lazy(() => import('../components/content/CityMarketIn
 const RelatedCityLinks = lazy(() => import('../components/content/RelatedCityLinks'));
 const StateNavigationGrid = lazy(() => import('../components/content/StateNavigationGrid'));
 const EggsIndiaContent = lazy(() => import('../components/seo/EggsIndiaContent'));
-const CityLinkGrid = lazy(() => import('../components/navigation/CityLinkGrid'));
 
 const MainPage = () => {
   // URL and location parameters
@@ -372,16 +371,14 @@ const MainPage = () => {
                       loading={loading}
                     />
                   </section>
-                )}{/* Related City Links Section - Universal SEO linking */}
-                {selectedCity && cities?.length > 0 && (
-                  <section aria-label="Compare Rates in Other Cities">
-                    <RelatedCityLinks 
-                      selectedCity={selectedCity}
-                      selectedState={selectedState}
-                      allCities={cities}
-                    />
-                  </section>
-                )}
+                )}                {/* Related City Links Section - Universal SEO linking for all pages */}
+                <section aria-label="Compare Rates in Other Cities">
+                  <RelatedCityLinks 
+                    selectedCity={selectedCity}
+                    selectedState={selectedState}
+                    allCities={cities}
+                  />
+                </section>
 
                 {/* All Cities SEO Table - Always show complete city links for SEO */}
                 {(selectedCity || selectedState) && eggRates?.length > 0 && (
@@ -416,16 +413,6 @@ const MainPage = () => {
                     <StateNavigationGrid selectedState={selectedState} />
                   </section>
                 )}
-
-                {/* Comprehensive City Link Grid - Universal orphan page linking */}
-                <section aria-label="Explore All Cities">
-                  <CityLinkGrid 
-                    title="Today's Egg Rates Across India"
-                    showWebStories={true}
-                    maxCities={selectedCity || selectedState ? 32 : 40}
-                    className="mt-8"
-                  />
-                </section>
                 
                 {/* FAQ Section */}
                 <section aria-label="Frequently Asked Questions">

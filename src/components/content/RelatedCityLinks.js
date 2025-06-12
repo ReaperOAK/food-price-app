@@ -57,23 +57,42 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
 
     fetchApiData();
   }, []);
-
-  // Get related cities from the same state or nearby popular cities
+  // Get related cities - prioritize next cities in alphabetical order for better internal linking
   const getRelatedCities = useMemo(() => {
     if (apiData.allCities?.length === 0) return [];
     
-    const sameCities = apiData.allCities
-      .filter(cityData => cityData.state === selectedState && cityData.city !== selectedCity)
-      .slice(0, 4);
+    // Sort all cities alphabetically for consistent ordering
+    const sortedCities = apiData.allCities
+      .filter(cityData => cityData.city !== selectedCity)
+      .sort((a, b) => a.city.localeCompare(b.city));
     
-    // Get random cities from different states to fill remaining slots
-    const otherCities = apiData.allCities
-      .filter(cityData => cityData.city !== selectedCity && cityData.state !== selectedState)
-      ?.sort(() => 0.5 - Math.random()) // Randomize
-      .slice(0, 8 - sameCities?.length);
+    if (!selectedCity) {
+      // If no selected city (homepage), return first 15 cities
+      return sortedCities.slice(0, 15);
+    }
     
-    return [...sameCities, ...otherCities];
-  }, [apiData.allCities, selectedCity, selectedState]);
+    // Find current city index in sorted list
+    const currentIndex = sortedCities.findIndex(
+      cityData => safeToLowerCase(cityData.city) === safeToLowerCase(selectedCity)
+    );
+    
+    if (currentIndex === -1) {
+      // Current city not found, return first 15 cities
+      return sortedCities.slice(0, 15);
+    }
+    
+    // Get next 15 cities after current city (wrapping around if necessary)
+    const nextCities = [];
+    for (let i = 1; i <= 15; i++) {
+      const nextIndex = (currentIndex + i) % sortedCities.length;
+      const nextCity = sortedCities[nextIndex];
+      if (nextCity && safeToLowerCase(nextCity.city) !== safeToLowerCase(selectedCity)) {
+        nextCities.push(nextCity);
+      }
+    }
+    
+    return nextCities;
+  }, [apiData.allCities, selectedCity]);
 
   // Get related states for cross-linking  
   const getRelatedStates = useMemo(() => {
@@ -83,19 +102,34 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
       .filter(state => state !== selectedState)
       ?.sort(() => 0.5 - Math.random()) // Randomize states
       .slice(0, 6);
-  }, [apiData.allStates, selectedState]);
-  if (!selectedCity || loading) return null;
+  }, [apiData.allStates, selectedState]);  if (loading) {
+    return (
+      <div className="animate-pulse max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64 mx-auto mb-6"></div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[...Array(15)].map((_, index) => (
+              <div key={index} className="h-16 bg-gray-200 dark:bg-gray-700 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const relatedCities = getRelatedCities;
   const relatedStates = getRelatedStates;
 
   if (relatedCities?.length === 0) return null;
 
-  return (
-    <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+  const componentTitle = selectedCity 
+    ? `Compare ${selectedCity} egg rates with other cities`
+    : "Explore egg rates across India's major cities";
+
+  return (    <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
       <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden p-8">
         <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
-          Compare Egg Rates in Other Cities
+          {componentTitle}
         </h3>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
