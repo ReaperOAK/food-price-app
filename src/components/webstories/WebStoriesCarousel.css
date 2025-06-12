@@ -1,0 +1,258 @@
+/* WebStories Carousel Custom Styles */
+
+/* Smooth scrolling and touch behavior */
+.webstories-carousel {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+/* Carousel container animations */
+.webstories-carousel-container {
+  transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  will-change: transform;
+}
+
+/* Smooth transitions for responsive changes */
+.webstories-carousel-container.transitioning {
+  transition: transform 0.7s ease-out, width 0.3s ease-out;
+}
+
+/* Enhanced card hover effects */
+.webstories-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.webstories-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.webstories-card:active {
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* Image hover zoom effect */
+.webstories-card-image {
+  transition: transform 0.5s ease-out;
+  overflow: hidden;
+}
+
+.webstories-card:hover .webstories-card-image img {
+  transform: scale(1.08);
+}
+
+/* Gradient overlay animation */
+.webstories-card-overlay {
+  transition: opacity 0.3s ease-out;
+}
+
+.webstories-card:hover .webstories-card-overlay {
+  opacity: 0.3;
+}
+
+/* Navigation button enhancements */
+.webstories-nav-button {
+  transition: all 0.2s ease-out;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.webstories-nav-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.webstories-nav-button:active {
+  transform: scale(0.95);
+}
+
+.webstories-nav-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.webstories-nav-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Dot indicators animations */
+.webstories-dot {
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+}
+
+.webstories-dot:hover {
+  transform: scale(1.2);
+}
+
+.webstories-dot.active {
+  transform: scale(1.1);
+}
+
+/* Auto-play button enhancements */
+.webstories-autoplay-button {
+  transition: all 0.2s ease-out;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.webstories-autoplay-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .webstories-card:hover {
+    transform: none;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+  
+  .webstories-card:active {
+    transform: scale(0.98);
+  }
+  
+  .webstories-nav-button:hover {
+    transform: none;
+  }
+  
+  .webstories-nav-button:active {
+    transform: scale(0.9);
+  }
+}
+
+/* Responsive breakpoint specific styles */
+@media (max-width: 480px) {
+  .webstories-carousel-container {
+    transition: transform 0.5s ease-out;
+  }
+  
+  .webstories-card {
+    margin: 0 4px;
+  }
+}
+
+@media (min-width: 768px) {
+  .webstories-card {
+    margin: 0 8px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .webstories-card {
+    margin: 0 12px;
+  }
+}
+
+/* Loading animation for skeleton cards */
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.webstories-skeleton {
+  animation: shimmer 1.2s ease-in-out infinite;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+}
+
+/* Dark mode specific enhancements */
+@media (prefers-color-scheme: dark) {
+  .webstories-nav-button {
+    backdrop-filter: blur(10px) brightness(0.8);
+    -webkit-backdrop-filter: blur(10px) brightness(0.8);
+  }
+  
+  .webstories-autoplay-button {
+    backdrop-filter: blur(5px) brightness(0.9);
+    -webkit-backdrop-filter: blur(5px) brightness(0.9);
+  }
+  
+  .webstories-skeleton {
+    background: linear-gradient(to right, #374151 8%, #4b5563 18%, #374151 33%);
+    background-size: 800px 104px;
+  }
+}
+
+/* Smooth scrolling for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .webstories-carousel-container {
+    transition: none;
+  }
+  
+  .webstories-card {
+    transition: none;
+  }
+  
+  .webstories-card-image img {
+    transition: none;
+  }
+  
+  .webstories-nav-button {
+    transition: none;
+  }
+  
+  .webstories-dot {
+    transition: none;
+  }
+  
+  .webstories-autoplay-button {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .webstories-card {
+    border: 2px solid currentColor;
+  }
+  
+  .webstories-nav-button {
+    border: 2px solid currentColor;
+  }
+  
+  .webstories-dot {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Focus styles for accessibility */
+.webstories-card:focus-visible,
+.webstories-nav-button:focus-visible,
+.webstories-dot:focus-visible,
+.webstories-autoplay-button:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Print styles */
+@media print {
+  .webstories-carousel {
+    overflow: visible;
+  }
+  
+  .webstories-carousel-container {
+    transform: none !important;
+    width: 100% !important;
+  }
+  
+  .webstories-nav-button,
+  .webstories-dot,
+  .webstories-autoplay-button {
+    display: none;
+  }
+}
