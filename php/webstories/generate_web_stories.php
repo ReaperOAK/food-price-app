@@ -565,14 +565,93 @@ try {
             
             // Log the original city data for debugging
             debug_log("TEMPLATE", "Replacing variables for {$city}, {$state} with rate ₹{$rate}");
-            
-            // Replace all city-specific variables with actual data
+              // Replace all city-specific variables with actual data
             $story = str_replace('{{CITY_NAME}}', htmlspecialchars($city, ENT_QUOTES, 'UTF-8'), $story);
             $story = str_replace('{{STATE_NAME}}', htmlspecialchars($state, ENT_QUOTES, 'UTF-8'), $story);            $story = str_replace('{{EGG_RATE}}', number_format((float)$rate, 2), $story);
             $story = str_replace('{{TRAY_RATE}}', number_format(((float)$rate * 30), 2), $story);            $story = str_replace('{{CITY_SLUG}}', $citySlug, $story);
             $story = str_replace('{{CITY_SLUG_CLEAN}}', $citySlug, $story);
+            
+            // Generate city slug without the -egg-rate-today suffix for original source linking
+            $citySlugWithoutSuffix = str_replace('-egg-rate-today', '', $citySlug);
+            $story = str_replace('{{CITY_SLUG_WITHOUT_SUFFIX}}', $citySlugWithoutSuffix, $story);
+            
             $story = str_replace('{{DATE}}', date('F j, Y', strtotime($date)), $story);
             $story = str_replace('{{ISO_DATE}}', date('c', strtotime($date)), $story);
+            
+            // Add date slug for uniqueness
+            $dateSlug = date('Y-m-d', strtotime($date));
+            $story = str_replace('{{DATE_SLUG}}', $dateSlug, $story);
+            
+            // Generate state code (simple mapping for major states)
+            $stateCodes = [
+                'Andhra Pradesh' => 'AP', 'Telangana' => 'TG', 'Karnataka' => 'KA',
+                'Tamil Nadu' => 'TN', 'Kerala' => 'KL', 'Maharashtra' => 'MH',
+                'Gujarat' => 'GJ', 'Rajasthan' => 'RJ', 'Uttar Pradesh' => 'UP',
+                'Bihar' => 'BR', 'West Bengal' => 'WB', 'Odisha' => 'OR',
+                'Jharkhand' => 'JH', 'Chhattisgarh' => 'CT', 'Madhya Pradesh' => 'MP',
+                'Punjab' => 'PB', 'Haryana' => 'HR', 'Himachal Pradesh' => 'HP',
+                'Delhi' => 'DL', 'Assam' => 'AS', 'Meghalaya' => 'ML',
+                'Manipur' => 'MN', 'Mizoram' => 'MZ', 'Nagaland' => 'NL',
+                'Tripura' => 'TR', 'Arunachal Pradesh' => 'AR', 'Sikkim' => 'SK',
+                'Goa' => 'GA', 'Uttarakhand' => 'UT', 'Jammu and Kashmir' => 'JK'            ];
+            $stateCode = isset($stateCodes[$state]) ? $stateCodes[$state] : 'IN';
+            $story = str_replace('{{STATE_CODE}}', $stateCode, $story);
+            
+            // Add approximate geographic coordinates for major cities (for enhanced local SEO)
+            $cityCoordinates = [
+                'mumbai' => ['lat' => '19.0760', 'lon' => '72.8777'],
+                'delhi' => ['lat' => '28.7041', 'lon' => '77.1025'],
+                'bangalore' => ['lat' => '12.9716', 'lon' => '77.5946'],
+                'hyderabad' => ['lat' => '17.3850', 'lon' => '78.4867'],
+                'chennai' => ['lat' => '13.0827', 'lon' => '80.2707'],
+                'kolkata' => ['lat' => '22.5726', 'lon' => '88.3639'],
+                'pune' => ['lat' => '18.5204', 'lon' => '73.8567'],
+                'ahmedabad' => ['lat' => '23.0225', 'lon' => '72.5714'],
+                'jaipur' => ['lat' => '26.9124', 'lon' => '75.7873'],
+                'lucknow' => ['lat' => '26.8467', 'lon' => '80.9462'],
+                'kanpur' => ['lat' => '26.4499', 'lon' => '80.3319'],
+                'nagpur' => ['lat' => '21.1458', 'lon' => '79.0882'],
+                'indore' => ['lat' => '22.7196', 'lon' => '75.8577'],
+                'thane' => ['lat' => '19.2183', 'lon' => '72.9781'],
+                'bhopal' => ['lat' => '23.2599', 'lon' => '77.4126'],
+                'visakhapatnam' => ['lat' => '17.6868', 'lon' => '83.2185'],
+                'pimpri' => ['lat' => '18.6298', 'lon' => '73.8131'],
+                'patna' => ['lat' => '25.5941', 'lon' => '85.1376'],
+                'vadodara' => ['lat' => '22.3072', 'lon' => '73.1812'],
+                'ghaziabad' => ['lat' => '28.6692', 'lon' => '77.4538'],
+                'ludhiana' => ['lat' => '30.9010', 'lon' => '75.8573'],
+                'agra' => ['lat' => '27.1767', 'lon' => '78.0081'],
+                'nashik' => ['lat' => '19.9975', 'lon' => '73.7898'],
+                'faridabad' => ['lat' => '28.4089', 'lon' => '77.3178'],
+                'meerut' => ['lat' => '28.9845', 'lon' => '77.7064'],
+                'rajkot' => ['lat' => '22.3039', 'lon' => '70.8022'],
+                'kalyan' => ['lat' => '19.2437', 'lon' => '73.1355'],
+                'vasai' => ['lat' => '19.4911', 'lon' => '72.8054'],
+                'varanasi' => ['lat' => '25.3176', 'lon' => '82.9739'],
+                'srinagar' => ['lat' => '34.0837', 'lon' => '74.7973'],
+                'aurangabad' => ['lat' => '19.8762', 'lon' => '75.3433'],
+                'dhanbad' => ['lat' => '23.7957', 'lon' => '86.4304'],
+                'amritsar' => ['lat' => '31.6340', 'lon' => '74.8723'],
+                'navi' => ['lat' => '19.0330', 'lon' => '73.0297'],
+                'allahabad' => ['lat' => '25.4358', 'lon' => '81.8463'],
+                'ranchi' => ['lat' => '23.3441', 'lon' => '85.3096'],
+                'howrah' => ['lat' => '22.5958', 'lon' => '88.2636'],
+                'coimbatore' => ['lat' => '11.0168', 'lon' => '76.9558'],
+                'jabalpur' => ['lat' => '23.1815', 'lon' => '79.9864'],
+                'gwalior' => ['lat' => '26.2183', 'lon' => '78.1828'],
+                'vijayawada' => ['lat' => '16.5062', 'lon' => '80.6480'],
+                'jodhpur' => ['lat' => '26.2389', 'lon' => '73.0243'],
+                'madurai' => ['lat' => '9.9252', 'lon' => '78.1198'],
+                'raipur' => ['lat' => '21.2514', 'lon' => '81.6296'],
+                'kota' => ['lat' => '25.2138', 'lon' => '75.8648']
+            ];
+            
+            $cityKey = strtolower(str_replace([' ', '-'], '', $city));
+            $cityKey = preg_replace('/[^a-z]/', '', $cityKey); // Remove non-alphabetic characters
+            
+            $coords = isset($cityCoordinates[$cityKey]) ? $cityCoordinates[$cityKey] : ['lat' => '20.5937', 'lon' => '78.9629']; // Default to India center
+            $story = str_replace('{{CITY_LAT}}', $coords['lat'], $story);
+            $story = str_replace('{{CITY_LON}}', $coords['lon'], $story);
             
             // Log to verify replacements worked
             debug_log("TEMPLATE", "Variables replaced successfully for {$city}");
