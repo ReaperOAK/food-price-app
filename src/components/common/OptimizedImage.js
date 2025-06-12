@@ -27,6 +27,7 @@ const OptimizedImage = memo(({
   const [currentSrc, setCurrentSrc] = useState(src);
   const [loadAttempts, setLoadAttempts] = useState(0);
   const [isStable, setIsStable] = useState(false); // Prevent flickering
+  const [hasEverLoaded, setHasEverLoaded] = useState(false); // Track if image ever loaded successfully
   const imgRef = useRef(null);
   const observer = useRef(null);
   const [dimensions, setDimensions] = useState({ 
@@ -71,8 +72,7 @@ const OptimizedImage = memo(({
     
     const img = new Image();
     img.crossOrigin = 'anonymous';
-    
-    const handleLoad = () => {
+      const handleLoad = () => {
       if (debug) console.log('OptimizedImage: Image loaded successfully:', currentSrc, { width: img.naturalWidth, height: img.naturalHeight });
       setDimensions({ 
         width: img.naturalWidth, 
@@ -80,15 +80,19 @@ const OptimizedImage = memo(({
       });
       setImageLoaded(true);
       setLoaded(true);
+      setHasEverLoaded(true); // Mark as successfully loaded
       onLoadProp?.();
     };
 
     const handleError = () => {
       if (debug) console.warn('OptimizedImage: Failed to load image:', currentSrc, 'Attempt:', loadAttempts + 1);
-      setLoadAttempts(prev => prev + 1);
-      setError(true);
+      // Don't mark as error if image has loaded before (prevents flickering)
+      if (!hasEverLoaded) {
+        setLoadAttempts(prev => prev + 1);
+        setError(true);
+      }
       onErrorProp?.();
-    };    img.onload = handleLoad;
+    };img.onload = handleLoad;
     img.onerror = handleError;
     
     // Set the src last to trigger loading
@@ -99,7 +103,7 @@ const OptimizedImage = memo(({
       img.onload = null;
       img.onerror = null;
     };
-  }, [currentSrc, width, height, onLoadProp, onErrorProp, debug, loadAttempts, isStable]);
+  }, [currentSrc, width, height, onLoadProp, onErrorProp, debug, loadAttempts, isStable, hasEverLoaded]);
   useEffect(() => {
     const cleanup = setupImageLoader();
     return cleanup;
@@ -164,21 +168,22 @@ const OptimizedImage = memo(({
           alt={alt}
           crossOrigin="anonymous" 
           width={dimensions.width || undefined}
-          height={dimensions.height || undefined}
-          className={`
+          height={dimensions.height || undefined}          className={`
             absolute top-0 left-0 w-full h-full object-cover 
             ${className} 
-            ${!loaded ? 'opacity-0 blur-sm' : 'opacity-100 blur-0'}
+            ${!loaded && !hasEverLoaded ? 'opacity-0 blur-sm' : 'opacity-100 blur-0'}
             transition-all duration-500
             motion-reduce:transition-none
             dark:brightness-90
           `}
           loading={priority ? 'eager' : 'lazy'}
-          decoding={priority ? 'sync' : 'async'}          sizes={getSizes()}
+          decoding={priority ? 'sync' : 'async'}
+          sizes={getSizes()}
           {...(getSrcSet() && { srcSet: getSrcSet() })}
           fetchpriority={priority ? 'high' : /hero|banner/.test(safeToLowerCase(className)) ? 'high' : 'auto'}
           onLoad={(e) => {
             setLoaded(true);
+            setHasEverLoaded(true);
             if (imgRef.current) {
               imgRef.current.style.transform = 'translateZ(0)';
             }
@@ -186,19 +191,22 @@ const OptimizedImage = memo(({
           }}          onError={(e) => {
             if (debug) console.warn('OptimizedImage: Main img element failed to load:', currentSrc);
             
-            // Try fallback if this isn't already the fallback and we haven't tried too many times
-            if (currentSrc !== fallbackSrc && fallbackSrc && loadAttempts < 2) {
-              if (debug) console.log('OptimizedImage: Trying fallback image:', fallbackSrc);
-              setCurrentSrc(fallbackSrc);
-              setLoadAttempts(prev => prev + 1);
-              e.target.srcset = ''; // Clear srcset to avoid conflicts
-              return;
+            // Only try fallback if image has never loaded successfully
+            if (!hasEverLoaded) {
+              // Try fallback if this isn't already the fallback and we haven't tried too many times
+              if (currentSrc !== fallbackSrc && fallbackSrc && loadAttempts < 2) {
+                if (debug) console.log('OptimizedImage: Trying fallback image:', fallbackSrc);
+                setCurrentSrc(fallbackSrc);
+                setLoadAttempts(prev => prev + 1);
+                e.target.srcset = ''; // Clear srcset to avoid conflicts
+                return;
+              }
+              
+              // If fallback also fails, show error state
+              if (debug) console.error('OptimizedImage: All fallbacks failed for:', src);
+              setError(true);
+              setLoaded(false);
             }
-            
-            // If fallback also fails, show error state
-            if (debug) console.error('OptimizedImage: All fallbacks failed for:', src);
-            setError(true);
-            setLoaded(false);
             onErrorProp?.(e);
           }}
           style={{

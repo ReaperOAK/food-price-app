@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
 import './WebStoriesCarousel.css';
 
-const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurrentIndex] = useState(0);
+const WebStoriesCarousel = ({ webStories }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
   const [visibleCards, setVisibleCards] = useState(3);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);  const [startX, setStartX] = useState(0);
   const carouselRef = useRef(null);
   const intervalRef = useRef(null);
   const dragRef = useRef(null);
@@ -20,12 +20,7 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
     if (memoizedStories.length > 0) {
       console.log('WebStoriesCarousel: Stories loaded:', memoizedStories.length);
       console.log('WebStoriesCarousel: Sample thumbnails:', memoizedStories.slice(0, 3).map(s => s.thumbnail));
-    }
-  }, [memoizedStories]);
-  // Handle image error callback
-  const handleImageError = useCallback((storySlug) => {
-    console.warn('WebStoriesCarousel: Image failed to load for story:', storySlug);
-  }, []);
+    }  }, [memoizedStories]);
 
   // Enhanced responsive design with more breakpoints
   useEffect(() => {
@@ -187,12 +182,10 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
             Auto-advances every 6s
           </span>
         </div>
-      </div>{/* Carousel container with touch support */}
+      </div>      {/* Carousel container with touch support */}
       <div 
         className="relative overflow-hidden rounded-lg bg-gray-50 dark:bg-gray-900 p-2 sm:p-4"
-        onMouseEnter={() => setIsAutoPlay(false)}
-        onMouseLeave={() => setIsAutoPlay(true)}
-      >        <div
+      ><div
           ref={carouselRef}          className="webstories-carousel-container flex cursor-grab active:cursor-grabbing"
           style={{
             transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
@@ -207,29 +200,34 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
           onTouchEnd={handleTouchEnd}
           role="listbox"
           aria-label="Web stories carousel"
-        >          {memoizedStories.map((story, index) => (
+        >          {memoizedStories.map((story, index) => {
+            // Create stable key that doesn't change on interactions
+            const stableKey = `story-${story.slug}-${index}`;
+            const isVisible = index >= currentIndex && index < currentIndex + Math.floor(visibleCards);
+            
+            return (
             <div
-              key={story.slug}
+              key={stableKey}
               className="flex-shrink-0 px-1 sm:px-2"
               style={{ width: `${100 / memoizedStories.length}%` }}
               role="option"
-              aria-selected={index >= currentIndex && index < currentIndex + Math.floor(visibleCards)}
-            >              <Link 
+              aria-selected={isVisible}
+            ><Link 
                 to={`/webstory/${story.slug}`}
                 className="webstories-card group block bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600"
                 aria-label={`View web story about egg rates in ${story.city}, ${story.state}. Current rate: ₹${story.rate} per egg`}
                 onClick={(e) => isDragging && e.preventDefault()}
-              >                <div className="webstories-card-image relative aspect-w-16 aspect-h-9 bg-gray-100 dark:bg-gray-700">                  <OptimizedImage 
-                    key={`${story.slug}-${story.thumbnail}`}
+              >                <div className="webstories-card-image relative aspect-w-16 aspect-h-9 bg-gray-100 dark:bg-gray-700">
+                  <OptimizedImage 
+                    key={`stable-${story.slug}`}
                     src={story.thumbnail} 
                     alt={`Fresh eggs in India rate visualization for ${story.city}, ${story.state} - Farm fresh eggs market analysis`}
                     className="w-full h-32 sm:h-40 md:h-44 object-cover"
                     fallbackSrc="/eggpic.webp"
                     width={300}
-                    height={160}
-                    loading={index < Math.floor(visibleCards) ? 'eager' : 'lazy'}
+                    height={160}                    loading={index < Math.floor(visibleCards) ? 'eager' : 'lazy'}
                     priority={index < 3}
-                    onError={() => handleImageError(story.slug)}
+                    debug={false}
                   />
                   <div className="webstories-card-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-60"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
@@ -248,9 +246,9 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
                     </p>
                   </div>
                 </div>
-              </Link>
-            </div>
-          ))}
+              </Link>            </div>
+            );
+          })}
         </div>
       </div>      {/* Navigation arrows with improved positioning */}
       {showNavigation && (

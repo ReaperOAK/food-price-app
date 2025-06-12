@@ -18,37 +18,46 @@
   transition: transform 0.7s ease-out, width 0.3s ease-out;
 }
 
-/* Enhanced card hover effects */
+/* Enhanced card hover effects - stable version */
 .webstories-card {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
   transform-origin: center;
   backface-visibility: hidden;
   perspective: 1000px;
+  will-change: transform;
 }
 
 .webstories-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 
-              0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transform: translateY(-6px) scale(1.015);
+  box-shadow: 0 16px 20px -5px rgba(0, 0, 0, 0.1), 
+              0 8px 8px -5px rgba(0, 0, 0, 0.04);
 }
 
 .webstories-card:active {
-  transform: translateY(-4px) scale(1.01);
+  transform: translateY(-2px) scale(1.005);
 }
 
-/* Image hover zoom effect */
+/* Stable image container - prevent layout shifts */
 .webstories-card-image {
-  transition: transform 0.5s ease-out;
   overflow: hidden;
+  position: relative;
+  contain: layout;
+}
+
+.webstories-card-image img {
+  transition: transform 0.4s ease-out;
+  will-change: transform;
+  transform: translateZ(0); /* Force GPU acceleration */
 }
 
 .webstories-card:hover .webstories-card-image img {
-  transform: scale(1.08);
+  transform: translateZ(0) scale(1.05);
 }
 
-/* Gradient overlay animation */
+/* Stable gradient overlay */
 .webstories-card-overlay {
   transition: opacity 0.3s ease-out;
+  pointer-events: none;
 }
 
 .webstories-card:hover .webstories-card-overlay {
