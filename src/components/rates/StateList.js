@@ -60,20 +60,19 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
 
     fetchApiData();
   }, []);
-
-  // Get randomized subset of cities for display (12-16 cities per load)
+  // Get randomized subset of cities for display (20-24 cities per load)
   const displayCities = useMemo(() => {
     if (apiData.allCities?.length === 0) return [];
     const shuffled = [...apiData.allCities]?.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 16);
+    return shuffled.slice(0, 24);
   }, [apiData.allCities]);
 
-  // Get randomized subset of states for display (8-10 states per load)  
+  // Get randomized subset of states for display (12-15 states per load)  
   const displayStates = useMemo(() => {
     if (apiData.allStates?.length === 0) return [];
     const shuffled = [...apiData.allStates]?.sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, 10);
-  }, [apiData.allStates]);  // Generate schema markup for SEO
+    return shuffled.slice(0, 15);
+  }, [apiData.allStates]);// Generate schema markup for SEO
   const generateSchemaMarkup = useMemo(() => {
     if (displayStates?.length === 0) return {};
     
@@ -154,9 +153,8 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
         ))}
       </div>
     </div>
-  );
-  const renderPopularCities = () => {
-    const popularCities = displayCities.slice(0, 8); // Get first 8 cities from dynamic data
+  );  const renderPopularCities = () => {
+    const popularCities = displayCities.slice(0, 12); // Get first 12 cities from dynamic data
     
     return (
       <section className="mt-6 p-6 bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-sm dark:from-gray-800 dark:to-gray-900" aria-labelledby="popular-cities-heading">
@@ -179,7 +177,7 @@ const StateList = memo(({ states = [], cities = [], isLoading = false }) => {
   };
 
   const renderPopularStates = () => {
-    const popularStates = displayStates.slice(0, 6); // Get first 6 states from dynamic data
+    const popularStates = displayStates.slice(0, 8); // Get first 8 states from dynamic data
     
     return (
       <section className="mt-6 p-6 bg-gradient-to-br from-green-50 to-white rounded-lg shadow-sm dark:from-gray-800 dark:to-gray-900" aria-labelledby="popular-states-heading">

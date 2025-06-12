@@ -1,5 +1,6 @@
 import React, { memo, useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 // Safe string conversion helper
 const safeToLowerCase = (value) => {
@@ -106,13 +107,14 @@ const TableRow = memo(({
       onMouseLeave={() => setHoveredRow(null)}
       style={{ height: rowHeight }}
     >      {showMarket && (
-        <td className={baseCellClasses}>          <a 
-            href={`/${safeToLowerCase(rate?.city)}-egg-rate-today`}
-            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+        <td className={baseCellClasses}>
+          <Link 
+            to={`/${safeToLowerCase(rate?.city)}-egg-rate-today`}
+            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors duration-200"
             aria-label={`View egg rates for ${rate.city}`}
           >
             {rate.city || 'N/A'}
-          </a>
+          </Link>
         </td>
       )}
 

@@ -52,7 +52,19 @@ const popularCityLinks = [
   { name: "Hyderabad", path: "/hyderabad-egg-rate-today" },
   { name: "Kolkata", path: "/kolkata-egg-rate-today" },
   { name: "Lucknow", path: "/lucknow-egg-rate-today" },
-  { name: "Kanpur", path: "/kanpur-(cc)-egg-rate-today" }
+  { name: "Kanpur", path: "/kanpur-egg-rate-today" },
+  { name: "Jaipur", path: "/jaipur-egg-rate-today" },
+  { name: "Agra", path: "/agra-egg-rate-today" },
+  { name: "Allahabad", path: "/allahabad-egg-rate-today" },
+  { name: "Nagpur", path: "/nagpur-egg-rate-today" },
+  { name: "Vizag", path: "/vizag-egg-rate-today" },
+  { name: "Jalandhar", path: "/jalandhar-egg-rate-today" },
+  { name: "Bareilly", path: "/bareilly-egg-rate-today" },
+  { name: "Ranchi", path: "/ranchi-egg-rate-today" },
+  { name: "Aurangabad", path: "/aurangabad-egg-rate-today" },
+  { name: "Faridabad", path: "/faridabad-egg-rate-today" },
+  { name: "Muzaffurpur", path: "/muzaffurpur-egg-rate-today" },
+  { name: "Coimbatore", path: "/coimbatore-egg-rate-today" }
 ];
 
 const popularStateLinks = [
