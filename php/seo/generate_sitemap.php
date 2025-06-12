@@ -283,7 +283,7 @@ try {
         }
     } else {
         // Add known blog posts from data/blogs.js
-        $known_blogs = ['egg-rate-barwala', 'blog-1', 'blog-2', 'ajmer-egg-rate-today'];
+        $known_blogs = ['egg-rate-barwala', 'blog-1', 'blog-2', 'ajmer-egg-rate-today', 'today-egg-rate-hyderabad'];
         foreach ($known_blogs as $blog) {
             $url = $baseUrl . '/blog/' . $blog;
             
@@ -303,7 +303,7 @@ try {
     // Log error but continue
     error_log("Error generating blog sitemap entries: " . $e->getMessage());
     // Add known blog posts as fallback
-    $known_blogs = ['egg-rate-barwala', 'blog-1', 'blog-2', 'ajmer-egg-rate-today'];
+    $known_blogs = ['egg-rate-barwala', 'blog-1', 'blog-2', 'ajmer-egg-rate-today', 'today-egg-rate-hyderabad'];
     foreach ($known_blogs as $blog) {
         $url = $baseUrl . '/blog/' . $blog;
         
