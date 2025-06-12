@@ -141,9 +141,8 @@ const BlogList = ({ blogs, selectedCity, selectedState, loading = false }) => {
           )}
         </div>
       )}
-      
-      {/* Blog Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8 mb-12" role="list">
+        {/* Blog Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 xl:gap-8 mb-12">
         {sortedBlogs.map((blog, index) => (
           <BlogCard 
             key={blog.link} 

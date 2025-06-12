@@ -9,13 +9,11 @@ const BlogCard = ({ blog, priority = false }) => {
     day: 'numeric'
   });
 
-  return (
-    <article 
+  return (    <article 
       className="group h-full bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-lg 
         transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
       itemScope 
       itemType="http://schema.org/BlogPosting"
-      role="listitem"
     >
       <Link 
         to={`/blog/${blog.link}`}
