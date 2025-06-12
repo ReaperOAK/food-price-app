@@ -17,6 +17,7 @@ const blogComponentMap = {
   'blog-1': () => import('../pages/blogs/blog-1'),
   'blog-2': () => import('../pages/blogs/blog-2'),
   'ajmer-egg-rate-today': () => import('../pages/blogs/ajmer-egg-rate-today'),
+  'today-egg-rate-hyderabad': () => import('../pages/blogs/today-egg-rate-hyderabad'),
   // Add more blog links and their corresponding imports here
 };
 
