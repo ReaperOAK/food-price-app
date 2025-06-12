@@ -4,12 +4,13 @@ import OptimizedImage from '../../common/OptimizedImage';
 const Logo = memo(() => {
   const [hasError, setHasError] = useState(false);
 
-  return (
-    <div 
+  return (    <div 
       className={`
         relative flex items-center justify-center
         transition-transform duration-200 hover:scale-102 will-change-transform
-        w-[120px] sm:w-[150px] md:w-[192px] h-[40px] sm:h-[48px] md:h-[64px]
+        w-[100px] sm:w-[120px] md:w-[150px] lg:w-[180px] xl:w-[192px] 
+        h-[32px] sm:h-[40px] md:h-[48px] lg:h-[60px] xl:h-[64px]
+        flex-shrink-0 min-w-0
         ${hasError ? 'opacity-90' : 'opacity-100'}
       `}
       aria-label="Food Price App"
@@ -22,7 +23,7 @@ const Logo = memo(() => {
           height={64}
           loading="eager"
           priority={true}
-          sizes="(max-width: 640px) 120px, (max-width: 768px) 150px, 192px"
+          sizes="(max-width: 640px) 100px, (max-width: 768px) 120px, (max-width: 1024px) 150px, (max-width: 1280px) 180px, 192px"
           fetchpriority="high"
           decoding="async"
           onError={(e) => {

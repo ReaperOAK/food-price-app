@@ -263,9 +263,8 @@ const Navbar = memo(({
       `}
       role="navigation"
       aria-label="Main navigation"
-    >
-      <div className="container mx-auto px-4 w-full max-w-7xl">
-        <div className="flex items-center justify-between h-16">
+    >      <div className="container mx-auto px-2 sm:px-4 w-full max-w-7xl">
+        <div className="flex items-center justify-between h-16 min-w-0">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link 
@@ -277,17 +276,17 @@ const Navbar = memo(({
             >
               <Logo />
             </Link>
-          </div>
-
-          {/* Desktop Navigation and Search */}
-          <div className="hidden lg:flex flex-1 items-center justify-between ml-8">
-            <div className="flex-grow flex justify-center mx-4">
-              <NavigationLinks 
-                handleHomeClick={handleHomeClick} 
-                handleCityClick={handleCityClick} 
-              />
+          </div>          {/* Desktop Navigation and Search */}
+          <div className="hidden lg:flex flex-1 items-center justify-between ml-4 xl:ml-8 min-w-0">
+            <div className="flex-1 flex justify-center min-w-0 overflow-hidden">
+              <div className="flex items-center space-x-1 max-w-full overflow-hidden">
+                <NavigationLinks 
+                  handleHomeClick={handleHomeClick} 
+                  handleCityClick={handleCityClick} 
+                />
+              </div>
             </div>
-            <div className="flex-shrink-0 w-64">
+            <div className="flex-shrink-0 w-48 xl:w-64 ml-4">
               <SearchBox
                 options={options}
                 selectedCity={selectedCity}
