@@ -131,8 +131,7 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
         <h3 className="text-2xl font-semibold text-gray-900 dark:text-white mb-6 text-center">
           {componentTitle}
         </h3>
-        
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
           {relatedCities.map((cityData, index) => (
             <Link
               key={index}
@@ -149,6 +148,52 @@ const RelatedCityLinks = memo(({ selectedCity, selectedState, allCities = [] }) 
               </p>
             </Link>
           ))}
+        </div>
+
+        {/* Web Stories Section */}
+        <div className="border-t border-gray-200 dark:border-gray-600 pt-6 mb-8">
+          <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 text-center">
+            📱 Visual Stories - Today's Egg Rates
+          </h4>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {/* Current city webstory if on a city page */}
+            {selectedCity && (
+              <Link
+                to={`/webstory/${safeToLowerCase(selectedCity)}-egg-rate-today`}
+                className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20
+                           rounded-lg p-3 text-center hover:shadow-md transition-all duration-200 
+                           hover:from-purple-100 hover:to-purple-200 dark:hover:from-purple-800/30 dark:hover:to-purple-700/30
+                           border-2 border-purple-300 dark:border-purple-600"
+                title={`Visual story about egg rates in ${selectedCity}`}
+              >
+                <p className="font-medium text-purple-900 dark:text-purple-100 text-xs">
+                  {selectedCity} Story
+                </p>
+                <p className="text-xs text-purple-700 dark:text-purple-300 mt-1">
+                  📱 Current City
+                </p>
+              </Link>
+            )}
+            
+            {/* Next 5 cities' webstories */}
+            {relatedCities.slice(0, selectedCity ? 5 : 6).map((cityData, index) => (
+              <Link
+                key={`webstory-${index}`}
+                to={`/webstory/${safeToLowerCase(cityData.city)}-egg-rate-today`}
+                className="bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20
+                           rounded-lg p-3 text-center hover:shadow-md transition-all duration-200 
+                           hover:from-purple-100 hover:to-purple-200 dark:hover:from-purple-800/30 dark:hover:to-purple-700/30"
+                title={`Visual story about egg rates in ${cityData.city}`}
+              >
+                <p className="font-medium text-gray-900 dark:text-white text-xs">
+                  {cityData.city} Story
+                </p>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  📱 Web Story
+                </p>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* State-level links */}
