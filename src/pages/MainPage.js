@@ -7,7 +7,7 @@ import HeadSection from '../components/common/HeadSection';
 import PriceOverview from '../components/prices/PriceOverview';
 import { getUniqueH1 } from '../utils/seo';
 import { useWebStories, useLocationAwareRates, useLocations, useBlogs } from '../hooks/useData';
-import { fetchRates } from '../services/api';
+import { fetchLatestRates } from '../services/api';
 
 // Lazy load non-critical components
 const RateTable = lazy(() => import('../components/rates/RateTable'));
@@ -150,11 +150,11 @@ const MainPage = () => {
 
       try {
         setAllRatesLoading(true);
-        // Use fetchRates with the selected city/state to get specific rates
-        const data = await fetchRates(selectedCity, selectedState);
+        // Use fetchLatestRates to get the latest rates for all cities regardless of current selection
+        const data = await fetchLatestRates();
         setAllRates(Array.isArray(data) ? data : []);
       } catch (error) {
-        console.error('Error fetching all rates:', error);
+        console.error('Error fetching latest rates:', error);
         setAllRates([]); // Set empty array on error
       } finally {
         setAllRatesLoading(false);

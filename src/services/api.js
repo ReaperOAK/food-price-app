@@ -147,6 +147,46 @@ export const fetchAllRates = async (date) => {
   }
 };
 
+export const fetchLatestRates = async (cityStateArray = null) => {
+  try {
+    const options = {
+      method: cityStateArray ? 'POST' : 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    };
+    
+    if (cityStateArray) {
+      options.body = JSON.stringify(cityStateArray);
+    }
+    
+    const response = await fetch('/php/api/rates/get_latest_rates.php', options);
+    if (!response.ok) {
+      throw new Error('Failed to fetch latest rates');
+    }
+    
+    const data = await response.json();
+    
+    // Handle the response structure - it might be an array or an object with a message
+    if (Array.isArray(data)) {
+      // Transform and validate rate data
+      return data.map(item => {
+        const rate = parseFloat(item.rate);
+        return {
+          ...item,
+          rate: isNaN(rate) ? 0 : rate,
+        };
+      });
+    } else if (data.message === "No rates found") {
+      return [];
+    } else {
+      console.warn('Unexpected response format from get_latest_rates.php:', data);
+      return [];
+    }
+  } catch (error) {
+    console.error('Error in fetchLatestRates:', error);
+    throw error;
+  }
+};
+
 export const updateMultipleRates = async (payload) => {
   const response = await fetch('/php/api/rates/update_multiple_rates.php', {
     method: 'POST',
