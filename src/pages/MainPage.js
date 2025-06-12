@@ -41,7 +41,7 @@ const MainPage = () => {
   };  // State management with initialization from URL
   const [selectedState, setSelectedState] = useState(() => stateParam?.replace('-egg-rate-today', '') || '');
   const [selectedCity, setSelectedCity] = useState(() => validateCityParam(cityParam));
-  const [showWebStories, setShowWebStories] = useState(true);
+  const [showWebStories, setShowWebStories] = useState(false);
   const [allRates, setAllRates] = useState([]);
   const [allRatesLoading, setAllRatesLoading] = useState(false);
     // Custom hooks for data fetching

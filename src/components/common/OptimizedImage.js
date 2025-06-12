@@ -21,19 +21,18 @@ const OptimizedImage = memo(({
   blur = true,
   quality = 'auto',
   debug = false // Add debug prop for troubleshooting
-}) => {
-  const [loaded, setLoaded] = useState(false);
+}) => {  const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [currentSrc, setCurrentSrc] = useState(src);
   const [loadAttempts, setLoadAttempts] = useState(0);
+  const [isStable, setIsStable] = useState(false); // Prevent flickering
   const imgRef = useRef(null);
   const observer = useRef(null);
   const [dimensions, setDimensions] = useState({ 
     width: width || 0, 
     height: height || 0 
   });
-
   // Update currentSrc when src prop changes
   useEffect(() => {
     if (debug) console.log('OptimizedImage: src changed to:', src);
@@ -41,11 +40,18 @@ const OptimizedImage = memo(({
     setError(false);
     setLoaded(false);
     setLoadAttempts(0);
+    setIsStable(false);
+    
+    // Add stability timer to prevent rapid re-renders
+    const stabilityTimer = setTimeout(() => {
+      setIsStable(true);
+    }, 100);
+    
+    return () => clearTimeout(stabilityTimer);
   }, [src, debug]);  // Load image dimensions and handle loading
   const setupImageLoader = useCallback(() => {
-    if (!currentSrc) {
-      if (debug) console.log('OptimizedImage: No currentSrc provided');
-      setError(true);
+    if (!currentSrc || !isStable) {
+      if (debug) console.log('OptimizedImage: No currentSrc provided or not stable yet');
       return () => {};
     }
 
@@ -82,9 +88,7 @@ const OptimizedImage = memo(({
       setLoadAttempts(prev => prev + 1);
       setError(true);
       onErrorProp?.();
-    };
-
-    img.onload = handleLoad;
+    };    img.onload = handleLoad;
     img.onerror = handleError;
     
     // Set the src last to trigger loading
@@ -95,12 +99,11 @@ const OptimizedImage = memo(({
       img.onload = null;
       img.onerror = null;
     };
-  }, [currentSrc, width, height, onLoadProp, onErrorProp, debug, loadAttempts]);
-
+  }, [currentSrc, width, height, onLoadProp, onErrorProp, debug, loadAttempts, isStable]);
   useEffect(() => {
     const cleanup = setupImageLoader();
     return cleanup;
-  }, [setupImageLoader]);
+  }, [setupImageLoader, isStable]);
 
   // Intersection Observer setup
   useEffect(() => {

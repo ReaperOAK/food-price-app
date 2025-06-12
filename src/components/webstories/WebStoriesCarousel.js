@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
 import './WebStoriesCarousel.css';
@@ -11,6 +11,21 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
   const carouselRef = useRef(null);
   const intervalRef = useRef(null);
   const dragRef = useRef(null);
+
+  // Memoize stories to prevent unnecessary re-renders
+  const memoizedStories = useMemo(() => webStories || [], [webStories]);
+
+  // Debug effect to log image loading issues
+  useEffect(() => {
+    if (memoizedStories.length > 0) {
+      console.log('WebStoriesCarousel: Stories loaded:', memoizedStories.length);
+      console.log('WebStoriesCarousel: Sample thumbnails:', memoizedStories.slice(0, 3).map(s => s.thumbnail));
+    }
+  }, [memoizedStories]);
+  // Handle image error callback
+  const handleImageError = useCallback((storySlug) => {
+    console.warn('WebStoriesCarousel: Image failed to load for story:', storySlug);
+  }, []);
 
   // Enhanced responsive design with more breakpoints
   useEffect(() => {
@@ -36,14 +51,13 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  // Auto-play functionality with slower timing
+  }, []);  // Auto-play functionality with slower timing
   useEffect(() => {
-    if (!isAutoPlay || !webStories?.length || isDragging) return;
+    if (!isAutoPlay || !memoizedStories?.length || isDragging) return;
 
     intervalRef.current = setInterval(() => {
       setCurrentIndex((prevIndex) => {
-        const maxIndex = Math.max(0, webStories.length - Math.floor(visibleCards));
+        const maxIndex = Math.max(0, memoizedStories.length - Math.floor(visibleCards));
         return prevIndex >= maxIndex ? 0 : prevIndex + 1;
       });
     }, 6000); // Increased from 4000ms to 6000ms for slower auto-play
@@ -53,25 +67,24 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
         clearInterval(intervalRef.current);
       }
     };
-  }, [isAutoPlay, webStories?.length, visibleCards, isDragging]);
-  const nextSlide = () => {
+  }, [isAutoPlay, memoizedStories?.length, visibleCards, isDragging]);  const nextSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => {
-      const maxIndex = Math.max(0, webStories.length - Math.floor(visibleCards));
+      const maxIndex = Math.max(0, memoizedStories.length - Math.floor(visibleCards));
       return prevIndex >= maxIndex ? 0 : prevIndex + 1;
     });
-  };
+  }, [memoizedStories.length, visibleCards]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentIndex((prevIndex) => {
-      const maxIndex = Math.max(0, webStories.length - Math.floor(visibleCards));
+      const maxIndex = Math.max(0, memoizedStories.length - Math.floor(visibleCards));
       return prevIndex <= 0 ? maxIndex : prevIndex - 1;
     });
-  };
+  }, [memoizedStories.length, visibleCards]);
 
-  const goToSlide = (index) => {
-    const maxIndex = Math.max(0, webStories.length - Math.floor(visibleCards));
+  const goToSlide = useCallback((index) => {
+    const maxIndex = Math.max(0, memoizedStories.length - Math.floor(visibleCards));
     setCurrentIndex(Math.min(index, maxIndex));
-  };
+  }, [memoizedStories.length, visibleCards]);
   // Touch/drag handlers for mobile
   const handleMouseDown = (e) => {
     setIsDragging(true);
@@ -121,8 +134,7 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
   const handleTouchEnd = () => {
     setIsDragging(false);
   };
-
-  if (!webStories?.length) {
+  if (!memoizedStories?.length) {
     return (
       <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
         <svg 
@@ -138,15 +150,15 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
       </div>
     );
   }
-  const maxIndex = Math.max(0, webStories.length - Math.floor(visibleCards));
-  const showNavigation = webStories.length > Math.floor(visibleCards);
+  
+  const maxIndex = Math.max(0, memoizedStories.length - Math.floor(visibleCards));
+  const showNavigation = memoizedStories.length > Math.floor(visibleCards);
   return (
     <div className="webstories-carousel relative px-2 sm:px-4">
       {/* Auto-play toggle with improved mobile layout */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-4">
-        <div className="flex items-center space-x-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-4">        <div className="flex items-center space-x-2">
           <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-            {currentIndex + 1}-{Math.min(currentIndex + Math.floor(visibleCards), webStories.length)} of {webStories.length} stories
+            {currentIndex + 1}-{Math.min(currentIndex + Math.floor(visibleCards), memoizedStories.length)} of {memoizedStories.length} stories
           </span>
         </div>
         <div className="flex items-center space-x-3">
@@ -181,11 +193,10 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
         onMouseEnter={() => setIsAutoPlay(false)}
         onMouseLeave={() => setIsAutoPlay(true)}
       >        <div
-          ref={carouselRef}
-          className="webstories-carousel-container flex cursor-grab active:cursor-grabbing"
+          ref={carouselRef}          className="webstories-carousel-container flex cursor-grab active:cursor-grabbing"
           style={{
             transform: `translateX(-${currentIndex * (100 / visibleCards)}%)`,
-            width: `${(webStories.length / visibleCards) * 100}%`
+            width: `${(memoizedStories.length / visibleCards) * 100}%`
           }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -196,12 +207,11 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
           onTouchEnd={handleTouchEnd}
           role="listbox"
           aria-label="Web stories carousel"
-        >
-          {webStories.map((story, index) => (
+        >          {memoizedStories.map((story, index) => (
             <div
               key={story.slug}
               className="flex-shrink-0 px-1 sm:px-2"
-              style={{ width: `${100 / webStories.length}%` }}
+              style={{ width: `${100 / memoizedStories.length}%` }}
               role="option"
               aria-selected={index >= currentIndex && index < currentIndex + Math.floor(visibleCards)}
             >              <Link 
@@ -209,16 +219,17 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
                 className="webstories-card group block bg-white dark:bg-gray-800 rounded-xl shadow-sm hover:shadow-xl overflow-hidden border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600"
                 aria-label={`View web story about egg rates in ${story.city}, ${story.state}. Current rate: ₹${story.rate} per egg`}
                 onClick={(e) => isDragging && e.preventDefault()}
-              >
-                <div className="webstories-card-image relative aspect-w-16 aspect-h-9 bg-gray-100 dark:bg-gray-700">
-                  <OptimizedImage 
+              >                <div className="webstories-card-image relative aspect-w-16 aspect-h-9 bg-gray-100 dark:bg-gray-700">                  <OptimizedImage 
+                    key={`${story.slug}-${story.thumbnail}`}
                     src={story.thumbnail} 
                     alt={`Fresh eggs in India rate visualization for ${story.city}, ${story.state} - Farm fresh eggs market analysis`}
                     className="w-full h-32 sm:h-40 md:h-44 object-cover"
-                    onError={(e) => { e.target.src = '/eggpic.webp' }}
+                    fallbackSrc="/eggpic.webp"
                     width={300}
                     height={160}
-                    loading="lazy"
+                    loading={index < Math.floor(visibleCards) ? 'eager' : 'lazy'}
+                    priority={index < 3}
+                    onError={() => handleImageError(story.slug)}
                   />
                   <div className="webstories-card-overlay absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-60"></div>
                   <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3">
@@ -283,9 +294,8 @@ const WebStoriesCarousel = ({ webStories }) => {  const [currentIndex, setCurren
       )}
 
       {/* Story counter and view all link with better mobile layout */}
-      <div className="mt-6 sm:mt-8 text-center">
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
-          Showing all {webStories.length} city web stories with current egg rates
+      <div className="mt-6 sm:mt-8 text-center">        <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
+          Showing all {memoizedStories.length} city web stories with current egg rates
         </p>
         <Link
           to="/webstories"
