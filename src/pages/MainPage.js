@@ -100,7 +100,6 @@ const MainPage = () => {
       isEstimate: false
     };
   }, [eggRates]);
-
   // Update selectedState and selectedCity when URL parameters change
   useEffect(() => {
     const updateStateFromUrl = async () => {
@@ -137,17 +136,31 @@ const MainPage = () => {
           setSelectedState('');
         }
       }
-    };    updateStateFromUrl();
+    };
+    
+    updateStateFromUrl();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stateParam, cityParam, loadStateForCity, loadCities]); // Intentionally excluding selectedState and selectedCity to prevent circular dependencies
-  // Fetch all rates data for SEO table
+  }, [stateParam, cityParam, loadStateForCity, loadCities]); // Intentionally excluding selectedState and selectedCity to prevent circular dependencies  // Fetch all rates data for SEO table
   useEffect(() => {
     const fetchAllRatesData = async () => {
       try {
         setAllRatesLoading(true);
-        // Use fetchRates without parameters to get latest rates per city (no duplicates)
-        const data = await fetchRates(null, null);
-        setAllRates(Array.isArray(data) ? data : []);
+        // When on a city or state page, wait for location data to be available
+        // before making API calls
+        if (selectedCity || selectedState) {
+          // For city pages, wait until we have both city and state
+          if (selectedCity && !selectedState) {
+            // Wait for state to be loaded for the city
+            return;
+          }
+          // Use fetchRates with the selected city/state to get specific rates
+          const data = await fetchRates(selectedCity, selectedState);
+          setAllRates(Array.isArray(data) ? data : []);
+        } else {
+          // For home page, get general latest rates
+          const data = await fetchRates(null, null);
+          setAllRates(Array.isArray(data) ? data : []);
+        }
       } catch (error) {
         console.error('Error fetching all rates:', error);
         setAllRates([]); // Set empty array on error
@@ -156,10 +169,8 @@ const MainPage = () => {
       }
     };
 
-    // Only fetch all rates when we're on a city or state page
-    if (selectedCity || selectedState) {
-      fetchAllRatesData();
-    }
+    // Always fetch all rates, but with proper location context
+    fetchAllRatesData();
   }, [selectedCity, selectedState]);
   
   // Loading skeleton component with content-visibility optimization

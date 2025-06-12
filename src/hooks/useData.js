@@ -66,8 +66,7 @@ export const useRates = (selectedCity, selectedState) => {
       }
     };
 
-    // Always load rates, even if selectedCity and selectedState are empty
-    // This ensures API calls are made consistently
+    // Always load rates - the API will handle whether to use city, state, or general rates
     loadRates();
   }, [selectedCity, selectedState]);
 
@@ -95,7 +94,6 @@ export const useLocations = () => {
       }
     }
   };
-
   const loadStateForCity = async (city) => {
     try {
       const data = await fetchStateForCity(city);

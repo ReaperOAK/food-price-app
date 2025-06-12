@@ -11,12 +11,18 @@ export const fetchRates = async (city, state) => {
   try {
     // Build URL with proper encoding and validation
     let url;
-    if (city && state) {
-      // Encode parameters to handle special characters and spaces
-      const encodedCity = encodeURIComponent(city.trim());
-      const encodedState = encodeURIComponent(state.trim());
-      url = `/php/api/rates/get_rates.php?city=${encodedCity}&state=${encodedState}`;
+    if (city || state) {
+      // Use get_rates.php when we have either city or state
+      const params = new URLSearchParams();
+      if (city) {
+        params.append('city', city.trim());
+      }
+      if (state) {
+        params.append('state', state.trim());
+      }
+      url = `/php/api/rates/get_rates.php?${params.toString()}`;
     } else {
+      // Only use get_latest_rates.php when we have no specific location
       url = `/php/api/rates/get_latest_rates.php`;
     }
 
