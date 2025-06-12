@@ -87,29 +87,27 @@ const QuickInfo = memo(({
 
       {/* Content */}
       <div className="p-4 pt-3 space-y-3">
-        <div className="flex justify-between items-center group">
-          <span className="text-sm text-gray-600 dark:text-gray-300">Single Egg:</span>
-          <span className="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+        <div className="flex justify-between items-center group">          <span className="text-sm text-gray-700 dark:text-gray-300">Single Egg:</span>
+          <span className="font-bold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
             ₹{formatPrice(todayRate)}
           </span>
         </div>
 
         <div className="flex justify-between items-center group">
-          <span className="text-sm text-gray-600 dark:text-gray-300">Tray (30):</span>
-          <span className="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+          <span className="text-sm text-gray-700 dark:text-gray-300">Tray (30):</span>
+          <span className="font-bold text-gray-900 dark:text-white group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors">
             ₹{formatPrice(trayPrice)}
-          </span>        </div>
+          </span></div>
 
         <div className="flex justify-between items-center pt-1 border-t border-gray-100 dark:border-gray-700">
-          <span className="text-sm text-gray-600 dark:text-gray-300">Weekly Change:</span>
+          <span className="text-sm text-gray-700 dark:text-gray-300">Weekly Change:</span>
           <div className="flex items-center">
             <span className={`
               font-bold text-base
-              ${weeklyChange > 0 
-                ? 'text-green-600 dark:text-green-400' 
+              ${weeklyChange > 0                ? 'text-green-700 dark:text-green-400' 
                 : weeklyChange < 0 
-                  ? 'text-red-600 dark:text-red-400' 
-                  : 'text-gray-600 dark:text-gray-400'}
+                  ? 'text-red-700 dark:text-red-400' 
+                  : 'text-gray-700 dark:text-gray-400'}
             `}>
               {weeklyChange !== 'N/A' && (weeklyChange > 0 ? '+' : '')}{weeklyChange}
               <span className="text-xs ml-1 opacity-75">
@@ -125,9 +123,8 @@ const QuickInfo = memo(({
         </div>
         
         {/* Mini FAQ with semantic keywords */}
-        <div className="pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">
-          <details className="text-xs text-gray-600 dark:text-gray-400">
-            <summary className="cursor-pointer font-medium hover:text-gray-800 dark:hover:text-gray-200">
+        <div className="pt-2 border-t border-gray-100 dark:border-gray-700 mt-2">          <details className="text-xs text-gray-700 dark:text-gray-400">
+            <summary className="cursor-pointer font-medium hover:text-gray-900 dark:hover:text-gray-200">
               Fresh Eggs in India Info ℹ️
             </summary>
             <div className="mt-1 space-y-1">

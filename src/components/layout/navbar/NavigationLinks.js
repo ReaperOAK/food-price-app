@@ -17,12 +17,11 @@ const NavLink = memo(({ to, onClick, children, className = '', role = 'menuitem'
       to={to}
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      className={`
-        group relative inline-flex items-center px-2 xl:px-3 py-2 text-sm font-medium rounded-lg
+      className={`        group relative inline-flex items-center px-2 xl:px-3 py-2 text-sm font-medium rounded-lg
         transition-all duration-200 ease-in-out will-change-transform
         ${isActive 
-          ? 'text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20' 
-          : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+          ? 'text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/30' 
+          : 'text-gray-800 dark:text-gray-200 hover:text-blue-700 dark:hover:text-blue-300 hover:bg-gray-100 dark:hover:bg-gray-700'
         }
         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
         active:scale-95
@@ -35,12 +34,11 @@ const NavLink = memo(({ to, onClick, children, className = '', role = 'menuitem'
     >
       <span className="relative z-10 truncate">
         {children}
-      </span>
-      <span className={`
+      </span>      <span className={`
         absolute inset-0 rounded-lg transition-opacity duration-200
-        ${isActive ? 'bg-blue-100 dark:bg-blue-900/40 opacity-50' : 'opacity-0'}
-        group-hover:opacity-10
-      `} 
+        ${isActive ? 'bg-blue-200 dark:bg-blue-800/50 opacity-60' : 'opacity-0'}
+        group-hover:opacity-15
+      `}
       aria-hidden="true" />
     </Link>
   );
@@ -98,8 +96,8 @@ const NavigationLinks = memo(({ handleHomeClick, handleCityClick }) => (
       </NavLink>      {/* State Links Dropdown for orphan states */}
       <div className="relative group hidden lg:block flex-shrink-0">        <button 
           className="group relative inline-flex items-center px-2 xl:px-3 py-2 text-sm font-medium rounded-lg
-                     text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 
-                     hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 
+                     text-gray-800 dark:text-gray-200 hover:text-blue-700 dark:hover:text-blue-300 
+                     hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 
                      focus:ring-blue-500 focus:ring-offset-1 transition-all duration-200 whitespace-nowrap"
           role="menuitem"
           aria-haspopup="true"
