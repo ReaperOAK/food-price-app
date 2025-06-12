@@ -110,12 +110,21 @@ async function processDirectory(directory) {
   }
 }
 
+async function processDirectoryIfExists(dirPath) {
+  try {
+    await fs.access(dirPath);
+    return processDirectory(dirPath);
+  } catch (error) {
+    console.log(`Skipping directory ${dirPath} - does not exist`);
+    return Promise.resolve();
+  }
+}
+
 console.log('Starting image optimization...');
 const directories = [
-  path.resolve(__dirname, '../public'),
-  path.resolve(__dirname, '../build'),
-  path.resolve(__dirname, '../src/assets')
+  path.resolve(__dirname, '../public')
 ];
-Promise.all(directories.map(processDirectory))
+
+Promise.all(directories.map(processDirectoryIfExists))
   .then(() => console.log('Image optimization complete'))
   .catch(console.error);

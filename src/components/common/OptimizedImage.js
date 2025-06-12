@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
+import { generateSrcSet, getResponsiveSizes } from '../../utils/imageUtils';
 
 // Safe string conversion helper
 const safeToLowerCase = (value) => {
@@ -18,11 +19,14 @@ const OptimizedImage = memo(({
   onError: onErrorProp,
   fallbackSrc = '/logo.webp',
   blur = true,
-  quality = 'auto'
+  quality = 'auto',
+  debug = false // Add debug prop for troubleshooting
 }) => {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState(src);
+  const [loadAttempts, setLoadAttempts] = useState(0);
   const imgRef = useRef(null);
   const observer = useRef(null);
   const [dimensions, setDimensions] = useState({ 
@@ -30,45 +34,68 @@ const OptimizedImage = memo(({
     height: height || 0 
   });
 
-  // Load image dimensions with IntersectionObserver
+  // Update currentSrc when src prop changes
+  useEffect(() => {
+    if (debug) console.log('OptimizedImage: src changed to:', src);
+    setCurrentSrc(src);
+    setError(false);
+    setLoaded(false);
+    setLoadAttempts(0);
+  }, [src, debug]);  // Load image dimensions and handle loading
   const setupImageLoader = useCallback(() => {
-    if (!width || !height) {
-      const img = new Image();
-      img.src = src;
-      
-      if ('loading' in HTMLImageElement.prototype && !priority) {
-        img.loading = 'lazy';
-      }
-      
-      const handleLoad = () => {
-        setDimensions({ 
-          width: img.naturalWidth, 
-          height: img.naturalHeight 
-        });
-        setImageLoaded(true);
-        setLoaded(true);
-        onLoadProp?.();
-      };
+    if (!currentSrc) {
+      if (debug) console.log('OptimizedImage: No currentSrc provided');
+      setError(true);
+      return () => {};
+    }
 
-      const handleError = () => {
-        setError(true);
-        onErrorProp?.();
-      };
+    // Reset states when src changes
+    setLoaded(false);
+    setError(false);
+    setImageLoaded(false);
 
-      img.onload = handleLoad;
-      img.onerror = handleError;
-
-      // Clean up
-      return () => {
-        img.onload = null;
-        img.onerror = null;
-      };
-    } else {
+    if (width && height) {
+      if (debug) console.log('OptimizedImage: Using provided dimensions:', { width, height });
       setDimensions({ width, height });
       setImageLoaded(true);
       return () => {};
     }
-  }, [src, width, height, priority, onLoadProp, onErrorProp]);
+
+    if (debug) console.log('OptimizedImage: Loading image to get dimensions:', currentSrc);
+    
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    
+    const handleLoad = () => {
+      if (debug) console.log('OptimizedImage: Image loaded successfully:', currentSrc, { width: img.naturalWidth, height: img.naturalHeight });
+      setDimensions({ 
+        width: img.naturalWidth, 
+        height: img.naturalHeight 
+      });
+      setImageLoaded(true);
+      setLoaded(true);
+      onLoadProp?.();
+    };
+
+    const handleError = () => {
+      if (debug) console.warn('OptimizedImage: Failed to load image:', currentSrc, 'Attempt:', loadAttempts + 1);
+      setLoadAttempts(prev => prev + 1);
+      setError(true);
+      onErrorProp?.();
+    };
+
+    img.onload = handleLoad;
+    img.onerror = handleError;
+    
+    // Set the src last to trigger loading
+    img.src = currentSrc;
+
+    // Clean up
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [currentSrc, width, height, onLoadProp, onErrorProp, debug, loadAttempts]);
 
   useEffect(() => {
     const cleanup = setupImageLoader();
@@ -101,41 +128,13 @@ const OptimizedImage = memo(({
 
   // Extract Tailwind dimensions and calculate responsive sizes
   const hasTailwindDimensions = /w-\d+|h-\d+/.test(className);
-  const aspectRatio = imageLoaded ? (dimensions.height / dimensions.width) * 100 : 56.25;
+  const aspectRatio = imageLoaded ? (dimensions.height / dimensions.width) * 100 : 56.25;  const getSizes = useCallback(() => {
+    return getResponsiveSizes(className, sizes);
+  }, [className, sizes]);
 
-  const getSizes = useCallback(() => {
-    if (sizes) return sizes;
-    if (className.includes('w-full')) {
-      return '(max-width: 640px) 100vw, (max-width: 768px) 80vw, (max-width: 1024px) 60vw, 1200px';
-    }
-    if (className.match(/w-(\d+)\/(\d+)/)) {
-      const [, num, den] = className.match(/w-(\d+)\/(\d+)/);
-      const percentage = (num / den) * 100;
-      return `(max-width: 640px) ${percentage}vw, (max-width: 768px) ${percentage * 0.8}vw, ${percentage * 0.6}vw`;
-    }
-    return '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw';
-  }, [className, sizes]);  const optimizedSrcSet = useCallback((src) => {
-    const isWebStory = src.includes('/ampstory/');
-    
-    // For webstory thumbnails, don't use optimized versions since they may not exist
-    // Just return the original src
-    if (isWebStory) {
-      return src;
-    }
-    
-    const basePath = '/optimized/';
-    const sizes = [300, 600, 900];
-    
-    return sizes
-      .map(size => {
-        const optimizedSrc = src
-          .replace('.webp', `-${size}.webp`)
-          .replace('/', basePath);
-        return `${optimizedSrc} ${size}w`;
-      })
-      .concat(`${src} 1200w`)
-      .join(', ');
-  }, []);
+  const getSrcSet = useCallback(() => {
+    return generateSrcSet(currentSrc);
+  }, [currentSrc]);
 
   return (
     <div 
@@ -155,11 +154,10 @@ const OptimizedImage = memo(({
         className={`${error ? 'bg-gray-200 dark:bg-gray-700' : 'bg-gray-100 dark:bg-gray-800'}
                    transition-colors duration-200`}
         aria-hidden="true"
-      />
-        {!error && imageLoaded && (
+      />        {!error && imageLoaded && (
         <img
           ref={imgRef}
-          src={src}
+          src={currentSrc}
           alt={alt}
           crossOrigin="anonymous" 
           width={dimensions.width || undefined}
@@ -172,9 +170,9 @@ const OptimizedImage = memo(({
             motion-reduce:transition-none
             dark:brightness-90
           `}
-          loading={priority ? 'eager' : 'lazy'}          decoding={priority ? 'sync' : 'async'}
-          sizes={getSizes()}
-          {...(!src.includes('/ampstory/') && { srcSet: optimizedSrcSet(src) })}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding={priority ? 'sync' : 'async'}          sizes={getSizes()}
+          {...(getSrcSet() && { srcSet: getSrcSet() })}
           fetchpriority={priority ? 'high' : /hero|banner/.test(safeToLowerCase(className)) ? 'high' : 'auto'}
           onLoad={(e) => {
             setLoaded(true);
@@ -182,16 +180,27 @@ const OptimizedImage = memo(({
               imgRef.current.style.transform = 'translateZ(0)';
             }
             onLoadProp?.(e);
-          }}
-          onError={(e) => {
+          }}          onError={(e) => {
+            if (debug) console.warn('OptimizedImage: Main img element failed to load:', currentSrc);
+            
+            // Try fallback if this isn't already the fallback and we haven't tried too many times
+            if (currentSrc !== fallbackSrc && fallbackSrc && loadAttempts < 2) {
+              if (debug) console.log('OptimizedImage: Trying fallback image:', fallbackSrc);
+              setCurrentSrc(fallbackSrc);
+              setLoadAttempts(prev => prev + 1);
+              e.target.srcset = ''; // Clear srcset to avoid conflicts
+              return;
+            }
+            
+            // If fallback also fails, show error state
+            if (debug) console.error('OptimizedImage: All fallbacks failed for:', src);
             setError(true);
-            e.target.onerror = null;
-            e.target.src = fallbackSrc;
+            setLoaded(false);
             onErrorProp?.(e);
           }}
           style={{
             contain: 'layout paint style',
-            willChange: 'transform',
+            willChange: loaded ? 'auto' : 'transform',
             transform: 'translateZ(0)'
           }}
         />
