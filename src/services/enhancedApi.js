@@ -63,13 +63,32 @@ const enhancedFetch = async (url, options = {}) => {
         }
       });
 
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
+      clearTimeout(timeoutId);      if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const data = await response.json();
+      // Get response text first to check content type
+      const responseText = await response.text();
+      
+      // Check if response is actually JSON
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (jsonError) {
+        console.error('❌ Invalid JSON response:', responseText.substring(0, 200));
+        throw new Error(`Invalid JSON response: ${jsonError.message}. Response: ${responseText.substring(0, 100)}`);
+      }
+
+      // Validate that we got an array (expected format)
+      if (!Array.isArray(data)) {
+        console.warn('⚠️ Response is not an array:', data);
+        // If it's an object with error property, throw that error
+        if (data && typeof data === 'object' && data.error) {
+          throw new Error(data.error);
+        }
+        // Otherwise, try to convert to array or return empty array
+        data = data ? [data] : [];
+      }
 
       // Cache successful response
       if (useCache) {
@@ -209,18 +228,16 @@ export const fetchLatestRates = async (cityStateArray = null, options = {}) => {
   try {
     console.log('🔍 Fetching latest rates');
 
-    const fetchOptions = {
-      method: cityStateArray ? 'POST' : 'GET',
-      headers: { 'Content-Type': 'application/json' },
+    let endpoint = '/php/api/rates/get_latest_rates.php';
+    let fetchOptions = {
       ...options,
-      cacheBust: options.forceRefresh || false
+      cacheBust: options.forceRefresh || false,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cityStateArray || []) // Send empty array if no cities specified
     };
     
-    if (cityStateArray) {
-      fetchOptions.body = JSON.stringify(cityStateArray);
-    }
-    
-    const data = await enhancedFetch('/php/api/rates/get_latest_rates.php', fetchOptions);
+    const data = await enhancedFetch(endpoint, fetchOptions);
 
     // Handle different response formats
     if (Array.isArray(data)) {
@@ -241,7 +258,7 @@ export const fetchLatestRates = async (cityStateArray = null, options = {}) => {
       console.log('ℹ️ No rates found');
       return [];
     } else {
-      console.warn('⚠️ Unexpected response format from get_latest_rates.php:', data);
+      console.warn('⚠️ Unexpected response format:', data);
       return [];
     }
 

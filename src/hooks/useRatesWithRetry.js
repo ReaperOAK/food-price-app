@@ -73,8 +73,7 @@ export const useRatesWithRetry = (initialCity, initialState) => {
     
     throw lastError;
   }, []);
-
-  // Enhanced fetchRates with cache busting
+  // Enhanced fetchRates with cache busting and better error handling
   const fetchRatesWithCacheBuster = useCallback(async (city, state, options = {}) => {
     try {
       let url;
@@ -84,6 +83,7 @@ export const useRatesWithRetry = (initialCity, initialState) => {
         if (state) params.append('state', state.trim());
         url = `/php/api/rates/get_rates.php?${params.toString()}`;
       } else {
+        // For home page, use get_latest_rates.php with empty body
         url = `/php/api/rates/get_latest_rates.php`;
       }
       
@@ -92,19 +92,52 @@ export const useRatesWithRetry = (initialCity, initialState) => {
         url = addCacheBuster(url);
       }
 
-      const response = await fetch(url, {
+      const fetchOptions = {
         signal: options.signal,
         headers: {
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
         }
-      });
+      };
+
+      // For get_latest_rates.php, send empty array as POST data
+      if (!city && !state) {
+        fetchOptions.method = 'POST';
+        fetchOptions.headers['Content-Type'] = 'application/json';
+        fetchOptions.body = JSON.stringify([]);
+      }
+
+      const response = await fetch(url, fetchOptions);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const data = await response.json();
+      // Get response text first to validate JSON
+      const responseText = await response.text();
+      
+      if (!responseText.trim()) {
+        console.warn('Empty response received');
+        return [];
+      }
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (jsonError) {
+        console.error('Invalid JSON response:', responseText.substring(0, 200));
+        throw new Error(`Invalid JSON response: ${jsonError.message}`);
+      }
+      
+      // Handle different response formats
+      if (data && data.error) {
+        throw new Error(data.error);
+      }
+      
+      if (data && data.message && !Array.isArray(data)) {
+        console.warn('No data available:', data.message);
+        return [];
+      }
       
       if (!Array.isArray(data)) {
         console.warn('Expected array but got:', typeof data, data);
@@ -205,26 +238,17 @@ export const useRatesWithRetry = (initialCity, initialState) => {
       if (currentRequestRef.current !== requestId) {
         return; // Request was superseded
       }
+        // Step 2: Fetch rates with retry logic
+      const [ratesData, specialRatesData] = await Promise.all([
+        fetchWithRetry(fetchRatesWithCacheBuster, finalCity, finalState),
+        fetchWithRetry(fetchSpecialRatesWithCacheBuster)
+      ]);
       
-      // Step 2: Fetch rates with retry logic
-      if (finalCity || finalState) {
-        const [ratesData, specialRatesData] = await Promise.all([
-          fetchWithRetry(fetchRatesWithCacheBuster, finalCity, finalState),
-          fetchWithRetry(fetchSpecialRatesWithCacheBuster)
-        ]);
-        
-        // Check if this request is still current before updating state
-        if (currentRequestRef.current === requestId) {
-          setEggRates(ratesData || []);
-          setSpecialRates(specialRatesData || []);
-          setRetryCount(0); // Reset retry count on success
-        }
-      } else {
-        // No location data available
-        if (currentRequestRef.current === requestId) {
-          setEggRates([]);
-          setSpecialRates([]);
-        }
+      // Check if this request is still current before updating state
+      if (currentRequestRef.current === requestId) {
+        setEggRates(ratesData || []);
+        setSpecialRates(specialRatesData || []);
+        setRetryCount(0); // Reset retry count on success
       }
       
     } catch (error) {
@@ -243,17 +267,13 @@ export const useRatesWithRetry = (initialCity, initialState) => {
         setLocationReady(true);
       }
     }
-  }, [selectedCity, selectedState, fetchWithRetry, fetchRatesWithCacheBuster, fetchSpecialRatesWithCacheBuster]);
-
-  // Effect to load data when location changes
+  }, [selectedCity, selectedState, fetchWithRetry, fetchRatesWithCacheBuster, fetchSpecialRatesWithCacheBuster]);  // Effect to load data when location changes
   useEffect(() => {
     if (selectedCity || selectedState) {
       loadData();
     } else {
-      setLoading(false);
-      setLocationReady(true);
-      setEggRates([]);
-      setSpecialRates([]);
+      // For home page, fetch default data using the same function but without location
+      loadData();
     }
 
     // Cleanup function
