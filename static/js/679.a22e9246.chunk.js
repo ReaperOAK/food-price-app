@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkfood_price_app=self.webpackChunkfood_price_app||[]).push([[679],{679:(p,e,c)=>{c(9950)}}]);
