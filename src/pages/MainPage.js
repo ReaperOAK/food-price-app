@@ -6,11 +6,12 @@ import LoadingSkeleton from '../components/common/LoadingSkeleton';
 import HeadSection from '../components/common/HeadSection';
 import PriceOverview from '../components/prices/PriceOverview';
 import { getUniqueH1 } from '../utils/seo';
-import { useWebStories, useLocationAwareRates, useLocations, useBlogs } from '../hooks/useData';
-import { fetchLatestRates } from '../services/api';
+import { useWebStories, useLocations, useBlogs } from '../hooks/useData';
+import { useRatesWithRetry } from '../hooks/useRatesWithRetry';
+import { fetchLatestRates } from '../services/enhancedApi';
 
 // Lazy load non-critical components
-const RateTable = lazy(() => import('../components/rates/RateTable'));
+const EnhancedRateTable = lazy(() => import('../components/rates/EnhancedRateTable'));
 const StateList = lazy(() => import('../components/rates/StateList'));
 const BlogList = lazy(() => import('../components/blog/BlogList'));
 const Footer = lazy(() => import('../components/layout/Footer'));
@@ -39,14 +40,24 @@ const MainPage = () => {
     const cleanParam = param.replace('-egg-rate-today', '');
     return nonCityPages.includes(cleanParam) ? '' : cleanParam;
   };  // State management with initialization from URL
-  const [selectedState, setSelectedState] = useState(() => stateParam?.replace('-egg-rate-today', '') || '');
-  const [selectedCity, setSelectedCity] = useState(() => validateCityParam(cityParam));
   const [showWebStories, setShowWebStories] = useState(false);
   const [allRates, setAllRates] = useState([]);
   const [allRatesLoading, setAllRatesLoading] = useState(false);
-    // Custom hooks for data fetching
-  const { allWebStories, webStoriesLoading } = useWebStories(showWebStories);
-  const { eggRates, specialRates, loading, locationReady } = useLocationAwareRates(selectedCity, selectedState);
+    // Use enhanced hooks for better data loading
+  const { 
+    eggRates, 
+    specialRates, 
+    loading, 
+    locationReady, 
+    error, 
+    retryFetch, 
+    canRetry, 
+    selectedCity, 
+    selectedState, 
+    setSelectedCity, 
+    setSelectedState 
+  } = useRatesWithRetry(cityParam, stateParam);
+  const { allWebStories, webStoriesLoading } = useWebStories(false);
   const { states, cities, loadCities, loadStateForCity } = useLocations();
   const { blogs } = useBlogs();
 
@@ -254,11 +265,10 @@ const MainPage = () => {
           
           {!loading && (
             <Suspense fallback={<LoadingSkeleton />}>
-              <div className="space-y-8">
-                {/* Rate Table Section */}
+              <div className="space-y-8">                {/* Rate Table Section */}
                 <section aria-label="Price History Table">
                   {selectedCity || selectedState ? (
-                    <RateTable
+                    <EnhancedRateTable
                       key={`${selectedCity}-${selectedState}`}
                       selectedCity={selectedCity}
                       selectedState={selectedState}
@@ -269,17 +279,25 @@ const MainPage = () => {
                       showState={false}
                       showAdmin={false}
                       showMarket={false}
+                      isLoading={loading}
+                      error={error}
+                      onRetry={retryFetch}
+                      canRetry={canRetry}
                     />
                   ) : (
-                    <RateTable
+                    <EnhancedRateTable
                       key="default-table"
                       rates={eggRates}
                       showPriceColumns={true}
                       showChart={true}
                       chartType="bar"
+                      isLoading={loading}
+                      error={error}
+                      onRetry={retryFetch}
+                      canRetry={canRetry}
                     />
                   )}
-                </section>                {/* Price Trends Section */}
+                </section>{/* Price Trends Section */}
                 <section aria-label="Price Trends Analysis">
                   <PriceTrends 
                     selectedCity={selectedCity} 
@@ -322,11 +340,10 @@ const MainPage = () => {
                     />
                   </section>
                 )}
-                
-                {/* Special Rates Section */}
+                  {/* Special Rates Section */}
                 {specialRates?.length > 0 && (
                   <section aria-label="Special Market Rates">
-                    <RateTable
+                    <EnhancedRateTable
                       key="special-rates"
                       rates={specialRates}
                       showSpecialRates={true}
@@ -336,9 +353,13 @@ const MainPage = () => {
                       showState={false}
                       showMarket={true}
                       itemsPerPage={5}
+                      isLoading={loading}
+                      error={error}
+                      onRetry={retryFetch}
+                      canRetry={canRetry}
                     />
                   </section>
-                )}                {/* Detailed Info Section */}
+                )}{/* Detailed Info Section */}
                 <section aria-label="Detailed Egg Information">
                   <DetailedEggInfo 
                     selectedCity={selectedCity} 
@@ -394,7 +415,7 @@ const MainPage = () => {
                         <p className="text-gray-600 dark:text-gray-400 text-center mt-2">
                           Compare today's egg prices in major cities across India
                         </p>
-                      </div>                      <RateTable
+                      </div>                      <EnhancedRateTable
                         key="all-cities-seo-table"
                         rates={allRates}
                         showPriceColumns={true}
@@ -407,6 +428,9 @@ const MainPage = () => {
                         isLoading={allRatesLoading}
                         title="Complete City Coverage"
                         description="Comprehensive egg rate information for all major Indian cities and states"
+                        error={null}
+                        onRetry={null}
+                        canRetry={false}
                       />
                     </div>
                   </section>
