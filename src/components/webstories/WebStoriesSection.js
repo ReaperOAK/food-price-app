@@ -81,14 +81,14 @@ const WebStoriesSection = memo(({
             </>
           )}
         </button>
-      </div>
-
-      <div 
+      </div>      <div 
         id="stories-carousel"
         className={`transition-all duration-500 ease-in-out ${
-          showWebStories ? 'opacity-100 max-h-[2000px]' : 'opacity-0 max-h-0 overflow-hidden'
+          showWebStories 
+            ? 'opacity-100 max-h-[2000px] mt-6 sm:mt-8' 
+            : 'opacity-0 max-h-0 overflow-hidden mt-0'
         }`}
-      >        {webStoriesLoading ? (
+      >{webStoriesLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" aria-hidden="true">
             {[...Array(6)].map((_, index) => (
               <div 
