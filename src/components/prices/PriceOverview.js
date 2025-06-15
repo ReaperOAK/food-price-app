@@ -14,17 +14,16 @@ const PriceOverview = memo(({
   const locationDescription = selectedCity 
     ? `${selectedCity}, ${selectedState}`
     : selectedState || 'India';
-
   return (
     <section 
-      className="max-w-5xl mx-auto mb-8 px-4 sm:px-6 lg:px-8"
+      className="max-w-4xl mx-auto mb-8 px-4 sm:px-6 lg:px-8"
       aria-label="Price Overview"
     >
       <div 
         className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
       >
         <div 
-          className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-900 p-8 min-h-[200px] flex flex-col justify-center relative overflow-hidden"
+          className="bg-gradient-to-br from-slate-700 via-slate-600 to-slate-800 p-8 min-h-[200px] flex flex-col justify-center relative overflow-hidden"
           style={{ 
             willChange: 'transform', 
             containIntrinsicSize: '0 200px', 
@@ -45,14 +44,13 @@ const PriceOverview = memo(({
             className="relative text-3xl sm:text-4xl lg:text-5xl font-bold text-white text-center mb-4 tracking-tight"
           >
             {getUniqueH1(selectedCity, selectedState, todayRate)}
-          </h1>
-          <p className="relative text-center text-blue-100 text-lg sm:text-xl font-medium mb-2">
+          </h1>          <p className="relative text-center text-slate-100 text-lg sm:text-xl font-medium mb-2">
             Updated {new Date().toLocaleDateString('en-IN', { 
               day: 'numeric', 
               month: 'long',
               year: 'numeric'
             })}
-          </p>          <p className="relative text-center text-blue-200 text-base sm:text-lg">
+          </p>          <p className="relative text-center text-slate-200 text-base sm:text-lg">
             {selectedCity 
               ? `Latest farm fresh eggs in India wholesale and retail prices for ${locationDescription}`
               : selectedState
