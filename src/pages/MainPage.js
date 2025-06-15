@@ -57,7 +57,7 @@ const MainPage = () => {
     setSelectedCity, 
     setSelectedState 
   } = useRatesWithRetry(cityParam, stateParam);
-  const { allWebStories, webStoriesLoading } = useWebStories(false);
+  const { allWebStories, webStoriesLoading } = useWebStories();
   const { states, cities, loadCities, loadStateForCity } = useLocations();
   const { blogs } = useBlogs();
 

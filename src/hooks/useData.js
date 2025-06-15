@@ -7,7 +7,8 @@ export const useWebStories = (showWebStories) => {
 
   useEffect(() => {
     const handleFetchWebStories = async () => {
-      if (!showWebStories) return;
+      // Always fetch web stories data when hook is first used
+      // This ensures data is available when the user clicks "Show Stories"
       try {
         setWebStoriesLoading(true);
         const data = await fetchWebStories();
@@ -19,10 +20,11 @@ export const useWebStories = (showWebStories) => {
       } finally {
         setWebStoriesLoading(false);
       }
-    };
-
-    handleFetchWebStories();
-  }, [showWebStories]);
+    };    // Fetch web stories on component mount to have data ready
+    if (allWebStories.length === 0) {
+      handleFetchWebStories();
+    }
+  }, [allWebStories.length]); // Include allWebStories.length as dependency
 
   return { allWebStories, webStoriesLoading };
 };
